@@ -117,8 +117,7 @@ foreach(TYPE ${CMAKE_CONFIGURATION_TYPES})
 endforeach()
 
 find_package(zlib CONFIG)
-find_package(libjpeg CONFIG)
-
+find_package(jpeg CONFIG)
 
 # Checks for type presence and size
 include(TypeSizeChecks)
