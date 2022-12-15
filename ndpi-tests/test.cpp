@@ -5,7 +5,7 @@
 // Demonstrate some basic assertions.
 TEST(NDPITest, openFile) {
 	//std::string path = R"(d:\Projects\slideio\images\hamamatsu\2017-02-27 15.29.08.ndpi)";
-    std::string path = R"(d:\Projects\slideio\images\hamamatsu\DM0014 - 2020-04-02 10.25.21.ndpi)";
+    std::string path = R"(/home/stanislav/projects/slideio/images/hamamatsu/DM0014 - 2020-04-02 10.25.21.ndpi)";
     TIFF* tif = TIFFOpen(path.c_str(), "r");
     ASSERT_TRUE(tif != NULL);
     int dircount = TIFFNumberOfDirectories(tif);
@@ -51,5 +51,8 @@ TEST(NDPITest, openFile) {
         std::cout << "Resolution: " << resx << " , " << resy << std::endl;
         std::cout << "Tiled: " << tiled << std::endl;
     }
+    int success = TIFFSetDirectory(tif, 0);
+    ASSERT_EQ(1, success);
+
     TIFFClose(tif);
 }
