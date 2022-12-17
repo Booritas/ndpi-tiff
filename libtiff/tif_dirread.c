@@ -3592,12 +3592,12 @@ TIFFReadDirectory(TIFF* tif)
     int bitspersample_read = FALSE;
         int color_channels;
 
-	// if (tif->tif_nextdiroff)
-	// {
-	// 	tif->tif_nextdiroff += (tif->tif_diroff >> 32) << 32;
-	// 	while (tif->tif_nextdiroff < tif->tif_diroff)
-	// 		tif->tif_nextdiroff += 0x100000000ULL;
-	// }
+	if (tif->tif_nextdiroff)
+	{
+		tif->tif_nextdiroff += (tif->tif_diroff >> 32) << 32;
+		while (tif->tif_nextdiroff < tif->tif_diroff)
+			tif->tif_nextdiroff += 0x100000000ULL;
+	}
 	tif->tif_diroff=tif->tif_nextdiroff;
 	if (!TIFFCheckDirOffset(tif,tif->tif_nextdiroff))
 		return 0;           /* last offset or bad offset (IFD looping) */

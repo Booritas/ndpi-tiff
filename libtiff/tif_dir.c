@@ -1706,17 +1706,21 @@ TIFFNumberOfDirectories(TIFF* tif)
 int
 TIFFSetDirectory(TIFF* tif, uint16_t dirn)
 {
-	uint64_t nextdir;
+	uint64_t nextdir, lastdir;
 	uint16_t n;
 
 	if (!(tif->tif_flags&TIFF_BIGTIFF))
 		nextdir = tif->tif_header.classic.tiff_diroff;
 	else
 		nextdir = tif->tif_header.big.tiff_diroff;
-	for (n = dirn; n > 0 && nextdir != 0; n--)
+	lastdir = nextdir;
+	for (n = dirn; n > 0 && nextdir != 0; n--) {
+		lastdir = nextdir;
 		if (!TIFFAdvanceDirectory(tif, &nextdir, NULL))
 			return (0);
+	}
 	tif->tif_nextdiroff = nextdir;
+	tif->tif_diroff = lastdir;
 	/*
 	 * Set curdir to the actual directory index.  The
 	 * -1 is because TIFFReadDirectory will increment

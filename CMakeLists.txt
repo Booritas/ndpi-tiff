@@ -31,20 +31,6 @@ cmake_policy(VERSION 3.9.0)
 
 # Find CMake modules in cmake/
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
-list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
-
-add_definitions("-std=c++11")
-
-if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-  message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
-  file(DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/0.18.1/conan.cmake"
-                "${CMAKE_BINARY_DIR}/conan.cmake"
-                TLS_VERIFY ON)
-endif()
-
-include(${CMAKE_BINARY_DIR}/conan.cmake)
-set(CMAKE_CONFIGURATION_TYPES "Debug;Release") 
 
 # Read version information from configure.ac.
 include(AutotoolsVersion)
@@ -52,18 +38,6 @@ message(STATUS "Building tiff version ${LIBTIFF_VERSION_FULL}")
 message(STATUS "libtiff library version ${SO_VERSION}")
 string(TIMESTAMP BUILD_DATE "%Y%m%d")
 message(STATUS "libtiff build date: ${BUILD_DATE}")
-
-# GoogleTest requires at least C++14
-set(CMAKE_CXX_STANDARD 14)
-
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
-)
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
 
 
 set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries")
@@ -104,20 +78,6 @@ set(LIBTIFF_DOCDIR "${CMAKE_INSTALL_FULL_DOCDIR}")
 
 # CTest testing
 enable_testing()
-
-conan_cmake_configure(REQUIRES libjpeg/9d zlib/1.2.12 GENERATORS cmake_find_package_multi)
-
-foreach(TYPE ${CMAKE_CONFIGURATION_TYPES})
-    conan_cmake_autodetect(settings BUILD_TYPE ${TYPE})
-    conan_cmake_install(PATH_OR_REFERENCE .
-      BUILD missing
-      REMOTE conancenter
-      SETTINGS ${settings}
-    )
-endforeach()
-
-find_package(zlib CONFIG)
-find_package(jpeg CONFIG)
 
 # Checks for type presence and size
 include(TypeSizeChecks)
@@ -235,25 +195,3 @@ message(STATUS "")
 # message(STATUS "  X Athena Widgets support:           ${HAVE_XAW}")
 message(STATUS "  OpenGL support:                     ${HAVE_OPENGL}")
 message(STATUS "")
-
-enable_testing()
-
-add_executable(
-  ndpi-test
-  ndpi-tests/test.cpp
-)
-target_link_libraries(
-  ndpi-test
-  gtest_main
-  tiff
-)
-
-message(STATUS "Build directory: ${CMAKE_BINARY_DIR}" ) 
-
-target_include_directories(ndpi-test PUBLIC
-  libtiff
-  ${CMAKE_BINARY_DIR}/libtiff
-  )
-
-include(GoogleTest)
-gtest_discover_tests(ndpi-test)

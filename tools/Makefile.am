@@ -24,114 +24,50 @@
 # Process this file with automake to produce Makefile.in.
 
 LIBPORT = $(top_builddir)/port/libport.la
-LIBTIFF = $(top_builddir)/libtiff/libtiff.la
+LIBTIFF = $(top_builddir)/libtiff/.libs/libtiff.a
+LIBJPEG = $(top_builddir)/../lib/libjpeg.a
 
 EXTRA_DIST = \
 	CMakeLists.txt
 
 bin_PROGRAMS = \
-	fax2ps \
-	fax2tiff \
-	pal2rgb \
-	ppm2tiff \
-	raw2tiff \
-	tiff2bw \
-	tiff2pdf \
-	tiff2ps \
-	tiff2rgba \
-	tiffcmp \
-	tiffcp \
-	tiffcrop \
-	tiffdither \
-	tiffdump \
-	tiffinfo \
-	tiffmedian \
-	tiffset \
-	tiffsplit
-if HAVE_OPENGL
-bin_PROGRAMS += tiffgt
-endif
-
-EXTRA_PROGRAMS = rgb2ycbcr thumbnail
-
-# Executable programs which need to be built in order to support tests
-check_PROGRAMS = \
-	rgb2ycbcr \
-	thumbnail
+	ndpi2tiff \
+	ndpisplit \
+	ndpisplit-s \
+	ndpisplit-m \
+	ndpisplit-mJ \
+	ndpisplit-s-m \
+	ndpisplit-s-mJ
 
 if HAVE_RPATH
 AM_LDFLAGS = $(LIBDIR)
 endif
 
-fax2ps_SOURCES = fax2ps.c
-fax2ps_LDADD = $(LIBTIFF) $(LIBPORT)
-
-fax2tiff_SOURCES = fax2tiff.c
-fax2tiff_LDADD = $(LIBTIFF) $(LIBPORT)
-
-pal2rgb_SOURCES = pal2rgb.c
-pal2rgb_LDADD = $(LIBTIFF) $(LIBPORT)
-
-ppm2tiff_SOURCES = ppm2tiff.c
-ppm2tiff_LDADD = $(LIBTIFF) $(LIBPORT)
-
-raw2tiff_SOURCES = raw2tiff.c
-raw2tiff_LDADD = $(LIBTIFF) $(LIBPORT)
-
-rgb2ycbcr_SOURCES = rgb2ycbcr.c
-rgb2ycbcr_LDADD = $(LIBTIFF) $(LIBPORT)
-
-thumbnail_SOURCES = thumbnail.c
-thumbnail_LDADD = $(LIBTIFF) $(LIBPORT)
-
-tiff2bw_SOURCES = tiff2bw.c
-tiff2bw_LDADD = $(LIBTIFF) $(LIBPORT)
-
-tiff2pdf_SOURCES = tiff2pdf.c
-tiff2pdf_LDADD = $(LIBTIFF) $(LIBPORT)
-
-tiff2ps_SOURCES = tiff2ps.c
-tiff2ps_LDADD = $(LIBTIFF) $(LIBPORT)
-
-tiff2rgba_SOURCES = tiff2rgba.c
-tiff2rgba_LDADD = $(LIBTIFF) $(LIBPORT)
-
-tiffcmp_SOURCES = tiffcmp.c
-tiffcmp_LDADD = $(LIBTIFF) $(LIBPORT)
-
-tiffcp_SOURCES = tiffcp.c
-tiffcp_LDADD = $(LIBTIFF) $(LIBPORT)
-
-tiffcrop_SOURCES = tiffcrop.c
-tiffcrop_LDADD = $(LIBTIFF) $(LIBPORT)
-
-tiffdither_SOURCES = tiffdither.c
-tiffdither_LDADD = $(LIBTIFF) $(LIBPORT)
-
-tiffdump_SOURCES = tiffdump.c
-tiffdump_LDADD = $(LIBTIFF) $(LIBPORT)
-
-tiffinfo_SOURCES = tiffinfo.c
-tiffinfo_LDADD = $(LIBTIFF) $(LIBPORT)
-
-tiffmedian_SOURCES = tiffmedian.c
-tiffmedian_LDADD = $(LIBTIFF) $(LIBPORT)
-
-tiffset_SOURCES = tiffset.c
-tiffset_LDADD = $(LIBTIFF) $(LIBPORT)
-
-tiffsplit_SOURCES = tiffsplit.c
-tiffsplit_LDADD = $(LIBTIFF) $(LIBPORT)
-
-tiffgt_SOURCES = tiffgt.c
-tiffgt_CFLAGS = $(CFLAGS) $(GLUT_CFLAGS) $(AM_CFLAGS)
-tiffgt_LDADD = $(LIBTIFF) $(LIBPORT) $(X_LIBS) $(GLUT_LIBS)
+ndpi2tiff_SOURCES = ndpi2tiff.c
+ndpi2tiff_LDADD = $(LIBTIFF) $(LIBPORT) $(LIBJPEG)
+  
+ndpisplit_SOURCES = ndpisplit.c
+ndpisplit_LDADD = $(LIBTIFF) $(LIBPORT) $(LIBJPEG)
+  
+ndpisplit_s_SOURCES = ndpisplit-s.c
+ndpisplit_s_LDADD = $(LIBTIFF) $(LIBPORT) $(LIBJPEG)
+  
+ndpisplit_m_SOURCES = ndpisplit-m.c
+ndpisplit_m_LDADD = $(LIBTIFF) $(LIBPORT) $(LIBJPEG)
+  
+ndpisplit_mJ_SOURCES = ndpisplit-mJ.c
+ndpisplit_mJ_LDADD = $(LIBTIFF) $(LIBPORT) $(LIBJPEG)
+  
+ndpisplit_s_m_SOURCES = ndpisplit-s-m.c
+ndpisplit_s_m_LDADD = $(LIBTIFF) $(LIBPORT) $(LIBJPEG)
+  
+ndpisplit_s_mJ_SOURCES = ndpisplit-s-mJ.c
+ndpisplit_s_mJ_LDADD = $(LIBTIFF) $(LIBPORT) $(LIBJPEG)
 
 AM_CPPFLAGS = -I$(top_srcdir)/libtiff -I$(top_srcdir)/port
 
 echo:
 	(echo $(CFLAGS))
-	(echo $(tiffgt_CFLAGS))
 	(echo $(GL_CFLAGS))
 	(echo $(GLU_CFLAGS))
 	(echo $(GLUT_CFLAGS))
