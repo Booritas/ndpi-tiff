@@ -27,7 +27,7 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>NDPIOpen, TIFFFdOpen, NDPIClientOpen &minus; open a
+<p>NDPIOpen, NDPIdOpen, NDPIClientOpen &minus; open a
 <small>TIFF</small> file for reading or writing</p>
 </td>
 </table>
@@ -43,7 +43,7 @@
 <!-- INDENTATION -->
 <p><b>TIFF* NDPIOpen(const char *</b><i>filename</i><b>,
 const char *</b><i>mode</i><b>)<br>
-TIFF* TIFFFdOpen(const int</b> <i>fd</i><b>, const char
+TIFF* NDPIdOpen(const int</b> <i>fd</i><b>, const char
 *</b><i>filename</i><b>, const char
 *</b><i>mode</i><b>)</b></p>
 <!-- INDENTATION -->
@@ -107,7 +107,7 @@ column represents the visual left hand side),
 for additional fields, <i>NDPISetField</i>(3TIFF) must be
 used.</p>
 <!-- INDENTATION -->
-<p><i>TIFFFdOpen</i> is like <i>NDPIOpen</i> except that it
+<p><i>NDPIdOpen</i> is like <i>NDPIOpen</i> except that it
 opens a <small>TIFF</small> file given an open file
 descriptor <i>fd</i>. The file&rsquo;s name and mode must
 reflect that of the open descriptor. The object associated
@@ -359,7 +359,7 @@ in the call to open a file; for example,
 <td width="8%"></td>
 <td width="91%">
 <p>Upon successful completion <i>NDPIOpen</i>,
-<i>TIFFFdOpen</i>, and <i>NDPIClientOpen</i> return a
+<i>NDPIdOpen</i>, and <i>NDPIClientOpen</i> return a
 <small>TIFF</small> pointer. Otherwise, NULL is
 returned.</p>
 </td>
@@ -374,7 +374,7 @@ returned.</p>
 <td width="91%">
 <p>All error messages are directed to the
 <i>NDPIError</i>(3TIFF) routine. Likewise, warning messages
-are directed to the <i>TIFFWarning</i>(3TIFF) routine.</p>
+are directed to the <i>NDPIWarning</i>(3TIFF) routine.</p>
 <!-- INDENTATION -->
 <p><b>&quot;%s&quot;: Bad mode</b>. The specified
 <i>mode</i> parameter was not one of

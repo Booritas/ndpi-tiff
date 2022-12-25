@@ -79,7 +79,7 @@ int test(int classictif, int height, int tiled)
         {
             unsigned char tilebuffer[256];
             memset(tilebuffer, (unsigned char)j, 256);
-            ret = TIFFWriteEncodedTile( tif, j, tilebuffer, 256 );
+            ret = NDPIWriteEncodedTile( tif, j, tilebuffer, 256 );
             assert(ret == 256);
         }
     }
@@ -90,7 +90,7 @@ int test(int classictif, int height, int tiled)
         for( i = 0; i < height; i++ )
         {
             unsigned char c = (unsigned char)i;
-            ret = TIFFWriteEncodedStrip( tif, i, &c, 1 );
+            ret = NDPIWriteEncodedStrip( tif, i, &c, 1 );
             assert(ret == 1);
 
             if( i == 1 && height > 100000 )

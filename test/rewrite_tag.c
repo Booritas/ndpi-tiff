@@ -92,7 +92,7 @@ int test_packbits()
 
     for (i = 0; i < length; i++ )
     {
-        if( !TIFFWriteEncodedStrip( tif, i, buf, 10 ) )
+        if( !NDPIWriteEncodedStrip( tif, i, buf, 10 ) )
         {
             fprintf (stderr, "Can't write image data.\n");
             goto failure;
@@ -113,7 +113,7 @@ int test_packbits()
     buf[3] = 17;
     buf[6] = 12;
 
-    if( !TIFFWriteEncodedStrip( tif, 6, buf, 10 ) )
+    if( !NDPIWriteEncodedStrip( tif, 6, buf, 10 ) )
     {
         fprintf (stderr, "Can't write image data.\n");
         goto failure;
@@ -194,7 +194,7 @@ int rewrite_test(const char *filename, uint32_t width, int length, int bigtiff,
 
     for (i = 0; i < length; i++ )
     {
-        if( TIFFWriteScanline( tif, buf, i, 0 ) == -1 )
+        if( NDPIWriteScanline( tif, buf, i, 0 ) == -1 )
         {
             fprintf (stderr, "Can't write image data.\n");
             goto failure;

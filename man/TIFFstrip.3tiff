@@ -63,7 +63,7 @@ returns the equivalent size for a strip of data as it would be returned in a
 call to
 .IR NDPIReadEncodedStrip
 or as it would be expected in a call to
-.IR TIFFWriteEncodedStrip .
+.IR NDPIWriteEncodedStrip .
 .PP
 .I NDPIVStripSize
 returns the number of bytes in a strip with
@@ -90,8 +90,8 @@ None.
 .SH "SEE ALSO"
 .BR NDPIReadEncodedStrip (3TIFF),
 .BR NDPIReadRawStrip (3TIFF),
-.BR TIFFWriteEncodedStrip (3TIFF),
-.BR TIFFWriteRawStrip (3TIFF),
+.BR NDPIWriteEncodedStrip (3TIFF),
+.BR NDPIWriteRawStrip (3TIFF),
 .BR libtiff (3TIFF),
 .PP
 Libtiff library home page:

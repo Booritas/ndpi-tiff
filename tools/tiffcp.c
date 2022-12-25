@@ -756,7 +756,7 @@ tiffcp(TIFF* in, TIFF* out)
 	switch (orientation) {
 		case ORIENTATION_BOTRIGHT:
 		case ORIENTATION_RIGHTBOT:	/* XXX */
-			TIFFWarning(NDPIFileName(in), "using bottom-left orientation");
+			NDPIWarning(NDPIFileName(in), "using bottom-left orientation");
 			orientation = ORIENTATION_BOTLEFT;
 		/* fall through... */
 		case ORIENTATION_LEFTBOT:	/* XXX */
@@ -765,7 +765,7 @@ tiffcp(TIFF* in, TIFF* out)
 		case ORIENTATION_TOPRIGHT:
 		case ORIENTATION_RIGHTTOP:	/* XXX */
 		default:
-			TIFFWarning(NDPIFileName(in), "using top-left orientation");
+			NDPIWarning(NDPIFileName(in), "using top-left orientation");
 			orientation = ORIENTATION_TOPLEFT;
 		/* fall through... */
 		case ORIENTATION_LEFTTOP:	/* XXX */
@@ -1011,7 +1011,7 @@ DECLAREcpFunc(cpContig2ContigByRow)
 				  row);
 			goto bad;
 		}
-		if (TIFFWriteScanline(out, buf, row, 0) < 0) {
+		if (NDPIWriteScanline(out, buf, row, 0) < 0) {
 			NDPIError(NDPIFileName(out),
 				  "Error, can't write scanline %"PRIu32,
 				  row);
@@ -1091,7 +1091,7 @@ DECLAREcpFunc(cpBiasedContig2Contig)
 						goto bad;
 					}
 					subtractLine (buf, biasBuf, imagewidth);
-					if (TIFFWriteScanline(out, buf, row, 0) < 0) {
+					if (NDPIWriteScanline(out, buf, row, 0) < 0) {
 						NDPIError(NDPIFileName(out),
 						    "Error, can't write scanline %"PRIu32,
 						    row);
@@ -1153,7 +1153,7 @@ DECLAREcpFunc(cpDecodedStrips)
 				    s);
 				goto bad;
 			}
-			if (TIFFWriteEncodedStrip(out, s, buf, cc) < 0) {
+			if (NDPIWriteEncodedStrip(out, s, buf, cc) < 0) {
 				NDPIError(NDPIFileName(out),
 				    "Error, can't write strip %"PRIu32,
 				    s);
@@ -1198,7 +1198,7 @@ DECLAREcpFunc(cpSeparate2SeparateByRow)
 				    row);
 				goto bad;
 			}
-			if (TIFFWriteScanline(out, buf, row, s) < 0) {
+			if (NDPIWriteScanline(out, buf, row, s) < 0) {
 				NDPIError(NDPIFileName(out),
 				    "Error, can't write scanline %"PRIu32,
 				    row);
@@ -1259,7 +1259,7 @@ DECLAREcpFunc(cpContig2SeparateByRow)
 				*outp++ = *inp;
 				inp += spp;
 			}
-			if (TIFFWriteScanline(out, outbuf, row, s) < 0) {
+			if (NDPIWriteScanline(out, outbuf, row, s) < 0) {
 				NDPIError(NDPIFileName(out),
 				    "Error, can't write scanline %"PRIu32,
 				    row);
@@ -1323,7 +1323,7 @@ DECLAREcpFunc(cpSeparate2ContigByRow)
 				outp += spp;
 			}
 		}
-		if (TIFFWriteScanline(out, outbuf, row, 0) < 0) {
+		if (NDPIWriteScanline(out, outbuf, row, 0) < 0) {
 			NDPIError(NDPIFileName(out),
 			    "Error, can't write scanline %"PRIu32,
 			    row);
@@ -1643,7 +1643,7 @@ DECLAREwriteFunc(writeBufferToContigStrips)
 		uint32_t nrows = (row + rowsperstrip > imagelength) ?
 		    imagelength-row : rowsperstrip;
 		tsize_t stripsize = NDPIVStripSize(out, nrows);
-		if (TIFFWriteEncodedStrip(out, strip++, buf, stripsize) < 0) {
+		if (NDPIWriteEncodedStrip(out, strip++, buf, stripsize) < 0) {
 			NDPIError(NDPIFileName(out),
 			    "Error, can't write strip %"PRIu32, strip - 1u);
 			return 0;
@@ -1677,7 +1677,7 @@ DECLAREwriteFunc(writeBufferToSeparateStrips)
 			cpContigBufToSeparateBuf(
 			    obuf, (uint8_t*) buf + row * rowsize + s,
 			    nrows, imagewidth, 0, 0, spp, 1);
-			if (TIFFWriteEncodedStrip(out, strip++, obuf, stripsize) < 0) {
+			if (NDPIWriteEncodedStrip(out, strip++, obuf, stripsize) < 0) {
 				NDPIError(NDPIFileName(out),
 				    "Error, can't write strip %"PRIu32,
 				    strip - 1u);
@@ -1728,7 +1728,7 @@ DECLAREwriteFunc(writeBufferToContigTiles)
 			} else
 				cpStripToTile(obuf, bufp + colb, nrow, tilew,
 				    0, iskew);
-			if (TIFFWriteTile(out, obuf, col, row, 0, 0) < 0) {
+			if (NDPIWriteTile(out, obuf, col, row, 0, 0) < 0) {
 				NDPIError(NDPIFileName(out),
 				    "Error, can't write tile at %"PRIu32" %"PRIu32,
 				    col, row);
@@ -1804,7 +1804,7 @@ DECLAREwriteFunc(writeBufferToSeparateTiles)
 					    nrow, tilewidth,
 					    0, iskew, spp,
 					    bytes_per_sample);
-				if (TIFFWriteTile(out, obuf, col, row, 0, s) < 0) {
+				if (NDPIWriteTile(out, obuf, col, row, 0, s) < 0) {
 					NDPIError(NDPIFileName(out),
 					    "Error, can't write tile at %"PRIu32" %"PRIu32
 					    " sample %"PRIu16,

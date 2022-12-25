@@ -127,7 +127,7 @@ main()
 	}
 
 	/* Write dummy pixel data. */
-	if (TIFFWriteScanline(tif, buf, 0, 0) == -1) {
+	if (NDPIWriteScanline(tif, buf, 0, 0) == -1) {
 		fprintf (stderr, "Can't write image data.\n");
 		goto failure;
 	}

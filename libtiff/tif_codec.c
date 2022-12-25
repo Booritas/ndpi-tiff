@@ -44,7 +44,7 @@ static int NotConfigured(TIFF*, int);
 #define NDPIInitNeXT NotConfigured
 #endif
 #ifndef JPEG_SUPPORT
-#define TIFFInitJPEG NotConfigured
+#define NDPIInitJPEG NotConfigured
 #endif
 #ifndef OJPEG_SUPPORT
 #define TIFFInitOJPEG NotConfigured
@@ -89,7 +89,7 @@ const TIFFCodec _TIFFBuiltinCODECS[] = {
     { "PackBits",	COMPRESSION_PACKBITS,	TIFFInitPackBits },
     { "ThunderScan",	COMPRESSION_THUNDERSCAN,TIFFInitThunderScan },
     { "NeXT",		COMPRESSION_NEXT,	NDPIInitNeXT },
-    { "JPEG",		COMPRESSION_JPEG,	TIFFInitJPEG },
+    { "JPEG",		COMPRESSION_JPEG,	NDPIInitJPEG },
     { "Old-style JPEG",	COMPRESSION_OJPEG,	TIFFInitOJPEG },
     { "CCITT RLE",	COMPRESSION_CCITTRLE,	TIFFInitCCITTRLE },
     { "CCITT RLE/W",	COMPRESSION_CCITTRLEW,	TIFFInitCCITTRLEW },

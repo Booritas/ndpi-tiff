@@ -4,11 +4,11 @@
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
 <meta name="Content-Style" content="text/css">
-<title>TIFFWriteScanline</title>
+<title>NDPIWriteScanline</title>
 </head>
 <body>
 
-<h1 align=center>TIFFWriteScanline</h1>
+<h1 align=center>NDPIWriteScanline</h1>
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
@@ -27,7 +27,7 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>TIFFWriteScanline &minus; write a scanline to an open
+<p>NDPIWriteScanline &minus; write a scanline to an open
 <small>TIFF</small> file</p>
 </td>
 </table>
@@ -41,7 +41,7 @@
 <td width="91%">
 <p><b>#include &lt;tiffio.h&gt;</b></p>
 <!-- INDENTATION -->
-<p><b>int TIFFWriteScanline(TIFF *</b><i>tif</i><b>,
+<p><b>int NDPIWriteScanline(TIFF *</b><i>tif</i><b>,
 tdata_t</b> <i>buf</i><b>, uint32_t</b> <i>row</i><b>,
 tsample_t</b> <i>sample</i><b>)</b></p>
 </td>
@@ -107,7 +107,7 @@ strips.</p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><i>TIFFWriteScanline</i> returns &minus;1 if it
+<p><i>NDPIWriteScanline</i> returns &minus;1 if it
 immediately detects an error and 1 for a successful
 write.</p>
 </td>
@@ -194,8 +194,8 @@ block-interleaved samples.</p>
 <td width="8%"></td>
 <td width="91%">
 <p><b>NDPIOpen</b>(3TIFF),
-<b>TIFFWriteEncodedStrip</b>(3TIFF),
-<b>TIFFWriteRawStrip</b>(3TIFF), <b>libtiff</b>(3TIFF)</p>
+<b>NDPIWriteEncodedStrip</b>(3TIFF),
+<b>NDPIWriteRawStrip</b>(3TIFF), <b>libtiff</b>(3TIFF)</p>
 <!-- INDENTATION -->
 <p>Libtiff library home page:
 <b>http://www.simplesystems.org/libtiff/</b></p>

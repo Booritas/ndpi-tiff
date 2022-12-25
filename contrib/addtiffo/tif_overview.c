@@ -628,7 +628,7 @@ void NDPI_ProcessFullResBlock( TIFF *hTIFF, int nPlanarConfig,
 
             if( bSubsampled )
             {
-                pabyOTile = TIFFGetOvrBlock_Subsampled( poRBI, nOXOff, nOYOff );
+                pabyOTile = NDPIGetOvrBlock_Subsampled( poRBI, nOXOff, nOYOff );
 
                 /*
                  * Establish the offset into this tile at which we should
@@ -656,7 +656,7 @@ void NDPI_ProcessFullResBlock( TIFF *hTIFF, int nPlanarConfig,
             else
             {
 
-                pabyOTile = TIFFGetOvrBlock( poRBI, nOXOff, nOYOff, iSample );
+                pabyOTile = NDPIGetOvrBlock( poRBI, nOXOff, nOYOff, iSample );
 
                 /*
                  * Establish the offset into this tile at which we should

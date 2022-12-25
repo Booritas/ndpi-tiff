@@ -21,15 +21,15 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFFieldTag 3TIFF "July 26, 2012" "libtiff"
+.TH NDPIFieldTag 3TIFF "July 26, 2012" "libtiff"
 .SH NAME
-TIFFFieldTag \- Get TIFF field tag value from field information
+NDPIFieldTag \- Get TIFF field tag value from field information
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "uint32_t TIFFFieldTag(const TIFFField* " fip ")"
+.BI "uint32_t NDPIFieldTag(const TIFFField* " fip ")"
 .SH DESCRIPTION
-.BR TIFFFieldTag
+.BR NDPIFieldTag
 returns the numeric tag value for a TIFF field.
 This can be compared to various constants exported by the
 .BR libtiff
@@ -41,11 +41,11 @@ is a field information pointer previously returned by
 .BR NDPIFindField ,
 .BR NDPIFieldWithTag ,
 or
-.BR TIFFFieldWithName .
+.BR NDPIFieldWithName .
 .br
 .SH "RETURN VALUES"
 .br
-.BR TIFFFieldTag
+.BR NDPIFieldTag
 returns an integer tag value.
 .br
 .SH "SEE ALSO"

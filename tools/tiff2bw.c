@@ -83,7 +83,7 @@ checkcmap(TIFF* tif, int n, uint16_t* r, uint16_t* g, uint16_t* b)
 	while (n-- > 0)
 		if (*r++ >= 256 || *g++ >= 256 || *b++ >= 256)
 			return (16);
-	TIFFWarning(NDPIFileName(tif), "Assuming 8-bit colormap");
+	NDPIWarning(NDPIFileName(tif), "Assuming 8-bit colormap");
 	return (8);
 }
 
@@ -265,7 +265,7 @@ main(int argc, char* argv[])
 			if (NDPIReadScanline(in, inbuf, row, 0) < 0)
 				break;
 			compresspalette(outbuf, inbuf, w, red, green, blue);
-			if (TIFFWriteScanline(out, outbuf, row, 0) < 0)
+			if (NDPIWriteScanline(out, outbuf, row, 0) < 0)
 				break;
 		}
 		break;
@@ -280,7 +280,7 @@ main(int argc, char* argv[])
 			if (NDPIReadScanline(in, inbuf, row, 0) < 0)
 				break;
 			compresscontig(outbuf, inbuf, w);
-			if (TIFFWriteScanline(out, outbuf, row, 0) < 0)
+			if (NDPIWriteScanline(out, outbuf, row, 0) < 0)
 				break;
 		}
 		break;
@@ -302,7 +302,7 @@ main(int argc, char* argv[])
                                         goto tiff2bw_error;
 			compresssep(outbuf,
 			    inbuf, inbuf+rowsize, inbuf+2*rowsize, w);
-			if (TIFFWriteScanline(out, outbuf, row, 0) < 0)
+			if (NDPIWriteScanline(out, outbuf, row, 0) < 0)
 				break;
 		}
 		break;

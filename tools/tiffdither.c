@@ -138,7 +138,7 @@ fsdither(TIFF* in, TIFF* out)
 					nextptr[0] += v / 16;
 			}
 		}
-		if (TIFFWriteScanline(out, outline, i-1, 0) < 0)
+		if (NDPIWriteScanline(out, outline, i-1, 0) < 0)
 			goto skip_on_error;
 	}
 	goto exit_label;

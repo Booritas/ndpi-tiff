@@ -61,7 +61,7 @@ void WriteImage(TIFF *tif)
 	
 	memset(buffer,0,sizeof(buffer));
 	for (i=0;i<HEIGHT;i++)
-		if (!TIFFWriteScanline(tif, buffer, i, 0))
+		if (!NDPIWriteScanline(tif, buffer, i, 0))
 			NDPIErrorExt(tif->tif_clientdata, "WriteImage","failure in WriteScanline\n");
 }
 

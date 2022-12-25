@@ -68,9 +68,9 @@ typedef struct
 } TIFFOvrCache;
 
 TIFFOvrCache *NDPICreateOvrCache( TIFF *hTIFF, toff_t nDirOffset );
-unsigned char *TIFFGetOvrBlock( TIFFOvrCache *psCache, int iTileX, int iTileY,
+unsigned char *NDPIGetOvrBlock( TIFFOvrCache *psCache, int iTileX, int iTileY,
                                 int iSample );
-unsigned char *TIFFGetOvrBlock_Subsampled( TIFFOvrCache *psCache, int iTileX, int iTileY );
+unsigned char *NDPIGetOvrBlock_Subsampled( TIFFOvrCache *psCache, int iTileX, int iTileY );
 void           NDPIDestroyOvrCache( TIFFOvrCache * );
 
 void NDPIBuildOverviews( TIFF *, int, int *, int, const char *,

@@ -22,15 +22,15 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFWriteTile 3TIFF "November 29, 1999" "libtiff"
+.TH NDPIWriteTile 3TIFF "November 29, 1999" "libtiff"
 .SH NAME
-TIFFWriteTile \- encode and write a tile of data to an open
+NDPIWriteTile \- encode and write a tile of data to an open
 .SM TIFF
 file
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "tsize_t TIFFWriteTile(TIFF *" tif ", tdata_t " buf ", uint32_t " x ", uint32_t " y ", uint32_t " z ", tsample_t " sample ")"
+.BI "tsize_t NDPIWriteTile(TIFF *" tif ", tdata_t " buf ", uint32_t " x ", uint32_t " y ", uint32_t " z ", tsample_t " sample ")"
 .SH DESCRIPTION
 Write the data for the tile
 .I containing
@@ -45,7 +45,7 @@ to find out the size (in bytes) of a tile buffer. The
 and
 .I y
 parameters are always used by
-.IR TIFFWriteTile .
+.IR NDPIWriteTile .
 The
 .I z
 parameter is used if the image is deeper than 1 slice (\c
@@ -55,7 +55,7 @@ The
 parameter is used only if data are organized in separate planes (\c
 .IR PlanarConfiguration =2).
 .SH "RETURN VALUES"
-.IR TIFFWriteTile
+.IR NDPIWriteTile
 returns \-1 if it detects an error; otherwise the number of bytes in the tile
 is returned.
 .SH DIAGNOSTICS
@@ -67,9 +67,9 @@ routine.
 .BR NDPIComputeTile (3TIFF),
 .BR NDPIOpen (3TIFF),
 .BR NDPIReadTile (3TIFF),
-.BR TIFFWriteScanline (3TIFF),
-.BR TIFFWriteEncodedTile (3TIFF),
-.BR TIFFWriteRawTile (3TIFF),
+.BR NDPIWriteScanline (3TIFF),
+.BR NDPIWriteEncodedTile (3TIFF),
+.BR NDPIWriteRawTile (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

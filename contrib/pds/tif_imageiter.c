@@ -179,7 +179,7 @@ TIFFImageIterBegin(TIFFImageIter* img, TIFF* tif, int stop, char emsg[1024])
     case ORIENTATION_BOTRIGHT:
     case ORIENTATION_RIGHTBOT:	/* XXX */
     case ORIENTATION_LEFTBOT:	/* XXX */
-	TIFFWarning(NDPIFileName(tif), "using bottom-left orientation");
+	NDPIWarning(NDPIFileName(tif), "using bottom-left orientation");
 	img->orientation = ORIENTATION_BOTLEFT;
 	/* fall through... */
     case ORIENTATION_BOTLEFT:
@@ -188,7 +188,7 @@ TIFFImageIterBegin(TIFFImageIter* img, TIFF* tif, int stop, char emsg[1024])
     case ORIENTATION_RIGHTTOP:	/* XXX */
     case ORIENTATION_LEFTTOP:	/* XXX */
     default:
-	TIFFWarning(NDPIFileName(tif), "using top-left orientation");
+	NDPIWarning(NDPIFileName(tif), "using top-left orientation");
 	img->orientation = ORIENTATION_TOPLEFT;
 	/* fall through... */
     case ORIENTATION_TOPLEFT:

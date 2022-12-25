@@ -229,7 +229,7 @@ main(argc, argv)
 	fprintf(stderr, "%dx%dx%d image, ", width, height, depth);
 
     for (row = 0; row < height; row++)
-	if (TIFFWriteScanline(tif,
+	if (NDPIWriteScanline(tif,
 			      (u_char *) mprd_addr(mpr_d(pix), 0, row),
 			      row, 0) < 0) {
 	    fprintf("failed a scanline write (%d)\n", row);

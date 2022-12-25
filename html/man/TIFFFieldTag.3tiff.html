@@ -13,12 +13,12 @@
        table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
        h1      { text-align: center }
 </style>
-<title>TIFFFieldTag</title>
+<title>NDPIFieldTag</title>
 
 </head>
 <body>
 
-<h1 align="center">TIFFFieldTag</h1>
+<h1 align="center">NDPIFieldTag</h1>
 
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
@@ -34,7 +34,7 @@
 </h2>
 
 
-<p style="margin-left:11%; margin-top: 1em">TIFFFieldTag
+<p style="margin-left:11%; margin-top: 1em">NDPIFieldTag
 &minus; Get TIFF field tag value from field information</p>
 
 <h2>SYNOPSIS
@@ -46,7 +46,7 @@
 &lt;tiffio.h&gt;</b></p>
 
 <p style="margin-left:11%; margin-top: 1em"><b>uint32_t
-TIFFFieldTag(const TIFFField*</b> <i>fip</i><b>)</b></p>
+NDPIFieldTag(const TIFFField*</b> <i>fip</i><b>)</b></p>
 
 <h2>DESCRIPTION
 <a name="DESCRIPTION"></a>
@@ -54,7 +54,7 @@ TIFFFieldTag(const TIFFField*</b> <i>fip</i><b>)</b></p>
 
 
 
-<p style="margin-left:11%; margin-top: 1em"><b>TIFFFieldTag</b>
+<p style="margin-left:11%; margin-top: 1em"><b>NDPIFieldTag</b>
 returns the numeric tag value for a TIFF field. This can be
 compared to various constants exported by the <b>libtiff</b>
 header files, such as <b>TIFFTAG_IMAGEWIDTH</b>.</p>
@@ -62,7 +62,7 @@ header files, such as <b>TIFFTAG_IMAGEWIDTH</b>.</p>
 <p style="margin-left:11%; margin-top: 1em"><i>fip</i> is a
 field information pointer previously returned by
 <b>NDPIFindField</b>, <b>NDPIFieldWithTag</b>, or
-<b>TIFFFieldWithName</b>.</p>
+<b>NDPIFieldWithName</b>.</p>
 
 <h2>RETURN VALUES
 <a name="RETURN VALUES"></a>
@@ -70,7 +70,7 @@ field information pointer previously returned by
 
 
 
-<p style="margin-left:11%; margin-top: 1em"><b>TIFFFieldTag</b>
+<p style="margin-left:11%; margin-top: 1em"><b>NDPIFieldTag</b>
 returns an integer tag value.</p>
 
 <h2>SEE ALSO

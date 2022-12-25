@@ -200,7 +200,7 @@ _tiffUnmapProc(thandle_t fd, void* base, toff_t size)
  * Open a TIFF file descriptor for read/writing.
  */
 TIFF*
-TIFFFdOpen(int fd, const char* name, const char* mode)
+NDPIdOpen(int fd, const char* name, const char* mode)
 {
 	TIFF* tif;
 
@@ -245,7 +245,7 @@ NDPIOpen(const char* name, const char* mode)
 		return ((TIFF *)0);
 	}
 
-	tif = TIFFFdOpen((int)fd, name, mode);
+	tif = NDPIdOpen((int)fd, name, mode);
 	if(!tif)
 		close(fd);
 	return tif;
@@ -294,7 +294,7 @@ TIFFOpenW(const wchar_t* name, const char* mode)
 				    NULL, NULL);
 	}
 
-	tif = TIFFFdOpen((int)fd, (mbname != NULL) ? mbname : "<unknown>",
+	tif = NDPIdOpen((int)fd, (mbname != NULL) ? mbname : "<unknown>",
 			 mode);
 	
 	_NDPIfree(mbname);

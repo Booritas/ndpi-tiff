@@ -24,13 +24,13 @@
 .if n .po 0
 .TH TIFFWriteRawtile 3TIFF "December 16, 1991" "libtiff"
 .SH NAME
-TIFFWriteRawTile \- write a tile of raw data to an open
+NDPIWriteRawTile \- write a tile of raw data to an open
 .SM TIFF
 file
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "tsize_t TIFFWriteRawTile(TIFF *" tif ", ttile_t " tile ", tdata_t " buf ", tsize_t " size ")"
+.BI "tsize_t NDPIWriteRawTile(TIFF *" tif ", ttile_t " tile ", tdata_t " buf ", tsize_t " size ")"
 .SH DESCRIPTION
 Append
 .I size
@@ -75,8 +75,8 @@ The specified tile is not valid according to the currently specified image
 dimensions.
 .SH "SEE ALSO"
 .BR NDPIOpen (3TIFF),
-.BR TIFFWriteEncodedTile (3TIFF),
-.BR TIFFWriteScanline (3TIFF),
+.BR NDPIWriteEncodedTile (3TIFF),
+.BR NDPIWriteScanline (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

@@ -51,12 +51,12 @@ All error messages are directed to the
 routine.
 .SH "SEE ALSO"
 .BR NDPIOpen (3TIFF),
-.BR TIFFWriteEncodedStrip (3TIFF),
-.BR TIFFWriteEncodedTile (3TIFF),
-.BR TIFFWriteRawStrip (3TIFF),
-.BR TIFFWriteRawTile (3TIFF),
-.BR TIFFWriteScanline (3TIFF),
-.BR TIFFWriteTile (3TIFF)
+.BR NDPIWriteEncodedStrip (3TIFF),
+.BR NDPIWriteEncodedTile (3TIFF),
+.BR NDPIWriteRawStrip (3TIFF),
+.BR NDPIWriteRawTile (3TIFF),
+.BR NDPIWriteScanline (3TIFF),
+.BR NDPIWriteTile (3TIFF)
 .BR libtiff (3TIFF),
 .PP
 Libtiff library home page:

@@ -724,7 +724,7 @@ tiffcp(TIFF* in, TIFF* out)
 	switch (orientation) {
 		case ORIENTATION_BOTRIGHT:
 		case ORIENTATION_RIGHTBOT:	/* XXX */
-			TIFFWarning(NDPIFileName(in), "using bottom-left orientation");
+			NDPIWarning(NDPIFileName(in), "using bottom-left orientation");
 			orientation = ORIENTATION_BOTLEFT;
 		/* fall thru... */
 		case ORIENTATION_LEFTBOT:	/* XXX */
@@ -733,7 +733,7 @@ tiffcp(TIFF* in, TIFF* out)
 		case ORIENTATION_TOPRIGHT:
 		case ORIENTATION_RIGHTTOP:	/* XXX */
 		default:
-			TIFFWarning(NDPIFileName(in), "using top-left orientation");
+			NDPIWarning(NDPIFileName(in), "using top-left orientation");
 			orientation = ORIENTATION_TOPLEFT;
 		/* fall thru... */
 		case ORIENTATION_LEFTTOP:	/* XXX */
@@ -745,7 +745,7 @@ tiffcp(TIFF* in, TIFF* out)
 	 */
 	NDPISetField(out, TIFFTAG_ORIENTATION, orientation);
 	if (! NDPIGetField(in, NDPITAG_MAGNIFICATION, &ndpi_magnification) ) {
-		TIFFWarning(NDPIFileName(in),
+		NDPIWarning(NDPIFileName(in),
 			"Warning, Magnification not found in NDPI file subdirectory");
 		ndpi_magnification= 0;
 	}
@@ -955,7 +955,7 @@ DECLAREcpFunc(cpContig2ContigByRow)
 				  row);
 			goto bad;
 		}
-		if (TIFFWriteScanline(out, buf, row, 0) < 0) {
+		if (NDPIWriteScanline(out, buf, row, 0) < 0) {
 			NDPIError(NDPIFileName(out),
 				  "Error, can't write scanline " 
 				  TIFF_UINT32_FORMAT,
@@ -1038,7 +1038,7 @@ DECLAREcpFunc(cpBiasedContig2Contig)
 						goto bad;
 					}
 					subtractLine (buf, biasBuf, imagewidth);
-					if (TIFFWriteScanline(out, buf, row, 0) < 0) {
+					if (NDPIWriteScanline(out, buf, row, 0) < 0) {
 						NDPIError(NDPIFileName(out),
 						    "Error, can't write scanline "
 						    TIFF_UINT32_FORMAT,
@@ -1102,7 +1102,7 @@ DECLAREcpFunc(cpDecodedStrips)
 				    s);
 				goto bad;
 			}
-			if (TIFFWriteEncodedStrip(out, s, buf, cc) < 0) {
+			if (NDPIWriteEncodedStrip(out, s, buf, cc) < 0) {
 				NDPIError(NDPIFileName(out),
 				    "Error, can't write strip "
 				    TIFF_UINT32_FORMAT,
@@ -1150,7 +1150,7 @@ DECLAREcpFunc(cpSeparate2SeparateByRow)
 				    row);
 				goto bad;
 			}
-			if (TIFFWriteScanline(out, buf, row, s) < 0) {
+			if (NDPIWriteScanline(out, buf, row, s) < 0) {
 				NDPIError(NDPIFileName(out),
 				    "Error, can't write scanline "
 				    TIFF_UINT32_FORMAT,
@@ -1203,7 +1203,7 @@ DECLAREcpFunc(cpContig2SeparateByRow)
 				*outp++ = *inp;
 				inp += spp;
 			}
-			if (TIFFWriteScanline(out, outbuf, row, s) < 0) {
+			if (NDPIWriteScanline(out, outbuf, row, s) < 0) {
 				NDPIError(NDPIFileName(out),
 				    "Error, can't write scanline "
 				    TIFF_UINT32_FORMAT,
@@ -1259,7 +1259,7 @@ DECLAREcpFunc(cpSeparate2ContigByRow)
 				outp += spp;
 			}
 		}
-		if (TIFFWriteScanline(out, outbuf, row, 0) < 0) {
+		if (NDPIWriteScanline(out, outbuf, row, 0) < 0) {
 			NDPIError(NDPIFileName(out),
 			    "Error, can't write scanline "
 			    TIFF_UINT32_FORMAT,
@@ -1589,7 +1589,7 @@ DECLAREwriteFunc(writeBufferToContigStrips)
 		uint32_t nrows = (row+rowsperstrip > firstrow+lengthtowrite) ?
 			firstrow+lengthtowrite-row : rowsperstrip;
 		tsize_t stripsize = NDPIVStripSize(out, nrows);
-		if (TIFFWriteEncodedStrip(out, strip++, buf, stripsize) < 0) {
+		if (NDPIWriteEncodedStrip(out, strip++, buf, stripsize) < 0) {
 			NDPIError(NDPIFileName(out),
 			    "Error, can't write strip "
 			    TIFF_UINT32_FORMAT,
@@ -1625,7 +1625,7 @@ DECLAREwriteFunc(writeBufferToSeparateStrips)
 			cpContigBufToSeparateBuf(
 			    obuf, (uint8_t*) buf + row*rowsize + s,
 			    nrows, imagewidth, 0, 0, spp, 1);
-			if (TIFFWriteEncodedStrip(out, strip++, obuf, stripsize) < 0) {
+			if (NDPIWriteEncodedStrip(out, strip++, obuf, stripsize) < 0) {
 				NDPIError(NDPIFileName(out),
 				    "Error, can't write strip "
 				    TIFF_UINT32_FORMAT,
@@ -1678,7 +1678,7 @@ DECLAREwriteFunc(writeBufferToContigTiles)
 			} else
 				cpStripToTile(obuf, bufp + colb, nrow, tilew,
 				    0, iskew);
-			if (TIFFWriteTile(out, obuf, col, row, 0, 0) < 0) {
+			if (NDPIWriteTile(out, obuf, col, row, 0, 0) < 0) {
 				NDPIError(NDPIFileName(out),
 				    "Error, can't write tile at "
 				    TIFF_UINT32_FORMAT " " 
@@ -1745,7 +1745,7 @@ DECLAREwriteFunc(writeBufferToSeparateTiles)
 					    nrow, tilewidth,
 					    0, iskew, spp,
 					    bytes_per_sample);
-				if (TIFFWriteTile(out, obuf, col, row, 0, s) < 0) {
+				if (NDPIWriteTile(out, obuf, col, row, 0, s) < 0) {
 					NDPIError(NDPIFileName(out),
 					    "Error, can't write tile at "
 					    TIFF_UINT32_FORMAT " " 

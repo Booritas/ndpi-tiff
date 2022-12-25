@@ -21,15 +21,15 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFFieldName 3TIFF "July 26, 2012" "libtiff"
+.TH NDPIFieldName 3TIFF "July 26, 2012" "libtiff"
 .SH NAME
-TIFFFieldName \- Get TIFF field name from field information
+NDPIFieldName \- Get TIFF field name from field information
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "const char* TIFFFieldName(const TIFFField* " fip ")"
+.BI "const char* NDPIFieldName(const TIFFField* " fip ")"
 .SH DESCRIPTION
-.BR TIFFFieldName
+.BR NDPIFieldName
 returns the textual name for a TIFF field.
 .P
 .I fip
@@ -37,11 +37,11 @@ is a field information pointer previously returned by
 .BR NDPIFindField ,
 .BR NDPIFieldWithTag ,
 or
-.BR TIFFFieldWithName .
+.BR NDPIFieldWithName .
 .br
 .SH "RETURN VALUES"
 .br
-.BR TIFFFieldName
+.BR NDPIFieldName
 returns a constant C string.
 .br
 .SH "SEE ALSO"

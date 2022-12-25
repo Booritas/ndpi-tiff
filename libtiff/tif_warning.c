@@ -46,7 +46,7 @@ TIFFSetWarningHandlerExt(TIFFErrorHandlerExt handler)
 }
 
 void
-TIFFWarning(const char* module, const char* fmt, ...)
+NDPIWarning(const char* module, const char* fmt, ...)
 {
 	va_list ap;
 	if (_TIFFwarningHandler) {

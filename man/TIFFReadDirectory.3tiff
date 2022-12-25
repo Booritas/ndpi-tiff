@@ -62,7 +62,7 @@ All error messages are directed to the
 .IR NDPIError (3TIFF)
 routine.
 All warning messages are directed to the
-.IR TIFFWarning (3TIFF)
+.IR NDPIWarning (3TIFF)
 routine.
 .PP
 \fBSeek error accessing TIFF directory\fP.

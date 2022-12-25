@@ -1010,7 +1010,7 @@ JPEGSetupDecode(TIFF* tif)
 	JPEGState* sp = JState(tif);
 	TIFFDirectory *td = &tif->tif_dir;
 
-#if defined(JPEG_DUAL_MODE_8_12) && !defined(TIFFInitJPEG)
+#if defined(JPEG_DUAL_MODE_8_12) && !defined(NDPIInitJPEG)
         if( tif->tif_dir.td_bitspersample == 12 )
             return NDPIReInitJPEG_12( tif, COMPRESSION_JPEG, 0 );
 #endif
@@ -1748,7 +1748,7 @@ JPEGSetupEncode(TIFF* tif)
 	TIFFDirectory *td = &tif->tif_dir;
 	static const char module[] = "JPEGSetupEncode";
 
-#if defined(JPEG_DUAL_MODE_8_12) && !defined(TIFFInitJPEG)
+#if defined(JPEG_DUAL_MODE_8_12) && !defined(NDPIInitJPEG)
         if( tif->tif_dir.td_bitspersample == 12 )
             return NDPIReInitJPEG_12( tif, COMPRESSION_JPEG, 1 );
 #endif
@@ -2427,14 +2427,14 @@ JPEGDefaultTileSize(TIFF* tif, uint32_t* tw, uint32_t* th)
 }
 
 /*
- * The JPEG library initialized used to be done in TIFFInitJPEG(), but
+ * The JPEG library initialized used to be done in NDPIInitJPEG(), but
  * now that we allow a TIFF file to be opened in update mode it is necessary
  * to have some way of deciding whether compression or decompression is
  * desired other than looking at tif->tif_mode.  We accomplish this by 
  * examining {TILE/STRIP}BYTECOUNTS to see if there is a non-zero entry.
  * If so, we assume decompression is desired. 
  *
- * This is tricky, because TIFFInitJPEG() is called while the directory is
+ * This is tricky, because NDPIInitJPEG() is called while the directory is
  * being read, and generally speaking the BYTECOUNTS tag won't have been read
  * at that point.  So we try to defer jpeg library initialization till we
  * do have that tag ... basically any access that might require the compressor
@@ -2500,7 +2500,7 @@ static int JPEGInitializeLibJPEG( TIFF * tif, int decompress )
 }
 
 int
-TIFFInitJPEG(TIFF* tif, int scheme)
+NDPIInitJPEG(TIFF* tif, int scheme)
 {
 	JPEGState* sp;
 
@@ -2512,7 +2512,7 @@ TIFFInitJPEG(TIFF* tif, int scheme)
 	 */
 	if (!_NDPIMergeFields(tif, jpegFields, TIFFArrayCount(jpegFields))) {
 		NDPIErrorExt(tif->tif_clientdata,
-			     "TIFFInitJPEG",
+			     "NDPIInitJPEG",
 			     "Merging JPEG codec-specific tags failed");
 		return 0;
 	}
@@ -2524,7 +2524,7 @@ TIFFInitJPEG(TIFF* tif, int scheme)
 
 	if (tif->tif_data == NULL) {
 		NDPIErrorExt(tif->tif_clientdata,
-			     "TIFFInitJPEG", "No space for JPEG state block");
+			     "NDPIInitJPEG", "No space for JPEG state block");
 		return 0;
 	}
         _NDPImemset(tif->tif_data, 0, sizeof(JPEGState));
@@ -2586,7 +2586,7 @@ TIFFInitJPEG(TIFF* tif, int scheme)
 /*
 The following line assumes incorrectly that all JPEG-in-TIFF files will have
 a JPEGTABLES tag generated and causes null-filled JPEGTABLES tags to be written
-when the JPEG data is placed with TIFFWriteRawStrip.  The field bit should be 
+when the JPEG data is placed with NDPIWriteRawStrip.  The field bit should be 
 set, anyway, later when actual JPEGTABLES header is generated, so removing it 
 here hopefully is harmless.
             TIFFSetFieldBit(tif, FIELD_JPEGTABLES);
@@ -2600,7 +2600,7 @@ here hopefully is harmless.
             else
             {
                 NDPIErrorExt(tif->tif_clientdata,
-			     "TIFFInitJPEG",
+			     "NDPIInitJPEG",
                              "Failed to allocate memory for JPEG tables");
                 return 0;
             }

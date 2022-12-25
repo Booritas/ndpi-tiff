@@ -408,7 +408,7 @@ main(int argc, char* argv[])
 			break;
 		}
 		pack_func (buf, w * spp, bpp);
-		if (TIFFWriteScanline(out, buf, row, 0) < 0)
+		if (NDPIWriteScanline(out, buf, row, 0) < 0)
 			break;
 	}
 	if (in != stdin)

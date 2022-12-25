@@ -448,7 +448,7 @@ main(int argc, char* argv[])
           {
 	    /*
 	  if ((pageWidth == 0) || (pageHeight == 0))
-	    TIFFWarning ("-r auto", " requires page height and width specified with -h and -w");
+	    NDPIWarning ("-r auto", " requires page height and width specified with -h and -w");
 	    */
           if ((maxPageWidth > 0) || (maxPageHeight > 0))
             {
@@ -592,7 +592,7 @@ checkImage(TIFF* tif)
 		return (0);
 	}
 	if (planarconfiguration == PLANARCONFIG_SEPARATE && extrasamples > 0)
-		TIFFWarning(filename, "Ignoring extra samples");
+		NDPIWarning(filename, "Ignoring extra samples");
 	return (1);
 }
 
@@ -1732,7 +1732,7 @@ checkcmap(TIFF* tif, int n, uint16_t* r, uint16_t* g, uint16_t* b)
 	while (n-- > 0)
 		if (*r++ >= 256 || *g++ >= 256 || *b++ >= 256)
 			return (16);
-	TIFFWarning(filename, "Assuming 8-bit colormap");
+	NDPIWarning(filename, "Assuming 8-bit colormap");
 	return (8);
 }
 

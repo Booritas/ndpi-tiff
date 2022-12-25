@@ -4,11 +4,11 @@
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
 <meta name="Content-Style" content="text/css">
-<title>TIFFWarning</title>
+<title>NDPIWarning</title>
 </head>
 <body>
 
-<h1 align=center>TIFFWarning</h1>
+<h1 align=center>NDPIWarning</h1>
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
@@ -24,7 +24,7 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>TIFFWarning, NDPISetWarningHandler &minus; library
+<p>NDPIWarning, NDPISetWarningHandler &minus; library
 warning interface</p>
 </td>
 </table>
@@ -38,17 +38,17 @@ warning interface</p>
 <td width="91%">
 <p><b>#include &lt;tiffio.h&gt;</b></p>
 <!-- INDENTATION -->
-<p><b>void TIFFWarning(const char *</b><i>module</i><b>,
+<p><b>void NDPIWarning(const char *</b><i>module</i><b>,
 const char *</b><i>fmt</i><b>,</b> <i>...</i><b>)</b></p>
 <!-- INDENTATION -->
 <p><b>#include &lt;stdarg.h&gt;</b></p>
 <!-- INDENTATION -->
-<p><b>typedef void (*TIFFWarningHandler)(const char
+<p><b>typedef void (*NDPIWarningHandler)(const char
 *</b><i>module</i><b>, const char *</b><i>fmt</i><b>,
 va_list</b> <i>ap</i><b>);</b></p>
 <!-- INDENTATION -->
-<p><b>TIFFWarningHandler
-NDPISetWarningHandler(TIFFWarningHandler</b>
+<p><b>NDPIWarningHandler
+NDPISetWarningHandler(NDPIWarningHandler</b>
 <i>handler</i><b>);</b></p>
 </td>
 </table>
@@ -60,7 +60,7 @@ NDPISetWarningHandler(TIFFWarningHandler</b>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><i>TIFFWarning</i> invokes the library-wide warning
+<p><i>NDPIWarning</i> invokes the library-wide warning
 handler function to (normally) write a warning message to
 the <b>stderr</b>. The <i>fmt</i> parameter is a
 <i>printf</i>(3S) format string, and any number arguments

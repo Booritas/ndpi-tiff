@@ -404,7 +404,7 @@ extern int TIFFInitLZW(TIFF*, int);
 extern int TIFFInitOJPEG(TIFF*, int);
 #endif
 #ifdef JPEG_SUPPORT
-extern int TIFFInitJPEG(TIFF*, int);
+extern int NDPIInitJPEG(TIFF*, int);
 extern int NDPIJPEGIsFullStripRequired(TIFF*);
 #endif
 #ifdef JBIG_SUPPORT

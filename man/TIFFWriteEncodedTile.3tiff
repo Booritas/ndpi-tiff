@@ -22,7 +22,7 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFWriteEncodedTile 3TIFF "December 16, 1991" "libtiff"
+.TH NDPIWriteEncodedTile 3TIFF "December 16, 1991" "libtiff"
 .SH NAME
 TIFFWritedEncodedTile \- compress and write a tile of data to an open
 .SM TIFF
@@ -30,7 +30,7 @@ file
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "tsize_t TIFFWriteEncodedTile(TIFF *" tif ", ttile_t " tile ", tdata_t " buf ", tsize_t " size ")"
+.BI "tsize_t NDPIWriteEncodedTile(TIFF *" tif ", ttile_t " tile ", tdata_t " buf ", tsize_t " size ")"
 .SH DESCRIPTION
 Compress
 .I size
@@ -87,8 +87,8 @@ There was not enough space for the arrays that hold tile offsets and byte
 counts.
 .SH "SEE ALSO"
 .BR NDPIOpen (3TIFF),
-.BR TIFFWriteTile (3TIFF),
-.BR TIFFWriteRawTile (3TIFF),
+.BR NDPIWriteTile (3TIFF),
+.BR NDPIWriteRawTile (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

@@ -4284,7 +4284,7 @@ NDPIReadDirectory(TIFF* tif)
 #ifdef STRIPBYTECOUNTSORTED_UNUSED
 	/*
 	 * XXX: We can optimize checking for the strip bounds using the sorted
-	 * bytecounts array. See also comments for TIFFAppendToStrip()
+	 * bytecounts array. See also comments for NDPIAppendToStrip()
 	 * function in tif_write.c.
 	 */
 	if (!(tif->tif_flags&TIFF_DEFERSTRILELOAD) && tif->tif_dir.td_nstrips > 1) {

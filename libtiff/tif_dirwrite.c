@@ -182,7 +182,7 @@ static int NDPIWriteDirectoryTagCheckedIfd8Array(TIFF* tif, uint32_t* ndir, TIFF
 
 static int NDPIWriteDirectoryTagData(TIFF* tif, uint32_t* ndir, TIFFDirEntry* dir, uint16_t tag, uint16_t datatype, uint32_t count, uint32_t datalength, void* data);
 
-static int TIFFLinkDirectory(TIFF*);
+static int NDPILinkDirectory(TIFF*);
 
 /*
  * Write the contents of the current directory
@@ -281,7 +281,7 @@ NDPIRewriteDirectory( TIFF *tif )
 		return NDPIWriteDirectory( tif );
 
 	/*
-	 * Find and zero the pointer to this directory, so that TIFFLinkDirectory
+	 * Find and zero the pointer to this directory, so that NDPILinkDirectory
 	 * will cause it to be added after this directories current pre-link.
 	 */
 
@@ -756,7 +756,7 @@ NDPIWriteDirectorySec(TIFF* tif, int isimage, int imagedone, uint64_t* pdiroff)
 							default:
 								NDPIErrorExt(tif->tif_clientdata,module,
 								            "Cannot write tag %"PRIu32" (%s)",
-								            TIFFFieldTag(o),
+								            NDPIFieldTag(o),
                                                                             o->field_name ? o->field_name : "unknown");
 								goto bad;
 						}
@@ -879,7 +879,7 @@ NDPIWriteDirectorySec(TIFF* tif, int isimage, int imagedone, uint64_t* pdiroff)
 		}
 		if (isimage)
 		{
-			if ((tif->tif_diroff==0)&&(!TIFFLinkDirectory(tif)))
+			if ((tif->tif_diroff==0)&&(!NDPILinkDirectory(tif)))
 				goto bad;
 		}
 		else
@@ -3090,9 +3090,9 @@ NDPIWriteDirectoryTagData(TIFF* tif, uint32_t* ndir, TIFFDirEntry* dir, uint16_t
  * Link the current directory into the directory chain for the file.
  */
 static int
-TIFFLinkDirectory(TIFF* tif)
+NDPILinkDirectory(TIFF* tif)
 {
-	static const char module[] = "TIFFLinkDirectory";
+	static const char module[] = "NDPILinkDirectory";
 
 	tif->tif_diroff = (NDPISeekFile(tif,0,SEEK_END)+1) & (~((toff_t)1));
 

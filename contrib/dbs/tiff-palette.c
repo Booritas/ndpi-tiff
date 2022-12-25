@@ -259,7 +259,7 @@ int main(int argc, char **argv)
 		break;
             }
         }
-        TIFFWriteScanline(tif, scan_line, i, 0);
+        NDPIWriteScanline(tif, scan_line, i, 0);
     }
 
     free(scan_line);

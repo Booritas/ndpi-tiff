@@ -4,11 +4,11 @@
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
 <meta name="Content-Style" content="text/css">
-<title>TIFFWriteEncodedStrip</title>
+<title>NDPIWriteEncodedStrip</title>
 </head>
 <body>
 
-<h1 align=center>TIFFWriteEncodedStrip</h1>
+<h1 align=center>NDPIWriteEncodedStrip</h1>
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
@@ -40,7 +40,7 @@ strip of data to an open</big> TIFF <big>file</big></p>
 <td width="91%">
 <p><big><b>#include &lt;tiffio.h&gt;</b></big></p>
 <!-- INDENTATION -->
-<p><big><b>tsize_t TIFFWriteEncodedStrip(TIFF
+<p><big><b>tsize_t NDPIWriteEncodedStrip(TIFF
 *</b><i>tif</i><b>, tstrip_t</b> <i>strip</i><b>,
 tdata_t</b> <i>buf</i><b>, tsize_t</b>
 <i>size</i><b>)</b></big></p>
@@ -81,7 +81,7 @@ than 8.</big></p>
 current settings of the <i>ImageLength</i> and
 <i>RowsPerStrip</i> tags. An image may be dynamically grown
 by increasing the value of <i>ImageLength</i> prior to each
-call to <i>TIFFWriteEncodedStrip</i>.</big></p>
+call to <i>NDPIWriteEncodedStrip</i>.</big></p>
 </td>
 </table>
 <a name="RETURN VALUES"></a>
@@ -140,8 +140,8 @@ and byte counts.</big></p>
 <td width="8%"></td>
 <td width="91%">
 <p><big><b>NDPIOpen</b>(3TIFF),
-<b>TIFFWriteScanline</b>(3TIFF),
-<b>TIFFWriteRawStrip</b>(3TIFF),
+<b>NDPIWriteScanline</b>(3TIFF),
+<b>NDPIWriteRawStrip</b>(3TIFF),
 <b>libtiff</b>(3TIFF)</big></p>
 <!-- INDENTATION -->
 <p><big>Libtiff library home page:

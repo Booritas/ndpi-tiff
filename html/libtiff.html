@@ -501,7 +501,7 @@
     Two routines are provided for scanline-based i/o:
     <tt>NDPIReadScanline</tt>
     and
-    <tt>TIFFWriteScanline</tt>.
+    <tt>NDPIWriteScanline</tt>.
     For example, to read the contents of a file that
     is assumed to be organized in strips, the following might be used:
   </p>
@@ -714,8 +714,8 @@
     Alternatively a direct interface to the low-level data is provided
     a la strips.  Tiles can be read with
     <tt>NDPIReadEncodedTile</tt> or <tt>NDPIReadRawTile</tt>,
-    and written with <tt>TIFFWriteEncodedTile</tt> or
-    <tt>TIFFWriteRawTile</tt>. For example, to read all the tiles in an image:
+    and written with <tt>NDPIWriteEncodedTile</tt> or
+    <tt>NDPIWriteRawTile</tt>. For example, to read all the tiles in an image:
   </p>
   <p style="margin-left: 40px">
     <tt>#include "tiffio.h"<br>

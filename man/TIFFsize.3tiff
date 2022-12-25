@@ -40,7 +40,7 @@ returns the size in bytes of a row of data as it would be returned in a call
 to
 .IR NDPIReadScanline ,
 or as it would be expected in a call to
-.IR TIFFWriteScanline .
+.IR NDPIWriteScanline .
 .PP
 .I NDPIRasterScanlineSize
 returns the size in bytes of a complete decoded and packed raster scanline.

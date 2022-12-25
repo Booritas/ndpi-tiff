@@ -67,7 +67,7 @@ returns the equivalent size for a tile of data as it would be returned in a
 call to
 .I NDPIReadTile
 or as it would be expected in a call to
-.IR TIFFWriteTile .
+.IR NDPIWriteTile .
 .PP
 .I NDPIVTileSize
 returns the number of bytes in a row-aligned tile with
@@ -121,9 +121,9 @@ None.
 .BR NDPIReadEncodedTile (3TIFF),
 .BR NDPIReadRawTile (3TIFF),
 .BR NDPIReadTile (3TIFF),
-.BR TIFFWriteEncodedTile (3TIFF),
-.BR TIFFWriteRawTile (3TIFF),
-.BR TIFFWriteTile (3TIFF),
+.BR NDPIWriteEncodedTile (3TIFF),
+.BR NDPIWriteRawTile (3TIFF),
+.BR NDPIWriteTile (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

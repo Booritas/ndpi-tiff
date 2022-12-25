@@ -21,15 +21,15 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFFieldWriteCount 3TIFF "July 26, 2012" "libtiff"
+.TH NDPIFieldWriteCount 3TIFF "July 26, 2012" "libtiff"
 .SH NAME
-TIFFFieldWriteCount \- Get number of values to be written to field
+NDPIFieldWriteCount \- Get number of values to be written to field
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "int TIFFFieldWriteCount(const TIFFField* " fip ")"
+.BI "int NDPIFieldWriteCount(const TIFFField* " fip ")"
 .SH DESCRIPTION
-.BR TIFFFieldWriteCount
+.BR NDPIFieldWriteCount
 returns the number of values to be written into the specified
 TIFF field; that is, the number of arguments that should be supplied to
 .BR NDPISetField .
@@ -67,17 +67,17 @@ is a field information pointer previously returned by
 .BR NDPIFindField ,
 .BR NDPIFieldWithTag ,
 or
-.BR TIFFFieldWithName .
+.BR NDPIFieldWithName .
 .P
 For most field types,
-.BR TIFFFieldWriteCount
+.BR NDPIFieldWriteCount
 returns the same value as
 .BR TIFFFieldReadCount ,
 but there are some exceptions.
 .br
 .SH "RETURN VALUES"
 .br
-.BR TIFFFieldWriteCount
+.BR NDPIFieldWriteCount
 returns an integer.
 .br
 .SH "SEE ALSO"

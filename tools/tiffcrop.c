@@ -1145,7 +1145,7 @@ static int writeBufferToContigStrips(TIFF* out, uint8_t* buf, uint32_t imageleng
     nrows = (row + rowsperstrip > imagelength) ?
 	     imagelength - row : rowsperstrip;
     stripsize = NDPIVStripSize(out, nrows);
-    if (TIFFWriteEncodedStrip(out, strip++, buf, stripsize) < 0)
+    if (NDPIWriteEncodedStrip(out, strip++, buf, stripsize) < 0)
       {
       NDPIError(NDPIFileName(out), "Error, can't write strip %"PRIu32, strip - 1);
       return 1;
@@ -1230,7 +1230,7 @@ writeBufferToSeparateStrips (TIFF* out, uint8_t* buf,
         dump_buffer(dump->outfile, dump->format, nrows, scanlinesize, row, obuf);
 	}
 
-      if (TIFFWriteEncodedStrip(out, strip++, obuf, stripsize) < 0)
+      if (NDPIWriteEncodedStrip(out, strip++, obuf, stripsize) < 0)
         {
 	NDPIError(NDPIFileName(out), "Error, can't write strip %"PRIu32, strip - 1);
 	_NDPIfree(obuf);
@@ -1323,7 +1323,7 @@ static int writeBufferToContigTiles (TIFF* out, uint8_t* buf, uint32_t imageleng
 	return 1;
         }
 
-      if (TIFFWriteTile(out, tilebuf, col, row, 0, 0) < 0)
+      if (NDPIWriteTile(out, tilebuf, col, row, 0, 0) < 0)
         {
 	NDPIError("writeBufferToContigTiles",
 	          "Cannot write tile at %"PRIu32" %"PRIu32,
@@ -1401,7 +1401,7 @@ static int writeBufferToSeparateTiles (TIFF* out, uint8_t* buf, uint32_t imagele
 	  return 1;
           }
 
-	if (TIFFWriteTile(out, obuf, col, row, 0, s) < 0)
+	if (NDPIWriteTile(out, obuf, col, row, 0, s) < 0)
           {
 	   NDPIError("writeBufferToseparateTiles",
 	             "Cannot write tile at %"PRIu32" %"PRIu32" sample %"PRIu16,

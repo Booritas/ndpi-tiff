@@ -793,7 +793,7 @@ quant(TIFF* in, TIFF* out)
 			blue = *inptr++ >> COLOR_SHIFT;
 			*outptr++ = (unsigned char)histogram[red][green][blue];
 		}
-		if (TIFFWriteScanline(out, outline, i, 0) < 0)
+		if (NDPIWriteScanline(out, outline, i, 0) < 0)
 			break;
 	}
 	_NDPIfree(inputline);
@@ -915,7 +915,7 @@ quant_fsdither(TIFF* in, TIFF* out)
 				nextptr += 3;
 			}
 		}
-		if (TIFFWriteScanline(out, outline, i-1, 0) < 0)
+		if (NDPIWriteScanline(out, outline, i-1, 0) < 0)
 			break;
 	}
 bad:

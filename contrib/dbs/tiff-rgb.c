@@ -138,7 +138,7 @@ int main(int argc, char **argv)
              scan_line[(j * 3) + 1] = 255;
              scan_line[(j * 3) + 2] = 255 - i;
         }
-        TIFFWriteScanline(tif, scan_line, i, 0);
+        NDPIWriteScanline(tif, scan_line, i, 0);
     }
     for (i = 255; i < 512; i++) {
         for (j = 0; j < 75; j++) {
@@ -176,7 +176,7 @@ int main(int argc, char **argv)
              scan_line[(j * 3) + 1] = i;
              scan_line[(j * 3) + 2] = 0;
         }
-        TIFFWriteScanline(tif, scan_line, i, 0);
+        NDPIWriteScanline(tif, scan_line, i, 0);
     }
 
     free(scan_line);

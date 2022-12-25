@@ -32,7 +32,7 @@
 #include <windows.h>
 
 /*
-  CreateFileA/CreateFileW return type 'HANDLE' while TIFFFdOpen() takes 'int',
+  CreateFileA/CreateFileW return type 'HANDLE' while NDPIdOpen() takes 'int',
   which is formally incompatible and can even seemingly be of different size:
   HANDLE is 64 bit under Win64, while int is still 32 bits there.
 
@@ -225,11 +225,11 @@ _tiffUnmapProc(thandle_t fd, void* base, toff_t size)
 
 /*
  * Open a TIFF file descriptor for read/writing.
- * Note that TIFFFdOpen and NDPIOpen recognise the character 'u' in the mode
+ * Note that NDPIdOpen and NDPIOpen recognise the character 'u' in the mode
  * string, which forces the file to be opened unmapped.
  */
 TIFF*
-TIFFFdOpen(int ifd, const char* name, const char* mode)
+NDPIdOpen(int ifd, const char* name, const char* mode)
 {
 	TIFF* tif;
 	int fSuppressMap;
@@ -288,7 +288,7 @@ NDPIOpen(const char* name, const char* mode)
 		return ((TIFF *)0);
 	}
 
-	tif = TIFFFdOpen(thandle_to_int(fd), name, mode);
+	tif = NDPIdOpen(thandle_to_int(fd), name, mode);
 	if(!tif)
 		CloseHandle(fd);
 	return tif;
@@ -343,7 +343,7 @@ TIFFOpenW(const wchar_t* name, const char* mode)
 				    NULL, NULL);
 	}
 
-	tif = TIFFFdOpen(thandle_to_int(fd),
+	tif = NDPIdOpen(thandle_to_int(fd),
 			 (mbname != NULL) ? mbname : "<unknown>", mode);
 	if(!tif)
 		CloseHandle(fd);

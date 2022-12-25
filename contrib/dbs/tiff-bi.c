@@ -65,7 +65,7 @@ int main(int argc, char **argv)
         scan_line[i] = 255;
 
     for (i = 0; i < HEIGHT / 2; i++)
-        TIFFWriteScanline(tif, scan_line, i, 0);
+        NDPIWriteScanline(tif, scan_line, i, 0);
 
     for (i = 0; i < (WIDTH / 8) / 2; i++)
         scan_line[i] = 255;
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
         scan_line[i] = 0;
 
     for (i = HEIGHT / 2; i < HEIGHT; i++)
-        TIFFWriteScanline(tif, scan_line, i, 0);
+        NDPIWriteScanline(tif, scan_line, i, 0);
 
     free(scan_line);
     NDPIClose(tif);

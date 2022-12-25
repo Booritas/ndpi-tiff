@@ -22,15 +22,15 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFWriteScanline 3TIFF "December 16, 1991" "libtiff"
+.TH NDPIWriteScanline 3TIFF "December 16, 1991" "libtiff"
 .SH NAME
-TIFFWriteScanline \- write a scanline to an open
+NDPIWriteScanline \- write a scanline to an open
 .SM TIFF
 file
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "int TIFFWriteScanline(TIFF *" tif ", tdata_t " buf ", uint32_t " row ", tsample_t " sample ")"
+.BI "int NDPIWriteScanline(TIFF *" tif ", tdata_t " buf ", uint32_t " row ", tsample_t " sample ")"
 .SH DESCRIPTION
 Write data to a file at the specified row. The
 .I sample
@@ -79,7 +79,7 @@ organization.  The routine
 .IR NDPIIsTiled
 can be used to determine if the file is organized as tiles or strips.
 .SH "RETURN VALUES"
-.IR TIFFWriteScanline
+.IR NDPIWriteScanline
 returns \-1 if it immediately detects an error and 1 for a successful write.
 .SH DIAGNOSTICS
 All error messages are directed to the
@@ -145,8 +145,8 @@ the size of a scanline is not calculated on a per-sample basis, and for
 the library does not pack the block-interleaved samples.
 .SH "SEE ALSO"
 .BR NDPIOpen (3TIFF),
-.BR TIFFWriteEncodedStrip (3TIFF),
-.BR TIFFWriteRawStrip (3TIFF),
+.BR NDPIWriteEncodedStrip (3TIFF),
+.BR NDPIWriteRawStrip (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

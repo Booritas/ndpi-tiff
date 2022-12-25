@@ -161,15 +161,15 @@ NDPICurrentStrip	return index of current strip
 NDPICurrentTile		return index of current tile
 TIFFDataWidth 		return the size of TIFF data types
 NDPIError		library error handler
-TIFFFdOpen		open a file for reading or writing
-TIFFFieldDataType	get data type from field information
-TIFFFieldName		get field name from field information
-TIFFFieldPassCount	get whether to pass a value count to Get/SetField
+NDPIdOpen		open a file for reading or writing
+NDPIFieldDataType	get data type from field information
+NDPIFieldName		get field name from field information
+NDPIFieldPassCount	get whether to pass a value count to Get/SetField
 TIFFFieldReadCount	get number of values to be read from field
-TIFFFieldTag		get tag value from field information
-TIFFFieldWithName	get field information given field name
+NDPIFieldTag		get tag value from field information
+NDPIFieldWithName	get field information given field name
 NDPIFieldWithTag	get field information given tag
-TIFFFieldWriteCount	get number of values to be written to field
+NDPIFieldWriteCount	get number of values to be written to field
 NDPIFileName		return name of open file
 NDPIFileno		return open file descriptor
 NDPIFindCODEC		find standard codec for the specific scheme
@@ -224,14 +224,14 @@ NDPIVGetField		return tag value in current directory
 NDPIVGetFieldDefaulted	return tag value in current directory
 NDPIVSetField		set a tag's value in the current directory
 NDPIVStripSize		returns the number of bytes in a strip
-TIFFWarning		library warning handler
+NDPIWarning		library warning handler
 NDPIWriteDirectory	write the current directory
-TIFFWriteEncodedStrip	compress and write a strip of data
-TIFFWriteEncodedTile	compress and write a tile of data
-TIFFWriteRawStrip	write a raw strip of data
-TIFFWriteRawTile	write a raw tile of data
-TIFFWriteScanline	write a scanline of data
-TIFFWriteTile		compress and write a tile of data
+NDPIWriteEncodedStrip	compress and write a strip of data
+NDPIWriteEncodedTile	compress and write a tile of data
+NDPIWriteRawStrip	write a raw strip of data
+NDPIWriteRawTile	write a raw tile of data
+NDPIWriteScanline	write a scanline of data
+NDPIWriteTile		compress and write a tile of data
 NDPIXYZToRGB		perform CIE XYZ to RGB conversion
 NDPIYCbCrToRGBInit	initialize YCbCr to RGB conversion state
 NDPIYCbCrtoRGB		perform YCbCr to RGB conversion
@@ -506,7 +506,7 @@ By default messages are directed to
 in the form:
 .IR "module: message\en."
 Warning messages are likewise directed through the
-.IR TIFFWarning
+.IR NDPIWarning
 routine.
 .SH "SEE ALSO"
 .BR fax2tiff (1),

@@ -212,7 +212,7 @@ TIFFReadPrivateDataSubDirectory(TIFF* tif, toff_t pdir_offset,
 		 */
 		if (dp->tdir_tag < fip->field_tag) {
 			if (!diroutoforderwarning) {
-				TIFFWarning(tif->tif_name,
+				NDPIWarning(tif->tif_name,
 	"invalid TIFF private subdirectory; tags are not sorted in ascending order");
 				diroutoforderwarning = 1;
 			}
@@ -222,7 +222,7 @@ TIFFReadPrivateDataSubDirectory(TIFF* tif, toff_t pdir_offset,
 		while (fip->field_tag && fip->field_tag < dp->tdir_tag)
 			fip++;
 		if (!fip->field_tag || fip->field_tag != dp->tdir_tag) {
-			TIFFWarning(tif->tif_name,
+			NDPIWarning(tif->tif_name,
 			    "unknown field with tag %d (0x%x) in private subdirectory ignored",
 			    dp->tdir_tag,  dp->tdir_tag);
 			dp->tdir_tag = IGNORE;
@@ -250,7 +250,7 @@ TIFFReadPrivateDataSubDirectory(TIFF* tif, toff_t pdir_offset,
 				break;
 			fip++;
 			if (!fip->field_tag || fip->field_tag != dp->tdir_tag) {
-				TIFFWarning(tif->tif_name,
+				NDPIWarning(tif->tif_name,
 				   "wrong data type %d for \"%s\"; tag ignored",
 				    dp->tdir_type, fip[-1].field_name);
 				goto ignore;
@@ -350,9 +350,9 @@ static int
 CheckDirCount(TIFF* tif, TIFFDirEntry* dir, uint32_t count)
 {
 	if (count != dir->tdir_count) {
-		TIFFWarning(tif->tif_name,
+		NDPIWarning(tif->tif_name,
 	"incorrect count for field \"%s\" (%lu, expecting %lu); tag ignored",
-		    _TIFFFieldWithTag(tif, dir->tdir_tag)->field_name,
+		    _NDPIFieldWithTag(tif, dir->tdir_tag)->field_name,
 		    dir->tdir_count, count);
 		return (0);
 	}
@@ -401,7 +401,7 @@ TIFFFetchData(TIFF* tif, TIFFDirEntry* dir, char* cp)
 	return (cc);
 bad:
 	NDPIErrorExt(tif->tif_clientdata, tif->tif_name, "Error fetching data for field \"%s\"",
-	    _TIFFFieldWithTag(tif, dir->tdir_tag)->field_name);
+	    _NDPIFieldWithTag(tif, dir->tdir_tag)->field_name);
 	return ((tsize_t) 0);
 }
 
@@ -430,7 +430,7 @@ cvtRational(TIFF* tif, TIFFDirEntry* dir, uint32_t num, uint32_t denom, float* r
 	if (denom == 0) {
 		NDPIErrorExt(tif->tif_clientdata, tif->tif_name,
 		    "%s: Rational with zero denominator (num = %lu)",
-		    _TIFFFieldWithTag(tif, dir->tdir_tag)->field_name, num);
+		    _NDPIFieldWithTag(tif, dir->tdir_tag)->field_name, num);
 		return (0);
 	} else {
 		if (dir->tdir_type == TIFF_RATIONAL)
@@ -719,7 +719,7 @@ TIFFFetchAnyArray(TIFF* tif, TIFFDirEntry* dir, double* v)
 		/* TIFF_UNDEFINED */
 		NDPIErrorExt(tif->tif_clientdata, tif->tif_name,
 		    "Cannot read TIFF_ANY type %d for field \"%s\"",
-		    _TIFFFieldWithTag(tif, dir->tdir_tag)->field_name);
+		    _NDPIFieldWithTag(tif, dir->tdir_tag)->field_name);
 		return (0);
 	}
 	return (1);
@@ -897,7 +897,7 @@ TIFFFetchPerSampleShorts(TIFF* tif, TIFFDirEntry* dir, int* pl)
 				if (v[i] != v[0]) {
 					NDPIErrorExt(tif->tif_clientdata, tif->tif_name,
 		"Cannot handle different per-sample values for field \"%s\"",
-			   _TIFFFieldWithTag(tif, dir->tdir_tag)->field_name);
+			   _NDPIFieldWithTag(tif, dir->tdir_tag)->field_name);
 					goto bad;
 				}
 			*pl = v[0];
@@ -933,7 +933,7 @@ TIFFFetchPerSampleAnys(TIFF* tif, TIFFDirEntry* dir, double* pl)
 				if (v[i] != v[0]) {
 					NDPIErrorExt(tif->tif_clientdata, tif->tif_name,
 		"Cannot handle different per-sample values for field \"%s\"",
-			   _TIFFFieldWithTag(tif, dir->tdir_tag)->field_name);
+			   _NDPIFieldWithTag(tif, dir->tdir_tag)->field_name);
 					goto bad;
 				}
 			*pl = v[0];

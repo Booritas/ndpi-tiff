@@ -4,11 +4,11 @@
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
 <meta name="Content-Style" content="text/css">
-<title>TIFFWriteTile</title>
+<title>NDPIWriteTile</title>
 </head>
 <body>
 
-<h1 align=center>TIFFWriteTile</h1>
+<h1 align=center>NDPIWriteTile</h1>
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
@@ -25,7 +25,7 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>TIFFWriteTile &minus; encode and write a tile of data to
+<p>NDPIWriteTile &minus; encode and write a tile of data to
 an open <small>TIFF</small> file</p>
 </td>
 </table>
@@ -39,7 +39,7 @@ an open <small>TIFF</small> file</p>
 <td width="91%">
 <p><b>#include &lt;tiffio.h&gt;</b></p>
 <!-- INDENTATION -->
-<p><b>tsize_t TIFFWriteTile(TIFF *</b><i>tif</i><b>,
+<p><b>tsize_t NDPIWriteTile(TIFF *</b><i>tif</i><b>,
 tdata_t</b> <i>buf</i><b>, uint32_t</b> <i>x</i><b>,
 uint32_t</b> <i>y</i><b>, uint32_t</b> <i>z</i><b>,
 tsample_t</b> <i>sample</i><b>)</b></p>
@@ -60,7 +60,7 @@ normally being appended to the end of the file. The buffer
 must be contain an entire tile of data. Applications should
 call the routine <i>NDPITileSize</i> to find out the size
 (in bytes) of a tile buffer. The <i>x</i> and <i>y</i>
-parameters are always used by <i>TIFFWriteTile</i>. The
+parameters are always used by <i>NDPIWriteTile</i>. The
 <i>z</i> parameter is used if the image is deeper than 1
 slice (<i>ImageDepth</i>&gt;1). The <i>sample</i> parameter
 is used only if data are organized in separate planes
@@ -75,7 +75,7 @@ is used only if data are organized in separate planes
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><i>TIFFWriteTile</i> returns &minus;1 if it detects an
+<p><i>NDPIWriteTile</i> returns &minus;1 if it detects an
 error; otherwise the number of bytes in the tile is
 returned.</p>
 </td>
@@ -102,9 +102,9 @@ returned.</p>
 <td width="91%">
 <p><b>NDPICheckTile</b>(3TIFF),
 <b>NDPIComputeTile</b>(3TIFF), <b>NDPIOpen</b>(3TIFF),
-<b>NDPIReadTile</b>(3TIFF), <b>TIFFWriteScanline</b>(3TIFF),
-<b>TIFFWriteEncodedTile</b>(3TIFF),
-<b>TIFFWriteRawTile</b>(3TIFF), <b>libtiff</b>(3TIFF)</p>
+<b>NDPIReadTile</b>(3TIFF), <b>NDPIWriteScanline</b>(3TIFF),
+<b>NDPIWriteEncodedTile</b>(3TIFF),
+<b>NDPIWriteRawTile</b>(3TIFF), <b>libtiff</b>(3TIFF)</p>
 <!-- INDENTATION -->
 <p>Libtiff library home page:
 <b>http://www.simplesystems.org/libtiff/</b></p>

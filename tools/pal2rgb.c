@@ -220,7 +220,7 @@ main(int argc, char* argv[])
 				*pp++ = (unsigned char) gmap[ibuf[x]];
 				*pp++ = (unsigned char) bmap[ibuf[x]];
 			}
-			if (!TIFFWriteScanline(out, obuf, row, 0))
+			if (!NDPIWriteScanline(out, obuf, row, 0))
 				goto done;
 		}
 		break;
@@ -230,15 +230,15 @@ main(int argc, char* argv[])
 				goto done;
 			for (pp = obuf, x = 0; x < imagewidth; x++)
 				*pp++ = (unsigned char) rmap[ibuf[x]];
-			if (!TIFFWriteScanline(out, obuf, row, 0))
+			if (!NDPIWriteScanline(out, obuf, row, 0))
 				goto done;
 			for (pp = obuf, x = 0; x < imagewidth; x++)
 				*pp++ = (unsigned char) gmap[ibuf[x]];
-			if (!TIFFWriteScanline(out, obuf, row, 0))
+			if (!NDPIWriteScanline(out, obuf, row, 0))
 				goto done;
 			for (pp = obuf, x = 0; x < imagewidth; x++)
 				*pp++ = (unsigned char) bmap[ibuf[x]];
-			if (!TIFFWriteScanline(out, obuf, row, 0))
+			if (!NDPIWriteScanline(out, obuf, row, 0))
 				goto done;
 		}
 		break;

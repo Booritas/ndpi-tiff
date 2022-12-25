@@ -62,7 +62,7 @@ is a field information pointer previously returned by
 .BR NDPIFindField ,
 .BR NDPIFieldWithTag ,
 or
-.BR TIFFFieldWithName .
+.BR NDPIFieldWithName .
 .br
 .SH "RETURN VALUES"
 .br

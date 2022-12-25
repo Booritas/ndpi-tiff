@@ -1489,7 +1489,7 @@
 2020-04-05  Thomas Bernard  <miniupnp@free.fr>
 
 	tiffset: pass size for TIFFTAG_INKNAMES.
-	Uses TIFFFieldPassCount() to know which arguments need to be
+	Uses NDPIFieldPassCount() to know which arguments need to be
 	passed to TiffSetField()
 
 	fixes #18
@@ -2867,13 +2867,13 @@
 2019-04-11  Even Rouault  <even.rouault@spatialys.com>
 
 	Merge branch 'fix_gdal_1439' into 'master'
-	TIFFWriteEncodedStrip/TIFFWriteEncodedTile: fix rewriting of LZW-compressed data
+	NDPIWriteEncodedStrip/NDPIWriteEncodedTile: fix rewriting of LZW-compressed data
 
 	See merge request libtiff/libtiff!74
 
 2019-04-11  Even Rouault  <even.rouault@spatialys.com>
 
-	TIFFWriteEncodedStrip/TIFFWriteEncodedTile: fix rewriting of LZW-compressed data
+	NDPIWriteEncodedStrip/NDPIWriteEncodedTile: fix rewriting of LZW-compressed data
 	Fixes https://github.com/OSGeo/gdal/issues/1439
 
 	When rewriting a LZW tile/strip whose existing size is very close to a multiple of
@@ -5084,8 +5084,8 @@
 	NDPIReadEncodedTile() directly use user provided buffer when
 	no compression (and other conditions) to save a memcpy().
 
-	* libtiff/tif_write.c: make TIFFWriteEncodedStrip() and
-	TIFFWriteEncodedTile() directly use user provided buffer when
+	* libtiff/tif_write.c: make NDPIWriteEncodedStrip() and
+	NDPIWriteEncodedTile() directly use user provided buffer when
 	no compression to save a memcpy().
 
 2016-07-01  Even Rouault <even.rouault at spatialys.com>
@@ -5192,13 +5192,13 @@
 2015-12-18  Even Rouault <even.rouault at spatialys.com>
 
 	* libtiff/tif_dirwrite.c: fix truncation to 32 bit of file offsets in
-	TIFFLinkDirectory() and NDPIWriteDirectorySec() when aligning directory
+	NDPILinkDirectory() and NDPIWriteDirectorySec() when aligning directory
 	offsets on a even offset (affects BigTIFF). This was a regression of the
 	changeset of 2015-10-19.
 
 2015-12-12  Even Rouault <even.rouault at spatialys.com>
 
-	* libtiff/tif_write.c: TIFFWriteEncodedStrip() and TIFFWriteEncodedTile()
+	* libtiff/tif_write.c: NDPIWriteEncodedStrip() and NDPIWriteEncodedTile()
 	should return -1 in case of failure of tif_encodestrip() as documented
 	* libtiff/tif_dumpmode.c: DumpModeEncode() should return 0 in case of
 	failure so that the above mentioned functions detect the error.
@@ -5568,13 +5568,13 @@
 
 2015-06-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
-	* libtiff/tif_write.c (TIFFWriteEncodedStrip): Fix Coverity 715975
+	* libtiff/tif_write.c (NDPIWriteEncodedStrip): Fix Coverity 715975
 	"Division or modulo by zero".
-	(TIFFWriteEncodedTile): Fix Coverity 715976 and 715977 "Division
+	(NDPIWriteEncodedTile): Fix Coverity 715976 and 715977 "Division
 	or modulo by zero".
-	(TIFFWriteRawStrip): Fix Coverity 715978 "Division or modulo by
+	(NDPIWriteRawStrip): Fix Coverity 715978 "Division or modulo by
 	zero".
-	(TIFFWriteScanline): Fix Coverity 715979 "Division or modulo by
+	(NDPIWriteScanline): Fix Coverity 715979 "Division or modulo by
 	zero".
 
 	* libtiff/tif_read.c (NDPIStartTile): Fix Coverity 715973 and
@@ -5674,7 +5674,7 @@
 
 	* contrib/addtiffo/tif_ovrcache.c (NDPICreateOvrCache): Fix
 	Coverity 298615 "Resource leak".
-	(TIFFGetOvrBlock): Fix Coverity 1024649 "Unintended sign
+	(NDPIGetOvrBlock): Fix Coverity 1024649 "Unintended sign
 	extension".
 
 	* tools/bmp2tiff.c (main): Fix Coverity 1024225 "Untrusted value
@@ -6185,8 +6185,8 @@
 2012-07-26  Tom Lane  <tgl@sss.pgh.pa.us>
 
 	* libtiff/{tiffio.h, tif_dirinfo.c, libtiff.def}: Add six new
- 	functions TIFFFieldTag(), TIFFFieldName(), TIFFFieldDataType(),
-	TIFFFieldPassCount(), TIFFFieldReadCount(), TIFFFieldWriteCount()
+ 	functions NDPIFieldTag(), NDPIFieldName(), NDPIFieldDataType(),
+	NDPIFieldPassCount(), TIFFFieldReadCount(), NDPIFieldWriteCount()
 	as external accessors for the opaque type TIFFField.
 
 	* tools/tiffset.c: Make tiffset use the above functions instead of
@@ -6780,7 +6780,7 @@
 	TIFFTAG_HALFTONEHINTS, TIFFTAG_YCBCRSUBSAMPLING, TIFFTAG_DOTRANGE
 	which should be set by value.
 
-	* libtiff/tif_dirinfo.c: Don't use assertions in _TIFFFieldWithTag()
+	* libtiff/tif_dirinfo.c: Don't use assertions in _NDPIFieldWithTag()
 	and _TIFFFieldWithName() if the tag is not found in the tag table.
 	This should be normal situation and returned NULL value should be
 	properly handled by the caller.
@@ -7229,7 +7229,7 @@
 
 2009-06-02  Frank Warmerdam  <warmerdam@pobox.com>
 
-	* libtiff/libtiff.def: Add TIFFUnsetField.
+	* libtiff/libtiff.def: Add NDPIUnsetField.
 
 2009-05-03  Frank Warmerdam  <warmerdam@pobox.com>
 
@@ -7343,7 +7343,7 @@
 2008-12-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* libtiff/tiffio.h: GCC will now validate format specifications
-	for NDPIError(), NDPIErrorExt(), TIFFWarning(), and
+	for NDPIError(), NDPIErrorExt(), NDPIWarning(), and
 	NDPIWarningExt() in order to reveal bugs.
 
 	* Many fixes throughout to work better as a 64-bit build.
@@ -7377,7 +7377,7 @@
 
 2008-12-21  Frank Warmerdam  <warmerdam@pobox.com>
 
-	* libtiff/tif_dir.c, tiffio.h: Introduce TIFFUnsetField() function.
+	* libtiff/tif_dir.c, tiffio.h: Introduce NDPIUnsetField() function.
 
 	* libtiff/tif_jpeg.c: Avoid errors if the application writes a full
 	strip for the last partial strip in a jpeg compressed file.
@@ -7593,7 +7593,7 @@ btiff/tif_win32.c: Replace custom Win32 memory api with generic
 	(x64).
 
 	* tools/tiffset.c: Changes to reflect the fact that NDPIFieldWithTag()
-	and TIFFFieldWithName() now return TIFFField pointers instead of
+	and NDPIFieldWithName() now return TIFFField pointers instead of
 	TIFFFieldInfo pointers.
 
 	* tools/tiffdump.c: Added ssize_t typedef on Windows since it doesn't
@@ -7620,7 +7620,7 @@ btiff/tif_win32.c: Replace custom Win32 memory api with generic
 	We also modify logic so that in update mode the directory is not
 	marked dirty on read, but only when something is changed.  This
 	means we need to keep track of updates to the stripmap stuff in
-	TIFFAppendToStrip().
+	NDPIAppendToStrip().
 
 2007-12-10  Frank Warmerdam  <warmerdam@pobox.com>
 
@@ -7643,13 +7643,13 @@ btiff/tif_win32.c: Replace custom Win32 memory api with generic
 
 2007-11-02  Frank Warmerdam  <warmerdam@pobox.com>
 
-	* tif_write.c: Rip out the fancy logic in TIFFAppendToStrip() for
+	* tif_write.c: Rip out the fancy logic in NDPIAppendToStrip() for
 	establishing if an existing tile can be rewritten to the same location
 	by comparing the current size to all the other blocks in the same
 	directory.  This is dangerous in many situations and can easily
 	corrupt a file.  (observed in esoteric GDAL situation that's hard to
 	document).  This change involves leaving the stripbytecount[] values
-	unaltered till TIFFAppendToStrip().  Now we only write a block back
+	unaltered till NDPIAppendToStrip().  Now we only write a block back
 	to the same location it used to be at if the new data is the same
 	size or smaller - otherwise we move it to the end of file.
 
@@ -8029,7 +8029,7 @@ btiff/tif_win32.c: Replace custom Win32 memory api with generic
 
 2006-11-19  Frank Warmerdam  <warmerdam@pobox.com>
 
-	* libtiff/tif_write.c: TIFFAppendToStrip() - clear sorted flag if
+	* libtiff/tif_write.c: NDPIAppendToStrip() - clear sorted flag if
 	we move a strip.
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=1359
 
@@ -8275,7 +8275,7 @@ btiff/tif_win32.c: Replace custom Win32 memory api with generic
 2006-03-25  Joris Van Damme  <joris.at.lebbeke@skynet.be>
 
 	* contrib/addtiffo/tif_ovrcache.c: bugfix to correctly pass size
-	of last truncated strip data to TIFFWriteEncodedStrip
+	of last truncated strip data to NDPIWriteEncodedStrip
 
 2006-03-25  Joris Van Damme  <joris.at.lebbeke@skynet.be>
 
@@ -8336,7 +8336,7 @@ btiff/tif_win32.c: Replace custom Win32 memory api with generic
 
 2006-03-15  Andrey Kiselev  <dron@ak4719.spb.edu>
 
-	* libtiff/tif_jpeg.c: Do not cleanup codec state in TIFFInitJPEG(). As
+	* libtiff/tif_jpeg.c: Do not cleanup codec state in NDPIInitJPEG(). As
 	per bug http://bugzilla.remotesensing.org/show_bug.cgi?id=1119
 
 	* tools/raw2tiff.c: Do not set RowsPerStrip larger than ImageLength.
@@ -8401,7 +8401,7 @@ btiff/tif_win32.c: Replace custom Win32 memory api with generic
 
 2006-02-27  Andrey Kiselev  <dron@ak4719.spb.edu>
 
-	* libtiff/tif_write.c: Small code rearrangement in TIFFWriteScanline()
+	* libtiff/tif_write.c: Small code rearrangement in NDPIWriteScanline()
 	to avoid crash as per bug
 
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=1081.
@@ -8581,7 +8581,7 @@ btiff/tif_win32.c: Replace custom Win32 memory api with generic
 	* libtiff/tiffio.h: fixed typo that potentially resulted in
 	redefininition of USE_WIN32_FILEIO
 
-	* libtiff/*: Added more 'dual-mode' error handling: Done TIFFWarning
+	* libtiff/*: Added more 'dual-mode' error handling: Done NDPIWarning
 	calls in core LibTiff.
 
 2005-12-21  Andrey Kiselev  <dron@ak4719.spb.edu>
@@ -8921,7 +8921,7 @@ btiff/tif_win32.c: Replace custom Win32 memory api with generic
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=838
 
 	* libtiff/tif_dirwrite.c: Use tdir_count when calling
-	TIFFCvtNativeToIEEEDouble() in the TIFFWriteDoubleArray() function as
+	TIFFCvtNativeToIEEEDouble() in the NDPIWriteDoubleArray() function as
 	per bug
 
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=845
@@ -9443,7 +9443,7 @@ btiff/tif_win32.c: Replace custom Win32 memory api with generic
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=662
 
 	* libtiff/tif_write.c: Fixed wrong if() statement in
-	TIFFAppendToStrip() function as per bug
+	NDPIAppendToStrip() function as per bug
 
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=660
 
@@ -9880,7 +9880,7 @@ btiff/tif_win32.c: Replace custom Win32 memory api with generic
 	Tags can be supplied by the mnemonic name or number.
 
 	* libtiff/{tiffio.h, tif_dir.h, tif_dirinfo.c,}: Added two new
-	functions TIFFFindFieldInfoByName() and TIFFFieldWithName().
+	functions TIFFFindFieldInfoByName() and NDPIFieldWithName().
 
 2004-05-27  Andrey Kiselev  <dron@ak4719.spb.edu>
 
@@ -10031,8 +10031,8 @@ btiff/tif_win32.c: Replace custom Win32 memory api with generic
 
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=474
 
-	Check results, returned by the TIFFFdOpen() before returning and close
-	file if TIFFFdOpen() failed as per bug
+	Check results, returned by the NDPIdOpen() before returning and close
+	file if NDPIdOpen() failed as per bug
 
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=468
 
@@ -10856,7 +10856,7 @@ btiff/tif_win32.c: Replace custom Win32 memory api with generic
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=168
 
 	* libtiff/tif_read.c, libtiff/tif_write.c: NDPIReadScanline() and
-	TIFFWriteScanline() now set tif_row explicitly in case the codec has
+	NDPIWriteScanline() now set tif_row explicitly in case the codec has
 	fooled with the value.
 
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=129
@@ -11859,7 +11859,7 @@ Tue Nov 30 14:15:32 EST 1999   Mike Welles <mike@onshore.com>
 
         * Added zip creation to release makefile target
 
-	* Added html for TIFFWriteTile.3t man page.
+	* Added html for NDPIWriteTile.3t man page.
 
 Tue Nov 30 09:20:16 1999  Frank Warmerdam  <warmerda@gdal.velocet.ca>
 
@@ -11869,7 +11869,7 @@ Tue Nov 30 09:20:16 1999  Frank Warmerdam  <warmerda@gdal.velocet.ca>
 
 Mon Nov 29 11:43:42 1999  Frank Warmerdam  <warmerda@gdal.velocet.ca>
 
-	* Added TIFFWriteTile.3t man page.
+	* Added NDPIWriteTile.3t man page.
 
 Sun Nov 28 20:36:18 1999  Frank Warmerdam  <warmerda@gdal.velocet.ca>
 

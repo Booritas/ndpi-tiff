@@ -178,8 +178,8 @@ information is located here:
         NDPIReadEncodedTile() directly use user provided buffer when
         no compression (and other conditions) to save a memcpy()
 
-    <LI> libtiff/tif_write.c: make TIFFWriteEncodedStrip() and
-        TIFFWriteEncodedTile() directly use user provided buffer when
+    <LI> libtiff/tif_write.c: make NDPIWriteEncodedStrip() and
+        NDPIWriteEncodedTile() directly use user provided buffer when
         no compression to save a memcpy().
 
     <LI> libtiff/tif_luv.c: validate that for COMPRESSION_SGILOG and
@@ -242,13 +242,13 @@ information is located here:
         Fax3PutEOLgdal(). Found by Clang Static Analyzer
 
     <LI> libtiff/tif_dirwrite.c: fix truncation to 32 bit of file
-        offsets in TIFFLinkDirectory() and NDPIWriteDirectorySec()
+        offsets in NDPILinkDirectory() and NDPIWriteDirectorySec()
         when aligning directory offsets on a even offset (affects
         BigTIFF). This was a regression of the changeset of
         2015-10-19.
 
-    <LI> libtiff/tif_write.c: TIFFWriteEncodedStrip() and
-        TIFFWriteEncodedTile() should return -1 in case of failure of
+    <LI> libtiff/tif_write.c: NDPIWriteEncodedStrip() and
+        NDPIWriteEncodedTile() should return -1 in case of failure of
         tif_encodestrip() as documented
 
     <LI> libtiff/tif_dumpmode.c: DumpModeEncode() should return 0 in

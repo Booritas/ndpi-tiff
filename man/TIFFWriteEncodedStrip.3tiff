@@ -22,7 +22,7 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFWriteEncodedStrip 3TIFF "October 15, 1995" "libtiff"
+.TH NDPIWriteEncodedStrip 3TIFF "October 15, 1995" "libtiff"
 .SH NAME
 TIFFWritedEncodedStrip \- compress and write a strip of data to an open
 .SM TIFF
@@ -30,7 +30,7 @@ file
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "tsize_t TIFFWriteEncodedStrip(TIFF *" tif ", tstrip_t " strip ", tdata_t " buf ", tsize_t " size ")"
+.BI "tsize_t NDPIWriteEncodedStrip(TIFF *" tif ", tstrip_t " strip ", tdata_t " buf ", tsize_t " size ")"
 .SH DESCRIPTION
 Compress
 .I size
@@ -57,7 +57,7 @@ tags.
 An image may be dynamically grown by increasing the value of
 .I ImageLength
 prior to each call to
-.IR TIFFWriteEncodedStrip .
+.IR NDPIWriteEncodedStrip .
 .SH "RETURN VALUES"
 \-1 is returned if an error was encountered. Otherwise, the value of
 .IR size
@@ -93,8 +93,8 @@ There was not enough space for the arrays that hold strip offsets and byte
 counts.
 .SH "SEE ALSO"
 .BR NDPIOpen (3TIFF),
-.BR TIFFWriteScanline (3TIFF),
-.BR TIFFWriteRawStrip (3TIFF),
+.BR NDPIWriteScanline (3TIFF),
+.BR NDPIWriteRawStrip (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

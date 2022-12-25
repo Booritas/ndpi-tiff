@@ -32,12 +32,12 @@ set(docfiles
     TIFFcolor.3tiff.html
     TIFFDataWidth.3tiff.html
     NDPIError.3tiff.html
-    TIFFFieldDataType.3tiff.html
-    TIFFFieldName.3tiff.html
-    TIFFFieldPassCount.3tiff.html
+    NDPIFieldDataType.3tiff.html
+    NDPIFieldName.3tiff.html
+    NDPIFieldPassCount.3tiff.html
     TIFFFieldReadCount.3tiff.html
-    TIFFFieldTag.3tiff.html
-    TIFFFieldWriteCount.3tiff.html
+    NDPIFieldTag.3tiff.html
+    NDPIFieldWriteCount.3tiff.html
     NDPIFlush.3tiff.html
     NDPIGetField.3tiff.html
     TIFFmemory.3tiff.html
@@ -61,14 +61,14 @@ set(docfiles
     TIFFstrip.3tiff.html
     TIFFswab.3tiff.html
     TIFFtile.3tiff.html
-    TIFFWarning.3tiff.html
+    NDPIWarning.3tiff.html
     NDPIWriteDirectory.3tiff.html
-    TIFFWriteEncodedStrip.3tiff.html
-    TIFFWriteEncodedTile.3tiff.html
-    TIFFWriteRawStrip.3tiff.html
-    TIFFWriteRawTile.3tiff.html
-    TIFFWriteScanline.3tiff.html
-    TIFFWriteTile.3tiff.html
+    NDPIWriteEncodedStrip.3tiff.html
+    NDPIWriteEncodedTile.3tiff.html
+    NDPIWriteRawStrip.3tiff.html
+    NDPIWriteRawTile.3tiff.html
+    NDPIWriteScanline.3tiff.html
+    NDPIWriteTile.3tiff.html
     fax2ps.1.html
     fax2tiff.1.html
     pal2rgb.1.html

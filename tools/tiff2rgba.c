@@ -250,7 +250,7 @@ cvt_by_tile( TIFF *in, TIFF *out )
              * Write out the result in a tile.
              */
 
-            if( TIFFWriteEncodedTile( out,
+            if( NDPIWriteEncodedTile( out,
                                       NDPIComputeTile( out, col, row, 0, 0),
                                       raster,
                                       4 * tile_width * tile_height ) == -1 )
@@ -369,7 +369,7 @@ cvt_by_strip( TIFF *in, TIFF *out )
          * Write out the result in a strip
          */
 
-        if( TIFFWriteEncodedStrip( out, row / rowsperstrip, raster,
+        if( NDPIWriteEncodedStrip( out, row / rowsperstrip, raster,
                                    4 * rows_to_write * width ) == -1 )
         {
             ok = 0;
@@ -487,7 +487,7 @@ cvt_whole_image( TIFF *in, TIFF *out )
         else
             rows_to_write = rowsperstrip;
 
-        if( TIFFWriteEncodedStrip( out, row / rowsperstrip, raster_strip,
+        if( NDPIWriteEncodedStrip( out, row / rowsperstrip, raster_strip,
                              bytes_per_pixel * rows_to_write * width ) == -1 )
         {
             _NDPIfree( raster );

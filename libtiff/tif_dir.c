@@ -862,7 +862,7 @@ NDPISetField(TIFF* tif, uint32_t tag, ...)
  * Clear the contents of the field in the internal structure.
  */
 int
-TIFFUnsetField(TIFF* tif, uint32_t tag)
+NDPIUnsetField(TIFF* tif, uint32_t tag)
 {
     const TIFFField *fip =  NDPIFieldWithTag(tif, tag);
     TIFFDirectory* td = &tif->tif_dir;

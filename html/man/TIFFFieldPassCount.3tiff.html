@@ -13,12 +13,12 @@
        table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
        h1      { text-align: center }
 </style>
-<title>TIFFFieldPassCount</title>
+<title>NDPIFieldPassCount</title>
 
 </head>
 <body>
 
-<h1 align="center">TIFFFieldPassCount</h1>
+<h1 align="center">NDPIFieldPassCount</h1>
 
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
@@ -35,7 +35,7 @@
 
 
 
-<p style="margin-left:11%; margin-top: 1em">TIFFFieldPassCount
+<p style="margin-left:11%; margin-top: 1em">NDPIFieldPassCount
 &minus; Get whether to pass a count to TIFFGet/SetField</p>
 
 <h2>SYNOPSIS
@@ -47,7 +47,7 @@
 &lt;tiffio.h&gt;</b></p>
 
 <p style="margin-left:11%; margin-top: 1em"><b>int
-TIFFFieldPassCount(const TIFFField*</b>
+NDPIFieldPassCount(const TIFFField*</b>
 <i>fip</i><b>)</b></p>
 
 <h2>DESCRIPTION
@@ -56,7 +56,7 @@ TIFFFieldPassCount(const TIFFField*</b>
 
 
 
-<p style="margin-left:11%; margin-top: 1em"><b>TIFFFieldPassCount</b>
+<p style="margin-left:11%; margin-top: 1em"><b>NDPIFieldPassCount</b>
 returns true (nonzero) if <b>NDPIGetField</b> and
 <b>NDPISetField</b> expect a <i>count</i> value to be passed
 before the actual data pointer.</p>
@@ -64,7 +64,7 @@ before the actual data pointer.</p>
 <p style="margin-left:11%; margin-top: 1em"><i>fip</i> is a
 field information pointer previously returned by
 <b>NDPIFindField</b>, <b>NDPIFieldWithTag</b>, or
-<b>TIFFFieldWithName</b>.</p>
+<b>NDPIFieldWithName</b>.</p>
 
 <p style="margin-left:11%; margin-top: 1em">When a
 <i>count</i> is required, it will be of type <b>uint32_t</b>
@@ -80,7 +80,7 @@ when <b>TIFFFieldReadCount</b> reports
 
 
 
-<p style="margin-left:11%; margin-top: 1em"><b>TIFFFieldPassCount</b>
+<p style="margin-left:11%; margin-top: 1em"><b>NDPIFieldPassCount</b>
 returns an integer that is always 1 (true) or 0 (false).</p>
 
 <h2>SEE ALSO

@@ -405,14 +405,14 @@ copyFaxFile(TIFF* tifin, TIFF* tifout)
 		}
 		tifin->tif_row++;
 
-		if (TIFFWriteScanline(tifout, rowbuf, row, 0) < 0) {
+		if (NDPIWriteScanline(tifout, rowbuf, row, 0) < 0) {
 			fprintf(stderr, "%s: Write error at row %"PRIu32".\n",
 			    tifout->tif_name, row);
 			break;
 		}
 		row++;
 		if (stretch) {
-			if (TIFFWriteScanline(tifout, rowbuf, row, 0) < 0) {
+			if (NDPIWriteScanline(tifout, rowbuf, row, 0) < 0) {
 				fprintf(stderr, "%s: Write error at row %"PRIu32".\n",
 				    tifout->tif_name, row);
 				break;

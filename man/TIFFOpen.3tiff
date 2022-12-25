@@ -24,7 +24,7 @@
 .if n .po 0
 .TH NDPIOpen 3TIFF "July 1, 2005" "libtiff"
 .SH NAME
-NDPIOpen, TIFFFdOpen, NDPIClientOpen \- open a
+NDPIOpen, NDPIdOpen, NDPIClientOpen \- open a
 .SM TIFF
 file for reading or writing
 .SH SYNOPSIS
@@ -32,7 +32,7 @@ file for reading or writing
 .sp
 .BI "TIFF* NDPIOpen(const char *" filename ", const char *" mode ")"
 .br
-.BI "TIFF* TIFFFdOpen(const int " fd ", const char *" filename ", const char *" mode ")"
+.BI "TIFF* NDPIdOpen(const int " fd ", const char *" filename ", const char *" mode ")"
 .sp
 .B "typedef tsize_t (*TIFFReadWriteProc)(thandle_t, tdata_t, tsize_t);"
 .br
@@ -94,7 +94,7 @@ To alter these values, or to define values for additional fields,
 .IR NDPISetField (3TIFF)
 must be used.
 .PP
-.IR TIFFFdOpen
+.IR NDPIdOpen
 is like
 .IR NDPIOpen
 except that it opens a
@@ -246,7 +246,7 @@ the call to open a file; for example, ``wb'' or ``wl''.
 .SH "RETURN VALUES"
 Upon successful completion 
 .IR NDPIOpen ,
-.IR TIFFFdOpen ,
+.IR NDPIdOpen ,
 and
 .IR NDPIClientOpen
 return a 
@@ -258,7 +258,7 @@ All error messages are directed to the
 .IR NDPIError (3TIFF)
 routine.
 Likewise, warning messages are directed to the
-.IR TIFFWarning (3TIFF)
+.IR NDPIWarning (3TIFF)
 routine.
 .PP
 \fB"%s": Bad mode\fP.

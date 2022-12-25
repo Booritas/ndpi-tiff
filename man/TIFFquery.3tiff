@@ -97,7 +97,7 @@ image in the filesystem.
 returns the pathname argument passed to
 .IR NDPIOpen
 or
-.IR TIFFFdOpen .
+.IR NDPIdOpen .
 .PP
 .IR NDPIGetMode
 returns the mode with which the underlying file was opened. On
@@ -138,4 +138,4 @@ None.
 .SH "SEE ALSO"
 .IR libtiff (3TIFF),
 .IR NDPIOpen (3TIFF),
-.IR TIFFFdOpen (3TIFF)
+.IR NDPIdOpen (3TIFF)

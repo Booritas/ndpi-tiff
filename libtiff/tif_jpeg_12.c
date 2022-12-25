@@ -3,7 +3,7 @@
 
 #if defined(JPEG_DUAL_MODE_8_12)
 
-#  define TIFFInitJPEG TIFFInitJPEG_12
+#  define NDPIInitJPEG TIFFInitJPEG_12
 #  define NDPIJPEGIsFullStripRequired NDPIJPEGIsFullStripRequired_12
 
 int

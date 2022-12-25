@@ -21,15 +21,15 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFFieldPassCount 3TIFF "July 26, 2012" "libtiff"
+.TH NDPIFieldPassCount 3TIFF "July 26, 2012" "libtiff"
 .SH NAME
-TIFFFieldPassCount \- Get whether to pass a count to TIFFGet/SetField
+NDPIFieldPassCount \- Get whether to pass a count to TIFFGet/SetField
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "int TIFFFieldPassCount(const TIFFField* " fip ")"
+.BI "int NDPIFieldPassCount(const TIFFField* " fip ")"
 .SH DESCRIPTION
-.BR TIFFFieldPassCount
+.BR NDPIFieldPassCount
 returns true (nonzero) if
 .BR NDPIGetField
 and
@@ -43,7 +43,7 @@ is a field information pointer previously returned by
 .BR NDPIFindField ,
 .BR NDPIFieldWithTag ,
 or
-.BR TIFFFieldWithName .
+.BR NDPIFieldWithName .
 .P
 When a
 .I count
@@ -62,7 +62,7 @@ but normally not so for use of
 .br
 .SH "RETURN VALUES"
 .br
-.BR TIFFFieldPassCount
+.BR NDPIFieldPassCount
 returns an integer that is always 1 (true) or 0 (false).
 .br
 .SH "SEE ALSO"

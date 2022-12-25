@@ -1235,7 +1235,7 @@ writeOutTIFF(TIFF* in, char* path, int fd, uint32_t xmin, uint32_t ymin,
 {
 	TIFF* out= fd < 0 ?
 		NDPIOpen(path, NDPIIsBigEndian(in)?"wb":"wl") :
-		TIFFFdOpen(fd, path, NDPIIsBigEndian(in)?"wb":"wl");
+		NDPIdOpen(fd, path, NDPIIsBigEndian(in)?"wb":"wl");
 
 	if (out == NULL)
 		return (-2);
@@ -1787,7 +1787,7 @@ cpStripsNoClipping(TIFF* in, TIFF* out, uint32_t xmin, uint32_t ymin,
 				bufsize = (tmsize_t)bytecounts[s];
 			}
 			if (NDPIReadRawStrip(in, s, buf, (tmsize_t)bytecounts[s]) < 0 ||
-			    TIFFWriteRawStrip(out, s, buf, (tmsize_t)bytecounts[s]) < 0) {
+			    NDPIWriteRawStrip(out, s, buf, (tmsize_t)bytecounts[s]) < 0) {
 				_NDPIfree(buf);
 				return (0);
 			}
@@ -1878,7 +1878,7 @@ cpTiles(TIFF* in, TIFF* out, uint32_t xmin, uint32_t ymin, uint32_t width, uint3
 				bufsize = (tmsize_t)bytecounts[t];
 			}
 			if (NDPIReadRawTile(in, t, buf, (tmsize_t)bytecounts[t]) < 0 ||
-			    TIFFWriteRawTile(out, t, buf, (tmsize_t)bytecounts[t]) < 0) {
+			    NDPIWriteRawTile(out, t, buf, (tmsize_t)bytecounts[t]) < 0) {
 				_NDPIfree(buf);
 				return (0);
 			}
@@ -1985,7 +1985,7 @@ writeBufferToContigTiles(TIFF* out, uint8_t* buf,
 			} else
 				cpBufToBuf(obuf, bufp + colb, nrow, tilew,
 				    0, iskew);
-			if (TIFFWriteTile(out, obuf, col, row, 0, 0) < 0) {
+			if (NDPIWriteTile(out, obuf, col, row, 0, 0) < 0) {
 				NDPIError(NDPIFileName(out),
 				    "Error, can't write tile at "
 				    TIFF_UINT32_FORMAT " " TIFF_UINT32_FORMAT,
@@ -2297,7 +2297,7 @@ NDPIFileName(TIFFout), outscanlinesizeinbytes, NDPIScanlineSize(TIFFout));*/
 
 		jpeg_write_scanlines(p_cinfo, row_pointers, length);
 	} else {
-		if (TIFFWriteEncodedStrip(TIFFout,
+		if (NDPIWriteEncodedStrip(TIFFout,
 			NDPIComputeStrip(TIFFout, 0, 0),
 		    outbuf, NDPIStripSize(TIFFout)) < 0) {
 			NDPIError(NDPIFileName(TIFFout),
@@ -2492,7 +2492,7 @@ fprintf(stderr, "Outfile \"%s\": compression set scanlinesize="
 
 		jpeg_write_scanlines(p_cinfo, row_pointers, length);
 	} else {
-		if (TIFFWriteEncodedStrip(TIFFout,
+		if (NDPIWriteEncodedStrip(TIFFout,
 			NDPIComputeStrip(TIFFout, 0, 0),
 		    outbuf, NDPIStripSize(TIFFout)) < 0) {
 			NDPIError(NDPIFileName(TIFFout),

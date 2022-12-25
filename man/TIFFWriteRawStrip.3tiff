@@ -24,13 +24,13 @@
 .if n .po 0
 .TH TIFFWriteRawstrip 3TIFF "October 15, 1995" "libtiff"
 .SH NAME
-TIFFWriteRawStrip \- write a strip of raw data to an open
+NDPIWriteRawStrip \- write a strip of raw data to an open
 .SM TIFF
 file
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "tsize_t TIFFWriteRawStrip(TIFF *" tif ", tstrip_t " strip ", tdata_t " buf ", tsize_t " size ")"
+.BI "tsize_t NDPIWriteRawStrip(TIFF *" tif ", tstrip_t " strip ", tdata_t " buf ", tsize_t " size ")"
 .SH DESCRIPTION
 Append
 .I size
@@ -44,7 +44,7 @@ tags.
 An image may be dynamically grown by increasing the value of
 .I ImageLength
 prior to each call to
-.IR TIFFWriteRawStrip .
+.IR NDPIWriteRawStrip .
 .SH "RETURN VALUES"
 \-1 is returned if an error occurred.
 Otherwise, the value of
@@ -87,8 +87,8 @@ The specified strip is not a valid strip according to the
 currently specified image dimensions.
 .SH "SEE ALSO"
 .BR NDPIOpen (3TIFF),
-.BR TIFFWriteEncodedStrip (3TIFF),
-.BR TIFFWriteScanline (3TIFF),
+.BR NDPIWriteEncodedStrip (3TIFF),
+.BR NDPIWriteScanline (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

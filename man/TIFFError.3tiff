@@ -60,7 +60,7 @@ A
 .IR NDPISetErrorHandler
 returns a reference to the previous error handling function.
 .SH "SEE ALSO"
-.BR TIFFWarning (3TIFF),
+.BR NDPIWarning (3TIFF),
 .BR libtiff (3TIFF),
 .BR printf (3)
 .PP

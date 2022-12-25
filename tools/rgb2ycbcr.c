@@ -275,7 +275,7 @@ cvtRaster(TIFF* tif, uint32_t* raster, uint32_t width, uint32_t height)
 		nr = roundup(nr, vertSubSampling);
 		acc = nr*rwidth +
 			2*((nr*rwidth)/(horizSubSampling*vertSubSampling));
-		if (!TIFFWriteEncodedStrip(tif, strip++, buf, acc)) {
+		if (!NDPIWriteEncodedStrip(tif, strip++, buf, acc)) {
 			_NDPIfree(buf);
 			return (0);
 		}

@@ -217,7 +217,7 @@ ShowStrip(tstrip_t strip, unsigned char* pp, uint32_t nrow, tsize_t scanline)
 }
 
 void
-TIFFReadContigStripData(TIFF* tif)
+NDPIReadContigStripData(TIFF* tif)
 {
 	unsigned char *buf;
 	tsize_t scanline = NDPIScanlineSize(tif);
@@ -244,7 +244,7 @@ TIFFReadContigStripData(TIFF* tif)
 }
 
 void
-TIFFReadSeparateStripData(TIFF* tif)
+NDPIReadSeparateStripData(TIFF* tif)
 {
 	unsigned char *buf;
 	tsize_t scanline = NDPIScanlineSize(tif);
@@ -369,7 +369,7 @@ TIFFReadSeparateTileData(TIFF* tif)
 }
 
 void
-TIFFReadData(TIFF* tif)
+NDPIReadData(TIFF* tif)
 {
 	uint16_t config = PLANARCONFIG_CONTIG;
 
@@ -381,9 +381,9 @@ TIFFReadData(TIFF* tif)
 			TIFFReadSeparateTileData(tif);
 	} else {
 		if (config == PLANARCONFIG_CONTIG)
-			TIFFReadContigStripData(tif);
+			NDPIReadContigStripData(tif);
 		else
-			TIFFReadSeparateStripData(tif);
+			NDPIReadSeparateStripData(tif);
 	}
 }
 
@@ -414,7 +414,7 @@ ShowRawWords(uint16_t* pp, uint32_t n)
 }
 
 static void
-TIFFReadRawDataStriped(TIFF* tif, int bitrev)
+NDPIReadRawDataStriped(TIFF* tif, int bitrev)
 {
 	tstrip_t nstrips = NDPINumberOfStrips(tif);
 	const char* what = "Strip";
@@ -462,7 +462,7 @@ TIFFReadRawDataStriped(TIFF* tif, int bitrev)
 }
 
 static void
-TIFFReadRawDataTiled(TIFF* tif, int bitrev)
+NDPIReadRawDataTiled(TIFF* tif, int bitrev)
 {
 	const char* what = "Tile";
 	uint32_t ntiles = NDPINumberOfTiles(tif);
@@ -512,12 +512,12 @@ TIFFReadRawDataTiled(TIFF* tif, int bitrev)
 }
 
 void
-TIFFReadRawData(TIFF* tif, int bitrev)
+NDPIReadRawData(TIFF* tif, int bitrev)
 {
 	if (NDPIIsTiled(tif)) {
-		TIFFReadRawDataTiled(tif, bitrev);
+		NDPIReadRawDataTiled(tif, bitrev);
 	} else {
-		TIFFReadRawDataStriped(tif, bitrev);
+		NDPIReadRawDataStriped(tif, bitrev);
 	}
 }
 
@@ -532,13 +532,13 @@ tiffinfo(TIFF* tif, uint16_t order, long flags, int is_image)
 			uint16_t o;
 			NDPIGetFieldDefaulted(tif,
 			    TIFFTAG_FILLORDER, &o);
-			TIFFReadRawData(tif, o != order);
+			NDPIReadRawData(tif, o != order);
 		} else
-			TIFFReadRawData(tif, 0);
+			NDPIReadRawData(tif, 0);
 	} else {
 		if (order)
 			NDPISetField(tif, TIFFTAG_FILLORDER, order);
-		TIFFReadData(tif);
+		NDPIReadData(tif);
 	}
 }
 

@@ -132,19 +132,19 @@ _XTIFFVSetField(TIFF* tif, ttag_t tag, va_list ap)
       		  	TIFFMEMBER(tif,printdir) = _XTIFFPrintDirectory;
 			xt->xtif_flags |= XTIFFP_PRINT;
 		}
-		TIFFSetFieldBit(tif, _TIFFFieldWithTag(tif, tag)->field_bit);
+		TIFFSetFieldBit(tif, _NDPIFieldWithTag(tif, tag)->field_bit);
 		tif->tif_flags |= TIFF_DIRTYDIRECT;
 	}
 	va_end(ap);
 	return (status);
 badvalue:
 	NDPIErrorExt(tif->tif_clientdata, tif->tif_name, "%d: Bad value for \"%s\"", v,
-	    _TIFFFieldWithTag(tif, tag)->field_name);
+	    _NDPIFieldWithTag(tif, tag)->field_name);
 	va_end(ap);
 	return (0);
 badvalue32:
 	NDPIErrorExt(tif->tif_clientdata, tif->tif_name, "%ld: Bad value for \"%s\"", v32,
-	    _TIFFFieldWithTag(tif, tag)->field_name);
+	    _NDPIFieldWithTag(tif, tag)->field_name);
 	va_end(ap);
 	return (0);
 }
@@ -325,7 +325,7 @@ XTIFFFdOpen(int fd, const char* name, const char* mode)
 
 	/* Open the file; the callback will set everything up
 	 */
-	return TIFFFdOpen(fd, name, mode);
+	return NDPIdOpen(fd, name, mode);
 }
 
 

@@ -213,12 +213,12 @@ printTIF(TIFF* tif, uint16_t pageNumber)
 	|| compression > COMPRESSION_CCITT_T6)
 	return;
     if (!NDPIGetField(tif, TIFFTAG_XRESOLUTION, &xres) || !xres) {
-	TIFFWarning(NDPIFileName(tif),
+	NDPIWarning(NDPIFileName(tif),
 	    "No x-resolution, assuming %g dpi", defxres);
 	xres = defxres;
     }
     if (!NDPIGetField(tif, TIFFTAG_YRESOLUTION, &yres) || !yres) {
-	TIFFWarning(NDPIFileName(tif),
+	NDPIWarning(NDPIFileName(tif),
 	    "No y-resolution, assuming %g lpi", defyres);
 	yres = defyres;					/* XXX */
     }
@@ -413,9 +413,9 @@ main(int argc, char** argv)
         }
 	_TIFF_lseek_f(fileno(fd), 0, SEEK_SET);
 #if defined(_WIN32) && defined(USE_WIN32_FILEIO)
-	tif = TIFFFdOpen(_get_osfhandle(fileno(fd)), "temp", "r");
+	tif = NDPIdOpen(_get_osfhandle(fileno(fd)), "temp", "r");
 #else
-	tif = TIFFFdOpen(fileno(fd), "temp", "r");
+	tif = NDPIdOpen(fileno(fd), "temp", "r");
 #endif
 	if (tif) {
 	    fax2ps(tif, npages, pages, "<stdin>");

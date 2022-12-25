@@ -21,15 +21,15 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFFieldDataType 3TIFF "July 26, 2012" "libtiff"
+.TH NDPIFieldDataType 3TIFF "July 26, 2012" "libtiff"
 .SH NAME
-TIFFFieldDataType \- Get TIFF data type from field information
+NDPIFieldDataType \- Get TIFF data type from field information
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "TIFFDataType TIFFFieldDataType(const TIFFField* " fip ")"
+.BI "TIFFDataType NDPIFieldDataType(const TIFFField* " fip ")"
 .SH DESCRIPTION
-.BR TIFFFieldDataType
+.BR NDPIFieldDataType
 returns the data type stored in a TIFF field.
 .P
 .I fip
@@ -37,11 +37,11 @@ is a field information pointer previously returned by
 .BR NDPIFindField ,
 .BR NDPIFieldWithTag ,
 or
-.BR TIFFFieldWithName .
+.BR NDPIFieldWithName .
 .br
 .SH "RETURN VALUES"
 .br
-.BR TIFFFieldDataType
+.BR NDPIFieldDataType
 returns a member of the enum type
 .BR TIFFDataType .
 .br

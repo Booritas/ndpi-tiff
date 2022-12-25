@@ -125,14 +125,14 @@ TIFFOvrCache *NDPICreateOvrCache( TIFF *hTIFF, toff_t nDirOffset )
 }
 
 /************************************************************************/
-/*                          TIFFWriteOvrRow()                           */
+/*                          NDPIWriteOvrRow()                           */
 /*                                                                      */
 /*      Write one entire row of blocks (row 1) to the tiff file, and    */
 /*      then rotate the block buffers, essentially moving things        */
 /*      down by one block.                                              */
 /************************************************************************/
 
-static void TIFFWriteOvrRow( TIFFOvrCache * psCache )
+static void NDPIWriteOvrRow( TIFFOvrCache * psCache )
 
 {
     int		nRet, iTileX, iTileY = psCache->nBlockOffset;
@@ -182,7 +182,7 @@ static void TIFFWriteOvrRow( TIFFOvrCache * psCache )
 
 			for( iSample = 0; iSample < psCache->nSamples; iSample++ )
 			{
-				pabyData = TIFFGetOvrBlock( psCache, iTileX, iTileY, iSample );
+				pabyData = NDPIGetOvrBlock( psCache, iTileX, iTileY, iSample );
 
 				if( psCache->bTiled )
 				{
@@ -190,7 +190,7 @@ static void TIFFWriteOvrRow( TIFFOvrCache * psCache )
 					    iTileX * psCache->nBlockXSize,
 					    iTileY * psCache->nBlockYSize,
 					    0, (tsample_t) iSample );
-					TIFFWriteEncodedTile( psCache->hTIFF, nTileID,
+					NDPIWriteEncodedTile( psCache->hTIFF, nTileID,
 					    pabyData,
 					    NDPITileSize(psCache->hTIFF) );
 				}
@@ -202,7 +202,7 @@ static void TIFFWriteOvrRow( TIFFOvrCache * psCache )
 					RowsInStrip=psCache->nBlockYSize;
 					if ((iTileY+1)*psCache->nBlockYSize>psCache->nYSize)
 						RowsInStrip=psCache->nYSize-iTileY*psCache->nBlockYSize;
-					TIFFWriteEncodedStrip( psCache->hTIFF, nTileID,
+					NDPIWriteEncodedStrip( psCache->hTIFF, nTileID,
 					    pabyData,
 					    NDPIVStripSize(psCache->hTIFF,RowsInStrip) );
 				}
@@ -211,7 +211,7 @@ static void TIFFWriteOvrRow( TIFFOvrCache * psCache )
 		}
 		else
 		{
-			pabyData = TIFFGetOvrBlock( psCache, iTileX, iTileY, 0 );
+			pabyData = NDPIGetOvrBlock( psCache, iTileX, iTileY, 0 );
 
 			if( psCache->bTiled )
 			{
@@ -219,7 +219,7 @@ static void TIFFWriteOvrRow( TIFFOvrCache * psCache )
 				    iTileX * psCache->nBlockXSize,
 				    iTileY * psCache->nBlockYSize,
 				    0, 0 );
-				TIFFWriteEncodedTile( psCache->hTIFF, nTileID,
+				NDPIWriteEncodedTile( psCache->hTIFF, nTileID,
 				    pabyData,
 				    NDPITileSize(psCache->hTIFF) );
 			}
@@ -231,13 +231,13 @@ static void TIFFWriteOvrRow( TIFFOvrCache * psCache )
 				RowsInStrip=psCache->nBlockYSize;
 				if ((iTileY+1)*psCache->nBlockYSize>psCache->nYSize)
 					RowsInStrip=psCache->nYSize-iTileY*psCache->nBlockYSize;
-				TIFFWriteEncodedStrip( psCache->hTIFF, nTileID,
+				NDPIWriteEncodedStrip( psCache->hTIFF, nTileID,
 				    pabyData,
 				    NDPIVStripSize(psCache->hTIFF,RowsInStrip) );
 			}
 		}
 	}
-	/* TODO: add checks on error status return of TIFFWriteEncodedTile and TIFFWriteEncodedStrip */
+	/* TODO: add checks on error status return of NDPIWriteEncodedTile and NDPIWriteEncodedStrip */
 
 /* -------------------------------------------------------------------- */
 /*      Rotate buffers.                                                 */
@@ -260,19 +260,19 @@ static void TIFFWriteOvrRow( TIFFOvrCache * psCache )
 }
 
 /************************************************************************/
-/*                          TIFFGetOvrBlock()                           */
+/*                          NDPIGetOvrBlock()                           */
 /************************************************************************/
 
 /* TODO: make TIFF_Downsample handle iSample offset, so that we can
- * do with a single TIFFGetOvrBlock and no longer need TIFFGetOvrBlock_Subsampled */
-unsigned char *TIFFGetOvrBlock( TIFFOvrCache *psCache, int iTileX, int iTileY,
+ * do with a single NDPIGetOvrBlock and no longer need NDPIGetOvrBlock_Subsampled */
+unsigned char *NDPIGetOvrBlock( TIFFOvrCache *psCache, int iTileX, int iTileY,
                                 int iSample )
 
 {
     long	       nRowOffset;
 
     if ( iTileY > psCache->nBlockOffset + 1 )
-        TIFFWriteOvrRow( psCache );
+        NDPIWriteOvrRow( psCache );
 
     assert( iTileX >= 0 && iTileX < psCache->nBlocksPerRow );
     assert( iTileY >= 0 && iTileY < psCache->nBlocksPerColumn );
@@ -294,17 +294,17 @@ unsigned char *TIFFGetOvrBlock( TIFFOvrCache *psCache, int iTileX, int iTileY,
 }
 
 /************************************************************************/
-/*                     TIFFGetOvrBlock_Subsampled()                     */
+/*                     NDPIGetOvrBlock_Subsampled()                     */
 /************************************************************************/
 
-unsigned char *TIFFGetOvrBlock_Subsampled( TIFFOvrCache *psCache, 
+unsigned char *NDPIGetOvrBlock_Subsampled( TIFFOvrCache *psCache, 
                                            int iTileX, int iTileY )
 
 {
     int		nRowOffset;
 
     if( iTileY > psCache->nBlockOffset + 1 )
-        TIFFWriteOvrRow( psCache );
+        NDPIWriteOvrRow( psCache );
 
     assert( iTileX >= 0 && iTileX < psCache->nBlocksPerRow );
     assert( iTileY >= 0 && iTileY < psCache->nBlocksPerColumn );
@@ -328,7 +328,7 @@ void NDPIDestroyOvrCache( TIFFOvrCache * psCache )
 
 {
     while( psCache->nBlockOffset < psCache->nBlocksPerColumn )
-        TIFFWriteOvrRow( psCache );
+        NDPIWriteOvrRow( psCache );
 
     _NDPIfree( psCache->pabyRow1Blocks );
     _NDPIfree( psCache->pabyRow2Blocks );

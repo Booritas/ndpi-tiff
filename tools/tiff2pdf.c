@@ -636,7 +636,7 @@ int main(int argc, char** argv){
 #endif
 #ifndef JPEG_SUPPORT
 			case 'j':  
-				TIFFWarning(
+				NDPIWarning(
 					TIFF2PDF_MODULE, 
 					"JPEG support in libtiff required for JPEG compression, ignoring option");
 				break;
@@ -648,7 +648,7 @@ int main(int argc, char** argv){
 #endif
 #ifndef ZIP_SUPPORT
 			case 'z':  
-				TIFFWarning(
+				NDPIWarning(
 					TIFF2PDF_MODULE, 
 					"Zip support in libtiff required for Zip compression, ignoring option");
 				break;
@@ -697,7 +697,7 @@ int main(int argc, char** argv){
 					optarg)){
 					t2p->pdf_overridepagesize=1;
 				} else {
-					TIFFWarning(TIFF2PDF_MODULE, 
+					NDPIWarning(TIFF2PDF_MODULE, 
 					"Unknown paper size %s, ignoring option",
 						optarg);
 				}
@@ -1371,7 +1371,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 		case 8:
 			break;
 		case 0:
-			TIFFWarning(
+			NDPIWarning(
 				TIFF2PDF_MODULE, 
 				"Image %s has 0 bits per sample, assuming 1",
 				NDPIFileName(input));
@@ -1398,7 +1398,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 		return;
 	}
 	if(t2p->tiff_samplesperpixel==0){
-		TIFFWarning(
+		NDPIWarning(
 			TIFF2PDF_MODULE, 
 			"Image %s has 0 samples per pixel, assuming 1",
 			NDPIFileName(input));
@@ -1492,7 +1492,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 							t2p->pdf_sample=T2P_SAMPLE_RGBA_TO_RGB;
 							break;
 						}
-						TIFFWarning(
+						NDPIWarning(
 							TIFF2PDF_MODULE, 
 							"RGB image %s has 4 samples per pixel, assuming RGBA",
 							NDPIFileName(input));
@@ -1500,7 +1500,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 					}
 					t2p->pdf_colorspace=T2P_CS_CMYK;
 					t2p->pdf_switchdecode ^= 1;
-					TIFFWarning(
+					NDPIWarning(
 						TIFF2PDF_MODULE, 
 						"RGB image %s has 4 samples per pixel, assuming inverse CMYK",
 					NDPIFileName(input));
@@ -1739,7 +1739,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 	if(NDPIGetField(input, TIFFTAG_PLANARCONFIG, &(t2p->tiff_planar))){
 		switch(t2p->tiff_planar){
 			case 0:
-				TIFFWarning(
+				NDPIWarning(
 					TIFF2PDF_MODULE, 
 					"Image %s has planar configuration 0, assuming 1", 
 					NDPIFileName(input));
@@ -1772,7 +1772,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
         NDPIGetFieldDefaulted(input, TIFFTAG_ORIENTATION,
                               &(t2p->tiff_orientation));
         if(t2p->tiff_orientation>8){
-                TIFFWarning(TIFF2PDF_MODULE,
+                NDPIWarning(TIFF2PDF_MODULE,
                             "Image %s has orientation %"PRIu16", assuming 0",
                             NDPIFileName(input), t2p->tiff_orientation);
                 t2p->tiff_orientation=0;
@@ -2013,7 +2013,7 @@ void t2p_read_tiff_size(T2P* t2p, TIFF* input){
 				if(t2p->tiff_dataoffset != 0){
 					if(NDPIGetField(input, TIFFTAG_JPEGIFBYTECOUNT, &(t2p->tiff_datasize))!=0){
 						if((uint64_t)t2p->tiff_datasize < k) {
-							TIFFWarning(TIFF2PDF_MODULE, 
+							NDPIWarning(TIFF2PDF_MODULE, 
 								"Input file %s has short JPEG interchange file byte count", 
 								NDPIFileName(input));
 							t2p->pdf_ojpegiflength=t2p->tiff_datasize;
@@ -2811,13 +2811,13 @@ dataready:
 #ifdef JPEG_SUPPORT
 	if(t2p->pdf_compression == T2P_COMPRESS_JPEG
 	   && t2p->tiff_photometric == PHOTOMETRIC_YCBCR){
-		bufferoffset = TIFFWriteEncodedStrip(output, (tstrip_t)0,
+		bufferoffset = NDPIWriteEncodedStrip(output, (tstrip_t)0,
 						     buffer,
 						     stripsize * stripcount); 
 	} else
 #endif /* ifdef JPEG_SUPPORT */
         {
-		bufferoffset = TIFFWriteEncodedStrip(output, (tstrip_t)0,
+		bufferoffset = NDPIWriteEncodedStrip(output, (tstrip_t)0,
 						     buffer,
 						     t2p->tiff_datasize); 
 	}
@@ -3188,7 +3188,7 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 	if(t2p_tile_is_right_edge(t2p->tiff_tiles[t2p->pdf_page], tile) != 0){
 		if ((uint64_t)t2p->tiff_datasize < (uint64_t)NDPITileRowSize(input) * (uint64_t)t2p->tiff_tiles[t2p->pdf_page].tiles_tilelength) {
 			/* we don't know how to handle PLANARCONFIG_CONTIG, PHOTOMETRIC_YCBCR with 3 samples per pixel */
-			TIFFWarning(
+			NDPIWarning(
 				TIFF2PDF_MODULE,
 				"Don't know how to collapse tile to the left");
 		} else {
@@ -3313,7 +3313,7 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 	}
 	t2p_enable(output);
 	t2p->outputwritten = 0;
-	bufferoffset = TIFFWriteEncodedStrip(output, (tstrip_t) 0, buffer,
+	bufferoffset = NDPIWriteEncodedStrip(output, (tstrip_t) 0, buffer,
 	                                     NDPIStripSize(output));
 	if (buffer != NULL) {
 		_NDPIfree(buffer);
@@ -5512,10 +5512,10 @@ tsize_t t2p_write_pdf_trailer(T2P* t2p, TIFF* output)
 
   The idea with using a TIFF* as output for a PDF file is that the file 
   can be created with NDPIClientOpen for memory-mapped use within the TIFF 
-  library, and TIFFWriteEncodedStrip can be used to write compressed data to 
+  library, and NDPIWriteEncodedStrip can be used to write compressed data to 
   the output.  The output is not actually a TIFF file, it is a PDF file.  
 
-  This function uses only t2pWriteFile and TIFFWriteEncodedStrip to write to 
+  This function uses only t2pWriteFile and NDPIWriteEncodedStrip to write to 
   the output TIFF file.  When libtiff would otherwise be writing data to the 
   output file, the write procedure of the TIFF structure is replaced with an 
   empty implementation.

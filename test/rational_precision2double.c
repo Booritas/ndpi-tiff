@@ -583,7 +583,7 @@ write_test_tiff(TIFF* tif, const char* filenameRead, int blnAllCustomTags) {
 	}	/* blnAllCustomTags */  /*==== END END - Automatically check all custom rational tags  == WRITING END ===*/
 
 	/*-- Write dummy pixel data. --*/
-	if (TIFFWriteScanline(tif, buf, 0, 0) < 0) {
+	if (NDPIWriteScanline(tif, buf, 0, 0) < 0) {
 		fprintf (stderr, "Can't write image data.\n");
 		goto failure;
 	}

@@ -52,12 +52,12 @@ dist_man3_MANS = \
 	TIFFcolor.3tiff \
 	TIFFDataWidth.3tiff \
 	NDPIError.3tiff \
-	TIFFFieldDataType.3tiff \
-	TIFFFieldName.3tiff \
-	TIFFFieldPassCount.3tiff \
+	NDPIFieldDataType.3tiff \
+	NDPIFieldName.3tiff \
+	NDPIFieldPassCount.3tiff \
 	TIFFFieldReadCount.3tiff \
-	TIFFFieldTag.3tiff \
-	TIFFFieldWriteCount.3tiff \
+	NDPIFieldTag.3tiff \
+	NDPIFieldWriteCount.3tiff \
 	NDPIFlush.3tiff \
 	NDPIGetField.3tiff \
 	TIFFmemory.3tiff \
@@ -81,14 +81,14 @@ dist_man3_MANS = \
 	TIFFstrip.3tiff \
 	TIFFswab.3tiff \
 	TIFFtile.3tiff \
-	TIFFWarning.3tiff \
+	NDPIWarning.3tiff \
 	NDPIWriteDirectory.3tiff \
-	TIFFWriteEncodedStrip.3tiff \
-	TIFFWriteEncodedTile.3tiff \
-	TIFFWriteRawStrip.3tiff \
-	TIFFWriteRawTile.3tiff \
-	TIFFWriteScanline.3tiff \
-	TIFFWriteTile.3tiff
+	NDPIWriteEncodedStrip.3tiff \
+	NDPIWriteEncodedTile.3tiff \
+	NDPIWriteRawStrip.3tiff \
+	NDPIWriteRawTile.3tiff \
+	NDPIWriteScanline.3tiff \
+	NDPIWriteTile.3tiff
 
 EXTRA_DIST = \
 	CMakeLists.txt

@@ -322,7 +322,7 @@ main(int argc, char* argv[])
 			break;
 		}
 				
-		if (TIFFWriteScanline(out, buf1, row, 0) < 0) {
+		if (NDPIWriteScanline(out, buf1, row, 0) < 0) {
 			fprintf(stderr,	"%s: %s: scanline %"PRIu32": Write error.\n",
 				argv[0], outfilename, row);
 			break;

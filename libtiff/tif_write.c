@@ -41,12 +41,12 @@
 	    TIFFWriteBufferSetup((tif), NULL, (tmsize_t) -1))
 
 static int TIFFGrowStrips(TIFF* tif, uint32_t delta, const char* module);
-static int TIFFAppendToStrip(TIFF* tif, uint32_t strip, uint8_t* data, tmsize_t cc);
+static int NDPIAppendToStrip(TIFF* tif, uint32_t strip, uint8_t* data, tmsize_t cc);
 
 int
-TIFFWriteScanline(TIFF* tif, void* buf, uint32_t row, uint16_t sample)
+NDPIWriteScanline(TIFF* tif, void* buf, uint32_t row, uint16_t sample)
 {
-	static const char module[] = "TIFFWriteScanline";
+	static const char module[] = "NDPIWriteScanline";
 	register TIFFDirectory *td;
 	int status, imagegrew = 0;
 	uint32_t strip;
@@ -133,7 +133,7 @@ TIFFWriteScanline(TIFF* tif, void* buf, uint32_t row, uint16_t sample)
 			/* if we are writing over existing tiles, zero length */
 			td->td_stripbytecount_p[strip] = 0;
 
-			/* this forces TIFFAppendToStrip() to do a seek */
+			/* this forces NDPIAppendToStrip() to do a seek */
 			tif->tif_curoff = 0;
 		}
 
@@ -178,9 +178,9 @@ TIFFWriteScanline(TIFF* tif, void* buf, uint32_t row, uint16_t sample)
 
 /* Make sure that at the first attempt of rewriting a tile/strip, we will have */
 /* more bytes available in the output buffer than the previous byte count, */
-/* so that TIFFAppendToStrip() will detect the overflow when it is called the first */
+/* so that NDPIAppendToStrip() will detect the overflow when it is called the first */
 /* time if the new compressed tile is bigger than the older one. (GDAL #4771) */
-static int _TIFFReserveLargeEnoughWriteBuffer(TIFF* tif, uint32_t strip_or_tile)
+static int _NDPIReserveLargeEnoughWriteBuffer(TIFF* tif, uint32_t strip_or_tile)
 {
     TIFFDirectory *td = &tif->tif_dir;
     if( td->td_stripbytecount_p[strip_or_tile] > 0 )
@@ -195,7 +195,7 @@ static int _TIFFReserveLargeEnoughWriteBuffer(TIFF* tif, uint32_t strip_or_tile)
                 return 0;
         }
 
-        /* Force TIFFAppendToStrip() to consider placing data at end
+        /* Force NDPIAppendToStrip() to consider placing data at end
             of file. */
         tif->tif_curoff = 0;
     }
@@ -209,9 +209,9 @@ static int _TIFFReserveLargeEnoughWriteBuffer(TIFF* tif, uint32_t strip_or_tile)
  * NB: Image length must be setup before writing.
  */
 tmsize_t
-TIFFWriteEncodedStrip(TIFF* tif, uint32_t strip, void* data, tmsize_t cc)
+NDPIWriteEncodedStrip(TIFF* tif, uint32_t strip, void* data, tmsize_t cc)
 {
-	static const char module[] = "TIFFWriteEncodedStrip";
+	static const char module[] = "NDPIWriteEncodedStrip";
 	TIFFDirectory *td = &tif->tif_dir;
 	uint16_t sample;
 
@@ -248,7 +248,7 @@ TIFFWriteEncodedStrip(TIFF* tif, uint32_t strip, void* data, tmsize_t cc)
         tif->tif_flags |= TIFF_BUF4WRITE;
 	tif->tif_curstrip = strip;
 
-	if( !_TIFFReserveLargeEnoughWriteBuffer(tif, strip) ) {
+	if( !_NDPIReserveLargeEnoughWriteBuffer(tif, strip) ) {
             return ((tmsize_t)(-1));
         }
 
@@ -280,7 +280,7 @@ TIFFWriteEncodedStrip(TIFF* tif, uint32_t strip, void* data, tmsize_t cc)
             NDPIReverseBits((uint8_t*) data, cc);
 
         if (cc > 0 &&
-            !TIFFAppendToStrip(tif, strip, (uint8_t*) data, cc))
+            !NDPIAppendToStrip(tif, strip, (uint8_t*) data, cc))
             return ((tmsize_t) -1);
         return (cc);
     }
@@ -300,7 +300,7 @@ TIFFWriteEncodedStrip(TIFF* tif, uint32_t strip, void* data, tmsize_t cc)
 	    (tif->tif_flags & TIFF_NOBITREV) == 0)
 		NDPIReverseBits(tif->tif_rawdata, tif->tif_rawcc);
 	if (tif->tif_rawcc > 0 &&
-	    !TIFFAppendToStrip(tif, strip, tif->tif_rawdata, tif->tif_rawcc))
+	    !NDPIAppendToStrip(tif, strip, tif->tif_rawdata, tif->tif_rawcc))
 		return ((tmsize_t) -1);
 	tif->tif_rawcc = 0;
 	tif->tif_rawcp = tif->tif_rawdata;
@@ -313,9 +313,9 @@ TIFFWriteEncodedStrip(TIFF* tif, uint32_t strip, void* data, tmsize_t cc)
  * NB: Image length must be setup before writing.
  */
 tmsize_t
-TIFFWriteRawStrip(TIFF* tif, uint32_t strip, void* data, tmsize_t cc)
+NDPIWriteRawStrip(TIFF* tif, uint32_t strip, void* data, tmsize_t cc)
 {
-	static const char module[] = "TIFFWriteRawStrip";
+	static const char module[] = "NDPIWriteRawStrip";
 	TIFFDirectory *td = &tif->tif_dir;
 
 	if (!WRITECHECKSTRIPS(tif, module))
@@ -352,7 +352,7 @@ TIFFWriteRawStrip(TIFF* tif, uint32_t strip, void* data, tmsize_t cc)
                 return ((tmsize_t) -1);
         }
 	tif->tif_row = (strip % td->td_stripsperimage) * td->td_rowsperstrip;
-	return (TIFFAppendToStrip(tif, strip, (uint8_t*) data, cc) ?
+	return (NDPIAppendToStrip(tif, strip, (uint8_t*) data, cc) ?
 	    cc : (tmsize_t) -1);
 }
 
@@ -361,17 +361,17 @@ TIFFWriteRawStrip(TIFF* tif, uint32_t strip, void* data, tmsize_t cc)
  * tile is selected by the (x,y,z,s) coordinates.
  */
 tmsize_t
-TIFFWriteTile(TIFF* tif, void* buf, uint32_t x, uint32_t y, uint32_t z, uint16_t s)
+NDPIWriteTile(TIFF* tif, void* buf, uint32_t x, uint32_t y, uint32_t z, uint16_t s)
 {
 	if (!NDPICheckTile(tif, x, y, z, s))
 		return ((tmsize_t)(-1));
 	/*
 	 * NB: A tile size of -1 is used instead of tif_tilesize knowing
-	 *     that TIFFWriteEncodedTile will clamp this to the tile size.
+	 *     that NDPIWriteEncodedTile will clamp this to the tile size.
 	 *     This is done because the tile size may not be defined until
 	 *     after the output buffer is setup in TIFFWriteBufferSetup.
 	 */
-	return (TIFFWriteEncodedTile(tif,
+	return (NDPIWriteEncodedTile(tif,
 	    NDPIComputeTile(tif, x, y, z, s), buf, (tmsize_t)(-1)));
 }
 
@@ -385,12 +385,12 @@ TIFFWriteTile(TIFF* tif, void* buf, uint32_t x, uint32_t y, uint32_t z, uint16_t
  *
  * NB: Image length must be setup before writing; this
  *     interface does not support automatically growing
- *     the image on each write (as TIFFWriteScanline does).
+ *     the image on each write (as NDPIWriteScanline does).
  */
 tmsize_t
-TIFFWriteEncodedTile(TIFF* tif, uint32_t tile, void* data, tmsize_t cc)
+NDPIWriteEncodedTile(TIFF* tif, uint32_t tile, void* data, tmsize_t cc)
 {
-	static const char module[] = "TIFFWriteEncodedTile";
+	static const char module[] = "NDPIWriteEncodedTile";
 	TIFFDirectory *td;
 	uint16_t sample;
         uint32_t howmany32;
@@ -414,7 +414,7 @@ TIFFWriteEncodedTile(TIFF* tif, uint32_t tile, void* data, tmsize_t cc)
         tif->tif_flags |= TIFF_BUF4WRITE;
 	tif->tif_curtile = tile;
 
-        if( !_TIFFReserveLargeEnoughWriteBuffer(tif, tile) ) {
+        if( !_NDPIReserveLargeEnoughWriteBuffer(tif, tile) ) {
             return ((tmsize_t)(-1));
         }
 
@@ -464,7 +464,7 @@ TIFFWriteEncodedTile(TIFF* tif, uint32_t tile, void* data, tmsize_t cc)
             NDPIReverseBits((uint8_t*) data, cc);
 
         if (cc > 0 &&
-            !TIFFAppendToStrip(tif, tile, (uint8_t*) data, cc))
+            !NDPIAppendToStrip(tif, tile, (uint8_t*) data, cc))
             return ((tmsize_t) -1);
         return (cc);
     }
@@ -482,7 +482,7 @@ TIFFWriteEncodedTile(TIFF* tif, uint32_t tile, void* data, tmsize_t cc)
     if (!isFillOrder(tif, td->td_fillorder) &&
         (tif->tif_flags & TIFF_NOBITREV) == 0)
             NDPIReverseBits((uint8_t*)tif->tif_rawdata, tif->tif_rawcc);
-    if (tif->tif_rawcc > 0 && !TIFFAppendToStrip(tif, tile,
+    if (tif->tif_rawcc > 0 && !NDPIAppendToStrip(tif, tile,
         tif->tif_rawdata, tif->tif_rawcc))
             return ((tmsize_t)(-1));
     tif->tif_rawcc = 0;
@@ -497,12 +497,12 @@ TIFFWriteEncodedTile(TIFF* tif, uint32_t tile, void* data, tmsize_t cc)
  *
  * NB: Image length must be setup before writing; this
  *     interface does not support automatically growing
- *     the image on each write (as TIFFWriteScanline does).
+ *     the image on each write (as NDPIWriteScanline does).
  */
 tmsize_t
-TIFFWriteRawTile(TIFF* tif, uint32_t tile, void* data, tmsize_t cc)
+NDPIWriteRawTile(TIFF* tif, uint32_t tile, void* data, tmsize_t cc)
 {
-	static const char module[] = "TIFFWriteRawTile";
+	static const char module[] = "NDPIWriteRawTile";
 
 	if (!WRITECHECKTILES(tif, module))
 		return ((tmsize_t)(-1));
@@ -512,7 +512,7 @@ TIFFWriteRawTile(TIFF* tif, uint32_t tile, void* data, tmsize_t cc)
 		    (unsigned long) tif->tif_dir.td_nstrips);
 		return ((tmsize_t)(-1));
 	}
-	return (TIFFAppendToStrip(tif, tile, (uint8_t*) data, cc) ?
+	return (NDPIAppendToStrip(tif, tile, (uint8_t*) data, cc) ?
 	    cc : (tmsize_t)(-1));
 }
 
@@ -736,9 +736,9 @@ TIFFGrowStrips(TIFF* tif, uint32_t delta, const char* module)
  * Append the data to the specified strip.
  */
 static int
-TIFFAppendToStrip(TIFF* tif, uint32_t strip, uint8_t* data, tmsize_t cc)
+NDPIAppendToStrip(TIFF* tif, uint32_t strip, uint8_t* data, tmsize_t cc)
 {
-	static const char module[] = "TIFFAppendToStrip";
+	static const char module[] = "NDPIAppendToStrip";
 	TIFFDirectory *td = &tif->tif_dir;
 	uint64_t m;
         int64_t old_byte_count = -1;
@@ -818,7 +818,7 @@ NDPIFlushData1(TIFF* tif)
 		    (tif->tif_flags & TIFF_NOBITREV) == 0)
 			NDPIReverseBits((uint8_t*)tif->tif_rawdata,
 			    tif->tif_rawcc);
-		if (!TIFFAppendToStrip(tif,
+		if (!NDPIAppendToStrip(tif,
 		    isTiled(tif) ? tif->tif_curtile : tif->tif_curstrip,
 		    tif->tif_rawdata, tif->tif_rawcc))
         {

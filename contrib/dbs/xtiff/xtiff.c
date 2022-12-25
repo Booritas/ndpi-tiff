@@ -535,7 +535,7 @@ CheckAndCorrectColormap()
         greenMap[i] = SCALE(greenMap[i], 255);
         blueMap[i] = SCALE(blueMap[i], 255);
     }
-    TIFFWarning(fileName, "Assuming 8-bit colormap");
+    NDPIWarning(fileName, "Assuming 8-bit colormap");
 }
 
 void

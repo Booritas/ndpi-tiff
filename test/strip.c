@@ -55,7 +55,7 @@ write_strips(TIFF *tif, const tdata_t array, const tsize_t size)
 		if (bufsize > stripsize)
 			bufsize = stripsize;
 
-		if (TIFFWriteEncodedStrip(tif, strip, (char *)array + offset,
+		if (NDPIWriteEncodedStrip(tif, strip, (char *)array + offset,
 					  bufsize) != bufsize) {
 			fprintf (stderr, "Can't write strip %"PRIu32".\n",
 				 strip);
@@ -275,7 +275,7 @@ write_scanlines(TIFF *tif, const tdata_t array, const tsize_t size)
 	}
 
 	for (offset = 0, row = 0; row < length; offset+=scanlinesize, row++) {
-		if (TIFFWriteScanline(tif, (char *)array + offset, row, 0) == -1) {
+		if (NDPIWriteScanline(tif, (char *)array + offset, row, 0) == -1) {
 			fprintf (stderr,
 				 "Can't write image data at row %"PRIu32".\n", row);
 			return -1;

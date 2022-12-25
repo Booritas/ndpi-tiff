@@ -111,7 +111,7 @@ Once you have edited these files, you may build the client module
 with the Makefile provided, and run the test programs.
 
 To use these files in your own code, the "xtif_dir.c" module defines
-replacement routines for the standard "NDPIOpen()" "TIFFFdOpen",
+replacement routines for the standard "NDPIOpen()" "NDPIdOpen",
 and "NDPIClose()" routines, called XTIFFOpen, XTIFFFdOpen and XTIFFClose.
 You must use these routines in order to have the extended tag handlers
 installed. Once installed, the standard NDPIGetField() and NDPISetField

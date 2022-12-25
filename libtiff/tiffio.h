@@ -320,14 +320,14 @@ typedef struct _TIFFFieldArray TIFFFieldArray;
 
 extern const TIFFField* NDPIFindField(TIFF *, uint32_t, TIFFDataType);
 extern const TIFFField* NDPIFieldWithTag(TIFF*, uint32_t);
-extern const TIFFField* TIFFFieldWithName(TIFF*, const char *);
+extern const TIFFField* NDPIFieldWithName(TIFF*, const char *);
 
-extern uint32_t TIFFFieldTag(const TIFFField*);
-extern const char* TIFFFieldName(const TIFFField*);
-extern TIFFDataType TIFFFieldDataType(const TIFFField*);
-extern int TIFFFieldPassCount(const TIFFField*);
+extern uint32_t NDPIFieldTag(const TIFFField*);
+extern const char* NDPIFieldName(const TIFFField*);
+extern TIFFDataType NDPIFieldDataType(const TIFFField*);
+extern int NDPIFieldPassCount(const TIFFField*);
 extern int TIFFFieldReadCount(const TIFFField*);
-extern int TIFFFieldWriteCount(const TIFFField*);
+extern int NDPIFieldWriteCount(const TIFFField*);
 
 typedef int (*TIFFVSetMethod)(TIFF*, uint32_t, va_list);
 typedef int (*TIFFVGetMethod)(TIFF*, uint32_t, va_list);
@@ -412,7 +412,7 @@ extern int NDPISetSubDirectory(TIFF*, uint64_t);
 extern int NDPIUnlinkDirectory(TIFF*, uint16_t);
 extern int NDPISetField(TIFF*, uint32_t, ...);
 extern int NDPIVSetField(TIFF*, uint32_t, va_list);
-extern int TIFFUnsetField(TIFF*, uint32_t);
+extern int NDPIUnsetField(TIFF*, uint32_t);
 extern int NDPIWriteDirectory(TIFF *);
 extern int NDPIWriteCustomDirectory(TIFF *, uint64_t *);
 extern int NDPICheckpointDirectory(TIFF *);
@@ -423,14 +423,14 @@ extern int NDPIForceStrileArrayWriting(TIFF* );
 #if defined(c_plusplus) || defined(__cplusplus)
 extern void NDPIPrintDirectory(TIFF*, FILE*, long = 0);
 extern int NDPIReadScanline(TIFF* tif, void* buf, uint32_t row, uint16_t sample = 0);
-extern int TIFFWriteScanline(TIFF* tif, void* buf, uint32_t row, uint16_t sample = 0);
+extern int NDPIWriteScanline(TIFF* tif, void* buf, uint32_t row, uint16_t sample = 0);
 extern int NDPIReadRGBAImage(TIFF*, uint32_t, uint32_t, uint32_t*, int = 0);
 extern int NDPIReadRGBAImageOriented(TIFF*, uint32_t, uint32_t, uint32_t*,
     int = ORIENTATION_BOTLEFT, int = 0);
 #else
 extern void NDPIPrintDirectory(TIFF*, FILE*, long);
 extern int NDPIReadScanline(TIFF* tif, void* buf, uint32_t row, uint16_t sample);
-extern int TIFFWriteScanline(TIFF* tif, void* buf, uint32_t row, uint16_t sample);
+extern int NDPIWriteScanline(TIFF* tif, void* buf, uint32_t row, uint16_t sample);
 extern int NDPIReadRGBAImage(TIFF*, uint32_t, uint32_t, uint32_t*, int);
 extern int NDPIReadRGBAImageOriented(TIFF*, uint32_t, uint32_t, uint32_t*, int, int);
 #endif
@@ -447,7 +447,7 @@ extern TIFF* NDPIOpen(const char*, const char*);
 # ifdef __WIN32__
 extern TIFF* TIFFOpenW(const wchar_t*, const char*);
 # endif /* __WIN32__ */
-extern TIFF* TIFFFdOpen(int, const char*, const char*);
+extern TIFF* NDPIdOpen(int, const char*, const char*);
 extern TIFF* NDPIClientOpen(const char*, const char*,
 	    thandle_t,
 	    TIFFReadWriteProc, TIFFReadWriteProc,
@@ -458,7 +458,7 @@ extern const char* NDPIFileName(TIFF*);
 extern const char* NDPISetFileName(TIFF*, const char *);
 extern void NDPIError(const char*, const char*, ...) TIFF_ATTRIBUTE((__format__ (__printf__,2,3)));
 extern void NDPIErrorExt(thandle_t, const char*, const char*, ...) TIFF_ATTRIBUTE((__format__ (__printf__,3,4)));
-extern void TIFFWarning(const char*, const char*, ...) TIFF_ATTRIBUTE((__format__ (__printf__,2,3)));
+extern void NDPIWarning(const char*, const char*, ...) TIFF_ATTRIBUTE((__format__ (__printf__,2,3)));
 extern void NDPIWarningExt(thandle_t, const char*, const char*, ...) TIFF_ATTRIBUTE((__format__ (__printf__,3,4)));
 extern TIFFErrorHandler NDPISetErrorHandler(TIFFErrorHandler);
 extern TIFFErrorHandlerExt NDPISetErrorHandlerExt(TIFFErrorHandlerExt);
@@ -469,7 +469,7 @@ extern uint32_t NDPIComputeTile(TIFF* tif, uint32_t x, uint32_t y, uint32_t z, u
 extern int NDPICheckTile(TIFF* tif, uint32_t x, uint32_t y, uint32_t z, uint16_t s);
 extern uint32_t NDPINumberOfTiles(TIFF*);
 extern tmsize_t NDPIReadTile(TIFF* tif, void* buf, uint32_t x, uint32_t y, uint32_t z, uint16_t s);
-extern tmsize_t TIFFWriteTile(TIFF* tif, void* buf, uint32_t x, uint32_t y, uint32_t z, uint16_t s);
+extern tmsize_t NDPIWriteTile(TIFF* tif, void* buf, uint32_t x, uint32_t y, uint32_t z, uint16_t s);
 extern uint32_t NDPIComputeStrip(TIFF*, uint32_t, uint16_t);
 extern uint32_t NDPINumberOfStrips(TIFF*);
 extern tmsize_t NDPIReadEncodedStrip(TIFF* tif, uint32_t strip, void* buf, tmsize_t size);
@@ -479,10 +479,10 @@ extern tmsize_t NDPIReadRawTile(TIFF* tif, uint32_t tile, void* buf, tmsize_t si
 extern int      NDPIReadFromUserBuffer(TIFF* tif, uint32_t strile,
                                        void* inbuf, tmsize_t insize,
                                        void* outbuf, tmsize_t outsize);
-extern tmsize_t TIFFWriteEncodedStrip(TIFF* tif, uint32_t strip, void* data, tmsize_t cc);
-extern tmsize_t TIFFWriteRawStrip(TIFF* tif, uint32_t strip, void* data, tmsize_t cc);
-extern tmsize_t TIFFWriteEncodedTile(TIFF* tif, uint32_t tile, void* data, tmsize_t cc);
-extern tmsize_t TIFFWriteRawTile(TIFF* tif, uint32_t tile, void* data, tmsize_t cc);
+extern tmsize_t NDPIWriteEncodedStrip(TIFF* tif, uint32_t strip, void* data, tmsize_t cc);
+extern tmsize_t NDPIWriteRawStrip(TIFF* tif, uint32_t strip, void* data, tmsize_t cc);
+extern tmsize_t NDPIWriteEncodedTile(TIFF* tif, uint32_t tile, void* data, tmsize_t cc);
+extern tmsize_t NDPIWriteRawTile(TIFF* tif, uint32_t tile, void* data, tmsize_t cc);
 extern int TIFFDataWidth(TIFFDataType);    /* table of tag datatype widths */
 extern void NDPISetWriteOffset(TIFF* tif, toff_t off);
 extern void NDPISwabShort(uint16_t*);

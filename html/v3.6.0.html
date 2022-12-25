@@ -214,7 +214,7 @@ present in the tiff tags as per bug 168.
 JPEGDecode() as per bug 129. 
 
 <li> libtiff/tif_read.c, libtiff/tif_write.c: NDPIReadScanline() and
-TIFFWriteScanline() now set tif_row explicitly in case the codec has
+NDPIWriteScanline() now set tif_row explicitly in case the codec has
 fooled with the value as per bug 129.
 
 <li> libtiff/tif_ojpeg.c: Major upgrade from Scott.  Details in bug 156.

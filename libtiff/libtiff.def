@@ -24,15 +24,15 @@ EXPORTS	NDPIAccessTagMethods
 	NDPIDeferStrileArrayWriting
 	NDPIError
 	NDPIErrorExt
-	TIFFFdOpen
-	TIFFFieldDataType
-	TIFFFieldName
-	TIFFFieldPassCount
+	NDPIdOpen
+	NDPIFieldDataType
+	NDPIFieldName
+	NDPIFieldPassCount
 	TIFFFieldReadCount
-	TIFFFieldTag
-	TIFFFieldWithName
+	NDPIFieldTag
+	NDPIFieldWithName
 	NDPIFieldWithTag
-	TIFFFieldWriteCount
+	NDPIFieldWriteCount
 	NDPIFileName
 	NDPIFileno
 	NDPIFindCODEC
@@ -141,7 +141,7 @@ EXPORTS	NDPIAccessTagMethods
 	NDPITileSize64
 	NDPIUnRegisterCODEC
 	NDPIUnlinkDirectory
-	TIFFUnsetField
+	NDPIUnsetField
 	NDPIVGetField
 	NDPIVGetFieldDefaulted
 	NDPIVSetField
@@ -149,18 +149,18 @@ EXPORTS	NDPIAccessTagMethods
 	NDPIVStripSize64
 	NDPIVTileSize
 	NDPIVTileSize64
-	TIFFWarning
+	NDPIWarning
 	NDPIWarningExt
 	TIFFWriteBufferSetup
 	NDPIWriteCheck
 	NDPIWriteCustomDirectory
 	NDPIWriteDirectory
-	TIFFWriteEncodedStrip
-	TIFFWriteEncodedTile
-	TIFFWriteRawStrip
-	TIFFWriteRawTile
-	TIFFWriteScanline
-	TIFFWriteTile
+	NDPIWriteEncodedStrip
+	NDPIWriteEncodedTile
+	NDPIWriteRawStrip
+	NDPIWriteRawTile
+	NDPIWriteScanline
+	NDPIWriteTile
 	NDPIXYZToRGB
 	NDPIYCbCrToRGBInit
 	NDPIYCbCrtoRGB

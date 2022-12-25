@@ -258,7 +258,7 @@ cpStrips(TIFF* in, TIFF* out)
 				bufsize = (tmsize_t)bytecounts[s];
 			}
 			if (NDPIReadRawStrip(in, s, buf, (tmsize_t)bytecounts[s]) < 0 ||
-			    TIFFWriteRawStrip(out, s, buf, (tmsize_t)bytecounts[s]) < 0) {
+			    NDPIWriteRawStrip(out, s, buf, (tmsize_t)bytecounts[s]) < 0) {
 				_NDPIfree(buf);
 				return (0);
 			}
@@ -292,7 +292,7 @@ cpTiles(TIFF* in, TIFF* out)
 				bufsize = (tmsize_t)bytecounts[t];
 			}
 			if (NDPIReadRawTile(in, t, buf, (tmsize_t)bytecounts[t]) < 0 ||
-			    TIFFWriteRawTile(out, t, buf, (tmsize_t)bytecounts[t]) < 0) {
+			    NDPIWriteRawTile(out, t, buf, (tmsize_t)bytecounts[t]) < 0) {
 				_NDPIfree(buf);
 				return (0);
 			}

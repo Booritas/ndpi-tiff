@@ -777,37 +777,37 @@ NDPIFieldWithTag(TIFF* tif, uint32_t tag)
 }
 
 const TIFFField*
-TIFFFieldWithName(TIFF* tif, const char *field_name)
+NDPIFieldWithName(TIFF* tif, const char *field_name)
 {
 	const TIFFField* fip =
 		_TIFFFindFieldByName(tif, field_name, TIFF_ANY);
 	if (!fip) {
-		NDPIErrorExt(tif->tif_clientdata, "TIFFFieldWithName",
+		NDPIErrorExt(tif->tif_clientdata, "NDPIFieldWithName",
 			     "Internal error, unknown tag %s", field_name);
 	}
 	return (fip);
 }
 
 uint32_t
-TIFFFieldTag(const TIFFField* fip)
+NDPIFieldTag(const TIFFField* fip)
 {
 	return fip->field_tag;
 }
 
 const char *
-TIFFFieldName(const TIFFField* fip)
+NDPIFieldName(const TIFFField* fip)
 {
 	return fip->field_name;
 }
 
 TIFFDataType
-TIFFFieldDataType(const TIFFField* fip)
+NDPIFieldDataType(const TIFFField* fip)
 {
 	return fip->field_type;
 }
 
 int
-TIFFFieldPassCount(const TIFFField* fip)
+NDPIFieldPassCount(const TIFFField* fip)
 {
 	return fip->field_passcount;
 }
@@ -819,7 +819,7 @@ TIFFFieldReadCount(const TIFFField* fip)
 }
 
 int
-TIFFFieldWriteCount(const TIFFField* fip)
+NDPIFieldWriteCount(const TIFFField* fip)
 {
 	return fip->field_writecount;
 }

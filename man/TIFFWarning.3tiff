@@ -22,21 +22,21 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFWarning 3TIFF "October 15, 1995" "libtiff"
+.TH NDPIWarning 3TIFF "October 15, 1995" "libtiff"
 .SH NAME
-TIFFWarning, NDPISetWarningHandler \- library warning interface
+NDPIWarning, NDPISetWarningHandler \- library warning interface
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "void TIFFWarning(const char *" module ", const char *" fmt ", " ... ")"
+.BI "void NDPIWarning(const char *" module ", const char *" fmt ", " ... ")"
 .sp
 .B "#include <stdarg.h>"
 .sp
-.BI "typedef void (*TIFFWarningHandler)(const char *" module ", const char *" fmt ", va_list " ap ");"
+.BI "typedef void (*NDPIWarningHandler)(const char *" module ", const char *" fmt ", va_list " ap ");"
 .sp
-.BI "TIFFWarningHandler NDPISetWarningHandler(TIFFWarningHandler " handler ");"
+.BI "NDPIWarningHandler NDPISetWarningHandler(NDPIWarningHandler " handler ");"
 .SH DESCRIPTION
-.I TIFFWarning
+.I NDPIWarning
 invokes the library-wide warning handler function to (normally) write a
 warning message to the
 .BR stderr .

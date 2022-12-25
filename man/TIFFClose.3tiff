@@ -42,7 +42,7 @@ All error messages are directed to the
 .BR NDPIError (3TIFF)
 routine.
 Likewise, warning messages are directed to the
-.BR TIFFWarning (3TIFF)
+.BR NDPIWarning (3TIFF)
 routine.
 .SH "SEE ALSO"
 .BR libtiff (3TIFF),
