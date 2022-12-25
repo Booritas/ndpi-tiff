@@ -67,21 +67,21 @@ typedef struct
     
 } TIFFOvrCache;
 
-TIFFOvrCache *TIFFCreateOvrCache( TIFF *hTIFF, toff_t nDirOffset );
+TIFFOvrCache *NDPICreateOvrCache( TIFF *hTIFF, toff_t nDirOffset );
 unsigned char *TIFFGetOvrBlock( TIFFOvrCache *psCache, int iTileX, int iTileY,
                                 int iSample );
 unsigned char *TIFFGetOvrBlock_Subsampled( TIFFOvrCache *psCache, int iTileX, int iTileY );
-void           TIFFDestroyOvrCache( TIFFOvrCache * );
+void           NDPIDestroyOvrCache( TIFFOvrCache * );
 
-void TIFFBuildOverviews( TIFF *, int, int *, int, const char *,
+void NDPIBuildOverviews( TIFF *, int, int *, int, const char *,
                          int (*)(double,void*), void * );
 
-void TIFF_ProcessFullResBlock( TIFF *, int, int, int, int, int, int *, int,
+void NDPI_ProcessFullResBlock( TIFF *, int, int, int, int, int, int *, int,
                                int, TIFFOvrCache **, uint32_t, uint32_t,
                                unsigned char *, uint32_t, uint32_t,
                                int, const char * );
 
-uint32_t TIFF_WriteOverview( TIFF *, uint32_t, uint32_t, int, int, int, int, int,
+uint32_t NDPI_WriteOverview( TIFF *, uint32_t, uint32_t, int, int, int, int, int,
                              int, int, int, int, unsigned short *,
                              unsigned short *, unsigned short *, int,
                              int, int);

@@ -24,34 +24,34 @@
 .if n .po 0
 .TH TIFFSIZE 3TIFF "October 15, 1995" "libtiff"
 .SH NAME
-TIFFScanlineSize, TIFFRasterScanlineSize,
+NDPIScanlineSize, NDPIRasterScanlineSize,
 \- return the size of various items associated with an open
 .SM TIFF
 file
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "tsize_t TIFFRasterScanlineSize(TIFF *" tif ")"
+.BI "tsize_t NDPIRasterScanlineSize(TIFF *" tif ")"
 .br
-.BI "tsize_t TIFFScanlineSize(TIFF *" tif ")"
+.BI "tsize_t NDPIScanlineSize(TIFF *" tif ")"
 .SH DESCRIPTION
-.I TIFFScanlineSize
+.I NDPIScanlineSize
 returns the size in bytes of a row of data as it would be returned in a call
 to
-.IR TIFFReadScanline ,
+.IR NDPIReadScanline ,
 or as it would be expected in a call to
 .IR TIFFWriteScanline .
 .PP
-.I TIFFRasterScanlineSize
+.I NDPIRasterScanlineSize
 returns the size in bytes of a complete decoded and packed raster scanline.
 Note that this value may be different from the value returned by
-.I TIFFScanlineSize
+.I NDPIScanlineSize
 if data is stored as separate planes.
 .SH DIAGNOSTICS
 None.
 .SH "SEE ALSO"
-.BR TIFFOpen (3TIFF),
-.BR TIFFReadScanline (3TIFF),
+.BR NDPIOpen (3TIFF),
+.BR NDPIReadScanline (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

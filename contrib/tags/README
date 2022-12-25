@@ -42,13 +42,13 @@ a single new routine, which has the following calling sequence:
 
   TIFFExtendProc old_extender;
   
-  old_extender = TIFFSetTagExtender(tag_extender);
+  old_extender = NDPISetTagExtender(tag_extender);
 
 which must be called prior to opening or creating TIFF files.
 
 This routine sets a static pointer to the user-specified function
-<tag_extender>, which in turn is called by TIFFDefaultDirectory(),
-just after the usual TIFFSetField() and TIFFGetField() methods
+<tag_extender>, which in turn is called by NDPIDefaultDirectory(),
+just after the usual NDPISetField() and NDPIGetField() methods
 are defined, and just before the compression tag is set. It also
 returns a pointer to the previously-defined value of the tag-extender,
 so that multiple clients may be installed.
@@ -85,7 +85,7 @@ build them with:
 This will build two example programs called "maketif" and "listtif" 
 and then run them. These programs do nothing more than create a small
 file called "newtif.tif", install the fake tags, and then list them out
-using TIFFPrintDirectory().
+using NDPIPrintDirectory().
 
 Installing Private Tags
 -----------------------
@@ -111,10 +111,10 @@ Once you have edited these files, you may build the client module
 with the Makefile provided, and run the test programs.
 
 To use these files in your own code, the "xtif_dir.c" module defines
-replacement routines for the standard "TIFFOpen()" "TIFFFdOpen",
-and "TIFFClose()" routines, called XTIFFOpen, XTIFFFdOpen and XTIFFClose.
+replacement routines for the standard "NDPIOpen()" "TIFFFdOpen",
+and "NDPIClose()" routines, called XTIFFOpen, XTIFFFdOpen and XTIFFClose.
 You must use these routines in order to have the extended tag handlers
-installed. Once installed, the standard TIFFGetField() and TIFFSetField
+installed. Once installed, the standard NDPIGetField() and NDPISetField
 routines may be used as before.
 
 Adding Extended Tags to "tools"

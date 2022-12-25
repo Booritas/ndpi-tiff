@@ -24,46 +24,46 @@
 .if n .po 0
 .TH QUERY 3TIFF "October 29, 2004" "libtiff"
 .SH NAME
-TIFFCurrentRow,
-TIFFCurrentStrip,
-TIFFCurrentTile,
-TIFFCurrentDirectory,
-TIFFLastDirectory,
-TIFFFileno,
-TIFFFileName,
-TIFFGetMode,
-TIFFIsTiled,
-TIFFIsByteSwapped,
-TIFFIsUpSampled,
-TIFFIsMSB2LSB,
+NDPICurrentRow,
+NDPICurrentStrip,
+NDPICurrentTile,
+NDPICurrentDirectory,
+NDPILastDirectory,
+NDPIFileno,
+NDPIFileName,
+NDPIGetMode,
+NDPIIsTiled,
+NDPIIsByteSwapped,
+NDPIIsUpSampled,
+NDPIIsMSB2LSB,
 TIFFGetVersion
 \- query routines
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "uint32_t TIFFCurrentRow(TIFF* " tif ")"
+.BI "uint32_t NDPICurrentRow(TIFF* " tif ")"
 .br
-.BI "tstrip_t TIFFCurrentStrip(TIFF* " tif ")"
+.BI "tstrip_t NDPICurrentStrip(TIFF* " tif ")"
 .br
-.BI "ttile_t TIFFCurrentTile(TIFF* " tif ")"
+.BI "ttile_t NDPICurrentTile(TIFF* " tif ")"
 .br
-.BI "tdir_t TIFFCurrentDirectory(TIFF* " tif ")"
+.BI "tdir_t NDPICurrentDirectory(TIFF* " tif ")"
 .br
-.BI "int TIFFLastDirectory(TIFF* " tif ")"
+.BI "int NDPILastDirectory(TIFF* " tif ")"
 .br
-.BI "int TIFFFileno(TIFF* " tif ")"
+.BI "int NDPIFileno(TIFF* " tif ")"
 .br
-.BI "char* TIFFFileName(TIFF* " tif ")"
+.BI "char* NDPIFileName(TIFF* " tif ")"
 .br
-.BI "int TIFFGetMode(TIFF* " tif ")"
+.BI "int NDPIGetMode(TIFF* " tif ")"
 .br
-.BI "int TIFFIsTiled(TIFF* " tif ")"
+.BI "int NDPIIsTiled(TIFF* " tif ")"
 .br
-.BI "int TIFFIsByteSwapped(TIFF* " tif ")"
+.BI "int NDPIIsByteSwapped(TIFF* " tif ")"
 .br
-.BI "int TIFFIsUpSampled(TIFF* " tif ")"
+.BI "int NDPIIsUpSampled(TIFF* " tif ")"
 .br
-.BI "int TIFFIsMSB2LSB(TIFF* " tif ")"
+.BI "int NDPIIsMSB2LSB(TIFF* " tif ")"
 .br
 .BI "const char* TIFFGetVersion(void)"
 .SH DESCRIPTION
@@ -71,59 +71,59 @@ The following routines return status information about an open
 .SM TIFF
 file.
 .PP
-.IR TIFFCurrentDirectory
+.IR NDPICurrentDirectory
 returns the index of the current directory (directories are numbered starting
 at 0). This number is suitable for use with the
-.IR TIFFSetDirectory
+.IR NDPISetDirectory
 routine.
 .PP
-.IR TIFFLastDirectory
+.IR NDPILastDirectory
 returns a non-zero value if the current directory is the last directory in the
 file; otherwise zero is returned.
 .PP
-.IR TIFFCurrentRow ,
-.IR TIFFCurrentStrip ,
+.IR NDPICurrentRow ,
+.IR NDPICurrentStrip ,
 and
-.IR TIFFCurrentTile ,
+.IR NDPICurrentTile ,
 return the current row, strip, and tile, respectively, that is being read or
 written. These values are updated each time a read or write is done.
 .PP
-.IR TIFFFileno
+.IR NDPIFileno
 returns the underlying file descriptor used to access the 
 .SM TIFF
 image in the filesystem.
 .PP
-.IR TIFFFileName
+.IR NDPIFileName
 returns the pathname argument passed to
-.IR TIFFOpen
+.IR NDPIOpen
 or
 .IR TIFFFdOpen .
 .PP
-.IR TIFFGetMode
+.IR NDPIGetMode
 returns the mode with which the underlying file was opened. On
 .SM UNIX
 systems, this is the value passed to the
 .IR open (2)
 system call.
 .PP
-.IR TIFFIsTiled
+.IR NDPIIsTiled
 returns a non-zero value if the image data has a tiled organization. Zero is
 returned if the image data is organized in strips.
 .PP
-.IR TIFFIsByteSwapped
+.IR NDPIIsByteSwapped
 returns a non-zero value if the image data was in a different byte-order than
 the host machine. Zero is returned if the TIFF file and local host byte-orders
-are the same.  Note that TIFFReadTile(), TIFFReadEncodedStrip() and
-TIFFReadScanline() functions already normally perform byte swapping to local
+are the same.  Note that NDPIReadTile(), NDPIReadEncodedStrip() and
+NDPIReadScanline() functions already normally perform byte swapping to local
 host order if needed.
 .PP
-.I TIFFIsUpSampled
+.I NDPIIsUpSampled
 returns a non-zero value if image data returned through the read interface
 routines is being up-sampled. This can be useful to applications that want to
 calculate I/O buffer sizes to reflect this usage (though the usual strip and
 tile size routines already do this).
 .PP
-.I TIFFIsMSB2LSB
+.I NDPIIsMSB2LSB
 returns a non-zero value if the image data is being returned with bit 0 as the
 most significant bit.
 .PP
@@ -137,5 +137,5 @@ library software.
 None.
 .SH "SEE ALSO"
 .IR libtiff (3TIFF),
-.IR TIFFOpen (3TIFF),
+.IR NDPIOpen (3TIFF),
 .IR TIFFFdOpen (3TIFF)

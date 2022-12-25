@@ -20,7 +20,7 @@ void main(int argc,char *argv[])
 	/* We want the double array listed */
 	flags = TIFFPRINT_MYMULTIDOUBLES;
 	
-	TIFFPrintDirectory(tif,stdout,flags);
+	NDPIPrintDirectory(tif,stdout,flags);
 	XTIFFClose(tif);
 	exit (0);
 	

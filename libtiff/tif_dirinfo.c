@@ -54,8 +54,8 @@ static const TIFFFieldArray gpsFieldArray;
 /*--: Rational2Double: --
  * The Rational2Double upgraded libtiff functionality allows the definition and achievement of true double-precision accuracy
  * for TIFF tags of RATIONAL type and field_bit=FIELD_CUSTOM using the set_field_type = TIFF_SETGET_DOUBLE.
- * Unfortunately, that changes the old implemented interface for TIFFGetField().
- * In order to keep the old TIFFGetField() interface behavior those tags have to be redefined with set_field_type = TIFF_SETGET_FLOAT!
+ * Unfortunately, that changes the old implemented interface for NDPIGetField().
+ * In order to keep the old NDPIGetField() interface behavior those tags have to be redefined with set_field_type = TIFF_SETGET_FLOAT!
  *
  *  Rational custom arrays are already defined as _Cxx_FLOAT, thus can stay.
  *
@@ -430,25 +430,25 @@ td_lfind(const void *key, const void *base, size_t *nmemb, size_t size,
 }
 
 const TIFFFieldArray*
-_TIFFGetFields(void)
+_NDPIGetFields(void)
 {
 	return(&tiffFieldArray);
 }
 
 const TIFFFieldArray*
-_TIFFGetExifFields(void)
+_NDPIGetExifFields(void)
 {
 	return(&exifFieldArray);
 }
 
 const TIFFFieldArray*
-_TIFFGetGpsFields(void)
+_NDPIGetGpsFields(void)
 {
 	return(&gpsFieldArray);
 }
 
 void
-_TIFFSetupFields(TIFF* tif, const TIFFFieldArray* fieldarray)
+_NDPISetupFields(TIFF* tif, const TIFFFieldArray* fieldarray)
 {
 	if (tif->tif_fields && tif->tif_nfields > 0) {
 		uint32_t i;
@@ -457,17 +457,17 @@ _TIFFSetupFields(TIFF* tif, const TIFFFieldArray* fieldarray)
 			TIFFField *fld = tif->tif_fields[i];
 			if (fld->field_bit == FIELD_CUSTOM &&
 				strncmp("Tag ", fld->field_name, 4) == 0) {
-					_TIFFfree(fld->field_name);
-					_TIFFfree(fld);
+					_NDPIfree(fld->field_name);
+					_NDPIfree(fld);
 				}
 		}
 
-		_TIFFfree(tif->tif_fields);
+		_NDPIfree(tif->tif_fields);
 		tif->tif_fields = NULL;
 		tif->tif_nfields = 0;
 	}
-	if (!_TIFFMergeFields(tif, fieldarray->fields, fieldarray->count)) {
-		TIFFErrorExt(tif->tif_clientdata, "_TIFFSetupFields",
+	if (!_NDPIMergeFields(tif, fieldarray->fields, fieldarray->count)) {
+		NDPIErrorExt(tif->tif_clientdata, "_NDPISetupFields",
 			     "Setting up field info failed");
 	}
 }
@@ -500,9 +500,9 @@ tagNameCompare(const void* a, const void* b)
 }
 
 int
-_TIFFMergeFields(TIFF* tif, const TIFFField info[], uint32_t n)
+_NDPIMergeFields(TIFF* tif, const TIFFField info[], uint32_t n)
 {
-	static const char module[] = "_TIFFMergeFields";
+	static const char module[] = "_NDPIMergeFields";
 	static const char reason[] = "for fields array";
 	/* TIFFField** tp; */
 	uint32_t i;
@@ -511,16 +511,16 @@ _TIFFMergeFields(TIFF* tif, const TIFFField info[], uint32_t n)
 
 	if (tif->tif_fields && tif->tif_nfields > 0) {
 		tif->tif_fields = (TIFFField**)
-			_TIFFCheckRealloc(tif, tif->tif_fields,
+			_NDPICheckRealloc(tif, tif->tif_fields,
 					  (tif->tif_nfields + n),
 					  sizeof(TIFFField *), reason);
 	} else {
 		tif->tif_fields = (TIFFField **)
-			_TIFFCheckMalloc(tif, n, sizeof(TIFFField *),
+			_NDPICheckMalloc(tif, n, sizeof(TIFFField *),
 					 reason);
 	}
 	if (!tif->tif_fields) {
-		TIFFErrorExt(tif->tif_clientdata, module,
+		NDPIErrorExt(tif->tif_clientdata, module,
 			     "Failed to allocate fields array");
 		return 0;
 	}
@@ -528,7 +528,7 @@ _TIFFMergeFields(TIFF* tif, const TIFFField info[], uint32_t n)
 	/* tp = tif->tif_fields + tif->tif_nfields; */
 	for (i = 0; i < n; i++) {
 		const TIFFField *fip =
-			TIFFFindField(tif, info[i].field_tag, TIFF_ANY);
+			NDPIFindField(tif, info[i].field_tag, TIFF_ANY);
 
                 /* only add definitions that aren't already present */
 		if (!fip) {
@@ -545,7 +545,7 @@ _TIFFMergeFields(TIFF* tif, const TIFFField info[], uint32_t n)
 }
 
 void
-_TIFFPrintFieldInfo(TIFF* tif, FILE* fd)
+_NDPIPrintFieldInfo(TIFF* tif, FILE* fd)
 {
 	uint32_t i;
 
@@ -607,7 +607,7 @@ TIFFDataWidth(TIFFDataType type)
  * but we use 4-byte float to represent rationals.
  */
 int
-_TIFFDataSize(TIFFDataType type)
+_NDPIDataSize(TIFFDataType type)
 {
 	switch (type)
 	{
@@ -645,7 +645,7 @@ _TIFFDataSize(TIFFDataType type)
  * This is now managed by the SetGetField of the tag-definition!
  */
 int
-_TIFFSetGetFieldSize(TIFFSetGetFieldType setgettype)
+_NDPISetGetFieldSize(TIFFSetGetFieldType setgettype)
 {
 	switch (setgettype)
 	{
@@ -709,11 +709,11 @@ _TIFFSetGetFieldSize(TIFFSetGetFieldType setgettype)
 		default:
 		    return 0;
 	}
-} /*-- _TIFFSetGetFieldSize --- */
+} /*-- _NDPISetGetFieldSize --- */
 
 
 const TIFFField*
-TIFFFindField(TIFF* tif, uint32_t tag, TIFFDataType dt)
+NDPIFindField(TIFF* tif, uint32_t tag, TIFFDataType dt)
 {
 	TIFFField key = {0, 0, 0, TIFF_NOTYPE, 0, 0, 0, 0, 0, 0, NULL, NULL};
 	TIFFField* pkey = &key;
@@ -765,11 +765,11 @@ _TIFFFindFieldByName(TIFF* tif, const char *field_name, TIFFDataType dt)
 }
 
 const TIFFField*
-TIFFFieldWithTag(TIFF* tif, uint32_t tag)
+NDPIFieldWithTag(TIFF* tif, uint32_t tag)
 {
-	const TIFFField* fip = TIFFFindField(tif, tag, TIFF_ANY);
+	const TIFFField* fip = NDPIFindField(tif, tag, TIFF_ANY);
 	if (!fip) {
-		TIFFErrorExt(tif->tif_clientdata, "TIFFFieldWithTag",
+		NDPIErrorExt(tif->tif_clientdata, "NDPIFieldWithTag",
 			     "Internal error, unknown tag 0x%x",
 			     (unsigned int) tag);
 	}
@@ -782,7 +782,7 @@ TIFFFieldWithName(TIFF* tif, const char *field_name)
 	const TIFFField* fip =
 		_TIFFFindFieldByName(tif, field_name, TIFF_ANY);
 	if (!fip) {
-		TIFFErrorExt(tif->tif_clientdata, "TIFFFieldWithName",
+		NDPIErrorExt(tif->tif_clientdata, "TIFFFieldWithName",
 			     "Internal error, unknown tag %s", field_name);
 	}
 	return (fip);
@@ -825,15 +825,15 @@ TIFFFieldWriteCount(const TIFFField* fip)
 }
 
 const TIFFField*
-_TIFFFindOrRegisterField(TIFF *tif, uint32_t tag, TIFFDataType dt)
+_NDPIFindOrRegisterField(TIFF *tif, uint32_t tag, TIFFDataType dt)
 
 {
 	const TIFFField *fld;
 
-	fld = TIFFFindField(tif, tag, dt);
+	fld = NDPIFindField(tif, tag, dt);
 	if (fld == NULL) {
-		fld = _TIFFCreateAnonField(tif, tag, dt);
-		if (!_TIFFMergeFields(tif, fld, 1))
+		fld = _NDPICreateAnonField(tif, tag, dt);
+		if (!_NDPIMergeFields(tif, fld, 1))
 			return NULL;
 	}
 
@@ -841,15 +841,15 @@ _TIFFFindOrRegisterField(TIFF *tif, uint32_t tag, TIFFDataType dt)
 }
 
 TIFFField*
-_TIFFCreateAnonField(TIFF *tif, uint32_t tag, TIFFDataType field_type)
+_NDPICreateAnonField(TIFF *tif, uint32_t tag, TIFFDataType field_type)
 {
 	TIFFField *fld;
 	(void) tif;
 
-	fld = (TIFFField *) _TIFFmalloc(sizeof (TIFFField));
+	fld = (TIFFField *) _NDPImalloc(sizeof (TIFFField));
 	if (fld == NULL)
 	    return NULL;
-	_TIFFmemset(fld, 0, sizeof(TIFFField));
+	_NDPImemset(fld, 0, sizeof(TIFFField));
 
 	fld->field_tag = tag;
 	fld->field_readcount = TIFF_VARIABLE2;
@@ -918,16 +918,16 @@ _TIFFCreateAnonField(TIFF *tif, uint32_t tag, TIFFDataType field_type)
 	fld->field_bit = FIELD_CUSTOM;
 	fld->field_oktochange = TRUE;
 	fld->field_passcount = TRUE;
-	fld->field_name = (char *) _TIFFmalloc(32);
+	fld->field_name = (char *) _NDPImalloc(32);
 	if (fld->field_name == NULL) {
-	    _TIFFfree(fld);
+	    _NDPIfree(fld);
 	    return NULL;
 	}
 	fld->field_subfields = NULL;
 
 	/* 
-	 * note that this name is a special sign to TIFFClose() and
-	 * _TIFFSetupFields() to free the field
+	 * note that this name is a special sign to NDPIClose() and
+	 * _NDPISetupFields() to free the field
 	 */
 	(void) snprintf(fld->field_name, 32, "Tag %d", (int) tag);
 
@@ -1105,16 +1105,16 @@ TIFFMergeFieldInfo(TIFF* tif, const TIFFFieldInfo info[], uint32_t n)
 
 	if (tif->tif_nfieldscompat > 0) {
 		tif->tif_fieldscompat = (TIFFFieldArray *)
-			_TIFFCheckRealloc(tif, tif->tif_fieldscompat,
+			_NDPICheckRealloc(tif, tif->tif_fieldscompat,
 					  tif->tif_nfieldscompat + 1,
 					  sizeof(TIFFFieldArray), reason);
 	} else {
 		tif->tif_fieldscompat = (TIFFFieldArray *)
-			_TIFFCheckMalloc(tif, 1, sizeof(TIFFFieldArray),
+			_NDPICheckMalloc(tif, 1, sizeof(TIFFFieldArray),
 					 reason);
 	}
 	if (!tif->tif_fieldscompat) {
-		TIFFErrorExt(tif->tif_clientdata, module,
+		NDPIErrorExt(tif->tif_clientdata, module,
 			     "Failed to allocate fields array");
 		return -1;
 	}
@@ -1124,10 +1124,10 @@ TIFFMergeFieldInfo(TIFF* tif, const TIFFFieldInfo info[], uint32_t n)
 	tif->tif_fieldscompat[nfields].allocated_size = n;
 	tif->tif_fieldscompat[nfields].count = n;
 	tif->tif_fieldscompat[nfields].fields =
-		(TIFFField *)_TIFFCheckMalloc(tif, n, sizeof(TIFFField),
+		(TIFFField *)_NDPICheckMalloc(tif, n, sizeof(TIFFField),
 					      reason);
 	if (!tif->tif_fieldscompat[nfields].fields) {
-		TIFFErrorExt(tif->tif_clientdata, module,
+		NDPIErrorExt(tif->tif_clientdata, module,
 			     "Failed to allocate fields array");
 		return -1;
 	}
@@ -1155,8 +1155,8 @@ TIFFMergeFieldInfo(TIFF* tif, const TIFFFieldInfo info[], uint32_t n)
 		tp++;
 	}
 
-	if (!_TIFFMergeFields(tif, tif->tif_fieldscompat[nfields].fields, n)) {
-		TIFFErrorExt(tif->tif_clientdata, module,
+	if (!_NDPIMergeFields(tif, tif->tif_fieldscompat[nfields].fields, n)) {
+		NDPIErrorExt(tif->tif_clientdata, module,
 			     "Setting up field info failed");
 		return -1;
 	}
@@ -1165,7 +1165,7 @@ TIFFMergeFieldInfo(TIFF* tif, const TIFFFieldInfo info[], uint32_t n)
 }
 
 int
-_TIFFCheckFieldIsValidForCodec(TIFF *tif, ttag_t tag)
+_NDPICheckFieldIsValidForCodec(TIFF *tif, ttag_t tag)
 {
 	/* Filter out non-codec specific tags */
 	switch (tag) {

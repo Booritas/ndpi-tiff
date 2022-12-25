@@ -78,10 +78,10 @@ The following information is located here:
 
 <UL>
 	<li> tif_strip.c: Take subsampling in account when calculating
-	TIFFScanlineSize().
+	NDPIScanlineSize().
 
 	<li> tif_jpeg.c, tif_fax3.c, tif_zip.c, tif_pixarlog.c,
-	tif_lzw.c, tif_luv.c: Use _TIFFSetDefaultCompressionState() in all
+	tif_lzw.c, tif_luv.c: Use _NDPISetDefaultCompressionState() in all
 	codec cleanup methods. As per bug
 	<a href="http://bugzilla.remotesensing.org/show_bug.cgi?id=1120">
 		http://bugzilla.remotesensing.org/show_bug.cgi?id=1120</a>
@@ -94,7 +94,7 @@ The following information is located here:
 	<li> tif_dir.c: Use double type instead of dblparam_t.
 
 	<li> tif_dirread.c: Do not check the PlanarConfig tag presence
-	in TIFFReadDirectory, because it is always set at the start of
+	in NDPIReadDirectory, because it is always set at the start of
 	function and we allow TIFFs without that tag set.
 
 </UL>

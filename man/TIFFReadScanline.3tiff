@@ -22,27 +22,27 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFReadScanline 3TIFF "October 15, 1995" "libtiff"
+.TH NDPIReadScanline 3TIFF "October 15, 1995" "libtiff"
 .SH NAME
-TIFFReadScanline \- read and decode a scanline of data from an open
+NDPIReadScanline \- read and decode a scanline of data from an open
 .SM TIFF
 file
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "int TIFFReadScanline(TIFF *" tif ", tdata_t " buf ", uint32_t " row ", tsample_t " sample ")"
+.BI "int NDPIReadScanline(TIFF *" tif ", tdata_t " buf ", uint32_t " row ", tsample_t " sample ")"
 .SH DESCRIPTION
 Read the data for the specified row into the (user supplied) data buffer
 .IR buf .
 The data are returned decompressed and, in the native byte- and bit-ordering,
 but are otherwise packed (see further below). The buffer must be large enough
 to hold an entire scanline of data. Applications should call the routine
-.IR TIFFScanlineSize
+.IR NDPIScanlineSize
 to find out the size (in bytes) of a scanline buffer.
 The
 .I row
 parameter is always used by
-.IR TIFFReadScanline ;
+.IR NDPIReadScanline ;
 the
 .I sample
 parameter is used only if data are organized in separate planes (\c
@@ -60,11 +60,11 @@ In C++ the
 .I sample
 parameter defaults to 0.
 .SH "RETURN VALUES"
-.IR TIFFReadScanline
+.IR NDPIReadScanline
 returns \-1 if it detects an error; otherwise 1 is returned.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.IR TIFFError (3TIFF)
+.IR NDPIError (3TIFF)
 routine.
 .PP
 .BR "Compression algorithm does not support random access" .
@@ -84,9 +84,9 @@ the size of a scanline is not calculated on a per-sample basis, and for
 the library does not unpack the block-interleaved samples; use the strip- and
 tile-based interfaces to read these formats.
 .SH "SEE ALSO"
-.BR TIFFOpen (3TIFF),
-.BR TIFFReadEncodedStrip (3TIFF),
-.BR TIFFReadRawStrip (3TIFF),
+.BR NDPIOpen (3TIFF),
+.BR NDPIReadEncodedStrip (3TIFF),
+.BR NDPIReadRawStrip (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

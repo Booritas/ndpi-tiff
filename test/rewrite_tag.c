@@ -24,7 +24,7 @@
 /*
  * TIFF Library
  *
- * Module to test _TIFFRewriteField().
+ * Module to test _NDPIRewriteField().
  */
 
 #include "tif_config.h"
@@ -54,38 +54,38 @@ int test_packbits()
     const char *filename = "test_packbits.tif";
 
     /* Test whether we can write tags. */
-    tif = TIFFOpen(filename, "w");
+    tif = NDPIOpen(filename, "w");
 
     if (!tif) {
         fprintf (stderr, "Can't create test TIFF file %s.\n", filename);
         return 1;
     }
 
-    if (!TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_PACKBITS)) {
+    if (!NDPISetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_PACKBITS)) {
         fprintf (stderr, "Can't set Compression tag.\n");
         goto failure;
     }
-    if (!TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, width)) {
+    if (!NDPISetField(tif, TIFFTAG_IMAGEWIDTH, width)) {
         fprintf (stderr, "Can't set ImageWidth tag.\n");
         goto failure;
     }
-    if (!TIFFSetField(tif, TIFFTAG_IMAGELENGTH, length)) {
+    if (!NDPISetField(tif, TIFFTAG_IMAGELENGTH, length)) {
         fprintf (stderr, "Can't set ImageLength tag.\n");
         goto failure;
     }
-    if (!TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8)) {
+    if (!NDPISetField(tif, TIFFTAG_BITSPERSAMPLE, 8)) {
         fprintf (stderr, "Can't set BitsPerSample tag.\n");
         goto failure;
     }
-    if (!TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1)) {
+    if (!NDPISetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1)) {
         fprintf (stderr, "Can't set SamplesPerPixel tag.\n");
         goto failure;
     }
-    if (!TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, rows_per_strip)) {
+    if (!NDPISetField(tif, TIFFTAG_ROWSPERSTRIP, rows_per_strip)) {
         fprintf (stderr, "Can't set SamplesPerPixel tag.\n");
         goto failure;
     }
-    if (!TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG)) {
+    if (!NDPISetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG)) {
         fprintf (stderr, "Can't set PlanarConfiguration tag.\n");
         goto failure;
     }
@@ -99,11 +99,11 @@ int test_packbits()
         }
     }
 
-    TIFFClose(tif);
+    NDPIClose(tif);
 
     /* Test whether we can write tags. */
 
-    tif = TIFFOpen(filename, "r+");
+    tif = NDPIOpen(filename, "r+");
 
     if (!tif) {
         fprintf (stderr, "Can't create test TIFF file %s.\n", filename);
@@ -119,7 +119,7 @@ int test_packbits()
         goto failure;
     }
 
-    TIFFClose(tif);
+    NDPIClose(tif);
 
     unlink(filename);
 
@@ -127,7 +127,7 @@ int test_packbits()
 
   failure:
     /* Something goes wrong; close file and return unsuccessful status. */
-    TIFFClose(tif);
+    NDPIClose(tif);
     /*  unlink(filename); */
 
     return 1;
@@ -153,9 +153,9 @@ int rewrite_test(const char *filename, uint32_t width, int length, int bigtiff,
 
     /* Test whether we can write tags. */
     if( bigtiff )
-        tif = TIFFOpen(filename, "w8");
+        tif = NDPIOpen(filename, "w8");
     else
-        tif = TIFFOpen(filename, "w4");
+        tif = NDPIOpen(filename, "w4");
 
     if (!tif) {
         fprintf (stderr, "Can't create test TIFF file %s.\n", filename);
@@ -163,31 +163,31 @@ int rewrite_test(const char *filename, uint32_t width, int length, int bigtiff,
         return 1;
     }
 
-    if (!TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_PACKBITS)) {
+    if (!NDPISetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_PACKBITS)) {
         fprintf (stderr, "Can't set Compression tag.\n");
         goto failure;
     }
-    if (!TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, width)) {
+    if (!NDPISetField(tif, TIFFTAG_IMAGEWIDTH, width)) {
         fprintf (stderr, "Can't set ImageWidth tag.\n");
         goto failure;
     }
-    if (!TIFFSetField(tif, TIFFTAG_IMAGELENGTH, length)) {
+    if (!NDPISetField(tif, TIFFTAG_IMAGELENGTH, length)) {
         fprintf (stderr, "Can't set ImageLength tag.\n");
         goto failure;
     }
-    if (!TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8)) {
+    if (!NDPISetField(tif, TIFFTAG_BITSPERSAMPLE, 8)) {
         fprintf (stderr, "Can't set BitsPerSample tag.\n");
         goto failure;
     }
-    if (!TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1)) {
+    if (!NDPISetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1)) {
         fprintf (stderr, "Can't set SamplesPerPixel tag.\n");
         goto failure;
     }
-    if (!TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, rows_per_strip)) {
+    if (!NDPISetField(tif, TIFFTAG_ROWSPERSTRIP, rows_per_strip)) {
         fprintf (stderr, "Can't set SamplesPerPixel tag.\n");
         goto failure;
     }
-    if (!TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG)) {
+    if (!NDPISetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG)) {
         fprintf (stderr, "Can't set PlanarConfiguration tag.\n");
         goto failure;
     }
@@ -201,68 +201,68 @@ int rewrite_test(const char *filename, uint32_t width, int length, int bigtiff,
         }
     }
 
-    TIFFClose(tif);
+    NDPIClose(tif);
 	
     /* Ok, now test whether we can read written values. */
-    tif = TIFFOpen(filename, "r+");
+    tif = NDPIOpen(filename, "r+");
     if (!tif) {
         fprintf (stderr, "Can't open test TIFF file %s.\n", filename);
         free(buf);
         return 1;
     }
         
-    if( !TIFFGetField( tif, TIFFTAG_STRIPOFFSETS, &rowoffset ) )
+    if( !NDPIGetField( tif, TIFFTAG_STRIPOFFSETS, &rowoffset ) )
     {
         fprintf (stderr, "Can't fetch STRIPOFFSETS.\n");
         goto failure;
     }
         
-    if( !TIFFGetField( tif, TIFFTAG_STRIPBYTECOUNTS, &rowbytes ) )
+    if( !NDPIGetField( tif, TIFFTAG_STRIPBYTECOUNTS, &rowbytes ) )
     {
         fprintf (stderr, "Can't fetch STRIPBYTECOUNTS.\n");
         goto failure;
     }
 
-    upd_rowoffset = (uint64_t *) _TIFFmalloc(sizeof(uint64_t) * length);
+    upd_rowoffset = (uint64_t *) _NDPImalloc(sizeof(uint64_t) * length);
     for( i = 0; i < length; i++ )
         upd_rowoffset[i] = base_value + i*width;
 
-    if( !_TIFFRewriteField( tif, TIFFTAG_STRIPOFFSETS, TIFF_LONG8, 
+    if( !_NDPIRewriteField( tif, TIFFTAG_STRIPOFFSETS, TIFF_LONG8, 
                             length, upd_rowoffset ) )
     {
         fprintf (stderr, "Can't rewrite STRIPOFFSETS.\n");
         goto failure;
     }
 
-    _TIFFfree( upd_rowoffset );
+    _NDPIfree( upd_rowoffset );
     upd_rowoffset = NULL;
 
-    upd_bytecount = (uint64_t *) _TIFFmalloc(sizeof(uint64_t) * length);
+    upd_bytecount = (uint64_t *) _NDPImalloc(sizeof(uint64_t) * length);
     for( i = 0; i < length; i++ )
         upd_bytecount[i] = 100 + i*width;
 
-    if( !_TIFFRewriteField( tif, TIFFTAG_STRIPBYTECOUNTS, TIFF_LONG8, 
+    if( !_NDPIRewriteField( tif, TIFFTAG_STRIPBYTECOUNTS, TIFF_LONG8, 
                             length, upd_bytecount ) )
     {
         fprintf (stderr, "Can't rewrite STRIPBYTECOUNTS.\n");
         goto failure;
     }
 
-    _TIFFfree( upd_bytecount );
+    _NDPIfree( upd_bytecount );
     upd_bytecount = NULL;
 
-    TIFFClose(tif);
+    NDPIClose(tif);
 
     /* Reopen file and read back to verify contents */
 
-    tif = TIFFOpen(filename, "r");
+    tif = NDPIOpen(filename, "r");
     if (!tif) {
         fprintf (stderr, "Can't open test TIFF file %s.\n", filename);
         free(buf);
         return 1;
     }
         
-    if( !TIFFGetField( tif, TIFFTAG_STRIPOFFSETS, &rowoffset ) )
+    if( !NDPIGetField( tif, TIFFTAG_STRIPOFFSETS, &rowoffset ) )
     {
         fprintf (stderr, "Can't fetch STRIPOFFSETS.\n");
         goto failure;
@@ -285,7 +285,7 @@ int rewrite_test(const char *filename, uint32_t width, int length, int bigtiff,
         }
     }
 
-    if( !TIFFGetField( tif, TIFFTAG_STRIPBYTECOUNTS, &rowbytes ) )
+    if( !NDPIGetField( tif, TIFFTAG_STRIPBYTECOUNTS, &rowbytes ) )
     {
         fprintf (stderr, "Can't fetch STRIPBYTECOUNTS.\n");
         goto failure;
@@ -308,7 +308,7 @@ int rewrite_test(const char *filename, uint32_t width, int length, int bigtiff,
         }
     }
 
-    TIFFClose( tif );
+    NDPIClose( tif );
     free(buf);
 
     /* All tests passed; delete file and exit with success status. */
@@ -317,15 +317,15 @@ int rewrite_test(const char *filename, uint32_t width, int length, int bigtiff,
 
   failure:
     /* Something goes wrong; close file and return unsuccessful status. */
-    TIFFClose(tif);
+    NDPIClose(tif);
     free(buf);
     if( upd_rowoffset != NULL )
     {
-        _TIFFfree( upd_rowoffset );
+        _NDPIfree( upd_rowoffset );
     }
     if ( upd_bytecount != NULL )
     {
-        _TIFFfree( upd_bytecount );
+        _NDPIfree( upd_bytecount );
     }
     /*  unlink(filename); */
 

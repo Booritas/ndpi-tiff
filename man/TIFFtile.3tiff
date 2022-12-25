@@ -24,28 +24,28 @@
 .if n .po 0
 .TH TIFFTILE 3TIFF "February 14, 1992" "libtiff"
 .SH NAME
-TIFFTileSize, TIFFTileRowSize, TIFFVTileSize, TIFFDefaultTileSize,
-TIFFComputeTile, TIFFCheckTile, TIFFNumberOfTiles \- tile-related utility
+NDPITileSize, NDPITileRowSize, NDPIVTileSize, NDPIDefaultTileSize,
+NDPIComputeTile, NDPICheckTile, NDPINumberOfTiles \- tile-related utility
 routines
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "void TIFFDefaultTileSize(TIFF *" tif ", uint32_t *" tw ", uint32_t *" th ")"
+.BI "void NDPIDefaultTileSize(TIFF *" tif ", uint32_t *" tw ", uint32_t *" th ")"
 .br
-.BI "tsize_t TIFFTileSize(TIFF *" tif ")"
+.BI "tsize_t NDPITileSize(TIFF *" tif ")"
 .br
-.BI "tsize_t TIFFTileRowSize(TIFF *" tif ")"
+.BI "tsize_t NDPITileRowSize(TIFF *" tif ")"
 .br
-.BI "tsize_t TIFFVTileSize(TIFF *" tif ", uint32_t " nrows ")"
+.BI "tsize_t NDPIVTileSize(TIFF *" tif ", uint32_t " nrows ")"
 .br
-.BI "ttile_t TIFFComputeTile(TIFF *" tif ", uint32_t " x ", uint32_t " y ", uint32_t " z ", tsample_t " sample ")"
+.BI "ttile_t NDPIComputeTile(TIFF *" tif ", uint32_t " x ", uint32_t " y ", uint32_t " z ", tsample_t " sample ")"
 .br
-.BI "int TIFFCheckTile(TIFF *" tif ", uint32_t " x ", uint32_t " y ", uint32_t " z ", tsample_t " sample ")"
+.BI "int NDPICheckTile(TIFF *" tif ", uint32_t " x ", uint32_t " y ", uint32_t " z ", tsample_t " sample ")"
 .br
-.BI "ttile_t TIFFNumberOfTiles(TIFF *" tif ")"
+.BI "ttile_t NDPINumberOfTiles(TIFF *" tif ")"
 .br
 .SH DESCRIPTION
-.I TIFFDefaultTileSize
+.I NDPIDefaultTileSize
 returns the pixel width and height of a reasonable-sized tile; suitable for
 setting up the
 .I TileWidth
@@ -62,22 +62,22 @@ constrained to be a multiple of 16 pixels to conform with the
 .SM TIFF
 specification.
 .PP
-.I TIFFTileSize
+.I NDPITileSize
 returns the equivalent size for a tile of data as it would be returned in a
 call to
-.I TIFFReadTile
+.I NDPIReadTile
 or as it would be expected in a call to
 .IR TIFFWriteTile .
 .PP
-.I TIFFVTileSize
+.I NDPIVTileSize
 returns the number of bytes in a row-aligned tile with
 .I nrows
 of data.
 .PP
-.I TIFFTileRowSize
+.I NDPITileRowSize
 returns the number of bytes of a row of data in a tile.
 .PP
-.IR TIFFComputeTile
+.IR NDPIComputeTile
 returns the tile that contains the specified coordinates. A valid tile is
 always returned; out-of-range coordinate values are clamped to the bounds of
 the image. The
@@ -93,7 +93,7 @@ The
 parameter is used only if data are organized in separate planes (\c
 .IR PlanarConfiguration =2).
 .PP
-.IR TIFFCheckTile
+.IR NDPICheckTile
 returns a non-zero value if the supplied coordinates are within the bounds of
 the image and zero otherwise. The
 .I x
@@ -113,14 +113,14 @@ parameter is checked against the value of the
 .I SamplesPerPixel
 parameter if the data are organized in separate planes.
 .PP
-.IR TIFFNumberOfTiles
+.IR NDPINumberOfTiles
 returns the number of tiles in the image.
 .SH DIAGNOSTICS
 None.
 .SH "SEE ALSO"
-.BR TIFFReadEncodedTile (3TIFF),
-.BR TIFFReadRawTile (3TIFF),
-.BR TIFFReadTile (3TIFF),
+.BR NDPIReadEncodedTile (3TIFF),
+.BR NDPIReadRawTile (3TIFF),
+.BR NDPIReadTile (3TIFF),
 .BR TIFFWriteEncodedTile (3TIFF),
 .BR TIFFWriteRawTile (3TIFF),
 .BR TIFFWriteTile (3TIFF),

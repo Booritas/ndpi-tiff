@@ -80,7 +80,7 @@ later.
 
 <li> libtiff/tif_jpeg.c: Define HAVE_BOOLEAN on windows if RPCNDR.H 
 	has been included.
-<li> man/Makefile.in: add TIFFClientOpen link as per debian submitted
+<li> man/Makefile.in: add NDPIClientOpen link as per debian submitted
 	bug 66.
 <li> libtiff/Makefile.in: Fixed @DSOSUB_VERSION to be @DSOSUF_VERSION@
 	in two places.
@@ -96,7 +96,7 @@ later.
 <UL> 
 <li> tif_fax3.c: keep rw_mode flag internal to fax3 state to remember
 	whether we are encoding or decoding.  This is to ensure graceful 
-	recovery if TIFFClientOpen() discovers an attempt to open a compressed
+	recovery if NDPIClientOpen() discovers an attempt to open a compressed
 	file for "r+" access, and subsequently close it, as it resets the 
 	tif_mode flag to O_RDONLY in this case to avoid writes, confusing the
 	compressor's concept of whether it is in encode or decode mode.
@@ -145,7 +145,7 @@ later.
 <li> libtiff/tiff.h, libtiff/tif_fax3.c: added check for __LP64__ 
 	when checking for 64 bit architectures as per bugzilla bug 67.
 <li> libtiff/tif_getimage.c: Use memmove() instead of TIFFmemcpy()
-	in TIFFReadRGBATile() to avoid issues in cases of overlapping
+	in NDPIReadRGBATile() to avoid issues in cases of overlapping
 	buffers.  See Bug 69 in Bugzilla. 
 <li> libtiff/tif_getimage.c: Don't complain for CMYK (separated)
 	images with more than four samples per pixel as per bug 73.
@@ -167,13 +167,13 @@ Josep Vallverdu (from HP), and further described in bug 47.
 	error about LZW not being available.
 
 <li> libtiff/tif_dir.c: propagate failure to initialize compression
-	back from TIFFSetField() as an error status, so applications can 
+	back from NDPISetField() as an error status, so applications can 
 	detect failure.
 
 <li> libtiff/tif_lzw.c: Avoid MS VC++ 5.0 optimization bug as per bug 78.
 
-<li> libtiff/tif_dirwrite.c: added TIFFRewriteDirectory() function.
-Updated TIFFWriteDirectory man page to include TIFFRewriteDirectory.
+<li> libtiff/tif_dirwrite.c: added NDPIRewriteDirectory() function.
+Updated NDPIWriteDirectory man page to include NDPIRewriteDirectory.
 
 <li> libtiff/tiff.h: I have created COMPRESSION_CCITT_T4, 
 	COMPRESSION_CCITT_T6, TIFFTAG_T4OPTIONS and TIFFTAG_T6OPTIONS aliases 

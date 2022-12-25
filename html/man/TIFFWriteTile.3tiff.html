@@ -58,7 +58,7 @@ specified coordinates. The data in <i>buf</i> are is
 (potentially) compressed, and written to the indicated file,
 normally being appended to the end of the file. The buffer
 must be contain an entire tile of data. Applications should
-call the routine <i>TIFFTileSize</i> to find out the size
+call the routine <i>NDPITileSize</i> to find out the size
 (in bytes) of a tile buffer. The <i>x</i> and <i>y</i>
 parameters are always used by <i>TIFFWriteTile</i>. The
 <i>z</i> parameter is used if the image is deeper than 1
@@ -89,7 +89,7 @@ returned.</p>
 <td width="8%"></td>
 <td width="91%">
 <p>All error messages are directed to the
-<b>TIFFError</b>(3TIFF) routine.</p>
+<b>NDPIError</b>(3TIFF) routine.</p>
 </td>
 </table>
 <a name="SEE ALSO"></a>
@@ -100,9 +100,9 @@ returned.</p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><b>TIFFCheckTile</b>(3TIFF),
-<b>TIFFComputeTile</b>(3TIFF), <b>TIFFOpen</b>(3TIFF),
-<b>TIFFReadTile</b>(3TIFF), <b>TIFFWriteScanline</b>(3TIFF),
+<p><b>NDPICheckTile</b>(3TIFF),
+<b>NDPIComputeTile</b>(3TIFF), <b>NDPIOpen</b>(3TIFF),
+<b>NDPIReadTile</b>(3TIFF), <b>TIFFWriteScanline</b>(3TIFF),
 <b>TIFFWriteEncodedTile</b>(3TIFF),
 <b>TIFFWriteRawTile</b>(3TIFF), <b>libtiff</b>(3TIFF)</p>
 <!-- INDENTATION -->

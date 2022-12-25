@@ -4,11 +4,11 @@
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
 <meta name="Content-Style" content="text/css">
-<title>TIFFSetDirectory</title>
+<title>NDPISetDirectory</title>
 </head>
 <body>
 
-<h1 align=center>TIFFSetDirectory</h1>
+<h1 align=center>NDPISetDirectory</h1>
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
@@ -25,7 +25,7 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>TIFFSetDirectory, TIFFSetSubDirectory &minus; set the
+<p>NDPISetDirectory, NDPISetSubDirectory &minus; set the
 current directory for an open <small>TIFF</small> file</p>
 </td>
 </table>
@@ -39,9 +39,9 @@ current directory for an open <small>TIFF</small> file</p>
 <td width="91%">
 <p><b>#include &lt;tiffio.h&gt;</b></p>
 <!-- INDENTATION -->
-<p><b>int TIFFSetDirectory(TIFF *</b><i>tif</i><b>,
+<p><b>int NDPISetDirectory(TIFF *</b><i>tif</i><b>,
 tdir_t</b> <i>dirnum</i><b>)<br>
-int TIFFSetSubDirectory(TIFF *</b><i>tif</i><b>, uint32_t</b>
+int NDPISetSubDirectory(TIFF *</b><i>tif</i><b>, uint32_t</b>
 <i>diroff</i><b>)</b></p>
 </td>
 </table>
@@ -53,14 +53,14 @@ int TIFFSetSubDirectory(TIFF *</b><i>tif</i><b>, uint32_t</b>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><i>TIFFSetDirectory</i> changes the current directory and
-reads its contents with <i>TIFFReadDirectory</i>. The
+<p><i>NDPISetDirectory</i> changes the current directory and
+reads its contents with <i>NDPIReadDirectory</i>. The
 parameter <i>dirnum</i> specifies the subfile/directory as
 an integer number, with the first directory numbered
 zero.</p>
 <!-- INDENTATION -->
-<p><i>TIFFSetSubDirectory</i> acts like
-<i>TIFFSetDirectory</i>, except the directory is specified
+<p><i>NDPISetSubDirectory</i> acts like
+<i>NDPISetDirectory</i>, except the directory is specified
 as a file offset instead of an index; this is required for
 accessing subdirectories linked through a <i>SubIFD</i>
 tag.</p>
@@ -89,7 +89,7 @@ reading the directory&rsquo;s contents.</p>
 <td width="8%"></td>
 <td width="91%">
 <p>All error messages are directed to the
-<i>TIFFError</i>(3TIFF) routine.</p>
+<i>NDPIError</i>(3TIFF) routine.</p>
 <!-- INDENTATION -->
 <p><b>%s: Error fetching directory count</b>. An error was
 encountered while reading the &lsquo;&lsquo;directory
@@ -109,9 +109,9 @@ file.</p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><i>TIFFCurrentDirectory</i>(3TIFF),
-<i>TIFFOpen</i>(3TIFF), <i>TIFFReadDirectory</i>(3TIFF),
-<i>TIFFWriteDirectory</i>(3TIFF), <i>libtiff</i>(3TIFF)</p>
+<p><i>NDPICurrentDirectory</i>(3TIFF),
+<i>NDPIOpen</i>(3TIFF), <i>NDPIReadDirectory</i>(3TIFF),
+<i>NDPIWriteDirectory</i>(3TIFF), <i>libtiff</i>(3TIFF)</p>
 <!-- INDENTATION -->
 <p>Libtiff library home page:
 <b>http://www.simplesystems.org/libtiff/</b></p>

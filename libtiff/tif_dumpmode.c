@@ -57,13 +57,13 @@ DumpModeEncode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s)
 		 * data buffer to avoid extra copy.
 		 */
 		if (tif->tif_rawcp != pp)
-			_TIFFmemcpy(tif->tif_rawcp, pp, n);
+			_NDPImemcpy(tif->tif_rawcp, pp, n);
 		tif->tif_rawcp += n;
 		tif->tif_rawcc += n;
 		pp += n;
 		cc -= n;
 		if (tif->tif_rawcc >= tif->tif_rawdatasize &&
-		    !TIFFFlushData1(tif))
+		    !NDPIFlushData1(tif))
 			return (0);
 	}
 	return (1);
@@ -78,7 +78,7 @@ DumpModeDecode(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
 	static const char module[] = "DumpModeDecode";
 	(void) s;
 	if (tif->tif_rawcc < cc) {
-		TIFFErrorExt(tif->tif_clientdata, module,
+		NDPIErrorExt(tif->tif_clientdata, module,
 "Not enough data for scanline %"PRIu32", expected a request for at most %"TIFF_SSIZE_FORMAT" bytes, got a request for %"TIFF_SSIZE_FORMAT" bytes",
 		             tif->tif_row,
 		             tif->tif_rawcc,
@@ -90,7 +90,7 @@ DumpModeDecode(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
 	 * data buffer to avoid extra copy.
 	 */
 	if (tif->tif_rawcp != buf)
-		_TIFFmemcpy(buf, tif->tif_rawcp, cc);
+		_NDPImemcpy(buf, tif->tif_rawcp, cc);
 	tif->tif_rawcp += cc;
 	tif->tif_rawcc -= cc;  
 	return (1);
@@ -111,7 +111,7 @@ DumpModeSeek(TIFF* tif, uint32_t nrows)
  * Initialize dump mode.
  */
 int
-TIFFInitDumpMode(TIFF* tif, int scheme)
+NDPIInitDumpMode(TIFF* tif, int scheme)
 {
 	(void) scheme;
 	tif->tif_fixuptags = DumpFixupTags;  

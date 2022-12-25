@@ -64,17 +64,17 @@ int ChkTIFF ( LPCTSTR lpszPath )
     TIFFErrorHandler  eh;
     TIFFErrorHandler  wh;
 
-    eh = TIFFSetErrorHandler(NULL);
-    wh = TIFFSetWarningHandler(NULL);
+    eh = NDPISetErrorHandler(NULL);
+    wh = NDPISetWarningHandler(NULL);
 
-    TIFF* tif = TIFFOpen(lpszPath, "r");
+    TIFF* tif = NDPIOpen(lpszPath, "r");
     if (tif) {
         rtn = 1;
-        TIFFClose(tif);
+        NDPIClose(tif);
     }
 
-    TIFFSetErrorHandler(eh);
-    TIFFSetWarningHandler(wh);
+    NDPISetErrorHandler(eh);
+    NDPISetWarningHandler(wh);
 
     return rtn;
 }
@@ -86,42 +86,42 @@ PVOID ReadTIFF ( LPCTSTR lpszPath )
     void*             pDIB = 0;
     TIFFErrorHandler  wh;
 
-    wh = TIFFSetWarningHandler(MyWarningHandler);
+    wh = NDPISetWarningHandler(MyWarningHandler);
 
     if (ChkTIFF(lpszPath)) {
-        TIFF* tif = TIFFOpen(lpszPath, "r");
+        TIFF* tif = NDPIOpen(lpszPath, "r");
         if (tif) {
             char emsg[1024];
 
-            if (TIFFRGBAImageOK(tif, emsg)) {
+            if (NDPIRGBAImageOK(tif, emsg)) {
                 TIFFDibImage img;
                 char emsg[1024];
 
-                if (TIFFRGBAImageBegin(&img.tif, tif, -1, emsg)) {
+                if (NDPIRGBAImageBegin(&img.tif, tif, -1, emsg)) {
                     size_t npixels;
                     uint32_t* raster;
 
                     DibInstallHack(&img);
 
                     npixels = img.tif.width * img.tif.height;
-                    raster = (uint32_t*) _TIFFmalloc(npixels * sizeof (uint32_t));
+                    raster = (uint32_t*) _NDPImalloc(npixels * sizeof (uint32_t));
                     if (raster != NULL) {
-                        if (TIFFRGBAImageGet(&img.tif, raster, img.tif.width, img.tif.height)) {
+                        if (NDPIRGBAImageGet(&img.tif, raster, img.tif.width, img.tif.height)) {
                             pDIB = TIFFRGBA2DIB(&img, raster);
                         }
                     }
-                    _TIFFfree(raster);
+                    _NDPIfree(raster);
                 }
-                TIFFRGBAImageEnd(&img.tif);
+                NDPIRGBAImageEnd(&img.tif);
             }
             else {
                 TRACE("Unable to open image(%s): %s\n", lpszPath, emsg );
             }
-            TIFFClose(tif);
+            NDPIClose(tif);
         }
     }
 
-    TIFFSetWarningHandler(wh);
+    NDPISetWarningHandler(wh);
 
     return pDIB;
 }
@@ -143,12 +143,12 @@ HANDLE TIFFRGBA2DIB(TIFFDibImage* dib, uint32_t* raster)
     BITMAPINFOHEADER   bi;
     int                dwDIBSize ;
 
-    TIFFGetField(img->tif, TIFFTAG_IMAGEWIDTH, &imageWidth);
-    TIFFGetField(img->tif, TIFFTAG_IMAGELENGTH, &imageLength);
-    TIFFGetField(img->tif, TIFFTAG_BITSPERSAMPLE, &BitsPerSample);
-    TIFFGetField(img->tif, TIFFTAG_ROWSPERSTRIP, &RowsPerStrip);
-    TIFFGetField(img->tif, TIFFTAG_SAMPLESPERPIXEL, &SamplePerPixel);
-    TIFFGetField(img->tif, TIFFTAG_PHOTOMETRIC, &PhotometricInterpretation);
+    NDPIGetField(img->tif, TIFFTAG_IMAGEWIDTH, &imageWidth);
+    NDPIGetField(img->tif, TIFFTAG_IMAGELENGTH, &imageLength);
+    NDPIGetField(img->tif, TIFFTAG_BITSPERSAMPLE, &BitsPerSample);
+    NDPIGetField(img->tif, TIFFTAG_ROWSPERSTRIP, &RowsPerStrip);
+    NDPIGetField(img->tif, TIFFTAG_SAMPLESPERPIXEL, &SamplePerPixel);
+    NDPIGetField(img->tif, TIFFTAG_PHOTOMETRIC, &PhotometricInterpretation);
 
     if ( BitsPerSample == 1 && SamplePerPixel == 1 && dib->dibinstalled ) {   // bilevel
         bi.biSize           = sizeof(BITMAPINFOHEADER);
@@ -200,7 +200,7 @@ HANDLE TIFFRGBA2DIB(TIFFDibImage* dib, uint32_t* raster)
         RGBQUAD*  rgbDib = (RGBQUAD*)pbiBits;
         long*     rgbTif = (long*)raster;
 
-        _TIFFmemcpy(pbiBits, raster, bi.biSizeImage);
+        _NDPImemcpy(pbiBits, raster, bi.biSizeImage);
     }
 
         //  For now just always default to the RGB 32 bit form.                                                       // save as 32 bit for simplicity
@@ -333,7 +333,7 @@ DECLAREContigPutFunc(putContig1bitTile)
     w = (w+7)/8;
 
     while (h-- > 0) {
-        _TIFFmemcpy(ucp, pp, w);
+        _NDPImemcpy(ucp, pp, w);
         /*
         for (x = wb; x-- > 0;) {
             *cp++ = rgbi(Map[pp[0]], Map[pp[1]], Map[pp[2]]);
@@ -358,7 +358,7 @@ setorientation(TIFFRGBAImage* img, uint32_t h)
     case ORIENTATION_BOTRIGHT:
     case ORIENTATION_RIGHTBOT:  /* XXX */
     case ORIENTATION_LEFTBOT:   /* XXX */
-    TIFFWarning(TIFFFileName(tif), "using bottom-left orientation");
+    TIFFWarning(NDPIFileName(tif), "using bottom-left orientation");
     img->orientation = ORIENTATION_BOTLEFT;
     /* fall through... */
     case ORIENTATION_BOTLEFT:
@@ -368,7 +368,7 @@ setorientation(TIFFRGBAImage* img, uint32_t h)
     case ORIENTATION_RIGHTTOP:  /* XXX */
     case ORIENTATION_LEFTTOP:   /* XXX */
     default:
-    TIFFWarning(TIFFFileName(tif), "using top-left orientation");
+    TIFFWarning(NDPIFileName(tif), "using top-left orientation");
     img->orientation = ORIENTATION_TOPLEFT;
     /* fall through... */
     case ORIENTATION_TOPLEFT:
@@ -408,24 +408,24 @@ getStripContig1Bit(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
     uint32_t  wb = WIDTHBYTES(w);
     int ret = 1;
 
-    buf = (u_char*) _TIFFmalloc(TIFFStripSize(tif));
+    buf = (u_char*) _NDPImalloc(NDPIStripSize(tif));
     if (buf == 0) {
-        TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "No space for strip buffer");
+        NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "No space for strip buffer");
         return (0);
     }
     y = setorientation(img, h);
     orientation = img->orientation;
     toskew = -(int32_t) (orientation == ORIENTATION_TOPLEFT ? wb+wb : wb-wb);
-    TIFFGetFieldDefaulted(tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
-    scanline = TIFFScanlineSize(tif);
+    NDPIGetFieldDefaulted(tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
+    scanline = NDPIScanlineSize(tif);
     fromskew = (w < imagewidth ? imagewidth - w : 0)/8;
     for (row = 0; row < h; row += nrow)
     {
         rowstoread = rowsperstrip - (row + img->row_offset) % rowsperstrip;
         nrow = (row + rowstoread > h ? h - row : rowstoread);
-        strip = TIFFComputeStrip(tif,row+img->row_offset, 0);
+        strip = NDPIComputeStrip(tif,row+img->row_offset, 0);
         stripsize = ((row + img->row_offset)%rowsperstrip + nrow) * scanline;
-        if (TIFFReadEncodedStrip(tif, strip, buf, stripsize ) < 0
+        if (NDPIReadEncodedStrip(tif, strip, buf, stripsize ) < 0
             && img->stoponerr)
         {
             ret = 0;
@@ -436,7 +436,7 @@ getStripContig1Bit(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
         (*put)(img, (uint32_t*)(braster+y*wb), 0, y, w, nrow, fromskew, toskew, buf + pos);
         y += (orientation == ORIENTATION_TOPLEFT ?-(int32_t) nrow : (int32_t) nrow);
     }
-    _TIFFfree(buf);
+    _NDPIfree(buf);
     return (ret);
 }
 

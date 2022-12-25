@@ -74,39 +74,39 @@ main()
 	char		*value;
 
 	/* Test whether we can write tags. */
-	tif = TIFFOpen(filename, "w");
+	tif = NDPIOpen(filename, "w");
 	if (!tif) {
 		fprintf (stderr, "Can't create test TIFF file %s.\n", filename);
 		return 1;
 	}
 
-	if (!TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, 1)) {
+	if (!NDPISetField(tif, TIFFTAG_IMAGEWIDTH, 1)) {
 		fprintf (stderr, "Can't set ImageWidth tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_IMAGELENGTH, 1)) {
+	if (!NDPISetField(tif, TIFFTAG_IMAGELENGTH, 1)) {
 		fprintf (stderr, "Can't set ImageLength tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8)) {
+	if (!NDPISetField(tif, TIFFTAG_BITSPERSAMPLE, 8)) {
 		fprintf (stderr, "Can't set BitsPerSample tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, sizeof(buf))) {
+	if (!NDPISetField(tif, TIFFTAG_SAMPLESPERPIXEL, sizeof(buf))) {
 		fprintf (stderr, "Can't set SamplesPerPixel tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG)) {
+	if (!NDPISetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG)) {
 		fprintf (stderr, "Can't set PlanarConfiguration tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB)) {
+	if (!NDPISetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB)) {
 		fprintf (stderr, "Can't set PhotometricInterpretation tag.\n");
 		goto failure;
 	}
 
 	for (i = 0; i < NTAGS; i++) {
-		if (!TIFFSetField(tif, ascii_tags[i].tag,
+		if (!NDPISetField(tif, ascii_tags[i].tag,
 				  ascii_tags[i].value)) {
 			fprintf(stderr, "Can't set tag %"PRIu32".\n",
 				ascii_tags[i].tag);
@@ -115,12 +115,12 @@ main()
 	}
 
 	/* InkNames tag has special form, so we handle it separately. */
-	if (!TIFFSetField(tif, TIFFTAG_NUMBEROFINKS, 3)) {
+	if (!NDPISetField(tif, TIFFTAG_NUMBEROFINKS, 3)) {
 		fprintf (stderr, "Can't set tag %d (NUMBEROFINKS).\n",
                          TIFFTAG_NUMBEROFINKS);
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_INKNAMES, ink_names_size, ink_names)) {
+	if (!NDPISetField(tif, TIFFTAG_INKNAMES, ink_names_size, ink_names)) {
 		fprintf (stderr, "Can't set tag %d (INKNAMES).\n",
 			 TIFFTAG_INKNAMES);
 		goto failure;
@@ -132,17 +132,17 @@ main()
 		goto failure;
 	}
 
-	TIFFClose(tif);
+	NDPIClose(tif);
 	
 	/* Ok, now test whether we can read written values. */
-	tif = TIFFOpen(filename, "r");
+	tif = NDPIOpen(filename, "r");
 	if (!tif) {
 		fprintf (stderr, "Can't open test TIFF file %s.\n", filename);
 		return 1;
 	}
 
 	for (i = 0; i < NTAGS; i++) {
-		if (!TIFFGetField(tif, ascii_tags[i].tag, &value)
+		if (!NDPIGetField(tif, ascii_tags[i].tag, &value)
 		    || strcmp(value, ascii_tags[i].value)) {
 			fprintf(stderr, "Can't get tag %"PRIu32".\n",
 				ascii_tags[i].tag);
@@ -150,14 +150,14 @@ main()
 		}
 	}
 
-	if (!TIFFGetField(tif, TIFFTAG_INKNAMES, &value)
+	if (!NDPIGetField(tif, TIFFTAG_INKNAMES, &value)
 	    || memcmp(value, ink_names, ink_names_size)) {
 		fprintf (stderr, "Can't get tag %d (INKNAMES).\n",
 			 TIFFTAG_INKNAMES);
 		goto failure;
 	}
 
-	TIFFClose(tif);
+	NDPIClose(tif);
 	
 	/* All tests passed; delete file and exit with success status. */
 	unlink(filename);
@@ -168,7 +168,7 @@ failure:
 	 * Something goes wrong; close file and return unsuccessful status.
 	 * Do not remove the file for further manual investigation.
 	 */
-	TIFFClose(tif);
+	NDPIClose(tif);
 	return 1;
 }
 

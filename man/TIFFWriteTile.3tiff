@@ -39,7 +39,7 @@ the specified coordinates. The data in
 are is (potentially) compressed, and written to the indicated file, normally
 being appended to the end of the file. The buffer must be contain an entire
 tile of data. Applications should call the routine
-.IR TIFFTileSize
+.IR NDPITileSize
 to find out the size (in bytes) of a tile buffer. The
 .I x
 and
@@ -60,13 +60,13 @@ returns \-1 if it detects an error; otherwise the number of bytes in the tile
 is returned.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.BR TIFFError (3TIFF)
+.BR NDPIError (3TIFF)
 routine.
 .SH "SEE ALSO"
-.BR TIFFCheckTile (3TIFF),
-.BR TIFFComputeTile (3TIFF),
-.BR TIFFOpen (3TIFF),
-.BR TIFFReadTile (3TIFF),
+.BR NDPICheckTile (3TIFF),
+.BR NDPIComputeTile (3TIFF),
+.BR NDPIOpen (3TIFF),
+.BR NDPIReadTile (3TIFF),
 .BR TIFFWriteScanline (3TIFF),
 .BR TIFFWriteEncodedTile (3TIFF),
 .BR TIFFWriteRawTile (3TIFF),

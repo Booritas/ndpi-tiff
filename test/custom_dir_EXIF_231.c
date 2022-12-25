@@ -111,7 +111,7 @@ main()
 	}
 
 	/* We write the main directory as a simple image. */
-	tif = TIFFOpen(filename, "w+");
+	tif = NDPIOpen(filename, "w+");
 	if (!tif) {
 		fprintf(stderr, "Can't create test TIFF file %s.\n", filename);
 		return 1;
@@ -128,7 +128,7 @@ main()
 		fprintf(stderr, "Can't delete test TIFF file %s.\n", filenameBigTiff);
 	}
 
-	tif = TIFFOpen(filenameBigTiff, "w8");
+	tif = NDPIOpen(filenameBigTiff, "w8");
 	if (!tif) {
 		fprintf(stderr, "Can't create test TIFF file %s.\n", filenameBigTiff);
 		return 1;
@@ -243,31 +243,31 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	}
 
 	/*-- Setup standard tags of a simple tiff file --*/
-	if (!TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, width)) {
+	if (!NDPISetField(tif, TIFFTAG_IMAGEWIDTH, width)) {
 		fprintf (stderr, "Can't set ImageWidth tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_IMAGELENGTH, length)) {
+	if (!NDPISetField(tif, TIFFTAG_IMAGELENGTH, length)) {
 		fprintf (stderr, "Can't set ImageLength tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, bps)) {
+	if (!NDPISetField(tif, TIFFTAG_BITSPERSAMPLE, bps)) {
 		fprintf (stderr, "Can't set BitsPerSample tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, SPP)) {
+	if (!NDPISetField(tif, TIFFTAG_SAMPLESPERPIXEL, SPP)) {
 		fprintf (stderr, "Can't set SamplesPerPixel tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, rows_per_strip)) {
+	if (!NDPISetField(tif, TIFFTAG_ROWSPERSTRIP, rows_per_strip)) {
 		fprintf (stderr, "Can't set SamplesPerPixel tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_PLANARCONFIG, planarconfig)) {
+	if (!NDPISetField(tif, TIFFTAG_PLANARCONFIG, planarconfig)) {
 		fprintf (stderr, "Can't set PlanarConfiguration tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, photometric)) {
+	if (!NDPISetField(tif, TIFFTAG_PHOTOMETRIC, photometric)) {
 		fprintf (stderr, "Can't set PhotometricInterpretation tag.\n");
 		goto failure;
 	}
@@ -277,7 +277,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	/*-- Additional tags to check Rational standard tags, which are also defined as FIELD_CUSTOM */
 
 	/*- TIFFTAG_INKSET is a SHORT parameter (TIFF_SHORT, TIFF_SETGET_UINT16) with field_bit=FIELD_CUSTOM !! -*/
-	if (!TIFFSetField(tif, TIFFTAG_INKSET, 34)) {
+	if (!NDPISetField(tif, TIFFTAG_INKSET, 34)) {
 		fprintf(stderr, "Can't set TIFFTAG_INKSET tag.\n");
 		goto failure;
 	}
@@ -287,7 +287,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 #define PIXAR_FOVCOT_VAL	5.123456789123456789
 	auxFloat = (float)PIXAR_FOVCOT_VAL;
 	auxDouble = (double)PIXAR_FOVCOT_VAL;
-	if (!TIFFSetField(tif, TIFFTAG_PIXAR_FOVCOT, auxDouble)) {
+	if (!NDPISetField(tif, TIFFTAG_PIXAR_FOVCOT, auxDouble)) {
 		fprintf(stderr, "Can't set TIFFTAG_PIXAR_FOVCOT tag.\n");
 		goto failure;
 	}
@@ -297,14 +297,14 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 #define STONITS_VAL 6.123456789123456789
 	auxDouble = STONITS_VAL;
 	auxFloat = (float)auxDouble;
-	if (!TIFFSetField(tif, TIFFTAG_STONITS, auxDouble)) {
+	if (!NDPISetField(tif, TIFFTAG_STONITS, auxDouble)) {
 		fprintf(stderr, "Can't set TIFFTAG_STONITS tag.\n");
 		goto failure;
 	}
 
 	/*- TIFFTAG_YCBCRPOSITIONING is a SHORT parameter */
 	auxLong = auxShort = 5;
-	if (!TIFFSetField(tif, TIFFTAG_YCBCRPOSITIONING, auxLong )) {
+	if (!NDPISetField(tif, TIFFTAG_YCBCRPOSITIONING, auxLong )) {
 		fprintf (stderr, "Can't set TIFFTAG_YCBCRPOSITIONING tag.\n");
 		goto failure;
 	}
@@ -313,13 +313,13 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	/* With Rational2Double upgrade tag is redefined to TIFF_SETGET_FLOAT, but can be still written with double. */
 #define BESTQUALITYSCALE_VAL   15.3
 	auxDouble = BESTQUALITYSCALE_VAL;
-	if (!TIFFSetField(tif, TIFFTAG_BESTQUALITYSCALE, auxDouble )) {
+	if (!NDPISetField(tif, TIFFTAG_BESTQUALITYSCALE, auxDouble )) {
 		fprintf (stderr, "Can't set TIFFTAG_BESTQUALITYSCALE tag.\n");
 		goto failure;
 	}
 
 	/* - TIFFTAG_BASELINENOISE, 1, 1, TIFF_RATIONAL, 0, TIFF_SETGET_FLOAT */
-	if (!TIFFSetField(tif, TIFFTAG_BASELINENOISE, auxDouble)) {
+	if (!NDPISetField(tif, TIFFTAG_BASELINENOISE, auxDouble)) {
 		fprintf(stderr, "Can't set TIFFTAG_BASELINENOISE tag.\n");
 		goto failure;
 	}
@@ -327,19 +327,19 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	
 	/*--- For static or variable ARRAYs the case is different ---*/
 /*- Variable Array: TIFFTAG_DECODE is a SRATIONAL parameter TIFF_SETGET_C16_FLOAT type FIELD_CUSTOM with passcount=1 and variable length of array. */
-	if (!TIFFSetField(tif, TIFFTAG_DECODE, 3, auxFloatArrayN2)) {
+	if (!NDPISetField(tif, TIFFTAG_DECODE, 3, auxFloatArrayN2)) {
 		fprintf(stderr, "Can't set TIFFTAG_DECODE tag.\n");
 		goto failure;
 	}
 
 	/*- Variable Array:  TIFF_RATIONAL, 0, TIFF_SETGET_C16_FLOAT */
-	if (!TIFFSetField(tif, TIFFTAG_BLACKLEVEL, 3, auxFloatArrayN1)) {
+	if (!NDPISetField(tif, TIFFTAG_BLACKLEVEL, 3, auxFloatArrayN1)) {
 		fprintf(stderr, "Can't set TIFFTAG_BLACKLEVEL tag.\n");
 		goto failure;
 	}
 
 	/*- Fixed Array: TIFFTAG_DEFAULTCROPSIZE, 2, 2, TIFF_RATIONAL, 0, TIFF_SETGET_C0_FLOAT */
-	if (!TIFFSetField(tif, TIFFTAG_DEFAULTCROPSIZE, &auxFloatArrayW[0])) {
+	if (!NDPISetField(tif, TIFFTAG_DEFAULTCROPSIZE, &auxFloatArrayW[0])) {
 		fprintf(stderr, "Can't set TIFFTAG_DEFAULTCROPSIZE tag.\n");
 		goto failure;
 	}
@@ -351,7 +351,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	     new interface in order to prevent the old reading behaviour.
 	     Tags to check: TIFFTAG_BESTQUALITYSCALE, TIFFTAG_BASELINENOISE, TIFFTAG_BASELINESHARPNESS
 	 */
-	fip = TIFFFindField(tif, TIFFTAG_BESTQUALITYSCALE, TIFF_ANY);
+	fip = NDPIFindField(tif, TIFFTAG_BESTQUALITYSCALE, TIFF_ANY);
 	tSetFieldType = fip->set_field_type;
 	if (tSetFieldType == TIFF_SETGET_DOUBLE) {
 		blnIsRational2Double = FALSE;
@@ -368,7 +368,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 
 #define WRITE_GPS_TAGS
 #ifdef WRITE_GPS_TAGS
-	if (!TIFFSetField(tif, TIFFTAG_GPSIFD, dir_offset )) {
+	if (!NDPISetField(tif, TIFFTAG_GPSIFD, dir_offset )) {
 		fprintf (stderr, "Can't write TIFFTAG_GPSIFD\n" );
 	}
 #endif
@@ -379,7 +379,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
      */
 #define WRITE_EXIF_TAGS
 #ifdef WRITE_EXIF_TAGS
-	if (!TIFFSetField(tif, TIFFTAG_EXIFIFD, dir_offset )) {
+	if (!NDPISetField(tif, TIFFTAG_EXIFIFD, dir_offset )) {
 		fprintf (stderr, "Can't write TIFFTAG_EXIFIFD\n" );
 	}
 #endif
@@ -399,28 +399,28 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 
 	/*-- Save current tiff-directory to file before directory is changed. Otherwise it will be lost!  */
 	/*   The tif-structure is overwritten/ freshly initialized by any "CreateDirectory" */
-	/*retCode = TIFFCheckpointDirectory(tif);*/	/* does not cleanup Tiff-Structure */
-	retCode = TIFFWriteDirectory(tif);			/* cleanup Tiff-structure */
+	/*retCode = NDPICheckpointDirectory(tif);*/	/* does not cleanup Tiff-Structure */
+	retCode = NDPIWriteDirectory(tif);			/* cleanup Tiff-structure */
 
 	/*-- Now create a GPS directory. */
-	if (TIFFCreateGPSDirectory(tif) != 0) {
-		fprintf (stderr, "TIFFCreateGPSDirectory() failed.\n" );
+	if (NDPICreateGPSDirectory(tif) != 0) {
+		fprintf (stderr, "NDPICreateGPSDirectory() failed.\n" );
 		goto failure;
 	}
 
-	if (!TIFFSetField( tif, GPSTAG_VERSIONID, gpsVersion)) {
+	if (!NDPISetField( tif, GPSTAG_VERSIONID, gpsVersion)) {
 		fprintf (stderr, "Can't write GPSTAG_VERSIONID\n" );
 		goto failure;
 	}		
 
 	if (blnFillGPSManually) {
 		/*================= Write manually valid data to the GPS fields ==============*/
-		if (!TIFFSetField( tif, GPSTAG_LATITUDEREF, "N\0")) {
+		if (!NDPISetField( tif, GPSTAG_LATITUDEREF, "N\0")) {
 			fprintf (stderr, "Can't write GPSTAG_LATITUDEREF\n" );
 			goto failure;
 		}		
 		/*-- Unfortunately, Rational values are defined as SETGET_DOUBLE but are internally always stored as float.
-		 *   Single Rational values do not matter for writing, because TIFFSetField() uses va_arg() which performs "variables promotion" from type float to type double!
+		 *   Single Rational values do not matter for writing, because NDPISetField() uses va_arg() which performs "variables promotion" from type float to type double!
 		 *   However, for reading of Rational values ONLY float-variables are allowed - in contrary to the SETGET_DOUBLE specification at tiffFields[] in tif_dirinfo.c.
 		 */
 		/*-- ATTENTION: After the upgrade with Rational2Double, the GPSTAG values are defined as double precision
@@ -436,74 +436,74 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 		}
 		if (!blnIsRational2Double) {
 			for (j = 0; j < 3; j++) auxFloatArray[j] = (float)auxDoubleArrayGPS1[j];
-			if (!TIFFSetField(tif, GPSTAG_LATITUDE, auxFloatArray)) {
+			if (!NDPISetField(tif, GPSTAG_LATITUDE, auxFloatArray)) {
 				fprintf(stderr, "Can't write GPSTAG_LATITUDE\n");
 				goto failure;
 			}
 		} else {
 			/* Rational2Double interface for GPSTAG */
-			if (!TIFFSetField(tif, GPSTAG_LATITUDE, auxDoubleArrayGPS1)) {
+			if (!NDPISetField(tif, GPSTAG_LATITUDE, auxDoubleArrayGPS1)) {
 				fprintf(stderr, "Can't write GPSTAG_LATITUDE\n");
 				goto failure;
 			}
 		}
-		if (!TIFFSetField( tif, GPSTAG_LONGITUDEREF, "W\0")) {
+		if (!NDPISetField( tif, GPSTAG_LONGITUDEREF, "W\0")) {
 			fprintf (stderr, "Can't write GPSTAG_LONGITUDEREF\n" );
 			goto failure;
 		}
 		if (!blnIsRational2Double) {
 			for (j=0; j<3; j++) auxFloatArray[j] = (float)auxDoubleArrayGPS2[j];
-			if (!TIFFSetField( tif, GPSTAG_LONGITUDE, auxFloatArray)) {
+			if (!NDPISetField( tif, GPSTAG_LONGITUDE, auxFloatArray)) {
 				fprintf (stderr, "Can't write GPSTAG_LONGITUDE\n" );
 				goto failure;
 			}
 		} else {
 			/* Rational2Double interface for GPSTAG */
-			if (!TIFFSetField(tif, GPSTAG_LONGITUDE, auxDoubleArrayGPS2)) {
+			if (!NDPISetField(tif, GPSTAG_LONGITUDE, auxDoubleArrayGPS2)) {
 				fprintf(stderr, "Can't write GPSTAG_LATITUDE\n");
 				goto failure;
 			}
 		}
 		/*-- AltitudeRef: default is above sea level!! */
-		if (!TIFFSetField( tif, GPSTAG_ALTITUDEREF, 0)) {
+		if (!NDPISetField( tif, GPSTAG_ALTITUDEREF, 0)) {
 			fprintf (stderr, "Can't write GPSTAG_ALTITUDEREF\n" );
 			goto failure;
 		}
-		if (!TIFFSetField( tif, GPSTAG_ALTITUDE, auxDoubleGPSAltitude)) {
+		if (!NDPISetField( tif, GPSTAG_ALTITUDE, auxDoubleGPSAltitude)) {
 			fprintf (stderr, "Can't write GPSTAG_ALTITUDE\n" );
 			goto failure;
 		}
 		/*-- TimeStamp is only hh:mm:ss. See also DateTime string */
-		if (!TIFFSetField( tif, GPSTAG_TIMESTAMP, auxDoubleArrayGPSTime)) {
+		if (!NDPISetField( tif, GPSTAG_TIMESTAMP, auxDoubleArrayGPSTime)) {
 			fprintf (stderr, "Can't write GPSTAG_TIMESTAMP\n" );
 			goto failure;
 		}
-		if (!TIFFSetField( tif, GPSTAG_DATESTAMP, "2012:11:04")) {
+		if (!NDPISetField( tif, GPSTAG_DATESTAMP, "2012:11:04")) {
 			fprintf (stderr, "Can't write GPSTAG_DATESTAMP\n" );
 			goto failure;
 		}
 
-		if (!TIFFSetField( tif, GPSTAG_IMGDIRECTIONREF, "T\0")) {
+		if (!NDPISetField( tif, GPSTAG_IMGDIRECTIONREF, "T\0")) {
 			fprintf (stderr, "Can't write GPSTAG_IMGDIRECTIONREF\n" );
 			goto failure;
 		}
-		if (!TIFFSetField( tif, GPSTAG_IMGDIRECTION, auxDoubleGPSDirection)) {
+		if (!NDPISetField( tif, GPSTAG_IMGDIRECTION, auxDoubleGPSDirection)) {
 			fprintf (stderr, "Can't write GPSTAG_IMGDIRECTION\n" );
 			goto failure;
 		}
 
 		/*-- Type TIFF_UNDEFINED */
-		if (!TIFFSetField( tif, GPSTAG_PROCESSINGMETHOD, 3, &auxCharArrayW[10])) {
+		if (!NDPISetField( tif, GPSTAG_PROCESSINGMETHOD, 3, &auxCharArrayW[10])) {
 			fprintf (stderr, "Can't write GPSTAG_PROCESSINGMETHOD\n" );
 			goto failure;
 		}
-		if (!TIFFSetField( tif, GPSTAG_AREAINFORMATION, 4, &auxCharArrayW[20])) {
+		if (!NDPISetField( tif, GPSTAG_AREAINFORMATION, 4, &auxCharArrayW[20])) {
 			fprintf (stderr, "Can't write GPSTAG_AREAINFORMATION\n" );
 			goto failure;
 		}
 
 		/*-- PSTAG_DIFFERENTIAL	, 1, 1,	TIFF_SHORT	, 0, 	TIFF_SETGET_UINT16 */
-		if (!TIFFSetField( tif, GPSTAG_DIFFERENTIAL, auxShortArrayW[5])) {
+		if (!NDPISetField( tif, GPSTAG_DIFFERENTIAL, auxShortArrayW[5])) {
 			fprintf (stderr, "Can't write GPSTAG_DIFFERENTIAL\n" );
 			goto failure;
 		}
@@ -511,7 +511,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 		/* GPSTAG_GPSHPOSITIONINGERROR	, 1, 1,	TIFF_RATIONAL	, 0, 	TIFF_SETGET_DOUBLE  but here written in float-precision */
 #define GPSHPOSITIONINGERROR_VAL 0.369
 		auxFloat = (float)GPSHPOSITIONINGERROR_VAL;
-		if (!TIFFSetField( tif, GPSTAG_GPSHPOSITIONINGERROR, auxFloat)) {
+		if (!NDPISetField( tif, GPSTAG_GPSHPOSITIONINGERROR, auxFloat)) {
 			fprintf (stderr, "Can't write GPSTAG_GPSHPOSITIONINGERROR\n" );
 			goto failure;
 		}
@@ -520,7 +520,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 		/*================= Write arbitrary data to the GPS fields ==============*/
 
 		/*-- Get array, where GPS tag fields are defined --*/
-		tFieldArray = _TIFFGetGpsFields();
+		tFieldArray = _NDPIGetGpsFields();
 		nTags = tFieldArray->count;
 
 		/*-- TODO: fill in the for / switch part of EXIF writing, when finished and tested!! */
@@ -532,22 +532,22 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 
 	/*-- GPS - write custom directory GPS into file...---*/
 	/*   (Get back the offset of GPS directory)          */
-	if (!TIFFWriteCustomDirectory( tif, &dir_offset_GPS )) {
-		fprintf (stderr, "TIFFWriteCustomDirectory() with GPS failed.\n");
+	if (!NDPIWriteCustomDirectory( tif, &dir_offset_GPS )) {
+		fprintf (stderr, "NDPIWriteCustomDirectory() with GPS failed.\n");
 		goto failure;
 	}
 
 	/*--- CheckpointDirectory at this place generates a second Main-IFD!!! */
-	/* retCode = TIFFCheckpointDirectory(tif); */
+	/* retCode = NDPICheckpointDirectory(tif); */
 
 	/*-- Set / reload previously saved main directory from file ---*/
-	if (!TIFFSetDirectory(tif, 0)) {
-		fprintf (stderr, "TIFFSetDirectory() within GPS failed.\n");
+	if (!NDPISetDirectory(tif, 0)) {
+		fprintf (stderr, "NDPISetDirectory() within GPS failed.\n");
 		goto failure;
 	}
 
 	/*-- Write GPS tag reference / offset into GPSIFD tag in main directory --*/
-	if (!TIFFSetField(tif, TIFFTAG_GPSIFD, dir_offset_GPS )) {
+	if (!NDPISetField(tif, TIFFTAG_GPSIFD, dir_offset_GPS )) {
 		fprintf (stderr, "Can't write TIFFTAG_GPSIFD\n");
 		goto failure;
 	}
@@ -561,7 +561,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	/*-- Set dummy EXIF/GPS tag in original tiff-structure in order to reserve space for final dir_offset value, */
 	/*   which is properly written at the end.*/
 	/*- We did this already above together with the GPS IFD-tag. Otherwise we would do this here !! --------*/
-	/* if (!TIFFSetField(tif, TIFFTAG_EXIFIFD, dir_offset )) {
+	/* if (!NDPISetField(tif, TIFFTAG_EXIFIFD, dir_offset )) {
 		fprintf (stderr, "Can't write TIFFTAG_EXIFIFD\n" );
 	} 
 	*/
@@ -573,17 +573,17 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	 */
 
 	/*-----  What is needed here ??? ----
-	 * In custom_dir.c only 	TIFFFreeDirectory( tif );   is used to set fields of another Sub-Directory
-	 * TIFFFreeDirectory(tif);  *-- Release storage associated with a directory, especially custom-fields.
-	 *-- Using only  TIFFFreeDirectory() here leads to an error!!
-	 *-- Using here TIFFCheckpointDirectory() leads to an additional Main-IFD ??
+	 * In custom_dir.c only 	NDPIFreeDirectory( tif );   is used to set fields of another Sub-Directory
+	 * NDPIFreeDirectory(tif);  *-- Release storage associated with a directory, especially custom-fields.
+	 *-- Using only  NDPIFreeDirectory() here leads to an error!!
+	 *-- Using here NDPICheckpointDirectory() leads to an additional Main-IFD ??
 	*/
-	/*retCode = TIFFCheckpointDirectory(tif);*/	/* does not cleanup Tiff-Structure */
-	retCode = TIFFWriteDirectory(tif);			/* cleanup Tiff-structure */
+	/*retCode = NDPICheckpointDirectory(tif);*/	/* does not cleanup Tiff-Structure */
+	retCode = NDPIWriteDirectory(tif);			/* cleanup Tiff-structure */
 
 	/*-- Now create an EXIF directory. */
-	if (TIFFCreateEXIFDirectory(tif) != 0) {
-		fprintf (stderr, "TIFFCreateEXIFDirectory() failed.\n" );
+	if (NDPICreateEXIFDirectory(tif) != 0) {
+		fprintf (stderr, "NDPICreateEXIFDirectory() failed.\n" );
 		goto failure;
 	}
 
@@ -593,7 +593,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	/*================= EXIF: Write arbitrary data to the EXIF fields ==============*/
 	/*-- Get array, where EXIF tag fields are defined 
 	*    EXIF tags are written automatically with the defined precision according to its tSetFieldType using the code below  --*/
-	tFieldArray = _TIFFGetExifFields();
+	tFieldArray = _NDPIGetExifFields();
 	nTags = tFieldArray->count;
 
 	for (i=0; i<nTags; i++) {
@@ -614,7 +614,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 				if (tWriteCount > 0) auxLong = tWriteCount-1; else auxLong = (long)strlen(auxTextArrayW[i])-1;
 				strncpy(auxCharArray, auxTextArrayW[i], auxLong);
 				auxCharArray[auxLong] = 0;
-				if (!TIFFSetField( tif, tTag, auxCharArray)) {
+				if (!NDPISetField( tif, tTag, auxCharArray)) {
 					fprintf (stderr, "Can't write %s\n", tFieldArray->fields[i].field_name);
 					goto failure;
 				}		
@@ -625,7 +625,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 			case TIFF_SETGET_IFD8:
 			case TIFF_SETGET_INT:
 				/*-- All those can be written with char, short or long parameter. Only value range should be in line. */
-				if (!TIFFSetField( tif, tTag, auxLongArrayW[i])) {
+				if (!NDPISetField( tif, tTag, auxLongArrayW[i])) {
 					fprintf (stderr, "Can't write %s\n", tFieldArray->fields[i].field_name);
 					goto failure;
 				}		
@@ -634,7 +634,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 			case TIFF_SETGET_SINT16:
 			case TIFF_SETGET_SINT32:
 				/*-- All those can be written with char, short or long parameter. Only value range should be in line. */
-				if (!TIFFSetField( tif, tTag, -1.0*auxLongArrayW[i])) {
+				if (!NDPISetField( tif, tTag, -1.0*auxLongArrayW[i])) {
 					fprintf (stderr, "Can't write %s\n", tFieldArray->fields[i].field_name);
 					goto failure;
 				}		
@@ -643,7 +643,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 			case TIFF_SETGET_DOUBLE:
 				if (tWriteCount == 1) {
 					/*-- All single values can be written with float or double parameter. Only value range should be in line. */
-					if (!TIFFSetField( tif, tTag, auxDoubleArrayW[i])) {
+					if (!NDPISetField( tif, tTag, auxDoubleArrayW[i])) {
 						fprintf (stderr, "Can't write %s\n", tFieldArray->fields[i].field_name);
 						goto failure;
 					}	
@@ -669,14 +669,14 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 					/* Now decide between fixed or variable array */
 					if (tWriteCount > 1) {
 						/* fixed array with needed arraysize defined in .field_writecount */
-						if (!TIFFSetField( tif, tTag, pVoid)) {
+						if (!NDPISetField( tif, tTag, pVoid)) {
 							fprintf (stderr, "Can't write %s\n", tFieldArray->fields[i].field_name);
 							goto failure;
 						}	
 					} else  {
 						/* special treatment of variable array */
 						/* for test, use always arraysize of VARIABLE_ARRAY_SIZE */
-						if (!TIFFSetField( tif, tTag, VARIABLE_ARRAY_SIZE, pVoid)) {
+						if (!NDPISetField( tif, tTag, VARIABLE_ARRAY_SIZE, pVoid)) {
 							fprintf (stderr, "Can't write %s\n", tFieldArray->fields[i].field_name);
 							goto failure;
 						}	
@@ -726,14 +726,14 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 				/* Now decide between fixed or variable array */
 				if (tWriteCount > 1) {
 					/* fixed array with needed arraysize defined in .field_writecount */
-					if (!TIFFSetField(tif, tTag, pVoid)) {
+					if (!NDPISetField(tif, tTag, pVoid)) {
 						fprintf(stderr, "Can't write %s\n", tFieldArray->fields[i].field_name);
 						goto failure;
 					}
 				} else {
 					/* special treatment of variable array */
 					/* for test, use always arraysize of VARIABLE_ARRAY_SIZE */
-					if (!TIFFSetField(tif, tTag, VARIABLE_ARRAY_SIZE, pVoid)) {
+					if (!NDPISetField(tif, tTag, VARIABLE_ARRAY_SIZE, pVoid)) {
 						fprintf(stderr, "Can't write %s\n", tFieldArray->fields[i].field_name);
 						goto failure;
 					}
@@ -745,7 +745,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 #endif  /*-- WRITE_ALL_EXIF_TAGS --*/
 
 	/*--- Set valid EXIF version, which is a 4 byte string --*/
-	if (!TIFFSetField( tif, EXIFTAG_EXIFVERSION, exifVersion)) {
+	if (!NDPISetField( tif, EXIFTAG_EXIFVERSION, exifVersion)) {
 		fprintf (stderr, "Can't write EXIFTAG_EXIFVERSION\n" );
 		goto failure;
 	}		
@@ -753,15 +753,15 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 
 	/*-- EXIF - write custom directory EXIF into file...---*/
 	/*   (Get back the offset of EXIF directory) */
-	if (!TIFFWriteCustomDirectory( tif, &dir_offset_EXIF )) {
-		fprintf (stderr, "TIFFWriteCustomDirectory() with EXIF failed.\n");
+	if (!NDPIWriteCustomDirectory( tif, &dir_offset_EXIF )) {
+		fprintf (stderr, "NDPIWriteCustomDirectory() with EXIF failed.\n");
 		goto failure;
 	}
 
 	/*-- Go back to the first (main) directory, and set correct value of the EXIFIFD pointer.  */
 	/*   (directory is reloaded from file!) */
-	TIFFSetDirectory(tif, 0);
-	TIFFSetField(tif, TIFFTAG_EXIFIFD, dir_offset_EXIF );	
+	NDPISetDirectory(tif, 0);
+	NDPISetField(tif, TIFFTAG_EXIFIFD, dir_offset_EXIF );	
 #endif /*-- WRITE_EXIF_TAGS --*/
 
 #ifdef WRITEPIXELLAST
@@ -773,30 +773,30 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 #endif
 	/*-- Write directory to file --*/
 	/* Always WriteDirectory before using/creating another directory. */
-	/* Not necessary before TIFFClose(), however, TIFFClose() uses TIFFReWriteDirectory(), which forces directory to be written at another location. */
-	retCode = TIFFWriteDirectory(tif);
+	/* Not necessary before NDPIClose(), however, NDPIClose() uses TIFFReWriteDirectory(), which forces directory to be written at another location. */
+	retCode = NDPIWriteDirectory(tif);
 
 	/*-- Write File to disk and close file --*/
-	/* TIFFClose() uses TIFFReWriteDirectory(), which forces directory to be written at another location. */
-	/* Therefore, better use TIFFWriteDirectory() before. */
-	TIFFClose(tif);
+	/* NDPIClose() uses TIFFReWriteDirectory(), which forces directory to be written at another location. */
+	/* Therefore, better use NDPIWriteDirectory() before. */
+	NDPIClose(tif);
 
 	fprintf (stderr, "-------- Continue Test  ---------- reading ...\n");
 
 /*=========================  READING  =============  READING  ========================================*/
 	/* Ok, now test whether we can read written values correctly. */
-	tif = TIFFOpen(filenameRead, "r");
+	tif = NDPIOpen(filenameRead, "r");
 	
 
 	/*-- Read some parameters out of the main directory --*/
 
 	/*-- IMAGEWIDTH and -LENGTH are defined as TIFF_SETGET_UINT32 */
-	retCode = TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &auxUint32 );
+	retCode = NDPIGetField(tif, TIFFTAG_IMAGEWIDTH, &auxUint32 );
 	if (!retCode) { fprintf(stderr, "Can't read %s\n", "TIFFTAG_IMAGEWIDTH"); }
 	if (auxUint32 != width) {
 		fprintf (stderr, "Read value of IMAGEWIDTH %"PRIu32" differs from set value %"PRIu16"\n", auxUint32, width);
 	}
-	retCode = TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &auxUint32 );
+	retCode = NDPIGetField(tif, TIFFTAG_IMAGELENGTH, &auxUint32 );
 	if (!retCode) { fprintf(stderr, "Can't read %s\n", "TIFFTAG_IMAGELENGTH"); }
 	if (auxUint32 != width) {
 		fprintf (stderr, "Read value of TIFFTAG_IMAGELENGTH %"PRIu32" differs from set value %"PRIu16"\n", auxUint32, length);
@@ -804,21 +804,21 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 
 #ifdef ADDITIONAL_TAGS
 	/*- TIFFTAG_PIXAR_FOVCOT is a FLOAT parameter of type  FIELD_CUSTOM !! */
-	retCode = TIFFGetField(tif, TIFFTAG_PIXAR_FOVCOT, &auxFloat ); 
+	retCode = NDPIGetField(tif, TIFFTAG_PIXAR_FOVCOT, &auxFloat ); 
 	if (!retCode) { fprintf(stderr, "Can't read %s\n", "TIFFTAG_PIXAR_FOVCOT"); }
 	if (auxFloat != (float)PIXAR_FOVCOT_VAL) {
 		fprintf (stderr, "Read value of TIFFTAG_PIXAR_FOVCOT %f differs from set value %f\n", auxFloat, PIXAR_FOVCOT_VAL);
 	}
 
 	/* - TIFFTAG_BESTQUALITYSCALE is a Rational parameter, FIELD_CUSTOM and TIFF_SETGET_FLOAT  */
-	retCode = TIFFGetField(tif, TIFFTAG_BESTQUALITYSCALE, &auxFloat );
+	retCode = NDPIGetField(tif, TIFFTAG_BESTQUALITYSCALE, &auxFloat );
 	if (!retCode) { fprintf(stderr, "Can't read %s\n", "TIFFTAG_BESTQUALITYSCALE"); }
 	if (auxFloat != (float)BESTQUALITYSCALE_VAL) {
 		fprintf (stderr, "Read value of TIFFTAG_BESTQUALITYSCALE %f differs from set value %f\n", auxFloat, BESTQUALITYSCALE_VAL);
 	}
 
 	/* - TIFFTAG_BASELINENOISE, 1, 1, TIFF_RATIONAL, 0, TIFF_SETGET_FLOAT */
-	retCode = TIFFGetField(tif, TIFFTAG_BASELINENOISE, &auxDblUnion.dbl);
+	retCode = NDPIGetField(tif, TIFFTAG_BASELINENOISE, &auxDblUnion.dbl);
 	if (!retCode) { fprintf(stderr, "Can't read %s\n", "TIFFTAG_BASELINENOISE"); }
 	if (auxDblUnion.flt1 != (float)BESTQUALITYSCALE_VAL) {
 		fprintf(stderr, "Read float value of TIFFTAG_BASELINENOISE %f differs from set value %f\n", auxDblUnion.flt1, BESTQUALITYSCALE_VAL);
@@ -826,7 +826,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 
 
 	/*- Variable Array: TIFFTAG_DECODE is a SRATIONAL parameter TIFF_SETGET_C16_FLOAT type FIELD_CUSTOM with passcount=1 and variable length of array. */
-	retCode = TIFFGetField(tif, TIFFTAG_DECODE, &count16, &pVoidArray );
+	retCode = NDPIGetField(tif, TIFFTAG_DECODE, &count16, &pVoidArray );
 	if (!retCode) { fprintf(stderr, "Can't read %s\n", "TIFFTAG_DECODE"); }
 	/*- pVoidArray points to a Tiff-internal temporary memorypart. Thus, contents needs to be saved. */
 	memcpy(&auxFloatArray, pVoidArray,(count16 * sizeof(auxFloatArray[0])));
@@ -838,7 +838,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 		}
 	}
 
-	retCode = TIFFGetField(tif, TIFFTAG_BLACKLEVEL, &count16, &pVoidArray);
+	retCode = NDPIGetField(tif, TIFFTAG_BLACKLEVEL, &count16, &pVoidArray);
 	if (!retCode) { fprintf(stderr, "Can't read %s\n", "TIFFTAG_BLACKLEVEL"); }
 	/*- pVoidArray points to a Tiff-internal temporary memorypart. Thus, contents needs to be saved. */
 	memcpy(&auxFloatArray, pVoidArray, (count16 * sizeof(auxFloatArray[0])));
@@ -851,7 +851,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	}
 
 	/*- Fixed Array: TIFFTAG_DEFAULTCROPSIZE, 2, 2, TIFF_RATIONAL, 0, TIFF_SETGET_C0_FLOAT */
-	retCode = TIFFGetField(tif, TIFFTAG_DEFAULTCROPSIZE, &pVoidArray);
+	retCode = NDPIGetField(tif, TIFFTAG_DEFAULTCROPSIZE, &pVoidArray);
 	if (!retCode) { fprintf(stderr, "Can't read %s\n", "TIFFTAG_DEFAULTCROPSIZE"); }
 	/*- pVoidArray points to a Tiff-internal temporary memorypart. Thus, contents needs to be saved. */
 	memcpy(&auxFloatArray, pVoidArray, (2 * sizeof(auxFloatArray[0])));
@@ -869,7 +869,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 #ifdef READ_GPS_TAGS
 /*================== Reading GPS tags =====================*/
 	/*-- First get offset to GPS-directory and set it active (this will destroy previously main directory fields in memory!) */
-	retCode = TIFFGetField(tif, TIFFTAG_GPSIFD, &read_dir_offset );
+	retCode = NDPIGetField(tif, TIFFTAG_GPSIFD, &read_dir_offset );
 	if (!retCode) {fprintf(stderr, "Can't read %s\n", "TIFFTAG_GPSIFD"); }
 	retCode = TIFFReadGPSDirectory(tif, read_dir_offset);
 	if (!retCode) { fprintf(stderr, "Can't read %s\n", "TIFFReadGPSDirectory()"); }
@@ -877,7 +877,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	/*-- Now read some parameters from GPS-directory --*/
 
 	/*-- Fixed Array: GPS-Version is a fixed array (of 4 characters) */
-	retCode = TIFFGetField(tif, GPSTAG_VERSIONID, &pGpsVersion);
+	retCode = NDPIGetField(tif, GPSTAG_VERSIONID, &pGpsVersion);
 	if (!retCode) { fprintf(stderr, "Can't read %s\n", "GPSTAG_VERSIONID"); }
 	else {
 		memcpy(auxCharArray, pGpsVersion, sizeof(gpsVersion));
@@ -888,14 +888,14 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 		}
 	}
 	/*-- LATITUDEREF is a fixed String of one character plus ending zero. */
-	retCode = TIFFGetField(tif, GPSTAG_LATITUDEREF, &pAscii);
+	retCode = NDPIGetField(tif, GPSTAG_LATITUDEREF, &pAscii);
 	if (!retCode) { fprintf(stderr, "Can't read %s\n", "GPSTAG_LATITUDEREF"); }
 	retCode2 = strncmp("N", pAscii, 1);
 	if (retCode2 != 0) {
 		fprintf (stderr, "Read value %d of GPSTAG_LATITUDEREF %s differs from set value %s\n", i, "N", pAscii);
 	}
 
-	/*-- Fixed Array: Latitude is an array of 3 Rational-values. TIFFGetField() returns a pointer to a temporary float-/double-array. */
+	/*-- Fixed Array: Latitude is an array of 3 Rational-values. NDPIGetField() returns a pointer to a temporary float-/double-array. */
 	/*-- ATTENTION: After the upgrade with Rational2Double, the GPSTAG values are defined as double precision 
 	 *              and need to be written and also read in double precision!
 	 *              In order to maintain this code for both cases, it is checked above if the TiffLibrary is
@@ -907,7 +907,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	} else {
 		fprintf(stderr, "-- GPS tags are read using standard --\n");
 	}
-	retCode = TIFFGetField(tif, GPSTAG_LATITUDE, &pVoidArray);
+	retCode = NDPIGetField(tif, GPSTAG_LATITUDE, &pVoidArray);
 	if (!retCode) { fprintf(stderr, "Can't read %s\n", "GPSTAG_LATITUDE"); }
 	if (!blnIsRational2Double) {
 		/* Reset arrays for debugging purpose first */
@@ -929,14 +929,14 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	}
 
 	/*-- LONGITUDEREF is a fixed String of one character plus ending zero. */
-	retCode = TIFFGetField(tif, GPSTAG_LONGITUDEREF, &pAscii);
+	retCode = NDPIGetField(tif, GPSTAG_LONGITUDEREF, &pAscii);
 	if (!retCode) { fprintf(stderr, "Can't read %s\n", "GPSTAG_LONGITUDEREF"); }
 	retCode2 = strncmp("W", pAscii, 1);
 	if (retCode2 != 0) {
 		fprintf(stderr, "Read value %d of GPSTAG_LONGITUDEREF %s differs from set value %s\n", i, "W", pAscii);
 	}
 
-	retCode = TIFFGetField(tif, GPSTAG_LONGITUDE, &pVoidArray);
+	retCode = NDPIGetField(tif, GPSTAG_LONGITUDE, &pVoidArray);
 	if (!retCode) { fprintf(stderr, "Can't read %s\n", "GPSTAG_LONGITUDE"); }
 	if (!blnIsRational2Double) {
 		/* Reset arrays for debugging purpose first */
@@ -958,7 +958,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	}
 
 	/* TIFF_RATIONAL, TIFF_SETGET_DOUBLE */
-	if (!TIFFGetField(tif, GPSTAG_ALTITUDE, &auxDblUnion.dbl)) {
+	if (!NDPIGetField(tif, GPSTAG_ALTITUDE, &auxDblUnion.dbl)) {
 		fprintf(stderr, "Can't read GPSTAG_ALTITUDE\n");
 		GOTOFAILURE_GPS
 	}
@@ -978,7 +978,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	}
 
 	/*-- TimeStamp is only hh:mm:ss. See also DateTime string  3, TIFF_RATIONAL, TIFF_SETGET_C0_DOUBLE */
-	retCode = TIFFGetField(tif, GPSTAG_TIMESTAMP, &pVoidArray);
+	retCode = NDPIGetField(tif, GPSTAG_TIMESTAMP, &pVoidArray);
 	if (!retCode) { fprintf(stderr, "Can't read %s\n", "GPSTAG_TIMESTAMP"); }
 	if (!blnIsRational2Double) {
 		/* Reset arrays for debugging purpose first */
@@ -1001,7 +1001,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	}
 
 	/* GPSTAG_IMGDIRECTION --- TIFF_RATIONAL, TIFF_SETGET_DOUBLE */
-	if (!TIFFGetField(tif, GPSTAG_IMGDIRECTION, &auxDblUnion.dbl)) {
+	if (!NDPIGetField(tif, GPSTAG_IMGDIRECTION, &auxDblUnion.dbl)) {
 		fprintf(stderr, "Can't read GPSTAG_IMGDIRECTION\n");
 		GOTOFAILURE_GPS
 	}
@@ -1021,7 +1021,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	}
 
 	/*-- GPSTAG_DIFFERENTIAL	, 1, 1,	TIFF_SHORT	, 0, 	TIFF_SETGET_UINT16 */
-	retCode = TIFFGetField(tif, GPSTAG_DIFFERENTIAL, &auxShort);
+	retCode = NDPIGetField(tif, GPSTAG_DIFFERENTIAL, &auxShort);
 	if (!retCode) { fprintf(stderr, "Can't read %s\n", "GPSTAG_DIFFERENTIAL"); }
 	if (auxShort != auxShortArrayW[5]) {
 		fprintf(stderr, "Read value of GPSTAG_DIFFERENTIAL %d differs from set value %d\n", auxShort, auxShortArrayW[5]);
@@ -1029,7 +1029,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 	}
 
 	/*-- GPSHPOSITIONINGERROR - new tag for EXIF 2.31 --*/
-	if (!TIFFGetField(tif, GPSTAG_GPSHPOSITIONINGERROR, &auxDblUnion.dbl)) {
+	if (!NDPIGetField(tif, GPSTAG_GPSHPOSITIONINGERROR, &auxDblUnion.dbl)) {
 		fprintf(stderr, "Can't read GPSTAG_GPSHPOSITIONINGERROR\n");
 		GOTOFAILURE_GPS
 	}
@@ -1060,24 +1060,24 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 
 	/*-- Go back to the first (main) directory, and get value of the EXIFIFD directory- offset.  */
 	/*   (directory is reloaded from file!) */
-	TIFFSetDirectory(tif, 0);
-	retCode = TIFFGetField(tif, TIFFTAG_EXIFIFD, &read_dir_offset );
+	NDPISetDirectory(tif, 0);
+	retCode = NDPIGetField(tif, TIFFTAG_EXIFIFD, &read_dir_offset );
 
 #ifdef READ_EXIF_TAGS
 	/*-- Now read EXIF directory from file into memory --*/
 	retCode = TIFFReadEXIFDirectory(tif, read_dir_offset);
 
 	/*-- Now get some parameters from EXIF-directory (already read into memory) --*/
-	retCode = TIFFGetField(tif, EXIFTAG_EXIFVERSION, &pAscii);
+	retCode = NDPIGetField(tif, EXIFTAG_EXIFVERSION, &pAscii);
 
 
 #ifdef READ_ALL_EXIF_TAGS
 	/*-- Get array, where EXIF tag fields are defined --*/
-	tFieldArray = _TIFFGetExifFields();
+	tFieldArray = _NDPIGetExifFields();
 	nTags = tFieldArray->count;
 	/*-- Check, if the TiffLibrary is compiled with the new interface with Rational2Double or still uses the old definitions. */
-	/* tif points to EXIF tags, so TIFFFindField() can only access the EXIF tag fields */
-	fip = TIFFFindField(tif, EXIFTAG_EXPOSURETIME, TIFF_ANY);
+	/* tif points to EXIF tags, so NDPIFindField() can only access the EXIF tag fields */
+	fip = NDPIFindField(tif, EXIFTAG_EXPOSURETIME, TIFF_ANY);
 	tSetFieldType = fip->set_field_type;
 	if (tSetFieldType == TIFF_SETGET_DOUBLE) {
 		blnIsRational2Double = FALSE;
@@ -1101,7 +1101,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 		{
 			case TIFF_SETGET_ASCII:
 				/* Either the stringlength is defined as a fixed length in .field_writecount or a NULL-terminated string is used. */
-				if (!TIFFGetField( tif, tTag, &pAscii)) {
+				if (!NDPIGetField( tif, tTag, &pAscii)) {
 					fprintf (stderr, "Can't read %s\n", tFieldArray->fields[i].field_name);
 					GOTOFAILURE_ALL_EXIF
 					break;
@@ -1119,7 +1119,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 				/*-- For reading, the parameter size is to be observed !! */
 			case TIFF_SETGET_UINT8:
 			case TIFF_SETGET_SINT8:
-				if (!TIFFGetField( tif, tTag, &auxChar)) {
+				if (!NDPIGetField( tif, tTag, &auxChar)) {
 					fprintf (stderr, "Can't read %s\n", tFieldArray->fields[i].field_name);
 					GOTOFAILURE_ALL_EXIF
 					break;
@@ -1132,7 +1132,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 				break;
 			case TIFF_SETGET_UINT16:
 			case TIFF_SETGET_SINT16:
-				if (!TIFFGetField( tif, tTag, &auxShort)) {
+				if (!NDPIGetField( tif, tTag, &auxShort)) {
 					fprintf (stderr, "Can't read %s\n", tFieldArray->fields[i].field_name);
 					GOTOFAILURE_ALL_EXIF
 					break;
@@ -1147,7 +1147,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 			case TIFF_SETGET_SINT32:
 			case TIFF_SETGET_IFD8:
 			case TIFF_SETGET_INT:
-				if (!TIFFGetField( tif, tTag, &auxUint32)) {
+				if (!NDPIGetField( tif, tTag, &auxUint32)) {
 					fprintf (stderr, "Can't read %s\n", tFieldArray->fields[i].field_name);
 					GOTOFAILURE_ALL_EXIF
 					break;
@@ -1159,7 +1159,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 				}
 				break;
 			case TIFF_SETGET_FLOAT:
-				if (!TIFFGetField( tif, tTag, &auxFloat)) {
+				if (!NDPIGetField( tif, tTag, &auxFloat)) {
 					fprintf (stderr, "Can't read %s\n", tFieldArray->fields[i].field_name);
 					GOTOFAILURE_ALL_EXIF
 					break;
@@ -1183,13 +1183,13 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 				/*   Only TIFFTAG_STONITS is a TIFF_DOUBLE, which has to be read as DOUBLE!! */
 				/*-- ATTENTION: ----
 				 *   Only after update with Rational2Double feature, also TIFF_RATIONAL can be read in double precision!!! 
-				 *   Therefore, use a union to avoid overflow in TIFFGetField() return value
+				 *   Therefore, use a union to avoid overflow in NDPIGetField() return value
 				 *   and depending on version check for the right interface here:
 				 *   - old interface:  correct value should be here a float
 				 *   - new interface:  correct value should be here a double
 				 *   Interface version (old/new) is determined above.
 				 -------------------*/
-				if (!TIFFGetField(tif, tTag, &auxDblUnion.dbl)) {
+				if (!NDPIGetField(tif, tTag, &auxDblUnion.dbl)) {
 					fprintf(stderr, "Can't read %s\n", tFieldArray->fields[i].field_name);
 					GOTOFAILURE_ALL_EXIF
 					break;
@@ -1235,7 +1235,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 					/* Now decide between fixed or variable array */
 					if (tWriteCount > 1) {
 						/* fixed array with needed arraysize defined in .field_writecount */
-						if (!TIFFGetField( tif, tTag, &pVoidArray)) {
+						if (!NDPIGetField( tif, tTag, &pVoidArray)) {
 							fprintf (stderr, "Can't read %s\n", tFieldArray->fields[i].field_name);
 							GOTOFAILURE_ALL_EXIF
 							break;
@@ -1245,7 +1245,7 @@ write_test_tiff(TIFF *tif, const char *filenameRead)
 					} else  {
 						/* Special treatment of variable array. */
 						/* Dependent on Cxx, the count parameter is char, short or long. Therefore use unionLong! */
-						if (!TIFFGetField( tif, tTag, &unionLong, &pVoidArray)) {
+						if (!NDPIGetField( tif, tTag, &unionLong, &pVoidArray)) {
 							fprintf (stderr, "Can't read %s\n", tFieldArray->fields[i].field_name);
 							GOTOFAILURE_ALL_EXIF
 							break;
@@ -1325,7 +1325,7 @@ break;
 				/* Now decide between fixed or variable array */
 				if (tWriteCount > 1) {
 					/* fixed array with needed arraysize defined in .field_writecount */
-					if (!TIFFGetField(tif, tTag, &pVoidArray)) {
+					if (!NDPIGetField(tif, tTag, &pVoidArray)) {
 						fprintf(stderr, "Can't read %s\n", tFieldArray->fields[i].field_name);
 						GOTOFAILURE_ALL_EXIF
 						break;
@@ -1335,7 +1335,7 @@ break;
 				} else {
 					/* special treatment of variable array */
 					/* for test, use always arraysize of VARIABLE_ARRAY_SIZE */
-					if (!TIFFGetField(tif, tTag, &unionLong, &pVoidArray)) {
+					if (!NDPIGetField(tif, tTag, &unionLong, &pVoidArray)) {
 						fprintf(stderr, "Can't read %s\n", tFieldArray->fields[i].field_name);
 						GOTOFAILURE_ALL_EXIF
 						break;
@@ -1404,7 +1404,7 @@ break;
 
 
 
-	TIFFClose(tif);
+	NDPIClose(tif);
 	
 	/* All tests passed; delete file and exit with success status. */
 #ifdef FOR_AUTO_TESTING
@@ -1418,7 +1418,7 @@ failure:
 	 * Something goes wrong; close file and return unsuccessful status.
 	 * Do not remove the file for further manual investigation.
 	 */
-	TIFFClose(tif);
+	NDPIClose(tif);
 	fprintf(stderr, "-------- Test finished with FAILURE --------\n");
 	return 1;
 }

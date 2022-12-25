@@ -44,10 +44,10 @@
  */
 #include <setjmp.h>
 
-int TIFFFillStrip(TIFF* tif, uint32_t strip);
-int TIFFFillTile(TIFF* tif, uint32_t tile);
-int TIFFReInitJPEG_12( TIFF *tif, int scheme, int is_encode );
-int TIFFJPEGIsFullStripRequired_12(TIFF* tif);
+int NDPIFillStrip(TIFF* tif, uint32_t strip);
+int NDPIFillTile(TIFF* tif, uint32_t tile);
+int NDPIReInitJPEG_12( TIFF *tif, int scheme, int is_encode );
+int NDPIJPEGIsFullStripRequired_12(TIFF* tif);
 
 /* We undefine FAR to avoid conflict with JPEG definition */
 
@@ -220,7 +220,7 @@ TIFFjpeg_error_exit(j_common_ptr cinfo)
 	char buffer[JMSG_LENGTH_MAX];
 
 	(*cinfo->err->format_message) (cinfo, buffer);
-	TIFFErrorExt(sp->tif->tif_clientdata, "JPEGLib", "%s", buffer);		/* display the error message */
+	NDPIErrorExt(sp->tif->tif_clientdata, "JPEGLib", "%s", buffer);		/* display the error message */
 	jpeg_abort(cinfo);			/* clean up libjpeg state */
 	LONGJMP(sp->exit_jmpbuf, 1);		/* return to libtiff caller */
 }
@@ -236,7 +236,7 @@ TIFFjpeg_output_message(j_common_ptr cinfo)
 	char buffer[JMSG_LENGTH_MAX];
 
 	(*cinfo->err->format_message) (cinfo, buffer);
-	TIFFWarningExt(((JPEGState *) cinfo)->tif->tif_clientdata, "JPEGLib", "%s", buffer);
+	NDPIWarningExt(((JPEGState *) cinfo)->tif->tif_clientdata, "JPEGLib", "%s", buffer);
 }
 
 /* Avoid the risk of denial-of-service on crafted JPEGs with an insane */
@@ -252,7 +252,7 @@ TIFFjpeg_progress_monitor(j_common_ptr cinfo)
             ((j_decompress_ptr)cinfo)->input_scan_number;
         if (scan_no >= sp->max_allowed_scan_number)
         {
-            TIFFErrorExt(((JPEGState *) cinfo)->tif->tif_clientdata, 
+            NDPIErrorExt(((JPEGState *) cinfo)->tif->tif_clientdata, 
                      "TIFFjpeg_progress_monitor",
                      "Scan number %d exceeds maximum scans (%d). This limit "
                      "can be raised through the LIBTIFF_JPEG_MAX_ALLOWED_SCAN_NUMBER "
@@ -466,7 +466,7 @@ std_empty_output_buffer(j_compress_ptr cinfo)
        }
 #endif
 
-	if( !TIFFFlushData1(tif) )
+	if( !NDPIFlushData1(tif) )
             return FALSE;
 	sp->dest.next_output_byte = (JOCTET*) tif->tif_rawdata;
 	sp->dest.free_in_buffer = (size_t) tif->tif_rawdatasize;
@@ -517,7 +517,7 @@ tables_empty_output_buffer(j_compress_ptr cinfo)
 	void* newbuf;
 
 	/* the entire buffer has been filled; enlarge it by 1000 bytes */
-	newbuf = _TIFFrealloc((void*) sp->jpegtables,
+	newbuf = _NDPIrealloc((void*) sp->jpegtables,
 			      (tmsize_t) (sp->jpegtables_length + 1000));
 	if (newbuf == NULL)
 		ERREXIT1(cinfo, JERR_OUT_OF_MEMORY, 100);
@@ -546,12 +546,12 @@ TIFFjpeg_tables_dest(JPEGState* sp, TIFF* tif)
 	 * Initial size is 1000 bytes, which is usually adequate.
 	 */
 	if (sp->jpegtables)
-		_TIFFfree(sp->jpegtables);
+		_NDPIfree(sp->jpegtables);
 	sp->jpegtables_length = 1000;
-	sp->jpegtables = (void*) _TIFFmalloc((tmsize_t) sp->jpegtables_length);
+	sp->jpegtables = (void*) _NDPImalloc((tmsize_t) sp->jpegtables_length);
 	if (sp->jpegtables == NULL) {
 		sp->jpegtables_length = 0;
-		TIFFErrorExt(sp->tif->tif_clientdata, "TIFFjpeg_tables_dest", "No space for JPEGTables");
+		NDPIErrorExt(sp->tif->tif_clientdata, "TIFFjpeg_tables_dest", "No space for JPEGTables");
 		return (0);
 	}
 	sp->cinfo.c.dest = &sp->dest;
@@ -781,7 +781,7 @@ JPEGFixupTagsSubsampling(TIFF* tif)
 	 */
 	static const char module[] = "JPEGFixupTagsSubsampling";
 	struct JPEGFixupTagsSubsamplingData m;
-        uint64_t fileoffset = TIFFGetStrileOffset(tif, 0);
+        uint64_t fileoffset = NDPIGetStrileOffset(tif, 0);
 
         if( fileoffset == 0 )
         {
@@ -793,10 +793,10 @@ JPEGFixupTagsSubsampling(TIFF* tif)
 
 	m.tif=tif;
 	m.buffersize=2048;
-	m.buffer=_TIFFmalloc(m.buffersize);
+	m.buffer=_NDPImalloc(m.buffersize);
 	if (m.buffer==NULL)
 	{
-		TIFFWarningExt(tif->tif_clientdata,module,
+		NDPIWarningExt(tif->tif_clientdata,module,
 		    "Unable to allocate memory for auto-correcting of subsampling values; auto-correcting skipped");
 		return;
 	}
@@ -804,11 +804,11 @@ JPEGFixupTagsSubsampling(TIFF* tif)
 	m.bufferbytesleft=0;
 	m.fileoffset=fileoffset;
 	m.filepositioned=0;
-	m.filebytesleft=TIFFGetStrileByteCount(tif, 0);
+	m.filebytesleft=NDPIGetStrileByteCount(tif, 0);
 	if (!JPEGFixupTagsSubsamplingSec(&m))
-		TIFFWarningExt(tif->tif_clientdata,module,
+		NDPIWarningExt(tif->tif_clientdata,module,
 		    "Unable to auto-correct subsampling values, likely corrupt JPEG compressed data in first strip/tile; auto-correcting skipped");
-	_TIFFfree(m.buffer);
+	_NDPIfree(m.buffer);
 }
 
 static int
@@ -898,7 +898,7 @@ JPEGFixupTagsSubsamplingSec(struct JPEGFixupTagsSubsamplingData* data)
 							return(0);
 						if (p!=0x11)
 						{
-							TIFFWarningExt(data->tif->tif_clientdata,module,
+							NDPIWarningExt(data->tif->tif_clientdata,module,
 							    "Subsampling values inside JPEG compressed data have no TIFF equivalent, auto-correction of TIFF subsampling values failed");
 							return(1);
 						}
@@ -906,13 +906,13 @@ JPEGFixupTagsSubsamplingSec(struct JPEGFixupTagsSubsamplingData* data)
 					}
 					if (((ph!=1)&&(ph!=2)&&(ph!=4))||((pv!=1)&&(pv!=2)&&(pv!=4)))
 					{
-						TIFFWarningExt(data->tif->tif_clientdata,module,
+						NDPIWarningExt(data->tif->tif_clientdata,module,
 						    "Subsampling values inside JPEG compressed data have no TIFF equivalent, auto-correction of TIFF subsampling values failed");
 						return(1);
 					}
 					if ((ph!=data->tif->tif_dir.td_ycbcrsubsampling[0])||(pv!=data->tif->tif_dir.td_ycbcrsubsampling[1]))
 					{
-/*						TIFFWarningExt(data->tif->tif_clientdata,module,
+/*						NDPIWarningExt(data->tif->tif_clientdata,module,
 						    "Auto-corrected former TIFF subsampling values [%"PRIu16",%"PRIu16"] to match subsampling values inside JPEG compressed data [%"PRIu8",%"PRIu8"]",
 						    data->tif->tif_dir.td_ycbcrsubsampling[0],
 						    data->tif->tif_dir.td_ycbcrsubsampling[1],
@@ -938,7 +938,7 @@ JPEGFixupTagsSubsamplingReadByte(struct JPEGFixupTagsSubsamplingData* data, uint
 			return(0);
 		if (!data->filepositioned)
 		{
-			if (TIFFSeekFile(data->tif,data->fileoffset,SEEK_SET) == (toff_t)-1)
+			if (NDPISeekFile(data->tif,data->fileoffset,SEEK_SET) == (toff_t)-1)
 			{
 			    return 0;
 			}
@@ -1012,7 +1012,7 @@ JPEGSetupDecode(TIFF* tif)
 
 #if defined(JPEG_DUAL_MODE_8_12) && !defined(TIFFInitJPEG)
         if( tif->tif_dir.td_bitspersample == 12 )
-            return TIFFReInitJPEG_12( tif, COMPRESSION_JPEG, 0 );
+            return NDPIReInitJPEG_12( tif, COMPRESSION_JPEG, 0 );
 #endif
 
 	JPEGInitializeLibJPEG( tif, TRUE );
@@ -1021,10 +1021,10 @@ JPEGSetupDecode(TIFF* tif)
 	assert(sp->cinfo.comm.is_decompressor);
 
 	/* Read JPEGTables if it is present */
-	if (TIFFFieldSet(tif,FIELD_JPEGTABLES)) {
+	if (NDPIFieldSet(tif,FIELD_JPEGTABLES)) {
 		TIFFjpeg_tables_src(sp);
 		if(TIFFjpeg_read_header(sp,FALSE) != JPEG_HEADER_TABLES_ONLY) {
-			TIFFErrorExt(tif->tif_clientdata, "JPEGSetupDecode", "Bogus JPEGTables field");
+			NDPIErrorExt(tif->tif_clientdata, "JPEGSetupDecode", "Bogus JPEGTables field");
 			return (0);
 		}
 	}
@@ -1045,7 +1045,7 @@ JPEGSetupDecode(TIFF* tif)
 
 	/* Set up for reading normal data */
 	TIFFjpeg_data_src(sp);
-	tif->tif_postdecode = _TIFFNoPostDecode; /* override byte swapping */
+	tif->tif_postdecode = _NDPINoPostDecode; /* override byte swapping */
 	return (1);
 }
 
@@ -1056,14 +1056,14 @@ JPEGSetupDecode(TIFF* tif)
 /* Only reads tif->tif_dir.td_bitspersample, tif->tif_rawdata and */
 /* tif->tif_rawcc members. */
 /* Can be called independently of the usual setup/predecode/decode states */
-int TIFFJPEGIsFullStripRequired(TIFF* tif)
+int NDPIJPEGIsFullStripRequired(TIFF* tif)
 {
     int ret;
     JPEGState state;
 
-#if defined(JPEG_DUAL_MODE_8_12) && !defined(TIFFJPEGIsFullStripRequired)
+#if defined(JPEG_DUAL_MODE_8_12) && !defined(NDPIJPEGIsFullStripRequired)
     if( tif->tif_dir.td_bitspersample == 12 )
-        return TIFFJPEGIsFullStripRequired_12( tif );
+        return NDPIJPEGIsFullStripRequired_12( tif );
 #endif
 
     memset(&state, 0, sizeof(JPEGState));
@@ -1116,13 +1116,13 @@ JPEGPreDecode(TIFF* tif, uint16_t s)
 	if (isTiled(tif)) {
                 segment_width = td->td_tilewidth;
                 segment_height = td->td_tilelength;
-		sp->bytesperline = TIFFTileRowSize(tif);
+		sp->bytesperline = NDPITileRowSize(tif);
 	} else {
 		segment_width = td->td_imagewidth;
 		segment_height = td->td_imagelength - tif->tif_row;
 		if (segment_height > td->td_rowsperstrip)
 			segment_height = td->td_rowsperstrip;
-		sp->bytesperline = TIFFScanlineSize(tif);
+		sp->bytesperline = NDPIScanlineSize(tif);
 	}
 	if (td->td_planarconfig == PLANARCONFIG_SEPARATE && s > 0) {
 		/*
@@ -1164,7 +1164,7 @@ JPEGPreDecode(TIFF* tif, uint16_t s)
 			td->td_imagelength = sp->cinfo.d.image_height;
 		} else if (sp->cinfo.d.image_width < segment_width ||
 	    sp->cinfo.d.image_height < segment_height) {
-		TIFFWarningExt(tif->tif_clientdata, module,
+		NDPIWarningExt(tif->tif_clientdata, module,
 			       "Improper JPEG strip/tile size, "
 			       "expected %"PRIu32"x%"PRIu32", got %lux%lu",
 			       segment_width, segment_height,
@@ -1180,7 +1180,7 @@ JPEGPreDecode(TIFF* tif, uint16_t s)
 		/* but their JPEG codestream has still the maximum strip */
 		/* height. Warn about this as this is non compliant, but */
 		/* we can safely recover from that. */
-		TIFFWarningExt(tif->tif_clientdata, module,
+		NDPIWarningExt(tif->tif_clientdata, module,
 			     "JPEG strip size exceeds expected dimensions,"
 			     " expected %"PRIu32"x%"PRIu32", got %lux%lu",
 			     segment_width, segment_height,
@@ -1194,7 +1194,7 @@ JPEGPreDecode(TIFF* tif, uint16_t s)
 		 * return, some potential security issues arise. Catch this
 		 * case and error out.
 		 */
-		TIFFErrorExt(tif->tif_clientdata, module,
+		NDPIErrorExt(tif->tif_clientdata, module,
 			     "JPEG strip/tile size exceeds expected dimensions,"
 			     " expected %"PRIu32"x%"PRIu32", got %lux%lu",
 			     segment_width, segment_height,
@@ -1204,19 +1204,19 @@ JPEGPreDecode(TIFF* tif, uint16_t s)
 	if (sp->cinfo.d.num_components !=
 	    (td->td_planarconfig == PLANARCONFIG_CONTIG ?
 	     td->td_samplesperpixel : 1)) {
-		TIFFErrorExt(tif->tif_clientdata, module, "Improper JPEG component count");
+		NDPIErrorExt(tif->tif_clientdata, module, "Improper JPEG component count");
 		return (0);
 	}
 #ifdef JPEG_LIB_MK1
 	if (12 != td->td_bitspersample && 8 != td->td_bitspersample) {
-		TIFFErrorExt(tif->tif_clientdata, module, "Improper JPEG data precision");
+		NDPIErrorExt(tif->tif_clientdata, module, "Improper JPEG data precision");
 		return (0);
 	}
 	sp->cinfo.d.data_precision = td->td_bitspersample;
 	sp->cinfo.d.bits_in_jsample = td->td_bitspersample;
 #else
 	if (sp->cinfo.d.data_precision != td->td_bitspersample) {
-		TIFFErrorExt(tif->tif_clientdata, module, "Improper JPEG data precision");
+		NDPIErrorExt(tif->tif_clientdata, module, "Improper JPEG data precision");
 		return (0);
 	}
 #endif
@@ -1248,7 +1248,7 @@ JPEGPreDecode(TIFF* tif, uint16_t s)
                 nRequiredMemory > (toff_t)(sp->cinfo.d.mem->max_memory_to_use) &&
                 getenv("LIBTIFF_ALLOW_LARGE_LIBJPEG_MEM_ALLOC") == NULL )
             {
-                TIFFErrorExt(tif->tif_clientdata, module,
+                NDPIErrorExt(tif->tif_clientdata, module,
                     "Reading this image would require libjpeg to allocate "
                     "at least %"PRIu64" bytes. "
                     "This is disabled since above the %ld threshold. "
@@ -1267,7 +1267,7 @@ JPEGPreDecode(TIFF* tif, uint16_t s)
 		/* Component 0 should have expected sampling factors */
 		if (sp->cinfo.d.comp_info[0].h_samp_factor != sp->h_sampling ||
 		    sp->cinfo.d.comp_info[0].v_samp_factor != sp->v_sampling) {
-			TIFFErrorExt(tif->tif_clientdata, module,
+			NDPIErrorExt(tif->tif_clientdata, module,
 				       "Improper JPEG sampling factors %d,%d\n"
 				       "Apparently should be %"PRIu16",%"PRIu16".",
 				       sp->cinfo.d.comp_info[0].h_samp_factor,
@@ -1279,7 +1279,7 @@ JPEGPreDecode(TIFF* tif, uint16_t s)
 		for (ci = 1; ci < sp->cinfo.d.num_components; ci++) {
 			if (sp->cinfo.d.comp_info[ci].h_samp_factor != 1 ||
 			    sp->cinfo.d.comp_info[ci].v_samp_factor != 1) {
-				TIFFErrorExt(tif->tif_clientdata, module, "Improper JPEG sampling factors");
+				NDPIErrorExt(tif->tif_clientdata, module, "Improper JPEG sampling factors");
 				return (0);
 			}
 		}
@@ -1287,7 +1287,7 @@ JPEGPreDecode(TIFF* tif, uint16_t s)
 		/* PC 2's single component should have sampling factors 1,1 */
 		if (sp->cinfo.d.comp_info[0].h_samp_factor != 1 ||
 		    sp->cinfo.d.comp_info[0].v_samp_factor != 1) {
-			TIFFErrorExt(tif->tif_clientdata, module, "Improper JPEG sampling factors");
+			NDPIErrorExt(tif->tif_clientdata, module, "Improper JPEG sampling factors");
 			return (0);
 		}
 	}
@@ -1360,7 +1360,7 @@ JPEGDecode(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
         
 	nrows = cc / sp->bytesperline;
 	if (cc % sp->bytesperline)
-		TIFFWarningExt(tif->tif_clientdata, tif->tif_name,
+		NDPIWarningExt(tif->tif_clientdata, tif->tif_name,
                                "fractional scanline not read");
 
 	if( nrows > (tmsize_t) sp->cinfo.d.image_height )
@@ -1416,7 +1416,7 @@ JPEGDecode(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
         
 	nrows = cc / sp->bytesperline;
 	if (cc % sp->bytesperline)
-		TIFFWarningExt(tif->tif_clientdata, tif->tif_name,
+		NDPIWarningExt(tif->tif_clientdata, tif->tif_name,
                                "fractional scanline not read");
 
 	if( nrows > (tmsize_t) sp->cinfo.d.image_height )
@@ -1434,7 +1434,7 @@ JPEGDecode(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
                 if( sp->cinfo.d.data_precision == 12 )
                 {
                         line_work_buf = (JSAMPROW)
-                                _TIFFmalloc(sizeof(short) * sp->cinfo.d.output_width
+                                _NDPImalloc(sizeof(short) * sp->cinfo.d.output_width
                                             * sp->cinfo.d.num_components );
                 }
 
@@ -1489,7 +1489,7 @@ JPEGDecode(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
                } while (--nrows > 0);
 
                if( line_work_buf != NULL )
-                       _TIFFfree( line_work_buf );
+                       _NDPIfree( line_work_buf );
         }
 
         /* Update information on consumed data */
@@ -1510,7 +1510,7 @@ DecodeRowError(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
     (void) cc;
     (void) s;
 
-    TIFFErrorExt(tif->tif_clientdata, "TIFFReadScanline",
+    NDPIErrorExt(tif->tif_clientdata, "NDPIReadScanline",
                  "scanline oriented access is not supported for downsampled JPEG compressed images, consider enabling TIFF_JPEGCOLORMODE as JPEGCOLORMODE_RGB." );
     return 0;
 }
@@ -1542,11 +1542,11 @@ JPEGDecodeRaw(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
 		int samples_per_clump = sp->samplesperclump;
 
 #if defined(JPEG_LIB_MK1_OR_12BIT)
-		unsigned short* tmpbuf = _TIFFmalloc(sizeof(unsigned short) *
+		unsigned short* tmpbuf = _NDPImalloc(sizeof(unsigned short) *
 						     sp->cinfo.d.output_width *
 						     sp->cinfo.d.num_components);
 		if(tmpbuf==NULL) {
-                        TIFFErrorExt(tif->tif_clientdata, "JPEGDecodeRaw",
+                        NDPIErrorExt(tif->tif_clientdata, "JPEGDecodeRaw",
 				     "Out of memory");
 			return 0;
                 }
@@ -1557,7 +1557,7 @@ JPEGDecodeRaw(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
 			int ci, clumpoffset;
 
                         if( cc < sp->bytesperline ) {
-				TIFFErrorExt(tif->tif_clientdata, "JPEGDecodeRaw",
+				NDPIErrorExt(tif->tif_clientdata, "JPEGDecodeRaw",
 					     "application buffer not large enough for all data.");
 				return 0;
                         }
@@ -1589,7 +1589,7 @@ JPEGDecodeRaw(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
 #else
 					JSAMPLE *outptr = (JSAMPLE*)buf + clumpoffset;
 					if (cc < (tmsize_t)(clumpoffset + (tmsize_t)samples_per_clump*(clumps_per_line-1) + hsamp)) {
-						TIFFErrorExt(tif->tif_clientdata, "JPEGDecodeRaw",
+						NDPIErrorExt(tif->tif_clientdata, "JPEGDecodeRaw",
 							     "application buffer not large enough for all data, possible subsampling issue");
 						return 0;
 					}
@@ -1654,7 +1654,7 @@ JPEGDecodeRaw(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
 		} while (nrows > 0);
 
 #if defined(JPEG_LIB_MK1_OR_12BIT)
-		_TIFFfree(tmpbuf);
+		_NDPIfree(tmpbuf);
 #endif
 
 	}
@@ -1750,7 +1750,7 @@ JPEGSetupEncode(TIFF* tif)
 
 #if defined(JPEG_DUAL_MODE_8_12) && !defined(TIFFInitJPEG)
         if( tif->tif_dir.td_bitspersample == 12 )
-            return TIFFReInitJPEG_12( tif, COMPRESSION_JPEG, 1 );
+            return NDPIReInitJPEG_12( tif, COMPRESSION_JPEG, 1 );
 #endif
 
         JPEGInitializeLibJPEG( tif, FALSE );
@@ -1796,13 +1796,13 @@ JPEGSetupEncode(TIFF* tif)
 		sp->v_sampling = td->td_ycbcrsubsampling[1];
                 if( sp->h_sampling == 0 || sp->v_sampling == 0 )
                 {
-                    TIFFErrorExt(tif->tif_clientdata, module,
+                    NDPIErrorExt(tif->tif_clientdata, module,
                             "Invalig horizontal/vertical sampling value");
                     return (0);
                 }
                 if( td->td_bitspersample > 16 )
                 {
-                    TIFFErrorExt(tif->tif_clientdata, module,
+                    NDPIErrorExt(tif->tif_clientdata, module,
                                  "BitsPerSample %"PRIu16" not allowed for JPEG",
                                  td->td_bitspersample);
                     return (0);
@@ -1815,7 +1815,7 @@ JPEGSetupEncode(TIFF* tif)
 		 */
 		{
 			float *ref;
-			if (!TIFFGetField(tif, TIFFTAG_REFERENCEBLACKWHITE,
+			if (!NDPIGetField(tif, TIFFTAG_REFERENCEBLACKWHITE,
 					  &ref)) {
 				float refbw[6];
 				long top = 1L << td->td_bitspersample;
@@ -1825,14 +1825,14 @@ JPEGSetupEncode(TIFF* tif)
 				refbw[3] = refbw[1];
 				refbw[4] = refbw[2];
 				refbw[5] = refbw[1];
-				TIFFSetField(tif, TIFFTAG_REFERENCEBLACKWHITE,
+				NDPISetField(tif, TIFFTAG_REFERENCEBLACKWHITE,
 					     refbw);
 			}
 		}
 		break;
 	case PHOTOMETRIC_PALETTE:		/* disallowed by Tech Note */
 	case PHOTOMETRIC_MASK:
-		TIFFErrorExt(tif->tif_clientdata, module,
+		NDPIErrorExt(tif->tif_clientdata, module,
 			  "PhotometricInterpretation %"PRIu16" not allowed for JPEG",
 			  sp->photometric);
 		return (0);
@@ -1857,7 +1857,7 @@ JPEGSetupEncode(TIFF* tif)
 	if (td->td_bitspersample != BITS_IN_JSAMPLE )
 #endif
 	{
-		TIFFErrorExt(tif->tif_clientdata, module, "BitsPerSample %"PRIu16" not allowed for JPEG",
+		NDPIErrorExt(tif->tif_clientdata, module, "BitsPerSample %"PRIu16" not allowed for JPEG",
 			  td->td_bitspersample);
 		return (0);
 	}
@@ -1867,13 +1867,13 @@ JPEGSetupEncode(TIFF* tif)
 #endif
 	if (isTiled(tif)) {
 		if ((td->td_tilelength % (sp->v_sampling * DCTSIZE)) != 0) {
-			TIFFErrorExt(tif->tif_clientdata, module,
+			NDPIErrorExt(tif->tif_clientdata, module,
 				  "JPEG tile height must be multiple of %"PRIu32,
 				  (uint32_t)(sp->v_sampling * DCTSIZE));
 			return (0);
 		}
 		if ((td->td_tilewidth % (sp->h_sampling * DCTSIZE)) != 0) {
-			TIFFErrorExt(tif->tif_clientdata, module,
+			NDPIErrorExt(tif->tif_clientdata, module,
 				  "JPEG tile width must be multiple of %"PRIu32,
 				  (uint32_t)(sp->h_sampling * DCTSIZE));
 			return (0);
@@ -1881,7 +1881,7 @@ JPEGSetupEncode(TIFF* tif)
 	} else {
 		if (td->td_rowsperstrip < td->td_imagelength &&
 		    (td->td_rowsperstrip % (sp->v_sampling * DCTSIZE)) != 0) {
-			TIFFErrorExt(tif->tif_clientdata, module,
+			NDPIErrorExt(tif->tif_clientdata, module,
 				  "RowsPerStrip must be multiple of %"PRIu32" for JPEG",
 				  (uint32_t)(sp->v_sampling * DCTSIZE));
 			return (0);
@@ -1896,14 +1896,14 @@ JPEGSetupEncode(TIFF* tif)
                         if (!prepare_JPEGTables(tif))
                                 return (0);
                         /* Mark the field present */
-                        /* Can't use TIFFSetField since BEENWRITING is already set! */
+                        /* Can't use NDPISetField since BEENWRITING is already set! */
                         tif->tif_flags |= TIFF_DIRTYDIRECT;
                         TIFFSetFieldBit(tif, FIELD_JPEGTABLES);
                 }
 	} else {
 		/* We do not support application-supplied JPEGTables, */
 		/* so mark the field not present */
-		TIFFClrFieldBit(tif, FIELD_JPEGTABLES);
+		NDPIClrFieldBit(tif, FIELD_JPEGTABLES);
 	}
 
 	/* Direct libjpeg output to libtiff's output buffer */
@@ -1938,13 +1938,13 @@ JPEGPreEncode(TIFF* tif, uint16_t s)
 	if (isTiled(tif)) {
 		segment_width = td->td_tilewidth;
 		segment_height = td->td_tilelength;
-		sp->bytesperline = TIFFTileRowSize(tif);
+		sp->bytesperline = NDPITileRowSize(tif);
 	} else {
 		segment_width = td->td_imagewidth;
 		segment_height = td->td_imagelength - tif->tif_row;
 		if (segment_height > td->td_rowsperstrip)
 			segment_height = td->td_rowsperstrip;
-		sp->bytesperline = TIFFScanlineSize(tif);
+		sp->bytesperline = NDPIScanlineSize(tif);
 	}
 	if (td->td_planarconfig == PLANARCONFIG_SEPARATE && s > 0) {
 		/* for PC 2, scale down the strip/tile size
@@ -1954,7 +1954,7 @@ JPEGPreEncode(TIFF* tif, uint16_t s)
 		segment_height = TIFFhowmany_32(segment_height, sp->v_sampling);
 	}
 	if (segment_width > 65535 || segment_height > 65535) {
-		TIFFErrorExt(tif->tif_clientdata, module, "Strip/tile too large for JPEG");
+		NDPIErrorExt(tif->tif_clientdata, module, "Strip/tile too large for JPEG");
 		return (0);
 	}
 	sp->cinfo.c.image_width = segment_width;
@@ -2066,7 +2066,7 @@ JPEGEncode(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
 	/* data is expected to be supplied in multiples of a scanline */
 	nrows = cc / sp->bytesperline;
 	if (cc % sp->bytesperline)
-            TIFFWarningExt(tif->tif_clientdata, tif->tif_name, 
+            NDPIWarningExt(tif->tif_clientdata, tif->tif_name, 
                            "fractional scanline discarded");
 
         /* The last strip will be limited to image size */
@@ -2076,10 +2076,10 @@ JPEGEncode(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
         if( sp->cinfo.c.data_precision == 12 )
         {
             line16_count = (int)((sp->bytesperline * 2) / 3);
-            line16 = (short *) _TIFFmalloc(sizeof(short) * line16_count);
+            line16 = (short *) _NDPImalloc(sizeof(short) * line16_count);
             if (!line16)
             {
-                TIFFErrorExt(tif->tif_clientdata,
+                NDPIErrorExt(tif->tif_clientdata,
 			     "JPEGEncode",
                              "Failed to allocate memory");
 
@@ -2120,7 +2120,7 @@ JPEGEncode(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
 
         if( sp->cinfo.c.data_precision == 12 )
         {
-            _TIFFfree( line16 );
+            _NDPIfree( line16 );
         }
             
 	return (1);
@@ -2154,7 +2154,7 @@ JPEGEncodeRaw(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
 
 	nrows = ( cc / bytesperclumpline ) * sp->v_sampling;
 	if (cc % bytesperclumpline)
-		TIFFWarningExt(tif->tif_clientdata, tif->tif_name, "fractional scanline discarded");
+		NDPIWarningExt(tif->tif_clientdata, tif->tif_name, "fractional scanline discarded");
 
 	/* Cb,Cr both have sampling factors 1, so this is correct */
 	clumps_per_line = sp->cinfo.c.comp_info[1].downsampled_width;
@@ -2235,7 +2235,7 @@ JPEGPostEncode(TIFF* tif)
 				* sizeof(JSAMPLE);
 			for (ypos = sp->scancount * vsamp;
 			     ypos < DCTSIZE * vsamp; ypos++) {
-				_TIFFmemcpy((void*)sp->ds_buffer[ci][ypos],
+				_NDPImemcpy((void*)sp->ds_buffer[ci][ypos],
 					    (void*)sp->ds_buffer[ci][ypos-1],
 					    row_width);
 
@@ -2262,11 +2262,11 @@ JPEGCleanup(TIFF* tif)
         if( sp->cinfo_initialized )
                 TIFFjpeg_destroy(sp);	/* release libjpeg resources */
         if (sp->jpegtables)		/* tag value */
-                _TIFFfree(sp->jpegtables);
-	_TIFFfree(tif->tif_data);	/* release local state */
+                _NDPIfree(sp->jpegtables);
+	_NDPIfree(tif->tif_data);	/* release local state */
 	tif->tif_data = NULL;
 
-	_TIFFSetDefaultCompressionState(tif);
+	_NDPISetDefaultCompressionState(tif);
 }
 
 static void 
@@ -2276,8 +2276,8 @@ JPEGResetUpsampled( TIFF* tif )
 	TIFFDirectory* td = &tif->tif_dir;
 
 	/*
-	 * Mark whether returned data is up-sampled or not so TIFFStripSize
-	 * and TIFFTileSize return values that reflect the true amount of
+	 * Mark whether returned data is up-sampled or not so NDPIStripSize
+	 * and NDPITileSize return values that reflect the true amount of
 	 * data.
 	 */
 	tif->tif_flags &= ~TIFF_UPSAMPLED;
@@ -2299,9 +2299,9 @@ JPEGResetUpsampled( TIFF* tif )
 	 * Should we really be doing this now if image size isn't set? 
 	 */
         if( tif->tif_tilesize > 0 )
-            tif->tif_tilesize = isTiled(tif) ? TIFFTileSize(tif) : (tmsize_t)(-1);   
+            tif->tif_tilesize = isTiled(tif) ? NDPITileSize(tif) : (tmsize_t)(-1);   
         if( tif->tif_scanlinesize > 0 )
-            tif->tif_scanlinesize = TIFFScanlineSize(tif); 
+            tif->tif_scanlinesize = NDPIScanlineSize(tif); 
 }
 
 static int
@@ -2320,7 +2320,7 @@ JPEGVSetField(TIFF* tif, uint32_t tag, va_list ap)
 			/* XXX */
 			return (0);
 		}
-		_TIFFsetByteArray(&sp->jpegtables, va_arg(ap, void*), v32);
+		_NDPIsetByteArray(&sp->jpegtables, va_arg(ap, void*), v32);
 		sp->jpegtables_length = v32;
 		TIFFSetFieldBit(tif, FIELD_JPEGTABLES);
 		break;
@@ -2349,7 +2349,7 @@ JPEGVSetField(TIFF* tif, uint32_t tag, va_list ap)
 		return (*sp->vsetparent)(tif, tag, ap);
 	}
 
-	if ((fip = TIFFFieldWithTag(tif, tag)) != NULL) {
+	if ((fip = NDPIFieldWithTag(tif, tag)) != NULL) {
 		TIFFSetFieldBit(tif, fip->field_bit);
 	} else {
 		return (0);
@@ -2395,7 +2395,7 @@ JPEGPrintDir(TIFF* tif, FILE* fd, long flags)
 	(void) flags;
 
         if( sp != NULL ) {
-		if (TIFFFieldSet(tif,FIELD_JPEGTABLES))
+		if (NDPIFieldSet(tif,FIELD_JPEGTABLES))
 			fprintf(fd, "  JPEG Tables: (%"PRIu32" bytes)\n",
 				sp->jpegtables_length);
 		if (sp->printdir)
@@ -2510,8 +2510,8 @@ TIFFInitJPEG(TIFF* tif, int scheme)
 	/*
 	 * Merge codec-specific tag information.
 	 */
-	if (!_TIFFMergeFields(tif, jpegFields, TIFFArrayCount(jpegFields))) {
-		TIFFErrorExt(tif->tif_clientdata,
+	if (!_NDPIMergeFields(tif, jpegFields, TIFFArrayCount(jpegFields))) {
+		NDPIErrorExt(tif->tif_clientdata,
 			     "TIFFInitJPEG",
 			     "Merging JPEG codec-specific tags failed");
 		return 0;
@@ -2520,14 +2520,14 @@ TIFFInitJPEG(TIFF* tif, int scheme)
 	/*
 	 * Allocate state block so tag methods have storage to record values.
 	 */
-	tif->tif_data = (uint8_t*) _TIFFmalloc(sizeof (JPEGState));
+	tif->tif_data = (uint8_t*) _NDPImalloc(sizeof (JPEGState));
 
 	if (tif->tif_data == NULL) {
-		TIFFErrorExt(tif->tif_clientdata,
+		NDPIErrorExt(tif->tif_clientdata,
 			     "TIFFInitJPEG", "No space for JPEG state block");
 		return 0;
 	}
-        _TIFFmemset(tif->tif_data, 0, sizeof(JPEGState));
+        _NDPImemset(tif->tif_data, 0, sizeof(JPEGState));
 
 	sp = JState(tif);
 	sp->tif = tif;				/* back link */
@@ -2592,14 +2592,14 @@ here hopefully is harmless.
             TIFFSetFieldBit(tif, FIELD_JPEGTABLES);
 */
             sp->jpegtables_length = SIZE_OF_JPEGTABLES;
-            sp->jpegtables = (void *) _TIFFmalloc(sp->jpegtables_length);
+            sp->jpegtables = (void *) _NDPImalloc(sp->jpegtables_length);
             if (sp->jpegtables)
             {
-                _TIFFmemset(sp->jpegtables, 0, SIZE_OF_JPEGTABLES);
+                _NDPImemset(sp->jpegtables, 0, SIZE_OF_JPEGTABLES);
             }
             else
             {
-                TIFFErrorExt(tif->tif_clientdata,
+                NDPIErrorExt(tif->tif_clientdata,
 			     "TIFFInitJPEG",
                              "Failed to allocate memory for JPEG tables");
                 return 0;

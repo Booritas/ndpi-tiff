@@ -33,10 +33,10 @@
 #include <float.h>
 
 uint32_t
-_TIFFMultiply32(TIFF* tif, uint32_t first, uint32_t second, const char* where)
+_NDPIMultiply32(TIFF* tif, uint32_t first, uint32_t second, const char* where)
 {
 	if (second && first > UINT32_MAX / second) {
-		TIFFErrorExt(tif->tif_clientdata, where, "Integer overflow in %s", where);
+		NDPIErrorExt(tif->tif_clientdata, where, "Integer overflow in %s", where);
 		return 0;
 	}
 
@@ -44,10 +44,10 @@ _TIFFMultiply32(TIFF* tif, uint32_t first, uint32_t second, const char* where)
 }
 
 uint64_t
-_TIFFMultiply64(TIFF* tif, uint64_t first, uint64_t second, const char* where)
+_NDPIMultiply64(TIFF* tif, uint64_t first, uint64_t second, const char* where)
 {
 	if (second && first > UINT64_MAX / second) {
-		TIFFErrorExt(tif->tif_clientdata, where, "Integer overflow in %s", where);
+		NDPIErrorExt(tif->tif_clientdata, where, "Integer overflow in %s", where);
 		return 0;
 	}
 
@@ -55,14 +55,14 @@ _TIFFMultiply64(TIFF* tif, uint64_t first, uint64_t second, const char* where)
 }
 
 tmsize_t
-_TIFFMultiplySSize(TIFF* tif, tmsize_t first, tmsize_t second, const char* where)
+_NDPIMultiplySSize(TIFF* tif, tmsize_t first, tmsize_t second, const char* where)
 {
     if( first <= 0 || second <= 0 )
     {
         if( tif != NULL && where != NULL )
         {
-            TIFFErrorExt(tif->tif_clientdata, where,
-                        "Invalid argument to _TIFFMultiplySSize() in %s", where);
+            NDPIErrorExt(tif->tif_clientdata, where,
+                        "Invalid argument to _NDPIMultiplySSize() in %s", where);
         }
         return 0;
     }
@@ -71,7 +71,7 @@ _TIFFMultiplySSize(TIFF* tif, tmsize_t first, tmsize_t second, const char* where
     {
         if( tif != NULL && where != NULL )
         {
-            TIFFErrorExt(tif->tif_clientdata, where,
+            NDPIErrorExt(tif->tif_clientdata, where,
                         "Integer overflow in %s", where);
         }
         return 0;
@@ -79,13 +79,13 @@ _TIFFMultiplySSize(TIFF* tif, tmsize_t first, tmsize_t second, const char* where
     return first * second;
 }
 
-tmsize_t _TIFFCastUInt64ToSSize(TIFF* tif, uint64_t val, const char* module)
+tmsize_t _NDPICastUInt64ToSSize(TIFF* tif, uint64_t val, const char* module)
 {
     if( val > (uint64_t)TIFF_TMSIZE_T_MAX )
     {
         if( tif != NULL && module != NULL )
         {
-            TIFFErrorExt(tif->tif_clientdata,module,"Integer overflow");
+            NDPIErrorExt(tif->tif_clientdata,module,"Integer overflow");
         }
         return 0;
     }
@@ -93,21 +93,21 @@ tmsize_t _TIFFCastUInt64ToSSize(TIFF* tif, uint64_t val, const char* module)
 }
 
 void*
-_TIFFCheckRealloc(TIFF* tif, void* buffer,
+_NDPICheckRealloc(TIFF* tif, void* buffer,
 		  tmsize_t nmemb, tmsize_t elem_size, const char* what)
 {
 	void* cp = NULL;
-        tmsize_t count = _TIFFMultiplySSize(tif, nmemb, elem_size, NULL);
+        tmsize_t count = _NDPIMultiplySSize(tif, nmemb, elem_size, NULL);
 	/*
 	 * Check for integer overflow.
 	 */
 	if (count != 0)
 	{
-		cp = _TIFFrealloc(buffer, count);
+		cp = _NDPIrealloc(buffer, count);
 	}
 
 	if (cp == NULL) {
-		TIFFErrorExt(tif->tif_clientdata, tif->tif_name,
+		NDPIErrorExt(tif->tif_clientdata, tif->tif_name,
 			     "Failed to allocate memory for %s "
 			     "(%"TIFF_SSIZE_FORMAT" elements of %"TIFF_SSIZE_FORMAT" bytes each)",
 			     what, nmemb, elem_size);
@@ -117,13 +117,13 @@ _TIFFCheckRealloc(TIFF* tif, void* buffer,
 }
 
 void*
-_TIFFCheckMalloc(TIFF* tif, tmsize_t nmemb, tmsize_t elem_size, const char* what)
+_NDPICheckMalloc(TIFF* tif, tmsize_t nmemb, tmsize_t elem_size, const char* what)
 {
-	return _TIFFCheckRealloc(tif, NULL, nmemb, elem_size, what);  
+	return _NDPICheckRealloc(tif, NULL, nmemb, elem_size, what);  
 }
 
 static int
-TIFFDefaultTransferFunction(TIFFDirectory* td)
+NDPIDefaultTransferFunction(TIFFDirectory* td)
 {
 	uint16_t **tf = td->td_transferfunction;
 	tmsize_t i, n, nbytes;
@@ -134,7 +134,7 @@ TIFFDefaultTransferFunction(TIFFDirectory* td)
 
 	n = ((tmsize_t)1)<<td->td_bitspersample;
 	nbytes = n * sizeof (uint16_t);
-        tf[0] = (uint16_t *)_TIFFmalloc(nbytes);
+        tf[0] = (uint16_t *)_NDPImalloc(nbytes);
 	if (tf[0] == NULL)
 		return 0;
 	tf[0][0] = 0;
@@ -144,34 +144,34 @@ TIFFDefaultTransferFunction(TIFFDirectory* td)
 	}
 
 	if (td->td_samplesperpixel - td->td_extrasamples > 1) {
-                tf[1] = (uint16_t *)_TIFFmalloc(nbytes);
+                tf[1] = (uint16_t *)_NDPImalloc(nbytes);
 		if(tf[1] == NULL)
 			goto bad;
-		_TIFFmemcpy(tf[1], tf[0], nbytes);
-                tf[2] = (uint16_t *)_TIFFmalloc(nbytes);
+		_NDPImemcpy(tf[1], tf[0], nbytes);
+                tf[2] = (uint16_t *)_NDPImalloc(nbytes);
 		if (tf[2] == NULL)
 			goto bad;
-		_TIFFmemcpy(tf[2], tf[0], nbytes);
+		_NDPImemcpy(tf[2], tf[0], nbytes);
 	}
 	return 1;
 
 bad:
 	if (tf[0])
-		_TIFFfree(tf[0]);
+		_NDPIfree(tf[0]);
 	if (tf[1])
-		_TIFFfree(tf[1]);
+		_NDPIfree(tf[1]);
 	if (tf[2])
-		_TIFFfree(tf[2]);
+		_NDPIfree(tf[2]);
 	tf[0] = tf[1] = tf[2] = 0;
 	return 0;
 }
 
 static int
-TIFFDefaultRefBlackWhite(TIFFDirectory* td)
+NDPIDefaultRefBlackWhite(TIFFDirectory* td)
 {
 	int i;
 
-        td->td_refblackwhite = (float *)_TIFFmalloc(6*sizeof (float));
+        td->td_refblackwhite = (float *)_NDPImalloc(6*sizeof (float));
 	if (td->td_refblackwhite == NULL)
 		return 0;
         if (td->td_photometric == PHOTOMETRIC_YCBCR) {
@@ -197,19 +197,19 @@ TIFFDefaultRefBlackWhite(TIFFDirectory* td)
 }
 
 /*
- * Like TIFFGetField, but return any default
+ * Like NDPIGetField, but return any default
  * value if the tag is not present in the directory.
  *
  * NB:	We use the value in the directory, rather than
  *	explicit values so that defaults exist only one
- *	place in the library -- in TIFFDefaultDirectory.
+ *	place in the library -- in NDPIDefaultDirectory.
  */
 int
-TIFFVGetFieldDefaulted(TIFF* tif, uint32_t tag, va_list ap)
+NDPIVGetFieldDefaulted(TIFF* tif, uint32_t tag, va_list ap)
 {
 	TIFFDirectory *td = &tif->tif_dir;
 
-	if (TIFFVGetField(tif, tag, ap))
+	if (NDPIVGetField(tif, tag, ap))
 		return (1);
 	switch (tag) {
 	case TIFFTAG_SUBFILETYPE:
@@ -250,7 +250,7 @@ TIFFVGetFieldDefaulted(TIFF* tif, uint32_t tag, va_list ap)
         TIFFPredictorState* sp = (TIFFPredictorState*) tif->tif_data;
         if( sp == NULL )
         {
-            TIFFErrorExt(tif->tif_clientdata, tif->tif_name,
+            NDPIErrorExt(tif->tif_clientdata, tif->tif_name,
                          "Cannot get \"Predictor\" tag as plugin is not configured");
             *va_arg(ap, uint16_t*) = 0;
             return 0;
@@ -317,8 +317,8 @@ TIFFVGetFieldDefaulted(TIFF* tif, uint32_t tag, va_list ap)
 		}
 	case TIFFTAG_TRANSFERFUNCTION:
 		if (!td->td_transferfunction[0] &&
-		    !TIFFDefaultTransferFunction(td)) {
-			TIFFErrorExt(tif->tif_clientdata, tif->tif_name, "No space for \"TransferFunction\" tag");
+		    !NDPIDefaultTransferFunction(td)) {
+			NDPIErrorExt(tif->tif_clientdata, tif->tif_name, "No space for \"TransferFunction\" tag");
 			return (0);
 		}
 		*va_arg(ap, const uint16_t **) = td->td_transferfunction[0];
@@ -328,7 +328,7 @@ TIFFVGetFieldDefaulted(TIFF* tif, uint32_t tag, va_list ap)
 		}
 		return (1);
 	case TIFFTAG_REFERENCEBLACKWHITE:
-		if (!td->td_refblackwhite && !TIFFDefaultRefBlackWhite(td))
+		if (!td->td_refblackwhite && !NDPIDefaultRefBlackWhite(td))
 			return (0);
 		*va_arg(ap, const float **) = td->td_refblackwhite;
 		return (1);
@@ -337,17 +337,17 @@ TIFFVGetFieldDefaulted(TIFF* tif, uint32_t tag, va_list ap)
 }
 
 /*
- * Like TIFFGetField, but return any default
+ * Like NDPIGetField, but return any default
  * value if the tag is not present in the directory.
  */
 int
-TIFFGetFieldDefaulted(TIFF* tif, uint32_t tag, ...)
+NDPIGetFieldDefaulted(TIFF* tif, uint32_t tag, ...)
 {
 	int ok;
 	va_list ap;
 
 	va_start(ap, tag);
-	ok =  TIFFVGetFieldDefaulted(tif, tag, ap);
+	ok =  NDPIVGetFieldDefaulted(tif, tag, ap);
 	va_end(ap);
 	return (ok);
 }
@@ -362,7 +362,7 @@ typedef union {
 } _Int64;
 
 float
-_TIFFUInt64ToFloat(uint64_t ui64)
+_NDPIUInt64ToFloat(uint64_t ui64)
 {
 	_Int64 i;
 
@@ -378,7 +378,7 @@ _TIFFUInt64ToFloat(uint64_t ui64)
 }
 
 double
-_TIFFUInt64ToDouble(uint64_t ui64)
+_NDPIUInt64ToDouble(uint64_t ui64)
 {
 	_Int64 i;
 
@@ -393,7 +393,7 @@ _TIFFUInt64ToDouble(uint64_t ui64)
 	}
 }
 
-float _TIFFClampDoubleToFloat( double val )
+float _NDPIClampDoubleToFloat( double val )
 {
     if( val > FLT_MAX )
         return FLT_MAX;
@@ -402,11 +402,11 @@ float _TIFFClampDoubleToFloat( double val )
     return (float)val;
 }
 
-int _TIFFSeekOK(TIFF* tif, toff_t off)
+int _NDPISeekOK(TIFF* tif, toff_t off)
 {
     /* Huge offsets, especially -1 / UINT64_MAX, can cause issues */
     /* See http://bugzilla.maptools.org/show_bug.cgi?id=2726 */
-    return off <= (~(uint64_t)0) / 2 && TIFFSeekFile(tif, off, SEEK_SET) == off;
+    return off <= (~(uint64_t)0) / 2 && NDPISeekFile(tif, off, SEEK_SET) == off;
 }
 
 /* vim: set ts=8 sts=8 sw=8 noet: */

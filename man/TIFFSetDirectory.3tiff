@@ -22,29 +22,29 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFSetDirectory 3TIFF "October 15, 1995" "libtiff"
+.TH NDPISetDirectory 3TIFF "October 15, 1995" "libtiff"
 .SH NAME
-TIFFSetDirectory, TIFFSetSubDirectory \- set the current directory for an open
+NDPISetDirectory, NDPISetSubDirectory \- set the current directory for an open
 .SM TIFF
 file
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "int TIFFSetDirectory(TIFF *" tif ", tdir_t " dirnum ")"
+.BI "int NDPISetDirectory(TIFF *" tif ", tdir_t " dirnum ")"
 .br
-.BI "int TIFFSetSubDirectory(TIFF *" tif ", uint64_t " diroff ")"
+.BI "int NDPISetSubDirectory(TIFF *" tif ", uint64_t " diroff ")"
 .SH DESCRIPTION
-.I TIFFSetDirectory
+.I NDPISetDirectory
 changes the current directory and reads its contents with
-.IR TIFFReadDirectory .
+.IR NDPIReadDirectory .
 The parameter
 .I dirnum
 specifies the subfile/directory as an integer number, with the first directory
 numbered zero.
 .PP
-.I TIFFSetSubDirectory
+.I NDPISetSubDirectory
 acts like 
-.IR TIFFSetDirectory ,
+.IR NDPISetDirectory ,
 except the directory is specified as a file offset instead of an index; this
 is required for accessing subdirectories linked through a
 .I SubIFD
@@ -58,7 +58,7 @@ specifies a non-existent directory, or if an error was encountered while
 reading the directory's contents.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.IR TIFFError (3TIFF)
+.IR NDPIError (3TIFF)
 routine.
 .PP
 .BR "%s: Error fetching directory count" .
@@ -68,10 +68,10 @@ An error was encountered while reading the ``directory count'' field.
 An error was encountered while reading the ``link value'' that points to the
 next directory in a file.
 .SH "SEE ALSO"
-.IR TIFFCurrentDirectory (3TIFF),
-.IR TIFFOpen (3TIFF),
-.IR TIFFReadDirectory (3TIFF),
-.IR TIFFWriteDirectory (3TIFF),
+.IR NDPICurrentDirectory (3TIFF),
+.IR NDPIOpen (3TIFF),
+.IR NDPIReadDirectory (3TIFF),
+.IR NDPIWriteDirectory (3TIFF),
 .IR libtiff (3TIFF)
 .PP
 Libtiff library home page:

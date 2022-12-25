@@ -22,9 +22,9 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFReadRGBATile 3TIFF "December 10, 1998" "libtiff"
+.TH NDPIReadRGBATile 3TIFF "December 10, 1998" "libtiff"
 .SH NAME
-TIFFReadRGBATile \- read and decode an image tile into a fixed-format raster
+NDPIReadRGBATile \- read and decode an image tile into a fixed-format raster
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
@@ -36,9 +36,9 @@ TIFFReadRGBATile \- read and decode an image tile into a fixed-format raster
 .br
 .B "#define TIFFGetA(abgr)	(((abgr) >> 24) & 0xff)"
 .sp
-.BI "int TIFFReadRGBATile(TIFF *" tif ", uint32_t " x ", uint32_t " y ", uint32_t *" raster ")"
+.BI "int NDPIReadRGBATile(TIFF *" tif ", uint32_t " x ", uint32_t " y ", uint32_t *" raster ")"
 .SH DESCRIPTION
-.IR TIFFReadRGBATile
+.IR NDPIReadRGBATile
 reads a single tile of a tile-based image into memory, storing the result in
 the user supplied RGBA
 .IR raster .
@@ -85,21 +85,21 @@ minus
 Palette image colormaps that appear to be incorrectly written as 8-bit values
 are automatically scaled to 16-bits.
 .PP
-.I TIFFReadRGBATile
+.I NDPIReadRGBATile
 is just a wrapper around the more general
 .IR TIFFRGBAImage (3TIFF)
 facilities.  It's main advantage over the similar 
-.IR TIFFReadRGBAImage() 
+.IR NDPIReadRGBAImage() 
 function is that for large images a single buffer capable of holding the whole
 image doesn't need to be allocated, only enough for one tile.  The 
-.IR TIFFReadRGBAStrip() 
+.IR NDPIReadRGBAStrip() 
 function does a similar operation for stripped images.
 .SH "RETURN VALUES"
 1 is returned if the image was successfully read and converted.
 Otherwise, 0 is returned if an error was encountered.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.IR TIFFError (3TIFF)
+.IR NDPIError (3TIFF)
 routine.
 .PP
 .BR "Sorry, can not handle %d-bit pictures" .
@@ -148,7 +148,7 @@ The image has a format (combination of
 and
 .IR PhotometricInterpretation )
 that
-.I TIFFReadRGBAImage
+.I NDPIReadRGBAImage
 can not handle.
 .PP
 .BR "No space for B&W mapping table" .
@@ -160,10 +160,10 @@ grayscale data to
 There was insufficient memory to allocate a table used to map data to 8-bit
 .SM RGB.
 .SH "SEE ALSO"
-.BR TIFFOpen (3TIFF),
+.BR NDPIOpen (3TIFF),
 .BR TIFFRGBAImage (3TIFF),
-.BR TIFFReadRGBAImage (3TIFF),
-.BR TIFFReadRGBAStrip (3TIFF),
+.BR NDPIReadRGBAImage (3TIFF),
+.BR NDPIReadRGBAStrip (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

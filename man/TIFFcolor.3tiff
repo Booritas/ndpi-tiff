@@ -23,20 +23,20 @@
 .if n .po 0
 .TH COLOR 3TIFF "December 21, 2003" "libtiff"
 .SH NAME
-TIFFYCbCrToRGBInit, TIFFYCbCrtoRGB, TIFFCIELabToRGBInit, TIFFCIELabToXYZ,
-TIFFXYZToRGB \- color conversion routines.
+NDPIYCbCrToRGBInit, NDPIYCbCrtoRGB, NDPICIELabToRGBInit, NDPICIELabToXYZ,
+NDPIXYZToRGB \- color conversion routines.
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "int TIFFYCbCrToRGBInit(TIFFYCbCrToRGB *" ycbcr ", float *" luma ", float *"refBlackWhite" );"
+.BI "int NDPIYCbCrToRGBInit(TIFFYCbCrToRGB *" ycbcr ", float *" luma ", float *"refBlackWhite" );"
 .br
-.BI "void TIFFYCbCrtoRGB(TIFFYCbCrToRGB *" ycbcr ", uint32_t " Y ", int32_t " Cb ", int32_t " Cr ", uint32_t *" R ", uint32_t *" G ", uint32_t *" B " );"
+.BI "void NDPIYCbCrtoRGB(TIFFYCbCrToRGB *" ycbcr ", uint32_t " Y ", int32_t " Cb ", int32_t " Cr ", uint32_t *" R ", uint32_t *" G ", uint32_t *" B " );"
 .sp
-.BI "int TIFFCIELabToRGBInit(TIFFCIELabToRGB *" cielab ", const TIFFDisplay *" display ", float *" refWhite ");"
+.BI "int NDPICIELabToRGBInit(TIFFCIELabToRGB *" cielab ", const TIFFDisplay *" display ", float *" refWhite ");"
 .br
-.BI "void TIFFCIELabToXYZ(TIFFCIELabToRGB *" cielab ", uint32_t " L ", int32_t " a ", int32_t " b ", float *" X ", float *" Y ", float *" Z ");"
+.BI "void NDPICIELabToXYZ(TIFFCIELabToRGB *" cielab ", uint32_t " L ", int32_t " a ", int32_t " b ", float *" X ", float *" Y ", float *" Z ");"
 .br
-.BI "void TIFFXYZToRGB(TIFFCIELabToRGB *" cielab ", float " X ", float " Y ", float " Z" , uint32_t *" R ", uint32_t *" G ", uint32_t *" B ");"
+.BI "void NDPIXYZToRGB(TIFFCIELabToRGB *" cielab ", float " X ", float " Y ", float " Z" , uint32_t *" R ", uint32_t *" G ", uint32_t *" B ");"
 .SH DESCRIPTION
 TIFF supports several color spaces for images stored in that format. There is
 usually a problem of application to handle the data properly and convert
@@ -46,7 +46,7 @@ itself. In particular, these routines used in
 .B TIFFRGBAImage(3TIFF)
 interface.
 .PP
-.B TIFFYCbCrToRGBInit()
+.B NDPIYCbCrToRGBInit()
 used to initialize
 .I YCbCr
 to
@@ -93,19 +93,19 @@ uint16_t hs, vs;
 
 /* Initialize structures */
 ycbcr = (TIFFYCbCrToRGB*)
-	_TIFFmalloc(TIFFroundup(sizeof(TIFFYCbCrToRGB), sizeof(long))
+	_NDPImalloc(TIFFroundup(sizeof(TIFFYCbCrToRGB), sizeof(long))
         	+ 4*256*sizeof(TIFFRGBValue)
         	+ 2*256*sizeof(int)
         	+ 3*256*sizeof(int32_t));
 if (ycbcr == NULL) {
-        TIFFError("YCbCr->RGB",
+        NDPIError("YCbCr->RGB",
 		"No space for YCbCr->RGB conversion state");
         exit(0);
 }
 
-TIFFGetFieldDefaulted(tif, TIFFTAG_YCBCRCOEFFICIENTS, &luma);
-TIFFGetFieldDefaulted(tif, TIFFTAG_REFERENCEBLACKWHITE, &refBlackWhite);
-if (TIFFYCbCrToRGBInit(ycbcr, luma, refBlackWhite) < 0)
+NDPIGetFieldDefaulted(tif, TIFFTAG_YCBCRCOEFFICIENTS, &luma);
+NDPIGetFieldDefaulted(tif, TIFFTAG_REFERENCEBLACKWHITE, &refBlackWhite);
+if (NDPIYCbCrToRGBInit(ycbcr, luma, refBlackWhite) < 0)
 	exit(0);
 
 /* Start conversion */
@@ -114,16 +114,16 @@ uint32_t Y;
 int32_t Cb, Cr;
 
 for each pixel in image
-	TIFFYCbCrtoRGB(img->ycbcr, Y, Cb, Cr, &r, &g, &b);
+	NDPIYCbCrtoRGB(img->ycbcr, Y, Cb, Cr, &r, &g, &b);
 
 /* Free state structure */
-_TIFFfree(ycbcr);
+_NDPIfree(ycbcr);
 .fi
 .RE
 .PP
 
 .PP
-.B TIFFCIELabToRGBInit()
+.B NDPICIELabToRGBInit()
 initializes the
 .I CIE L*a*b* 1976
 to
@@ -209,13 +209,13 @@ The conversion itself performed in two steps: at the first one we will convert
 to
 .I CIE XYZ
 using
-.B TIFFCIELabToXYZ()
+.B NDPICIELabToXYZ()
 routine, and at the second step we will convert
 .I CIE XYZ
 to
 .I RGB
 using
-.B TIFFXYZToRGB().
+.B NDPIXYZToRGB().
 Look at the code sample below:
 .PP
 .RS
@@ -225,22 +225,22 @@ float   refWhite[3];
 
 /* Initialize structures */
 img->cielab = (TIFFCIELabToRGB *)
-	_TIFFmalloc(sizeof(TIFFCIELabToRGB));
+	_NDPImalloc(sizeof(TIFFCIELabToRGB));
 if (!cielab) {
-	TIFFError("CIE L*a*b*->RGB",
+	NDPIError("CIE L*a*b*->RGB",
 		"No space for CIE L*a*b*->RGB conversion state.");
 	exit(0);
 }
 
-TIFFGetFieldDefaulted(tif, TIFFTAG_WHITEPOINT, &whitePoint);
+NDPIGetFieldDefaulted(tif, TIFFTAG_WHITEPOINT, &whitePoint);
 refWhite[1] = 100.0F;
 refWhite[0] = whitePoint[0] / whitePoint[1] * refWhite[1];
 refWhite[2] = (1.0F - whitePoint[0] - whitePoint[1])
 	      / whitePoint[1] * refWhite[1];
-if (TIFFCIELabToRGBInit(cielab, &display_sRGB, refWhite) < 0) {
-	TIFFError("CIE L*a*b*->RGB",
+if (NDPICIELabToRGBInit(cielab, &display_sRGB, refWhite) < 0) {
+	NDPIError("CIE L*a*b*->RGB",
 		"Failed to initialize CIE L*a*b*->RGB conversion state.");
-	_TIFFfree(cielab);
+	_NDPIfree(cielab);
 	exit(0);
 }
 
@@ -251,11 +251,11 @@ int32_t a, b;
 float X, Y, Z;
 
 for each pixel in image
-	TIFFCIELabToXYZ(cielab, L, a, b, &X, &Y, &Z);
-	TIFFXYZToRGB(cielab, X, Y, Z, &r, &g, &b);
+	NDPICIELabToXYZ(cielab, L, a, b, &X, &Y, &Z);
+	NDPIXYZToRGB(cielab, X, Y, Z, &r, &g, &b);
 
 /* Don't forget to free the state structure */
-_TIFFfree(cielab);
+_NDPIfree(cielab);
 .fi
 .RE
 .PP

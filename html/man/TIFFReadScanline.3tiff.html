@@ -4,11 +4,11 @@
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
 <meta name="Content-Style" content="text/css">
-<title>TIFFReadScanline</title>
+<title>NDPIReadScanline</title>
 </head>
 <body>
 
-<h1 align=center>TIFFReadScanline</h1>
+<h1 align=center>NDPIReadScanline</h1>
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
@@ -27,7 +27,7 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>TIFFReadScanline &minus; read and decode a scanline of
+<p>NDPIReadScanline &minus; read and decode a scanline of
 data from an open <small>TIFF</small> file</p>
 </td>
 </table>
@@ -41,7 +41,7 @@ data from an open <small>TIFF</small> file</p>
 <td width="91%">
 <p><b>#include &lt;tiffio.h&gt;</b></p>
 <!-- INDENTATION -->
-<p><b>int TIFFReadScanline(TIFF *</b><i>tif</i><b>,
+<p><b>int NDPIReadScanline(TIFF *</b><i>tif</i><b>,
 tdata_t</b> <i>buf</i><b>, uint32_t</b> <i>row</i><b>,
 tsample_t</b> <i>sample</i><b>)</b></p>
 </td>
@@ -59,10 +59,10 @@ supplied) data buffer <i>buf</i>. The data are returned
 decompressed and, in the native byte- and bit-ordering, but
 are otherwise packed (see further below). The buffer must be
 large enough to hold an entire scanline of data.
-Applications should call the routine <i>TIFFScanlineSize</i>
+Applications should call the routine <i>NDPIScanlineSize</i>
 to find out the size (in bytes) of a scanline buffer. The
 <i>row</i> parameter is always used by
-<i>TIFFReadScanline</i>; the <i>sample</i> parameter is used
+<i>NDPIReadScanline</i>; the <i>sample</i> parameter is used
 only if data are organized in separate planes
 (<i>PlanarConfiguration</i>=2).</p>
 </td>
@@ -94,7 +94,7 @@ opposite to the native machine byte order,</p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><i>TIFFReadScanline</i> returns &minus;1 if it detects an
+<p><i>NDPIReadScanline</i> returns &minus;1 if it detects an
 error; otherwise 1 is returned.</p>
 </td>
 </table>
@@ -107,7 +107,7 @@ error; otherwise 1 is returned.</p>
 <td width="8%"></td>
 <td width="91%">
 <p>All error messages are directed to the
-<i>TIFFError</i>(3TIFF) routine.</p>
+<i>NDPIError</i>(3TIFF) routine.</p>
 <!-- INDENTATION -->
 <p><b>Compression algorithm does not support random
 access</b>. Data was requested in a non-sequential order
@@ -144,9 +144,9 @@ interfaces to read these formats.</p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><b>TIFFOpen</b>(3TIFF),
-<b>TIFFReadEncodedStrip</b>(3TIFF),
-<b>TIFFReadRawStrip</b>(3TIFF), <b>libtiff</b>(3TIFF)</p>
+<p><b>NDPIOpen</b>(3TIFF),
+<b>NDPIReadEncodedStrip</b>(3TIFF),
+<b>NDPIReadRawStrip</b>(3TIFF), <b>libtiff</b>(3TIFF)</p>
 <!-- INDENTATION -->
 <p>Libtiff library home page:
 <b>http://www.simplesystems.org/libtiff/</b></p>

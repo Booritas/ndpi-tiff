@@ -24,7 +24,7 @@
 /*
  * TIFF Library
  *
- * Module to test TIFFDeferStrileArrayWriting and TIFFForceStrileArrayWriting
+ * Module to test NDPIDeferStrileArrayWriting and NDPIForceStrileArrayWriting
  */
 
 #include "tif_config.h"
@@ -47,92 +47,92 @@ int test(const char* mode, int tiled, int height)
     int ret = 0;
     (void)ret;
 
-    tif = TIFFOpen(filename, mode);
+    tif = NDPIOpen(filename, mode);
     if(!tif)
     {
         fprintf(stderr, "cannot create %s\n", filename);
         return 1;
     }
-    ret = TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
+    ret = NDPISetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, 1);
+    ret = NDPISetField(tif, TIFFTAG_IMAGEWIDTH, 1);
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_IMAGELENGTH, height);
+    ret = NDPISetField(tif, TIFFTAG_IMAGELENGTH, height);
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8);
+    ret = NDPISetField(tif, TIFFTAG_BITSPERSAMPLE, 8);
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1);
+    ret = NDPISetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1);
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+    ret = NDPISetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
     assert(ret);
 
     if( tiled )
     {
-        ret = TIFFSetField(tif, TIFFTAG_TILEWIDTH, 16);
+        ret = NDPISetField(tif, TIFFTAG_TILEWIDTH, 16);
         assert( ret );
-        ret = TIFFSetField(tif, TIFFTAG_TILELENGTH, 16);
+        ret = NDPISetField(tif, TIFFTAG_TILELENGTH, 16);
         assert( ret );
     }
     else
     {
-        ret = TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, 1);
+        ret = NDPISetField(tif, TIFFTAG_ROWSPERSTRIP, 1);
         assert(ret);
     }
 
-    ret = TIFFDeferStrileArrayWriting(tif);
+    ret = NDPIDeferStrileArrayWriting(tif);
     assert(ret);
 
-    ret = TIFFWriteCheck( tif, tiled, "test" );
+    ret = NDPIWriteCheck( tif, tiled, "test" );
     assert(ret);
 
-    ret = TIFFWriteDirectory( tif );
+    ret = NDPIWriteDirectory( tif );
     assert(ret);
 
     /* Create other directory */
-    TIFFFreeDirectory( tif );
-    TIFFCreateDirectory( tif );
+    NDPIFreeDirectory( tif );
+    NDPICreateDirectory( tif );
 
-    ret = TIFFSetField( tif, TIFFTAG_SUBFILETYPE, FILETYPE_PAGE );
+    ret = NDPISetField( tif, TIFFTAG_SUBFILETYPE, FILETYPE_PAGE );
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
+    ret = NDPISetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, 1);
+    ret = NDPISetField(tif, TIFFTAG_IMAGEWIDTH, 1);
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_IMAGELENGTH, 1);
+    ret = NDPISetField(tif, TIFFTAG_IMAGELENGTH, 1);
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8);
+    ret = NDPISetField(tif, TIFFTAG_BITSPERSAMPLE, 8);
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1);
+    ret = NDPISetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1);
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+    ret = NDPISetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, 1);
-    assert(ret);
-
-    ret = TIFFDeferStrileArrayWriting(tif);
+    ret = NDPISetField(tif, TIFFTAG_ROWSPERSTRIP, 1);
     assert(ret);
 
-    ret = TIFFWriteCheck( tif, 0, "test" );
+    ret = NDPIDeferStrileArrayWriting(tif);
     assert(ret);
 
-    ret = TIFFWriteDirectory( tif );
+    ret = NDPIWriteCheck( tif, 0, "test" );
+    assert(ret);
+
+    ret = NDPIWriteDirectory( tif );
     assert(ret);
 
     /* Force writing of strile arrays */
-    ret = TIFFSetDirectory( tif, 0 );
+    ret = NDPISetDirectory( tif, 0 );
     assert(ret);
 
-    ret = TIFFForceStrileArrayWriting(tif);
+    ret = NDPIForceStrileArrayWriting(tif);
     assert(ret);
 
-    ret = TIFFSetDirectory( tif, 1 );
+    ret = NDPISetDirectory( tif, 1 );
     assert(ret);
 
-    ret = TIFFForceStrileArrayWriting(tif);
+    ret = NDPIForceStrileArrayWriting(tif);
     assert(ret);
 
     /* Now write data on first directory */
-    ret = TIFFSetDirectory( tif, 0 );
+    ret = NDPISetDirectory( tif, 0 );
     assert(ret);
 
     if( tiled )
@@ -159,9 +159,9 @@ int test(const char* mode, int tiled, int height)
         }
     }
 
-    TIFFClose(tif);
+    NDPIClose(tif);
 
-    tif = TIFFOpen(filename, "r");
+    tif = NDPIOpen(filename, "r");
     if(!tif)
     {
         fprintf(stderr, "cannot open %s\n", filename);
@@ -178,14 +178,14 @@ int test(const char* mode, int tiled, int height)
                 unsigned char tilebuffer[256];
                 unsigned char expected_c = (unsigned char)j;
                 memset(tilebuffer,0, 256);
-                ret = TIFFReadEncodedTile( tif, j, tilebuffer, 256 );
+                ret = NDPIReadEncodedTile( tif, j, tilebuffer, 256 );
                 assert(ret == 256);
                 if( tilebuffer[0] != expected_c ||
                     tilebuffer[255] != expected_c )
                 {
                     fprintf(stderr, "unexpected value at tile %d: %d %d\n",
                             j, tilebuffer[0], tilebuffer[255]);
-                    TIFFClose(tif);
+                    NDPIClose(tif);
                     return 1;
                 }
             }
@@ -201,20 +201,20 @@ int test(const char* mode, int tiled, int height)
             {
                 unsigned char c = 0;
                 unsigned char expected_c = (unsigned char)j;
-                ret = TIFFReadEncodedStrip( tif, j, &c, 1 );
+                ret = NDPIReadEncodedStrip( tif, j, &c, 1 );
                 assert(ret == 1);
                 if( c != expected_c )
                 {
                     fprintf(stderr, "unexpected value at line %d: %d\n",
                             j, c);
-                    TIFFClose(tif);
+                    NDPIClose(tif);
                     return 1;
                 }
             }
         }
     }
 
-    TIFFClose(tif);
+    NDPIClose(tif);
 
     unlink(filename);
     return 0;

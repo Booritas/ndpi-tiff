@@ -1,29 +1,29 @@
-EXPORTS	TIFFAccessTagMethods
-	TIFFCIELabToRGBInit
-	TIFFCIELabToXYZ
-	TIFFCheckTile
-	TIFFCheckpointDirectory
-	TIFFCleanup
-	TIFFClientOpen
-	TIFFClientdata
-	TIFFClose
-	TIFFComputeStrip
-	TIFFComputeTile
-	TIFFCreateCustomDirectory
-	TIFFCreateDirectory
-	TIFFCreateEXIFDirectory
-	TIFFCreateGPSDirectory
-	TIFFCurrentDirOffset
-	TIFFCurrentDirectory
-	TIFFCurrentRow
-	TIFFCurrentStrip
-	TIFFCurrentTile
+EXPORTS	NDPIAccessTagMethods
+	NDPICIELabToRGBInit
+	NDPICIELabToXYZ
+	NDPICheckTile
+	NDPICheckpointDirectory
+	NDPICleanup
+	NDPIClientOpen
+	NDPIClientdata
+	NDPIClose
+	NDPIComputeStrip
+	NDPIComputeTile
+	NDPICreateCustomDirectory
+	NDPICreateDirectory
+	NDPICreateEXIFDirectory
+	NDPICreateGPSDirectory
+	NDPICurrentDirOffset
+	NDPICurrentDirectory
+	NDPICurrentRow
+	NDPICurrentStrip
+	NDPICurrentTile
 	TIFFDataWidth
-	TIFFDefaultStripSize
-	TIFFDefaultTileSize
-	TIFFDeferStrileArrayWriting
-	TIFFError
-	TIFFErrorExt
+	NDPIDefaultStripSize
+	NDPIDefaultTileSize
+	NDPIDeferStrileArrayWriting
+	NDPIError
+	NDPIErrorExt
 	TIFFFdOpen
 	TIFFFieldDataType
 	TIFFFieldName
@@ -31,149 +31,149 @@ EXPORTS	TIFFAccessTagMethods
 	TIFFFieldReadCount
 	TIFFFieldTag
 	TIFFFieldWithName
-	TIFFFieldWithTag
+	NDPIFieldWithTag
 	TIFFFieldWriteCount
-	TIFFFileName
-	TIFFFileno
-	TIFFFindCODEC
-	TIFFFindField
-	TIFFFlush
-	TIFFFlushData
-	TIFFForceStrileArrayWriting
-	TIFFFreeDirectory
+	NDPIFileName
+	NDPIFileno
+	NDPIFindCODEC
+	NDPIFindField
+	NDPIFlush
+	NDPIFlushData
+	NDPIForceStrileArrayWriting
+	NDPIFreeDirectory
 	TIFFGetBitRevTable
-	TIFFGetClientInfo
-	TIFFGetCloseProc
-	TIFFGetConfiguredCODECs
-	TIFFGetField
-	TIFFGetFieldDefaulted
-	TIFFGetMapFileProc
-	TIFFGetMode
-	TIFFGetReadProc
-	TIFFGetSeekProc
-	TIFFGetSizeProc
-	TIFFGetStrileByteCount
+	NDPIGetClientInfo
+	NDPIGetCloseProc
+	NDPIGetConfiguredCODECs
+	NDPIGetField
+	NDPIGetFieldDefaulted
+	NDPIGetMapFileProc
+	NDPIGetMode
+	NDPIGetReadProc
+	NDPIGetSeekProc
+	NDPIGetSizeProc
+	NDPIGetStrileByteCount
 	TIFFGetStrileByteCountWithErr
-	TIFFGetStrileOffset
+	NDPIGetStrileOffset
 	TIFFGetStrileOffsetWithErr
-	TIFFGetTagListCount
-	TIFFGetTagListEntry
-	TIFFGetUnmapFileProc
+	NDPIGetTagListCount
+	NDPIGetTagListEntry
+	NDPIGetUnmapFileProc
 	TIFFGetVersion
-	TIFFGetWriteProc
-	TIFFIsBigEndian
-	TIFFIsByteSwapped
-	TIFFIsCODECConfigured
-	TIFFIsMSB2LSB
-	TIFFIsTiled
-	TIFFIsUpSampled
-	TIFFLastDirectory
+	NDPIGetWriteProc
+	NDPIIsBigEndian
+	NDPIIsByteSwapped
+	NDPIIsCODECConfigured
+	NDPIIsMSB2LSB
+	NDPIIsTiled
+	NDPIIsUpSampled
+	NDPILastDirectory
 	TIFFMergeFieldInfo
-	TIFFNumberOfDirectories
-	TIFFNumberOfStrips
-	TIFFNumberOfTiles
-	TIFFOpen
+	NDPINumberOfDirectories
+	NDPINumberOfStrips
+	NDPINumberOfTiles
+	NDPIOpen
 	TIFFOpenW
-	TIFFPrintDirectory
-	TIFFRGBAImageBegin
-	TIFFRGBAImageEnd
-	TIFFRGBAImageGet
-	TIFFRGBAImageOK
-	TIFFRasterScanlineSize
-	TIFFRasterScanlineSize64
-	TIFFRawStripSize
-	TIFFRawStripSize64
-	TIFFReadBufferSetup
+	NDPIPrintDirectory
+	NDPIRGBAImageBegin
+	NDPIRGBAImageEnd
+	NDPIRGBAImageGet
+	NDPIRGBAImageOK
+	NDPIRasterScanlineSize
+	NDPIRasterScanlineSize64
+	NDPIRawStripSize
+	NDPIRawStripSize64
+	NDPIReadBufferSetup
 	TIFFReadCustomDirectory
-	TIFFReadDirectory
+	NDPIReadDirectory
 	TIFFReadEXIFDirectory
 	TIFFReadGPSDirectory
-	TIFFReadEncodedStrip
-	TIFFReadEncodedTile
-	TIFFReadFromUserBuffer
-	TIFFReadRGBAImage
-	TIFFReadRGBAImageOriented
-	TIFFReadRGBAStrip
-	TIFFReadRGBAStripExt
-	TIFFReadRGBATile
-	TIFFReadRGBATileExt
-	TIFFReadRawStrip
-	TIFFReadRawTile
-	TIFFReadScanline
-	TIFFReadTile
-	TIFFRegisterCODEC
-	TIFFReverseBits
-	TIFFRewriteDirectory
-	TIFFScanlineSize
-	TIFFScanlineSize64
-	TIFFSetClientInfo
-	TIFFSetClientdata
-	TIFFSetCompressionScheme
-	TIFFSetDirectory
-	TIFFSetErrorHandler
-	TIFFSetErrorHandlerExt
-	TIFFSetField
-	TIFFSetFileName
-	TIFFSetFileno
-	TIFFSetMode
-	TIFFSetSubDirectory
-	TIFFSetTagExtender
-	TIFFSetWarningHandler
+	NDPIReadEncodedStrip
+	NDPIReadEncodedTile
+	NDPIReadFromUserBuffer
+	NDPIReadRGBAImage
+	NDPIReadRGBAImageOriented
+	NDPIReadRGBAStrip
+	NDPIReadRGBAStripExt
+	NDPIReadRGBATile
+	NDPIReadRGBATileExt
+	NDPIReadRawStrip
+	NDPIReadRawTile
+	NDPIReadScanline
+	NDPIReadTile
+	NDPIRegisterCODEC
+	NDPIReverseBits
+	NDPIRewriteDirectory
+	NDPIScanlineSize
+	NDPIScanlineSize64
+	NDPISetClientInfo
+	NDPISetClientdata
+	NDPISetCompressionScheme
+	NDPISetDirectory
+	NDPISetErrorHandler
+	NDPISetErrorHandlerExt
+	NDPISetField
+	NDPISetFileName
+	NDPISetFileno
+	NDPISetMode
+	NDPISetSubDirectory
+	NDPISetTagExtender
+	NDPISetWarningHandler
 	TIFFSetWarningHandlerExt
-	TIFFSetWriteOffset
-	TIFFSetupStrips
-	TIFFStripSize
-	TIFFStripSize64
-	TIFFSwabArrayOfDouble
+	NDPISetWriteOffset
+	NDPISetupStrips
+	NDPIStripSize
+	NDPIStripSize64
+	NDPISwabArrayOfDouble
 	TIFFSwabArrayOfFloat
-	TIFFSwabArrayOfLong
+	NDPISwabArrayOfLong
 	TIFFSwabArrayOfLong8
-	TIFFSwabArrayOfShort
-	TIFFSwabArrayOfTriples
+	NDPISwabArrayOfShort
+	NDPISwabArrayOfTriples
 	TIFFSwabDouble
 	TIFFSwabFloat
-	TIFFSwabLong
-	TIFFSwabLong8
-	TIFFSwabShort
-	TIFFTileRowSize
-	TIFFTileRowSize64
-	TIFFTileSize
-	TIFFTileSize64
-	TIFFUnRegisterCODEC
-	TIFFUnlinkDirectory
+	NDPISwabLong
+	NDPISwabLong8
+	NDPISwabShort
+	NDPITileRowSize
+	NDPITileRowSize64
+	NDPITileSize
+	NDPITileSize64
+	NDPIUnRegisterCODEC
+	NDPIUnlinkDirectory
 	TIFFUnsetField
-	TIFFVGetField
-	TIFFVGetFieldDefaulted
-	TIFFVSetField
-	TIFFVStripSize
-	TIFFVStripSize64
-	TIFFVTileSize
-	TIFFVTileSize64
+	NDPIVGetField
+	NDPIVGetFieldDefaulted
+	NDPIVSetField
+	NDPIVStripSize
+	NDPIVStripSize64
+	NDPIVTileSize
+	NDPIVTileSize64
 	TIFFWarning
-	TIFFWarningExt
+	NDPIWarningExt
 	TIFFWriteBufferSetup
-	TIFFWriteCheck
-	TIFFWriteCustomDirectory
-	TIFFWriteDirectory
+	NDPIWriteCheck
+	NDPIWriteCustomDirectory
+	NDPIWriteDirectory
 	TIFFWriteEncodedStrip
 	TIFFWriteEncodedTile
 	TIFFWriteRawStrip
 	TIFFWriteRawTile
 	TIFFWriteScanline
 	TIFFWriteTile
-	TIFFXYZToRGB
-	TIFFYCbCrToRGBInit
-	TIFFYCbCrtoRGB
-	_TIFFCheckMalloc
-	_TIFFCheckRealloc
-	_TIFFRewriteField
-	_TIFFfree
-	_TIFFmalloc
+	NDPIXYZToRGB
+	NDPIYCbCrToRGBInit
+	NDPIYCbCrtoRGB
+	_NDPICheckMalloc
+	_NDPICheckRealloc
+	_NDPIRewriteField
+	_NDPIfree
+	_NDPImalloc
 	_TIFFmemcmp
-	_TIFFmemcpy
-	_TIFFmemset
-	_TIFFrealloc
-	_TIFFMultiply32
-	_TIFFMultiply64
-	_TIFFGetExifFields
-	_TIFFGetGpsFields
+	_NDPImemcpy
+	_NDPImemset
+	_NDPIrealloc
+	_NDPIMultiply32
+	_NDPIMultiply64
+	_NDPIGetExifFields
+	_NDPIGetGpsFields

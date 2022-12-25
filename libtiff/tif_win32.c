@@ -225,7 +225,7 @@ _tiffUnmapProc(thandle_t fd, void* base, toff_t size)
 
 /*
  * Open a TIFF file descriptor for read/writing.
- * Note that TIFFFdOpen and TIFFOpen recognise the character 'u' in the mode
+ * Note that TIFFFdOpen and NDPIOpen recognise the character 'u' in the mode
  * string, which forces the file to be opened unmapped.
  */
 TIFF*
@@ -243,7 +243,7 @@ TIFFFdOpen(int ifd, const char* name, const char* mode)
 			break;
 		}
 	}
-	tif = TIFFClientOpen(name, mode, thandle_from_int(ifd),
+	tif = NDPIClientOpen(name, mode, thandle_from_int(ifd),
 			_tiffReadProc, _tiffWriteProc,
 			_tiffSeekProc, _tiffCloseProc, _tiffSizeProc,
 			fSuppressMap ? _tiffDummyMapProc : _tiffMapProc,
@@ -259,15 +259,15 @@ TIFFFdOpen(int ifd, const char* name, const char* mode)
  * Open a TIFF file for read/writing.
  */
 TIFF*
-TIFFOpen(const char* name, const char* mode)
+NDPIOpen(const char* name, const char* mode)
 {
-	static const char module[] = "TIFFOpen";
+	static const char module[] = "NDPIOpen";
 	thandle_t fd;
 	int m;
 	DWORD dwMode;
 	TIFF* tif;
 
-	m = _TIFFgetMode(mode, module);
+	m = _NDPIgetMode(mode, module);
 
 	switch(m) {
 		case O_RDONLY:			dwMode = OPEN_EXISTING; break;
@@ -284,7 +284,7 @@ TIFFOpen(const char* name, const char* mode)
 		(m == O_RDONLY)?FILE_ATTRIBUTE_READONLY:FILE_ATTRIBUTE_NORMAL,
 		NULL);
 	if (fd == INVALID_HANDLE_VALUE) {
-		TIFFErrorExt(0, module, "%s: Cannot open", name);
+		NDPIErrorExt(0, module, "%s: Cannot open", name);
 		return ((TIFF *)0);
 	}
 
@@ -308,7 +308,7 @@ TIFFOpenW(const wchar_t* name, const char* mode)
 	char *mbname;
 	TIFF *tif;
 
-	m = _TIFFgetMode(mode, module);
+	m = _NDPIgetMode(mode, module);
 
 	switch(m) {
 		case O_RDONLY:			dwMode = OPEN_EXISTING; break;
@@ -325,16 +325,16 @@ TIFFOpenW(const wchar_t* name, const char* mode)
 		(m == O_RDONLY)?FILE_ATTRIBUTE_READONLY:FILE_ATTRIBUTE_NORMAL,
 		NULL);
 	if (fd == INVALID_HANDLE_VALUE) {
-		TIFFErrorExt(0, module, "%S: Cannot open", name);
+		NDPIErrorExt(0, module, "%S: Cannot open", name);
 		return ((TIFF *)0);
 	}
 
 	mbname = NULL;
 	mbsize = WideCharToMultiByte(CP_ACP, 0, name, -1, NULL, 0, NULL, NULL);
 	if (mbsize > 0) {
-		mbname = (char *)_TIFFmalloc(mbsize);
+		mbname = (char *)_NDPImalloc(mbsize);
 		if (!mbname) {
-			TIFFErrorExt(0, module,
+			NDPIErrorExt(0, module,
 			"Can't allocate space for filename conversion buffer");
 			return ((TIFF*)0);
 		}
@@ -348,7 +348,7 @@ TIFFOpenW(const wchar_t* name, const char* mode)
 	if(!tif)
 		CloseHandle(fd);
 
-	_TIFFfree(mbname);
+	_NDPIfree(mbname);
 
 	return tif;
 }
@@ -356,7 +356,7 @@ TIFFOpenW(const wchar_t* name, const char* mode)
 #endif /* ndef _WIN32_WCE */
 
 void*
-_TIFFmalloc(tmsize_t s)
+_NDPImalloc(tmsize_t s)
 {
         if (s == 0)
                 return ((void *) NULL);
@@ -373,25 +373,25 @@ void* _TIFFcalloc(tmsize_t nmemb, tmsize_t siz)
 }
 
 void
-_TIFFfree(void* p)
+_NDPIfree(void* p)
 {
 	free(p);
 }
 
 void*
-_TIFFrealloc(void* p, tmsize_t s)
+_NDPIrealloc(void* p, tmsize_t s)
 {
 	return (realloc(p, (size_t) s));
 }
 
 void
-_TIFFmemset(void* p, int v, tmsize_t c)
+_NDPImemset(void* p, int v, tmsize_t c)
 {
 	memset(p, v, (size_t) c);
 }
 
 void
-_TIFFmemcpy(void* d, const void* s, tmsize_t c)
+_NDPImemcpy(void* d, const void* s, tmsize_t c)
 {
 	memcpy(d, s, (size_t) c);
 }

@@ -113,7 +113,7 @@ static void* limitMalloc(tmsize_t s)
 		fprintf(stderr, "                  use -m option to change limit.\n");
 		return NULL;
 	}
-	return _TIFFmalloc(s);
+	return _NDPImalloc(s);
 }
 
 static int nextSrcImage (TIFF *tif, char **imageSpec)
@@ -126,7 +126,7 @@ static int nextSrcImage (TIFF *tif, char **imageSpec)
 	if (**imageSpec == comma) {  /* if not @comma, we've done all images */
 		char *start = *imageSpec + 1;
 		tdir_t nextImage = (tdir_t)strtol(start, imageSpec, 0);
-		if (start == *imageSpec) nextImage = TIFFCurrentDirectory (tif);
+		if (start == *imageSpec) nextImage = NDPICurrentDirectory (tif);
 		if (**imageSpec)
 		{
 			if (**imageSpec == comma) {
@@ -135,13 +135,13 @@ static int nextSrcImage (TIFF *tif, char **imageSpec)
 			}else{
 				fprintf (stderr,
 				    "Expected a %c separated image # list after %s\n",
-				    comma, TIFFFileName (tif));
+				    comma, NDPIFileName (tif));
 				exit (EXIT_FAILURE);   /* syntax error */
 			}
 		}
-		if (TIFFSetDirectory (tif, nextImage)) return 1;
+		if (NDPISetDirectory (tif, nextImage)) return 1;
 		fprintf (stderr, "%s%c%"PRIu16" not found!\n",
-		    TIFFFileName(tif), comma, nextImage);
+		    NDPIFileName(tif), comma, nextImage);
 	}
 	return 0;
 }
@@ -161,18 +161,18 @@ static TIFF* openSrcImage (char **imageSpec)
 	*imageSpec = strchr (fn, comma);
 	if (*imageSpec) {  /* there is at least one image number specifier */
 		**imageSpec = '\0';
-		tif = TIFFOpen (fn, mode);
+		tif = NDPIOpen (fn, mode);
 		/* but, ignore any single trailing comma */
 		if (!(*imageSpec)[1]) {*imageSpec = NULL; return tif;}
 		if (tif) {
 			**imageSpec = comma;  /* replace the comma */
 			if (!nextSrcImage(tif, imageSpec)) {
-				TIFFClose (tif);
+				NDPIClose (tif);
 				tif = NULL;
 			}
 		}
 	}else
-		tif = TIFFOpen (fn, mode);
+		tif = NDPIOpen (fn, mode);
 	return tif;
 }
 
@@ -216,11 +216,11 @@ main(int argc, char* argv[])
 				char **biasFn = &optarg;
 				bias = openSrcImage (biasFn);
 				if (!bias) exit (EXIT_FAILURE);
-				if (TIFFIsTiled (bias)) {
+				if (NDPIIsTiled (bias)) {
 					fputs ("Bias image must be organized in strips\n", stderr);
 					exit (EXIT_FAILURE);
 				}
-				TIFFGetField(bias, TIFFTAG_SAMPLESPERPIXEL, &samples);
+				NDPIGetField(bias, TIFFTAG_SAMPLESPERPIXEL, &samples);
 				if (samples != 1) {
 					fputs ("Bias image must be monochrome\n", stderr);
 					exit (EXIT_FAILURE);
@@ -302,7 +302,7 @@ main(int argc, char* argv[])
 		}
 	if (argc - optind < 2)
 		usage(EXIT_FAILURE);
-	out = TIFFOpen(argv[argc-1], mode);
+	out = NDPIOpen(argv[argc-1], mode);
 	if (out == NULL)
 		return (EXIT_FAILURE);
 	if ((argc - optind) == 2)
@@ -311,14 +311,14 @@ main(int argc, char* argv[])
 		char *imageCursor = argv[optind];
 		in = openSrcImage (&imageCursor);
 		if (in == NULL) {
-			(void) TIFFClose(out);
+			(void) NDPIClose(out);
 			return (EXIT_FAILURE);
 		}
-		if (diroff != 0 && !TIFFSetSubDirectory(in, diroff)) {
-			TIFFError(TIFFFileName(in),
+		if (diroff != 0 && !NDPISetSubDirectory(in, diroff)) {
+			NDPIError(NDPIFileName(in),
 			    "Error, setting subdirectory at %" PRIu64, diroff);
-			(void) TIFFClose(in);
-			(void) TIFFClose(out);
+			(void) NDPIClose(in);
+			(void) NDPIClose(out);
 			return (EXIT_FAILURE);
 		}
 		for (;;) {
@@ -331,20 +331,20 @@ main(int argc, char* argv[])
 			tilewidth = deftilewidth;
 			tilelength = deftilelength;
 			g3opts = defg3opts;
-			if (!tiffcp(in, out) || !TIFFWriteDirectory(out)) {
-				(void) TIFFClose(in);
-				(void) TIFFClose(out);
+			if (!tiffcp(in, out) || !NDPIWriteDirectory(out)) {
+				(void) NDPIClose(in);
+				(void) NDPIClose(out);
 				return (EXIT_FAILURE);
 			}
 			if (imageCursor) { /* seek next image directory */
 				if (!nextSrcImage(in, &imageCursor)) break;
 			}else
-				if (!TIFFReadDirectory(in)) break;
+				if (!NDPIReadDirectory(in)) break;
 		}
-		(void) TIFFClose(in);
+		(void) NDPIClose(in);
 	}
 
-	(void) TIFFClose(out);
+	(void) NDPIClose(out);
 	return (EXIT_SUCCESS);
 }
 
@@ -579,13 +579,13 @@ usage(int code)
 }
 
 #define	CopyField(tag, v) \
-    if (TIFFGetField(in, tag, &v)) TIFFSetField(out, tag, v)
+    if (NDPIGetField(in, tag, &v)) NDPISetField(out, tag, v)
 #define	CopyField2(tag, v1, v2) \
-    if (TIFFGetField(in, tag, &v1, &v2)) TIFFSetField(out, tag, v1, v2)
+    if (NDPIGetField(in, tag, &v1, &v2)) NDPISetField(out, tag, v1, v2)
 #define	CopyField3(tag, v1, v2, v3) \
-    if (TIFFGetField(in, tag, &v1, &v2, &v3)) TIFFSetField(out, tag, v1, v2, v3)
+    if (NDPIGetField(in, tag, &v1, &v2, &v3)) NDPISetField(out, tag, v1, v2, v3)
 #define	CopyField4(tag, v1, v2, v3, v4) \
-    if (TIFFGetField(in, tag, &v1, &v2, &v3, &v4)) TIFFSetField(out, tag, v1, v2, v3, v4)
+    if (NDPIGetField(in, tag, &v1, &v2, &v3, &v4)) NDPISetField(out, tag, v1, v2, v3, v4)
 
 static void
 cpTag(TIFF* in, TIFF* out, uint16_t tag, uint16_t count, TIFFDataType type)
@@ -636,7 +636,7 @@ cpTag(TIFF* in, TIFF* out, uint16_t tag, uint16_t count, TIFFDataType type)
 		}
 		break;
 	default:
-		TIFFError(TIFFFileName(in),
+		NDPIError(NDPIFileName(in),
 		    "Data type %"PRIu16" is not supported, tag %d skipped.",
 		    tag, type);
 	}
@@ -705,58 +705,58 @@ tiffcp(TIFF* in, TIFF* out)
 	CopyField(TIFFTAG_BITSPERSAMPLE, bitspersample);
 	CopyField(TIFFTAG_SAMPLESPERPIXEL, samplesperpixel);
 	if (compression != (uint16_t)-1)
-		TIFFSetField(out, TIFFTAG_COMPRESSION, compression);
+		NDPISetField(out, TIFFTAG_COMPRESSION, compression);
 	else
 		CopyField(TIFFTAG_COMPRESSION, compression);
-	TIFFGetFieldDefaulted(in, TIFFTAG_COMPRESSION, &input_compression);
-	TIFFGetFieldDefaulted(in, TIFFTAG_PHOTOMETRIC, &input_photometric);
+	NDPIGetFieldDefaulted(in, TIFFTAG_COMPRESSION, &input_compression);
+	NDPIGetFieldDefaulted(in, TIFFTAG_PHOTOMETRIC, &input_photometric);
 	if (input_compression == COMPRESSION_JPEG) {
 		/* Force conversion to RGB */
-		TIFFSetField(in, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
+		NDPISetField(in, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
 	} else if (input_photometric == PHOTOMETRIC_YCBCR) {
 		/* Otherwise, can't handle subsampled input */
 		uint16_t subsamplinghor,subsamplingver;
 
-		TIFFGetFieldDefaulted(in, TIFFTAG_YCBCRSUBSAMPLING,
+		NDPIGetFieldDefaulted(in, TIFFTAG_YCBCRSUBSAMPLING,
 				      &subsamplinghor, &subsamplingver);
 		if (subsamplinghor!=1 || subsamplingver!=1) {
 			fprintf(stderr, "tiffcp: %s: Can't copy/convert subsampled image.\n",
-				TIFFFileName(in));
+				NDPIFileName(in));
 			return FALSE;
 		}
 	}
 	if (compression == COMPRESSION_JPEG) {
 		if (input_photometric == PHOTOMETRIC_RGB &&
 		    jpegcolormode == JPEGCOLORMODE_RGB)
-		  TIFFSetField(out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_YCBCR);
+		  NDPISetField(out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_YCBCR);
 		else
-		  TIFFSetField(out, TIFFTAG_PHOTOMETRIC, input_photometric);
+		  NDPISetField(out, TIFFTAG_PHOTOMETRIC, input_photometric);
 	}
 	else if (compression == COMPRESSION_SGILOG
 	    || compression == COMPRESSION_SGILOG24)
-		TIFFSetField(out, TIFFTAG_PHOTOMETRIC,
+		NDPISetField(out, TIFFTAG_PHOTOMETRIC,
 		    samplesperpixel == 1 ?
 		    PHOTOMETRIC_LOGL : PHOTOMETRIC_LOGLUV);
 	else if (input_compression == COMPRESSION_JPEG &&
 			 samplesperpixel == 3 ) {
 		/* RGB conversion was forced above
 		hence the output will be of the same type */
-		TIFFSetField(out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
+		NDPISetField(out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
 	}
 	else
 		CopyTag(TIFFTAG_PHOTOMETRIC, 1, TIFF_SHORT);
 	if (fillorder != 0)
-		TIFFSetField(out, TIFFTAG_FILLORDER, fillorder);
+		NDPISetField(out, TIFFTAG_FILLORDER, fillorder);
 	else
 		CopyTag(TIFFTAG_FILLORDER, 1, TIFF_SHORT);
 	/*
 	 * Will copy `Orientation' tag from input image
 	 */
-	TIFFGetFieldDefaulted(in, TIFFTAG_ORIENTATION, &orientation);
+	NDPIGetFieldDefaulted(in, TIFFTAG_ORIENTATION, &orientation);
 	switch (orientation) {
 		case ORIENTATION_BOTRIGHT:
 		case ORIENTATION_RIGHTBOT:	/* XXX */
-			TIFFWarning(TIFFFileName(in), "using bottom-left orientation");
+			TIFFWarning(NDPIFileName(in), "using bottom-left orientation");
 			orientation = ORIENTATION_BOTLEFT;
 		/* fall through... */
 		case ORIENTATION_LEFTBOT:	/* XXX */
@@ -765,21 +765,21 @@ tiffcp(TIFF* in, TIFF* out)
 		case ORIENTATION_TOPRIGHT:
 		case ORIENTATION_RIGHTTOP:	/* XXX */
 		default:
-			TIFFWarning(TIFFFileName(in), "using top-left orientation");
+			TIFFWarning(NDPIFileName(in), "using top-left orientation");
 			orientation = ORIENTATION_TOPLEFT;
 		/* fall through... */
 		case ORIENTATION_LEFTTOP:	/* XXX */
 		case ORIENTATION_TOPLEFT:
 			break;
 	}
-	TIFFSetField(out, TIFFTAG_ORIENTATION, orientation);
+	NDPISetField(out, TIFFTAG_ORIENTATION, orientation);
 	/*
 	 * Choose tiles/strip for the output image according to
 	 * the command line arguments (-tiles, -strips) and the
 	 * structure of the input image.
 	 */
 	if (outtiled == -1)
-		outtiled = TIFFIsTiled(in);
+		outtiled = NDPIIsTiled(in);
 	if (outtiled) {
 		/*
 		 * Setup output file's tile width&height.  If either
@@ -788,12 +788,12 @@ tiffcp(TIFF* in, TIFF* out)
 		 * library default.
 		 */
 		if (tilewidth == (uint32_t) -1)
-			TIFFGetField(in, TIFFTAG_TILEWIDTH, &tilewidth);
+			NDPIGetField(in, TIFFTAG_TILEWIDTH, &tilewidth);
 		if (tilelength == (uint32_t) -1)
-			TIFFGetField(in, TIFFTAG_TILELENGTH, &tilelength);
-		TIFFDefaultTileSize(out, &tilewidth, &tilelength);
-		TIFFSetField(out, TIFFTAG_TILEWIDTH, tilewidth);
-		TIFFSetField(out, TIFFTAG_TILELENGTH, tilelength);
+			NDPIGetField(in, TIFFTAG_TILELENGTH, &tilelength);
+		NDPIDefaultTileSize(out, &tilewidth, &tilelength);
+		NDPISetField(out, TIFFTAG_TILEWIDTH, tilewidth);
+		NDPISetField(out, TIFFTAG_TILELENGTH, tilelength);
 	} else {
 		/*
 		 * RowsPerStrip is left unspecified: use either the
@@ -801,20 +801,20 @@ tiffcp(TIFF* in, TIFF* out)
 		 * use the library default.
 		 */
 		if (rowsperstrip == (uint32_t) 0) {
-			if (!TIFFGetField(in, TIFFTAG_ROWSPERSTRIP,
+			if (!NDPIGetField(in, TIFFTAG_ROWSPERSTRIP,
 			    &rowsperstrip)) {
 				rowsperstrip =
-				    TIFFDefaultStripSize(out, rowsperstrip);
+				    NDPIDefaultStripSize(out, rowsperstrip);
 			}
 			if (rowsperstrip > length && rowsperstrip != (uint32_t)-1)
 				rowsperstrip = length;
 		}
 		else if (rowsperstrip == (uint32_t) -1)
 			rowsperstrip = length;
-		TIFFSetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
+		NDPISetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
 	}
 	if (config != (uint16_t) -1)
-		TIFFSetField(out, TIFFTAG_PLANARCONFIG, config);
+		NDPISetField(out, TIFFTAG_PLANARCONFIG, config);
 	else
 		CopyField(TIFFTAG_PLANARCONFIG, config);
 	if (samplesperpixel <= 4)
@@ -823,8 +823,8 @@ tiffcp(TIFF* in, TIFF* out)
 /* SMinSampleValue & SMaxSampleValue */
 	switch (compression) {
 		case COMPRESSION_JPEG:
-			TIFFSetField(out, TIFFTAG_JPEGQUALITY, quality);
-			TIFFSetField(out, TIFFTAG_JPEGCOLORMODE, jpegcolormode);
+			NDPISetField(out, TIFFTAG_JPEGQUALITY, quality);
+			NDPISetField(out, TIFFTAG_JPEGCOLORMODE, jpegcolormode);
 			break;
 		case COMPRESSION_JBIG:
 			CopyTag(TIFFTAG_FAXRECVPARAMS, 1, TIFF_LONG);
@@ -835,14 +835,14 @@ tiffcp(TIFF* in, TIFF* out)
 		case COMPRESSION_LERC:
 			if( max_z_error > 0 )
 			{
-				if( TIFFSetField(out, TIFFTAG_LERC_MAXZERROR, max_z_error) != 1 )
+				if( NDPISetField(out, TIFFTAG_LERC_MAXZERROR, max_z_error) != 1 )
 				{
 					return FALSE;
 				}
 			}
 			if( subcodec != -1 )
 			{
-				if( TIFFSetField(out, TIFFTAG_LERC_ADD_COMPRESSION, subcodec) != 1 )
+				if( NDPISetField(out, TIFFTAG_LERC_ADD_COMPRESSION, subcodec) != 1 )
 				{
 					return FALSE;
 				}
@@ -851,13 +851,13 @@ tiffcp(TIFF* in, TIFF* out)
 			{
 				switch (subcodec) {
 					case LERC_ADD_COMPRESSION_DEFLATE:
-						if( TIFFSetField(out, TIFFTAG_ZIPQUALITY, preset) != 1 )
+						if( NDPISetField(out, TIFFTAG_ZIPQUALITY, preset) != 1 )
 						{
 							return FALSE;
 						}
 						break;
 					case LERC_ADD_COMPRESSION_ZSTD:
-						if( TIFFSetField( out, TIFFTAG_ZSTD_LEVEL, preset ) != 1 )
+						if( NDPISetField( out, TIFFTAG_ZSTD_LEVEL, preset ) != 1 )
 						{
 							return FALSE;
 						}
@@ -871,7 +871,7 @@ tiffcp(TIFF* in, TIFF* out)
                 case COMPRESSION_LZMA:
                 case COMPRESSION_ZSTD:
 			if (predictor != (uint16_t)-1)
-				TIFFSetField(out, TIFFTAG_PREDICTOR, predictor);
+				NDPISetField(out, TIFFTAG_PREDICTOR, predictor);
 			else
 				CopyField(TIFFTAG_PREDICTOR, predictor);
                         if( compression == COMPRESSION_ADOBE_DEFLATE ||
@@ -879,7 +879,7 @@ tiffcp(TIFF* in, TIFF* out)
                         {
                             if( subcodec != -1 )
                             {
-                                if( TIFFSetField(out, TIFFTAG_DEFLATE_SUBCODEC, subcodec) != 1 )
+                                if( NDPISetField(out, TIFFTAG_DEFLATE_SUBCODEC, subcodec) != 1 )
                                 {
                                     return FALSE;
                                 }
@@ -890,16 +890,16 @@ tiffcp(TIFF* in, TIFF* out)
 			if (preset != -1) {
                                 if (compression == COMPRESSION_ADOBE_DEFLATE
                                          || compression == COMPRESSION_DEFLATE)
-                                        TIFFSetField(out, TIFFTAG_ZIPQUALITY, preset);
+                                        NDPISetField(out, TIFFTAG_ZIPQUALITY, preset);
 				else if (compression == COMPRESSION_LZMA)
-					TIFFSetField(out, TIFFTAG_LZMAPRESET, preset);
+					NDPISetField(out, TIFFTAG_LZMAPRESET, preset);
 				else if (compression == COMPRESSION_ZSTD)
-					TIFFSetField(out, TIFFTAG_ZSTD_LEVEL, preset);
+					NDPISetField(out, TIFFTAG_ZSTD_LEVEL, preset);
 				else if (compression == COMPRESSION_WEBP) {
 					if (preset == 100) {
-						TIFFSetField(out, TIFFTAG_WEBP_LOSSLESS, TRUE);
+						NDPISetField(out, TIFFTAG_WEBP_LOSSLESS, TRUE);
 					} else {
-						TIFFSetField(out, TIFFTAG_WEBP_LEVEL, preset);						
+						NDPISetField(out, TIFFTAG_WEBP_LEVEL, preset);						
 					}
 				}
                         }
@@ -908,7 +908,7 @@ tiffcp(TIFF* in, TIFF* out)
 		case COMPRESSION_CCITTFAX4:
 			if (compression == COMPRESSION_CCITTFAX3) {
 				if (g3opts != (uint32_t) -1)
-					TIFFSetField(out, TIFFTAG_GROUP3OPTIONS,
+					NDPISetField(out, TIFFTAG_GROUP3OPTIONS,
 					    g3opts);
 				else
 					CopyField(TIFFTAG_GROUP3OPTIONS, g3opts);
@@ -925,15 +925,15 @@ tiffcp(TIFF* in, TIFF* out)
 	{
 		uint32_t len32;
 		void** data;
-		if (TIFFGetField(in, TIFFTAG_ICCPROFILE, &len32, &data))
-			TIFFSetField(out, TIFFTAG_ICCPROFILE, len32, data);
+		if (NDPIGetField(in, TIFFTAG_ICCPROFILE, &len32, &data))
+			NDPISetField(out, TIFFTAG_ICCPROFILE, len32, data);
 	}
 	{
 		uint16_t ninks;
 		const char* inknames;
-		if (TIFFGetField(in, TIFFTAG_NUMBEROFINKS, &ninks)) {
-			TIFFSetField(out, TIFFTAG_NUMBEROFINKS, ninks);
-			if (TIFFGetField(in, TIFFTAG_INKNAMES, &inknames)) {
+		if (NDPIGetField(in, TIFFTAG_NUMBEROFINKS, &ninks)) {
+			NDPISetField(out, TIFFTAG_NUMBEROFINKS, ninks);
+			if (NDPIGetField(in, TIFFTAG_INKNAMES, &inknames)) {
 				int inknameslen = strlen(inknames) + 1;
 				const char* cp = inknames;
 				while (ninks > 1) {
@@ -942,7 +942,7 @@ tiffcp(TIFF* in, TIFF* out)
                                         inknameslen += (strlen(cp) + 1);
 					ninks--;
 				}
-				TIFFSetField(out, TIFFTAG_INKNAMES, inknameslen, inknames);
+				NDPISetField(out, TIFFTAG_INKNAMES, inknameslen, inknames);
 			}
 		}
 	}
@@ -951,17 +951,17 @@ tiffcp(TIFF* in, TIFF* out)
 
 		if (pageInSeq == 1) {
 			if (pageNum < 0) /* only one input file */ {
-				if (TIFFGetField(in, TIFFTAG_PAGENUMBER, &pg0, &pg1))
-					TIFFSetField(out, TIFFTAG_PAGENUMBER, pg0, pg1);
+				if (NDPIGetField(in, TIFFTAG_PAGENUMBER, &pg0, &pg1))
+					NDPISetField(out, TIFFTAG_PAGENUMBER, pg0, pg1);
 			} else
-				TIFFSetField(out, TIFFTAG_PAGENUMBER, pageNum++, 0);
+				NDPISetField(out, TIFFTAG_PAGENUMBER, pageNum++, 0);
 
 		} else {
-			if (TIFFGetField(in, TIFFTAG_PAGENUMBER, &pg0, &pg1)) {
+			if (NDPIGetField(in, TIFFTAG_PAGENUMBER, &pg0, &pg1)) {
 				if (pageNum < 0) /* only one input file */
-					TIFFSetField(out, TIFFTAG_PAGENUMBER, pg0, pg1);
+					NDPISetField(out, TIFFTAG_PAGENUMBER, pg0, pg1);
 				else
-					TIFFSetField(out, TIFFTAG_PAGENUMBER, pageNum++, 0);
+					NDPISetField(out, TIFFTAG_PAGENUMBER, pageNum++, 0);
 			}
 		}
 	}
@@ -995,33 +995,33 @@ typedef int (*writeFunc)(TIFF*, uint8_t*, uint32_t, uint32_t, tsample_t);
  */
 DECLAREcpFunc(cpContig2ContigByRow)
 {
-	tsize_t scanlinesize = TIFFScanlineSize(in);
+	tsize_t scanlinesize = NDPIScanlineSize(in);
 	tdata_t buf;
 	uint32_t row;
 
 	buf = limitMalloc(scanlinesize);
 	if (!buf)
 		return 0;
-	_TIFFmemset(buf, 0, scanlinesize);
+	_NDPImemset(buf, 0, scanlinesize);
 	(void) imagewidth; (void) spp;
 	for (row = 0; row < imagelength; row++) {
-		if (TIFFReadScanline(in, buf, row, 0) < 0 && !ignore) {
-			TIFFError(TIFFFileName(in),
+		if (NDPIReadScanline(in, buf, row, 0) < 0 && !ignore) {
+			NDPIError(NDPIFileName(in),
 				  "Error, can't read scanline %"PRIu32,
 				  row);
 			goto bad;
 		}
 		if (TIFFWriteScanline(out, buf, row, 0) < 0) {
-			TIFFError(TIFFFileName(out),
+			NDPIError(NDPIFileName(out),
 				  "Error, can't write scanline %"PRIu32,
 				  row);
 			goto bad;
 		}
 	}
-	_TIFFfree(buf);
+	_NDPIfree(buf);
 	return 1;
 bad:
-	_TIFFfree(buf);
+	_NDPIfree(buf);
 	return 0;
 }
 
@@ -1059,71 +1059,71 @@ static biasFn *lineSubtractFn (unsigned bits)
 DECLAREcpFunc(cpBiasedContig2Contig)
 {
 	if (spp == 1) {
-		tsize_t biasSize = TIFFScanlineSize(bias);
-		tsize_t bufSize = TIFFScanlineSize(in);
+		tsize_t biasSize = NDPIScanlineSize(bias);
+		tsize_t bufSize = NDPIScanlineSize(in);
 		tdata_t buf, biasBuf;
 		uint32_t biasWidth = 0, biasLength = 0;
-		TIFFGetField(bias, TIFFTAG_IMAGEWIDTH, &biasWidth);
-		TIFFGetField(bias, TIFFTAG_IMAGELENGTH, &biasLength);
+		NDPIGetField(bias, TIFFTAG_IMAGEWIDTH, &biasWidth);
+		NDPIGetField(bias, TIFFTAG_IMAGELENGTH, &biasLength);
 		if (biasSize == bufSize &&
 		    imagelength == biasLength && imagewidth == biasWidth) {
 			uint16_t sampleBits = 0;
 			biasFn *subtractLine;
-			TIFFGetField(in, TIFFTAG_BITSPERSAMPLE, &sampleBits);
+			NDPIGetField(in, TIFFTAG_BITSPERSAMPLE, &sampleBits);
 			subtractLine = lineSubtractFn (sampleBits);
 			if (subtractLine) {
 				uint32_t row;
 				buf = limitMalloc(bufSize);
 				biasBuf = limitMalloc(bufSize);
 				for (row = 0; row < imagelength; row++) {
-					if (TIFFReadScanline(in, buf, row, 0) < 0
+					if (NDPIReadScanline(in, buf, row, 0) < 0
 					    && !ignore) {
-						TIFFError(TIFFFileName(in),
+						NDPIError(NDPIFileName(in),
 						    "Error, can't read scanline %"PRIu32,
 						    row);
 						goto bad;
 					}
-					if (TIFFReadScanline(bias, biasBuf, row, 0) < 0
+					if (NDPIReadScanline(bias, biasBuf, row, 0) < 0
 					    && !ignore) {
-						TIFFError(TIFFFileName(in),
+						NDPIError(NDPIFileName(in),
 						    "Error, can't read biased scanline %"PRIu32,
 						    row);
 						goto bad;
 					}
 					subtractLine (buf, biasBuf, imagewidth);
 					if (TIFFWriteScanline(out, buf, row, 0) < 0) {
-						TIFFError(TIFFFileName(out),
+						NDPIError(NDPIFileName(out),
 						    "Error, can't write scanline %"PRIu32,
 						    row);
 						goto bad;
 					}
 				}
 
-				_TIFFfree(buf);
-				_TIFFfree(biasBuf);
-				TIFFSetDirectory(bias,
-				    TIFFCurrentDirectory(bias)); /* rewind */
+				_NDPIfree(buf);
+				_NDPIfree(biasBuf);
+				NDPISetDirectory(bias,
+				    NDPICurrentDirectory(bias)); /* rewind */
 				return 1;
 bad:
-				_TIFFfree(buf);
-				_TIFFfree(biasBuf);
+				_NDPIfree(buf);
+				_NDPIfree(biasBuf);
 				return 0;
 			} else {
-				TIFFError(TIFFFileName(in),
+				NDPIError(NDPIFileName(in),
 				    "No support for biasing %"PRIu16" bit pixels\n",
 				    sampleBits);
 				return 0;
 			}
 		}
-		TIFFError(TIFFFileName(in),
+		NDPIError(NDPIFileName(in),
 		    "Bias image %s,%"PRIu16"\nis not the same size as %s,%"PRIu16"\n",
-		    TIFFFileName(bias), TIFFCurrentDirectory(bias),
-		    TIFFFileName(in), TIFFCurrentDirectory(in));
+		    NDPIFileName(bias), NDPICurrentDirectory(bias),
+		    NDPIFileName(in), NDPICurrentDirectory(in));
 		return 0;
 	} else {
-		TIFFError(TIFFFileName(in),
+		NDPIError(NDPIFileName(in),
 		    "Can't bias %s,%"PRIu16" as it has >1 Sample/Pixel\n",
-		    TIFFFileName(in), TIFFCurrentDirectory(in));
+		    NDPIFileName(in), NDPICurrentDirectory(in));
 		return 0;
 	}
 
@@ -1135,43 +1135,43 @@ bad:
  */
 DECLAREcpFunc(cpDecodedStrips)
 {
-	tsize_t stripsize  = TIFFStripSize(in);
+	tsize_t stripsize  = NDPIStripSize(in);
 	tdata_t buf = limitMalloc(stripsize);
 
 	(void) imagewidth; (void) spp;
 	if (buf) {
-		tstrip_t s, ns = TIFFNumberOfStrips(in);
+		tstrip_t s, ns = NDPINumberOfStrips(in);
 		uint32_t row = 0;
-		_TIFFmemset(buf, 0, stripsize);
+		_NDPImemset(buf, 0, stripsize);
 		for (s = 0; s < ns && row < imagelength; s++) {
 			tsize_t cc = (row + rowsperstrip > imagelength) ?
-			    TIFFVStripSize(in, imagelength - row) : stripsize;
-			if (TIFFReadEncodedStrip(in, s, buf, cc) < 0
+			    NDPIVStripSize(in, imagelength - row) : stripsize;
+			if (NDPIReadEncodedStrip(in, s, buf, cc) < 0
 			    && !ignore) {
-				TIFFError(TIFFFileName(in),
+				NDPIError(NDPIFileName(in),
 				    "Error, can't read strip %"PRIu32,
 				    s);
 				goto bad;
 			}
 			if (TIFFWriteEncodedStrip(out, s, buf, cc) < 0) {
-				TIFFError(TIFFFileName(out),
+				NDPIError(NDPIFileName(out),
 				    "Error, can't write strip %"PRIu32,
 				    s);
 				goto bad;
 			}
 			row += rowsperstrip;
 		}
-		_TIFFfree(buf);
+		_NDPIfree(buf);
 		return 1;
 	} else {
-		TIFFError(TIFFFileName(in),
+		NDPIError(NDPIFileName(in),
 		    "Error, can't allocate memory buffer of size %"TIFF_SSIZE_FORMAT
 		    " to read strips", stripsize);
 		return 0;
 	}
 
 bad:
-	_TIFFfree(buf);
+	_NDPIfree(buf);
 	return 0;
 }
 
@@ -1180,7 +1180,7 @@ bad:
  */
 DECLAREcpFunc(cpSeparate2SeparateByRow)
 {
-	tsize_t scanlinesize = TIFFScanlineSize(in);
+	tsize_t scanlinesize = NDPIScanlineSize(in);
 	tdata_t buf;
 	uint32_t row;
 	tsample_t s;
@@ -1189,27 +1189,27 @@ DECLAREcpFunc(cpSeparate2SeparateByRow)
 	buf = limitMalloc(scanlinesize);
 	if (!buf)
 		return 0;
-	_TIFFmemset(buf, 0, scanlinesize);
+	_NDPImemset(buf, 0, scanlinesize);
 	for (s = 0; s < spp; s++) {
 		for (row = 0; row < imagelength; row++) {
-			if (TIFFReadScanline(in, buf, row, s) < 0 && !ignore) {
-				TIFFError(TIFFFileName(in),
+			if (NDPIReadScanline(in, buf, row, s) < 0 && !ignore) {
+				NDPIError(NDPIFileName(in),
 				    "Error, can't read scanline %"PRIu32,
 				    row);
 				goto bad;
 			}
 			if (TIFFWriteScanline(out, buf, row, s) < 0) {
-				TIFFError(TIFFFileName(out),
+				NDPIError(NDPIFileName(out),
 				    "Error, can't write scanline %"PRIu32,
 				    row);
 				goto bad;
 			}
 		}
 	}
-	_TIFFfree(buf);
+	_NDPIfree(buf);
 	return 1;
 bad:
-	_TIFFfree(buf);
+	_NDPIfree(buf);
 	return 0;
 }
 
@@ -1218,8 +1218,8 @@ bad:
  */
 DECLAREcpFunc(cpContig2SeparateByRow)
 {
-	tsize_t scanlinesizein = TIFFScanlineSize(in);
-	tsize_t scanlinesizeout = TIFFScanlineSize(out);
+	tsize_t scanlinesizein = NDPIScanlineSize(in);
+	tsize_t scanlinesizeout = NDPIScanlineSize(out);
 	tdata_t inbuf;
 	tdata_t outbuf;
 	register uint8_t *inp, *outp;
@@ -1228,10 +1228,10 @@ DECLAREcpFunc(cpContig2SeparateByRow)
 	tsample_t s;
         uint16_t bps = 0;
 
-        (void) TIFFGetField(in, TIFFTAG_BITSPERSAMPLE, &bps);
+        (void) NDPIGetField(in, TIFFTAG_BITSPERSAMPLE, &bps);
         if( bps != 8 )
         {
-            TIFFError(TIFFFileName(in),
+            NDPIError(NDPIFileName(in),
                       "Error, can only handle BitsPerSample=8 in %s",
                       "cpContig2SeparateByRow");
             return 0;
@@ -1241,14 +1241,14 @@ DECLAREcpFunc(cpContig2SeparateByRow)
 	outbuf = limitMalloc(scanlinesizeout);
 	if (!inbuf || !outbuf)
 		goto bad;
-	_TIFFmemset(inbuf, 0, scanlinesizein);
-	_TIFFmemset(outbuf, 0, scanlinesizeout);
+	_NDPImemset(inbuf, 0, scanlinesizein);
+	_NDPImemset(outbuf, 0, scanlinesizeout);
 	/* unpack channels */
 	for (s = 0; s < spp; s++) {
 		for (row = 0; row < imagelength; row++) {
-			if (TIFFReadScanline(in, inbuf, row, 0) < 0
+			if (NDPIReadScanline(in, inbuf, row, 0) < 0
 			    && !ignore) {
-				TIFFError(TIFFFileName(in),
+				NDPIError(NDPIFileName(in),
 				    "Error, can't read scanline %"PRIu32,
 				    row);
 				goto bad;
@@ -1260,19 +1260,19 @@ DECLAREcpFunc(cpContig2SeparateByRow)
 				inp += spp;
 			}
 			if (TIFFWriteScanline(out, outbuf, row, s) < 0) {
-				TIFFError(TIFFFileName(out),
+				NDPIError(NDPIFileName(out),
 				    "Error, can't write scanline %"PRIu32,
 				    row);
 				goto bad;
 			}
 		}
 	}
-	if (inbuf) _TIFFfree(inbuf);
-	if (outbuf) _TIFFfree(outbuf);
+	if (inbuf) _NDPIfree(inbuf);
+	if (outbuf) _NDPIfree(outbuf);
 	return 1;
 bad:
-	if (inbuf) _TIFFfree(inbuf);
-	if (outbuf) _TIFFfree(outbuf);
+	if (inbuf) _NDPIfree(inbuf);
+	if (outbuf) _NDPIfree(outbuf);
 	return 0;
 }
 
@@ -1281,8 +1281,8 @@ bad:
  */
 DECLAREcpFunc(cpSeparate2ContigByRow)
 {
-	tsize_t scanlinesizein = TIFFScanlineSize(in);
-	tsize_t scanlinesizeout = TIFFScanlineSize(out);
+	tsize_t scanlinesizein = NDPIScanlineSize(in);
+	tsize_t scanlinesizeout = NDPIScanlineSize(out);
 	tdata_t inbuf;
 	tdata_t outbuf;
 	register uint8_t *inp, *outp;
@@ -1291,10 +1291,10 @@ DECLAREcpFunc(cpSeparate2ContigByRow)
 	tsample_t s;
         uint16_t bps = 0;
 
-        (void) TIFFGetField(in, TIFFTAG_BITSPERSAMPLE, &bps);
+        (void) NDPIGetField(in, TIFFTAG_BITSPERSAMPLE, &bps);
         if( bps != 8 )
         {
-            TIFFError(TIFFFileName(in),
+            NDPIError(NDPIFileName(in),
                       "Error, can only handle BitsPerSample=8 in %s",
                       "cpSeparate2ContigByRow");
             return 0;
@@ -1304,14 +1304,14 @@ DECLAREcpFunc(cpSeparate2ContigByRow)
 	outbuf = limitMalloc(scanlinesizeout);
 	if (!inbuf || !outbuf)
                 goto bad;
-	_TIFFmemset(inbuf, 0, scanlinesizein);
-	_TIFFmemset(outbuf, 0, scanlinesizeout);
+	_NDPImemset(inbuf, 0, scanlinesizein);
+	_NDPImemset(outbuf, 0, scanlinesizeout);
 	for (row = 0; row < imagelength; row++) {
 		/* merge channels */
 		for (s = 0; s < spp; s++) {
-			if (TIFFReadScanline(in, inbuf, row, s) < 0
+			if (NDPIReadScanline(in, inbuf, row, s) < 0
 			    && !ignore) {
-				TIFFError(TIFFFileName(in),
+				NDPIError(NDPIFileName(in),
 				    "Error, can't read scanline %"PRIu32,
 				    row);
 				goto bad;
@@ -1324,18 +1324,18 @@ DECLAREcpFunc(cpSeparate2ContigByRow)
 			}
 		}
 		if (TIFFWriteScanline(out, outbuf, row, 0) < 0) {
-			TIFFError(TIFFFileName(out),
+			NDPIError(NDPIFileName(out),
 			    "Error, can't write scanline %"PRIu32,
 			    row);
 			goto bad;
 		}
 	}
-	if (inbuf) _TIFFfree(inbuf);
-	if (outbuf) _TIFFfree(outbuf);
+	if (inbuf) _NDPIfree(inbuf);
+	if (outbuf) _NDPIfree(outbuf);
 	return 1;
 bad:
-	if (inbuf) _TIFFfree(inbuf);
-	if (outbuf) _TIFFfree(outbuf);
+	if (inbuf) _NDPIfree(inbuf);
+	if (outbuf) _NDPIfree(outbuf);
 	return 0;
 }
 
@@ -1399,7 +1399,7 @@ cpImage(TIFF* in, TIFF* out, readFunc fin, writeFunc fout,
 {
 	int status = 0;
 	tdata_t buf = NULL;
-	tsize_t scanlinesize = TIFFRasterScanlineSize(in);
+	tsize_t scanlinesize = NDPIRasterScanlineSize(in);
 	tsize_t bytes = scanlinesize * (tsize_t)imagelength;
 	/*
 	 * XXX: Check for integer overflow.
@@ -1414,13 +1414,13 @@ cpImage(TIFF* in, TIFF* out, readFunc fin, writeFunc fout,
 				status = (*fout)(out, (uint8_t*)buf,
 				    imagelength, imagewidth, spp);
 			}
-			_TIFFfree(buf);
+			_NDPIfree(buf);
 		} else {
-			TIFFError(TIFFFileName(in),
+			NDPIError(NDPIFileName(in),
 			    "Error, can't allocate space for image buffer");
 		}
 	} else {
-		TIFFError(TIFFFileName(in), "Error, no space for image buffer");
+		NDPIError(NDPIFileName(in), "Error, no space for image buffer");
 	}
 
 	return status;
@@ -1428,15 +1428,15 @@ cpImage(TIFF* in, TIFF* out, readFunc fin, writeFunc fout,
 
 DECLAREreadFunc(readContigStripsIntoBuffer)
 {
-	tsize_t scanlinesize = TIFFScanlineSize(in);
+	tsize_t scanlinesize = NDPIScanlineSize(in);
 	uint8_t* bufp = buf;
 	uint32_t row;
 
 	(void) imagewidth; (void) spp;
 	for (row = 0; row < imagelength; row++) {
-		if (TIFFReadScanline(in, (tdata_t) bufp, row, 0) < 0
+		if (NDPIReadScanline(in, (tdata_t) bufp, row, 0) < 0
 		    && !ignore) {
-			TIFFError(TIFFFileName(in),
+			NDPIError(NDPIFileName(in),
 			    "Error, can't read scanline %"PRIu32,
 			    row);
 			return 0;
@@ -1450,7 +1450,7 @@ DECLAREreadFunc(readContigStripsIntoBuffer)
 DECLAREreadFunc(readSeparateStripsIntoBuffer)
 {
 	int status = 1;
-	tsize_t scanlinesize = TIFFScanlineSize(in);
+	tsize_t scanlinesize = NDPIScanlineSize(in);
 	tdata_t scanline;
 	if (!scanlinesize)
 		return 0;
@@ -1458,7 +1458,7 @@ DECLAREreadFunc(readSeparateStripsIntoBuffer)
 	scanline = limitMalloc(scanlinesize);
 	if (!scanline)
 		return 0;
-	_TIFFmemset(scanline, 0, scanlinesize);
+	_NDPImemset(scanline, 0, scanlinesize);
 	(void) imagewidth;
 	if (scanline) {
 		uint8_t* bufp = (uint8_t*) buf;
@@ -1471,9 +1471,9 @@ DECLAREreadFunc(readSeparateStripsIntoBuffer)
 				tsize_t n = scanlinesize;
 				uint8_t* sbuf = scanline;
 
-				if (TIFFReadScanline(in, scanline, row, s) < 0
+				if (NDPIReadScanline(in, scanline, row, s) < 0
 				    && !ignore) {
-					TIFFError(TIFFFileName(in),
+					NDPIError(NDPIFileName(in),
 					    "Error, can't read scanline %"PRIu32,
 					    row);
 					    status = 0;
@@ -1487,17 +1487,17 @@ DECLAREreadFunc(readSeparateStripsIntoBuffer)
 	}
 
 done:
-	_TIFFfree(scanline);
+	_NDPIfree(scanline);
 	return status;
 }
 
 DECLAREreadFunc(readContigTilesIntoBuffer)
 {
 	int status = 1;
-	tsize_t tilesize = TIFFTileSize(in);
+	tsize_t tilesize = NDPITileSize(in);
 	tdata_t tilebuf;
-	uint32_t imagew = TIFFScanlineSize(in);
-	uint32_t tilew  = TIFFTileRowSize(in);
+	uint32_t imagew = NDPIScanlineSize(in);
+	uint32_t tilew  = NDPITileRowSize(in);
 	int64_t iskew = (int64_t)imagew - (int64_t)tilew;
 	uint8_t* bufp = (uint8_t*) buf;
 	uint32_t tw, tl;
@@ -1507,9 +1507,9 @@ DECLAREreadFunc(readContigTilesIntoBuffer)
 	tilebuf = limitMalloc(tilesize);
 	if (tilebuf == 0)
 		return 0;
-	_TIFFmemset(tilebuf, 0, tilesize);
-	(void) TIFFGetField(in, TIFFTAG_TILEWIDTH, &tw);
-	(void) TIFFGetField(in, TIFFTAG_TILELENGTH, &tl);
+	_NDPImemset(tilebuf, 0, tilesize);
+	(void) NDPIGetField(in, TIFFTAG_TILEWIDTH, &tw);
+	(void) NDPIGetField(in, TIFFTAG_TILELENGTH, &tl);
         
 	for (row = 0; row < imagelength; row += tl) {
 		uint32_t nrow = (row + tl > imagelength) ? imagelength - row : tl;
@@ -1517,9 +1517,9 @@ DECLAREreadFunc(readContigTilesIntoBuffer)
 		uint32_t col;
 
 		for (col = 0; col < imagewidth && colb < imagew; col += tw) {
-			if (TIFFReadTile(in, tilebuf, col, row, 0, 0) < 0
+			if (NDPIReadTile(in, tilebuf, col, row, 0, 0) < 0
 			    && !ignore) {
-				TIFFError(TIFFFileName(in),
+				NDPIError(NDPIFileName(in),
 				    "Error, can't read tile at %"PRIu32" %"PRIu32,
 				    col, row);
 				status = 0;
@@ -1540,17 +1540,17 @@ DECLAREreadFunc(readContigTilesIntoBuffer)
 		bufp += imagew * nrow;
 	}
 done:
-	_TIFFfree(tilebuf);
+	_NDPIfree(tilebuf);
 	return status;
 }
 
 DECLAREreadFunc(readSeparateTilesIntoBuffer)
 {
 	int status = 1;
-	uint32_t imagew = TIFFRasterScanlineSize(in);
-	uint32_t tilew = TIFFTileRowSize(in);
+	uint32_t imagew = NDPIRasterScanlineSize(in);
+	uint32_t tilew = NDPITileRowSize(in);
 	int iskew;
-	tsize_t tilesize = TIFFTileSize(in);
+	tsize_t tilesize = NDPITileSize(in);
 	tdata_t tilebuf;
 	uint8_t* bufp = (uint8_t*) buf;
 	uint32_t tw, tl;
@@ -1559,26 +1559,26 @@ DECLAREreadFunc(readSeparateTilesIntoBuffer)
 
 	if (tilew && spp > (INT_MAX / tilew))
 	{
-		TIFFError(TIFFFileName(in), "Error, cannot handle that much samples per tile row (Tile Width * Samples/Pixel)");
+		NDPIError(NDPIFileName(in), "Error, cannot handle that much samples per tile row (Tile Width * Samples/Pixel)");
 		return 0;
 	}
 	iskew = imagew - tilew*spp;
 	tilebuf = limitMalloc(tilesize);
 	if (tilebuf == 0)
 		return 0;
-	_TIFFmemset(tilebuf, 0, tilesize);
-	(void) TIFFGetField(in, TIFFTAG_TILEWIDTH, &tw);
-	(void) TIFFGetField(in, TIFFTAG_TILELENGTH, &tl);
-	(void) TIFFGetField(in, TIFFTAG_BITSPERSAMPLE, &bps);
+	_NDPImemset(tilebuf, 0, tilesize);
+	(void) NDPIGetField(in, TIFFTAG_TILEWIDTH, &tw);
+	(void) NDPIGetField(in, TIFFTAG_TILELENGTH, &tl);
+	(void) NDPIGetField(in, TIFFTAG_BITSPERSAMPLE, &bps);
         if( bps == 0 )
         {
-            TIFFError(TIFFFileName(in), "Error, cannot read BitsPerSample");
+            NDPIError(NDPIFileName(in), "Error, cannot read BitsPerSample");
             status = 0;
             goto done;
         }
         if( (bps % 8) != 0 )
         {
-            TIFFError(TIFFFileName(in), "Error, cannot handle BitsPerSample that is not a multiple of 8");
+            NDPIError(NDPIFileName(in), "Error, cannot handle BitsPerSample that is not a multiple of 8");
             status = 0;
             goto done;
         }
@@ -1593,9 +1593,9 @@ DECLAREreadFunc(readSeparateTilesIntoBuffer)
 			tsample_t s;
 
 			for (s = 0; s < spp; s++) {
-				if (TIFFReadTile(in, tilebuf, col, row, 0, s) < 0
+				if (NDPIReadTile(in, tilebuf, col, row, 0, s) < 0
 				    && !ignore) {
-					TIFFError(TIFFFileName(in),
+					NDPIError(NDPIFileName(in),
 					    "Error, can't read tile at %"PRIu32" %"PRIu32", "
 					    "sample %"PRIu16,
 					    col, row, s);
@@ -1628,7 +1628,7 @@ DECLAREreadFunc(readSeparateTilesIntoBuffer)
 		bufp += imagew * nrow;
 	}
 done:
-	_TIFFfree(tilebuf);
+	_NDPIfree(tilebuf);
 	return status;
 }
 
@@ -1638,13 +1638,13 @@ DECLAREwriteFunc(writeBufferToContigStrips)
 	tstrip_t strip = 0;
 
 	(void) imagewidth; (void) spp;
-	(void) TIFFGetFieldDefaulted(out, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
+	(void) NDPIGetFieldDefaulted(out, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
 	for (row = 0; row < imagelength; row += rowsperstrip) {
 		uint32_t nrows = (row + rowsperstrip > imagelength) ?
 		    imagelength-row : rowsperstrip;
-		tsize_t stripsize = TIFFVStripSize(out, nrows);
+		tsize_t stripsize = NDPIVStripSize(out, nrows);
 		if (TIFFWriteEncodedStrip(out, strip++, buf, stripsize) < 0) {
-			TIFFError(TIFFFileName(out),
+			NDPIError(NDPIFileName(out),
 			    "Error, can't write strip %"PRIu32, strip - 1u);
 			return 0;
 		}
@@ -1657,7 +1657,7 @@ DECLAREwriteFunc(writeBufferToSeparateStrips)
 {
 	uint32_t rowsize = imagewidth * spp;
 	uint32_t rowsperstrip;
-	tsize_t stripsize = TIFFStripSize(out);
+	tsize_t stripsize = NDPIStripSize(out);
 	tdata_t obuf;
 	tstrip_t strip = 0;
 	tsample_t s;
@@ -1665,38 +1665,38 @@ DECLAREwriteFunc(writeBufferToSeparateStrips)
 	obuf = limitMalloc(stripsize);
 	if (obuf == NULL)
 		return (0);
-	_TIFFmemset(obuf, 0, stripsize);
-	(void) TIFFGetFieldDefaulted(out, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
+	_NDPImemset(obuf, 0, stripsize);
+	(void) NDPIGetFieldDefaulted(out, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
 	for (s = 0; s < spp; s++) {
 		uint32_t row;
 		for (row = 0; row < imagelength; row += rowsperstrip) {
 			uint32_t nrows = (row + rowsperstrip > imagelength) ?
 			    imagelength-row : rowsperstrip;
-			tsize_t stripsize = TIFFVStripSize(out, nrows);
+			tsize_t stripsize = NDPIVStripSize(out, nrows);
 
 			cpContigBufToSeparateBuf(
 			    obuf, (uint8_t*) buf + row * rowsize + s,
 			    nrows, imagewidth, 0, 0, spp, 1);
 			if (TIFFWriteEncodedStrip(out, strip++, obuf, stripsize) < 0) {
-				TIFFError(TIFFFileName(out),
+				NDPIError(NDPIFileName(out),
 				    "Error, can't write strip %"PRIu32,
 				    strip - 1u);
-				_TIFFfree(obuf);
+				_NDPIfree(obuf);
 				return 0;
 			}
 		}
 	}
-	_TIFFfree(obuf);
+	_NDPIfree(obuf);
 	return 1;
 
 }
 
 DECLAREwriteFunc(writeBufferToContigTiles)
 {
-	uint32_t imagew = TIFFScanlineSize(out);
-	uint32_t tilew  = TIFFTileRowSize(out);
+	uint32_t imagew = NDPIScanlineSize(out);
+	uint32_t tilew  = NDPITileRowSize(out);
 	int iskew = imagew - tilew;
-	tsize_t tilesize = TIFFTileSize(out);
+	tsize_t tilesize = NDPITileSize(out);
 	tdata_t obuf;
 	uint8_t* bufp = (uint8_t*) buf;
 	uint32_t tl, tw;
@@ -1704,12 +1704,12 @@ DECLAREwriteFunc(writeBufferToContigTiles)
 
 	(void) spp;
 
-	obuf = limitMalloc(TIFFTileSize(out));
+	obuf = limitMalloc(NDPITileSize(out));
 	if (obuf == NULL)
 		return 0;
-	_TIFFmemset(obuf, 0, tilesize);
-	(void) TIFFGetField(out, TIFFTAG_TILELENGTH, &tl);
-	(void) TIFFGetField(out, TIFFTAG_TILEWIDTH, &tw);
+	_NDPImemset(obuf, 0, tilesize);
+	(void) NDPIGetField(out, TIFFTAG_TILELENGTH, &tl);
+	(void) NDPIGetField(out, TIFFTAG_TILEWIDTH, &tw);
 	for (row = 0; row < imagelength; row += tilelength) {
 		uint32_t nrow = (row + tl > imagelength) ? imagelength - row : tl;
 		uint32_t colb = 0;
@@ -1729,50 +1729,50 @@ DECLAREwriteFunc(writeBufferToContigTiles)
 				cpStripToTile(obuf, bufp + colb, nrow, tilew,
 				    0, iskew);
 			if (TIFFWriteTile(out, obuf, col, row, 0, 0) < 0) {
-				TIFFError(TIFFFileName(out),
+				NDPIError(NDPIFileName(out),
 				    "Error, can't write tile at %"PRIu32" %"PRIu32,
 				    col, row);
-				_TIFFfree(obuf);
+				_NDPIfree(obuf);
 				return 0;
 			}
 			colb += tilew;
 		}
 		bufp += nrow * imagew;
 	}
-	_TIFFfree(obuf);
+	_NDPIfree(obuf);
 	return 1;
 }
 
 DECLAREwriteFunc(writeBufferToSeparateTiles)
 {
-	uint32_t imagew = TIFFScanlineSize(out);
-	tsize_t tilew  = TIFFTileRowSize(out);
-	uint32_t iimagew = TIFFRasterScanlineSize(out);
+	uint32_t imagew = NDPIScanlineSize(out);
+	tsize_t tilew  = NDPITileRowSize(out);
+	uint32_t iimagew = NDPIRasterScanlineSize(out);
 	int iskew = iimagew - tilew*spp;
-	tsize_t tilesize = TIFFTileSize(out);
+	tsize_t tilesize = NDPITileSize(out);
 	tdata_t obuf;
 	uint8_t* bufp = (uint8_t*) buf;
 	uint32_t tl, tw;
 	uint32_t row;
 	uint16_t bps = 0, bytes_per_sample;
 
-	obuf = limitMalloc(TIFFTileSize(out));
+	obuf = limitMalloc(NDPITileSize(out));
 	if (obuf == NULL)
 		return 0;
-	_TIFFmemset(obuf, 0, tilesize);
-	(void) TIFFGetField(out, TIFFTAG_TILELENGTH, &tl);
-	(void) TIFFGetField(out, TIFFTAG_TILEWIDTH, &tw);
-	(void) TIFFGetField(out, TIFFTAG_BITSPERSAMPLE, &bps);
+	_NDPImemset(obuf, 0, tilesize);
+	(void) NDPIGetField(out, TIFFTAG_TILELENGTH, &tl);
+	(void) NDPIGetField(out, TIFFTAG_TILEWIDTH, &tw);
+	(void) NDPIGetField(out, TIFFTAG_BITSPERSAMPLE, &bps);
         if( bps == 0 )
         {
-            TIFFError(TIFFFileName(out), "Error, cannot read BitsPerSample");
-            _TIFFfree(obuf);
+            NDPIError(NDPIFileName(out), "Error, cannot read BitsPerSample");
+            _NDPIfree(obuf);
             return 0;
         }
         if( (bps % 8) != 0 )
         {
-            TIFFError(TIFFFileName(out), "Error, cannot handle BitsPerSample that is not a multiple of 8");
-            _TIFFfree(obuf);
+            NDPIError(NDPIFileName(out), "Error, cannot handle BitsPerSample that is not a multiple of 8");
+            _NDPIfree(obuf);
             return 0;
         }
 	bytes_per_sample = bps/8;
@@ -1805,11 +1805,11 @@ DECLAREwriteFunc(writeBufferToSeparateTiles)
 					    0, iskew, spp,
 					    bytes_per_sample);
 				if (TIFFWriteTile(out, obuf, col, row, 0, s) < 0) {
-					TIFFError(TIFFFileName(out),
+					NDPIError(NDPIFileName(out),
 					    "Error, can't write tile at %"PRIu32" %"PRIu32
 					    " sample %"PRIu16,
 					    col, row, s);
-					_TIFFfree(obuf);
+					_NDPIfree(obuf);
 					return 0;
 				}
 			}
@@ -1817,7 +1817,7 @@ DECLAREwriteFunc(writeBufferToSeparateTiles)
 		}
 		bufp += nrow * iimagew;
 	}
-	_TIFFfree(obuf);
+	_NDPIfree(obuf);
 	return 1;
 }
 
@@ -1963,43 +1963,43 @@ pickCopyFunc(TIFF* in, TIFF* out, uint16_t bitspersample, uint16_t samplesperpix
 	uint32_t w, l, tw, tl;
 	int bychunk;
 
-	(void) TIFFGetFieldDefaulted(in, TIFFTAG_PLANARCONFIG, &shortv);
+	(void) NDPIGetFieldDefaulted(in, TIFFTAG_PLANARCONFIG, &shortv);
 	if (shortv != config && bitspersample != 8 && samplesperpixel > 1) {
 		fprintf(stderr,
 		    "%s: Cannot handle different planar configuration w/ bits/sample != 8\n",
-		    TIFFFileName(in));
+		    NDPIFileName(in));
 		return (NULL);
 	}
-	TIFFGetField(in, TIFFTAG_IMAGEWIDTH, &w);
-	TIFFGetField(in, TIFFTAG_IMAGELENGTH, &l);
-	if (!(TIFFIsTiled(out) || TIFFIsTiled(in))) {
+	NDPIGetField(in, TIFFTAG_IMAGEWIDTH, &w);
+	NDPIGetField(in, TIFFTAG_IMAGELENGTH, &l);
+	if (!(NDPIIsTiled(out) || NDPIIsTiled(in))) {
 		uint32_t irps = (uint32_t) -1L;
-		TIFFGetField(in, TIFFTAG_ROWSPERSTRIP, &irps);
+		NDPIGetField(in, TIFFTAG_ROWSPERSTRIP, &irps);
 		/* if biased, force decoded copying to allow image subtraction */
 		bychunk = !bias && (rowsperstrip == irps);
 	}else{  /* either in or out is tiled */
 		if (bias) {
 			fprintf(stderr,
 			    "%s: Cannot handle tiled configuration w/bias image\n",
-			TIFFFileName(in));
+			NDPIFileName(in));
 			return (NULL);
 		}
-		if (TIFFIsTiled(out)) {
-			if (!TIFFGetField(in, TIFFTAG_TILEWIDTH, &tw))
+		if (NDPIIsTiled(out)) {
+			if (!NDPIGetField(in, TIFFTAG_TILEWIDTH, &tw))
 				tw = w;
-			if (!TIFFGetField(in, TIFFTAG_TILELENGTH, &tl))
+			if (!NDPIGetField(in, TIFFTAG_TILELENGTH, &tl))
 				tl = l;
 			bychunk = (tw == tilewidth && tl == tilelength);
 		} else {  /* out's not, so in must be tiled */
-			TIFFGetField(in, TIFFTAG_TILEWIDTH, &tw);
-			TIFFGetField(in, TIFFTAG_TILELENGTH, &tl);
+			NDPIGetField(in, TIFFTAG_TILEWIDTH, &tw);
+			NDPIGetField(in, TIFFTAG_TILELENGTH, &tl);
 			bychunk = (tw == w && tl == rowsperstrip);
 		}
 	}
 #define	T 1
 #define	F 0
 #define pack(a,b,c,d,e)	((long)(((a)<<11)|((b)<<3)|((c)<<2)|((d)<<1)|(e)))
-	switch(pack(shortv,config,TIFFIsTiled(in),TIFFIsTiled(out),bychunk)) {
+	switch(pack(shortv,config,NDPIIsTiled(in),NDPIIsTiled(out),bychunk)) {
 		/* Strips -> Tiles */
 		case pack(PLANARCONFIG_CONTIG,   PLANARCONFIG_CONTIG,   F,T,F):
 		case pack(PLANARCONFIG_CONTIG,   PLANARCONFIG_CONTIG,   F,T,T):
@@ -2058,7 +2058,7 @@ pickCopyFunc(TIFF* in, TIFF* out, uint16_t bitspersample, uint16_t samplesperpix
 #undef F
 #undef T
 	fprintf(stderr, "tiffcp: %s: Don't know how to copy/convert image.\n",
-	    TIFFFileName(in));
+	    NDPIFileName(in));
 	return (NULL);
 }
 

@@ -66,7 +66,7 @@ NeXTDecode(TIFF* tif, uint8_t* buf, tmsize_t occ, uint16_t s)
 	scanline = tif->tif_scanlinesize;
 	if (occ % scanline)
 	{
-		TIFFErrorExt(tif->tif_clientdata, module, "Fractional scanlines cannot be read");
+		NDPIErrorExt(tif->tif_clientdata, module, "Fractional scanlines cannot be read");
 		return (0);
 	}
 	for (row = buf; cc > 0 && occ > 0; occ -= scanline, row += scanline) {
@@ -79,7 +79,7 @@ NeXTDecode(TIFF* tif, uint8_t* buf, tmsize_t occ, uint16_t s)
 			 */
 			if (cc < scanline)
 				goto bad;
-			_TIFFmemcpy(row, bp, scanline);
+			_NDPImemcpy(row, bp, scanline);
 			bp += scanline;
 			cc -= scanline;
 			break;
@@ -95,7 +95,7 @@ NeXTDecode(TIFF* tif, uint8_t* buf, tmsize_t occ, uint16_t s)
 			n = (bp[2] * 256) + bp[3];
 			if (cc < 4+n || off+n > scanline)
 				goto bad;
-			_TIFFmemcpy(row+off, bp+4, n);
+			_NDPImemcpy(row+off, bp+4, n);
 			bp += 4+n;
 			cc -= 4+n;
 			break;
@@ -127,7 +127,7 @@ NeXTDecode(TIFF* tif, uint8_t* buf, tmsize_t occ, uint16_t s)
 				if (npixels >= imagewidth)
 					break;
                 if (op_offset >= scanline ) {
-                    TIFFErrorExt(tif->tif_clientdata, module, "Invalid data for scanline %"PRIu32,
+                    NDPIErrorExt(tif->tif_clientdata, module, "Invalid data for scanline %"PRIu32,
                         tif->tif_row);
                     return (0);
                 }
@@ -144,7 +144,7 @@ NeXTDecode(TIFF* tif, uint8_t* buf, tmsize_t occ, uint16_t s)
 	tif->tif_rawcc = cc;
 	return (1);
 bad:
-	TIFFErrorExt(tif->tif_clientdata, module, "Not enough data for scanline %"PRIu32,
+	NDPIErrorExt(tif->tif_clientdata, module, "Not enough data for scanline %"PRIu32,
 	    tif->tif_row);
 	return (0);
 }
@@ -158,7 +158,7 @@ NeXTPreDecode(TIFF* tif, uint16_t s)
 
 	if( td->td_bitspersample != 2 )
 	{
-		TIFFErrorExt(tif->tif_clientdata, module, "Unsupported BitsPerSample = %"PRIu16,
+		NDPIErrorExt(tif->tif_clientdata, module, "Unsupported BitsPerSample = %"PRIu16,
 					 td->td_bitspersample);
 		return (0);
 	}
@@ -166,7 +166,7 @@ NeXTPreDecode(TIFF* tif, uint16_t s)
 }
 	
 int
-TIFFInitNeXT(TIFF* tif, int scheme)
+NDPIInitNeXT(TIFF* tif, int scheme)
 {
 	(void) scheme;
 	tif->tif_predecode = NeXTPreDecode;  

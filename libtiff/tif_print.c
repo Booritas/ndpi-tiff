@@ -33,7 +33,7 @@
 #include <ctype.h>
 
 static void
-_TIFFprintAsciiBounded(FILE* fd, const char* cp, size_t max_chars);
+_NDPIprintAsciiBounded(FILE* fd, const char* cp, size_t max_chars);
 
 static const char * const photoNames[] = {
     "min-is-white",				/* PHOTOMETRIC_MINISWHITE */
@@ -64,7 +64,7 @@ static const char * const orientNames[] = {
 #define	NORIENTNAMES	(sizeof (orientNames) / sizeof (orientNames[0]))
 
 static void
-_TIFFPrintField(FILE* fd, const TIFFField *fip,
+_NDPIPrintField(FILE* fd, const TIFFField *fip,
                 uint32_t value_count, void *raw_data)
 {
 	uint32_t j;
@@ -119,7 +119,7 @@ _TIFFPrintField(FILE* fd, const TIFFField *fip,
 }
 
 static int
-_TIFFPrettyPrintField(TIFF* tif, const TIFFField *fip, FILE* fd, uint32_t tag,
+_NDPIPrettyPrintField(TIFF* tif, const TIFFField *fip, FILE* fd, uint32_t tag,
                       uint32_t value_count, void *raw_data)
 {
         (void) tif;
@@ -212,7 +212,7 @@ _TIFFPrettyPrintField(TIFF* tif, const TIFFField *fip, FILE* fd, uint32_t tag,
  * to the specified stdio file stream.
  */
 void
-TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
+NDPIPrintDirectory(TIFF* tif, FILE* fd, long flags)
 {
 	TIFFDirectory *td = &tif->tif_dir;
 	char *sep;
@@ -221,7 +221,7 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 	fprintf(fd, "TIFF Directory at offset 0x%"PRIu64" (%"PRIx64")\n",
 		tif->tif_diroff,
 		tif->tif_diroff);
-	if (TIFFFieldSet(tif,FIELD_SUBFILETYPE)) {
+	if (NDPIFieldSet(tif,FIELD_SUBFILETYPE)) {
 		fprintf(fd, "  Subfile Type:");
 		sep = " ";
 		if (td->td_subfiletype & FILETYPE_REDUCEDIMAGE) {
@@ -237,26 +237,26 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 		fprintf(fd, " (%"PRIu32" = 0x%"PRIx32")\n",
 		    td->td_subfiletype, td->td_subfiletype);
 	}
-	if (TIFFFieldSet(tif,FIELD_IMAGEDIMENSIONS)) {
+	if (NDPIFieldSet(tif,FIELD_IMAGEDIMENSIONS)) {
 		fprintf(fd, "  Image Width: %"PRIu32" Image Length: %"PRIu32,
 		    td->td_imagewidth, td->td_imagelength);
-		if (TIFFFieldSet(tif,FIELD_IMAGEDEPTH))
+		if (NDPIFieldSet(tif,FIELD_IMAGEDEPTH))
 			fprintf(fd, " Image Depth: %"PRIu32,
 			    td->td_imagedepth);
 		fprintf(fd, "\n");
 	}
-	if (TIFFFieldSet(tif,FIELD_TILEDIMENSIONS)) {
+	if (NDPIFieldSet(tif,FIELD_TILEDIMENSIONS)) {
 		fprintf(fd, "  Tile Width: %"PRIu32" Tile Length: %"PRIu32,
 		    td->td_tilewidth, td->td_tilelength);
-		if (TIFFFieldSet(tif,FIELD_TILEDEPTH))
+		if (NDPIFieldSet(tif,FIELD_TILEDEPTH))
 			fprintf(fd, " Tile Depth: %"PRIu32,
 			    td->td_tiledepth);
 		fprintf(fd, "\n");
 	}
-	if (TIFFFieldSet(tif,FIELD_RESOLUTION)) {
+	if (NDPIFieldSet(tif,FIELD_RESOLUTION)) {
 		fprintf(fd, "  Resolution: %g, %g",
 		    td->td_xresolution, td->td_yresolution);
-		if (TIFFFieldSet(tif,FIELD_RESOLUTIONUNIT)) {
+		if (NDPIFieldSet(tif,FIELD_RESOLUTIONUNIT)) {
 			switch (td->td_resolutionunit) {
 			case RESUNIT_NONE:
 				fprintf(fd, " (unitless)");
@@ -276,12 +276,12 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 		}
 		fprintf(fd, "\n");
 	}
-	if (TIFFFieldSet(tif,FIELD_POSITION))
+	if (NDPIFieldSet(tif,FIELD_POSITION))
 		fprintf(fd, "  Position: %g, %g\n",
 		    td->td_xposition, td->td_yposition);
-	if (TIFFFieldSet(tif,FIELD_BITSPERSAMPLE))
+	if (NDPIFieldSet(tif,FIELD_BITSPERSAMPLE))
 		fprintf(fd, "  Bits/Sample: %"PRIu16"\n", td->td_bitspersample);
-	if (TIFFFieldSet(tif,FIELD_SAMPLEFORMAT)) {
+	if (NDPIFieldSet(tif,FIELD_SAMPLEFORMAT)) {
 		fprintf(fd, "  Sample Format: ");
 		switch (td->td_sampleformat) {
 		case SAMPLEFORMAT_VOID:
@@ -308,8 +308,8 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 			break;
 		}
 	}
-	if (TIFFFieldSet(tif,FIELD_COMPRESSION)) {
-		const TIFFCodec* c = TIFFFindCODEC(td->td_compression);
+	if (NDPIFieldSet(tif,FIELD_COMPRESSION)) {
+		const TIFFCodec* c = NDPIFindCODEC(td->td_compression);
 		fprintf(fd, "  Compression Scheme: ");
 		if (c)
 			fprintf(fd, "%s\n", c->name);
@@ -317,7 +317,7 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 			fprintf(fd, "%"PRIu16" (0x%"PRIx16")\n",
 			    td->td_compression, td->td_compression);
 	}
-	if (TIFFFieldSet(tif,FIELD_PHOTOMETRIC)) {
+	if (NDPIFieldSet(tif,FIELD_PHOTOMETRIC)) {
 		fprintf(fd, "  Photometric Interpretation: ");
 		if (td->td_photometric < NPHOTONAMES)
 			fprintf(fd, "%s\n", photoNames[td->td_photometric]);
@@ -336,7 +336,7 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 			}
 		}
 	}
-	if (TIFFFieldSet(tif,FIELD_EXTRASAMPLES) && td->td_extrasamples) {
+	if (NDPIFieldSet(tif,FIELD_EXTRASAMPLES) && td->td_extrasamples) {
 		uint16_t i;
 		fprintf(fd, "  Extra Samples: %"PRIu16"<", td->td_extrasamples);
 		sep = "";
@@ -360,7 +360,7 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 		}
 		fprintf(fd, ">\n");
 	}
-	if (TIFFFieldSet(tif,FIELD_INKNAMES)) {
+	if (NDPIFieldSet(tif,FIELD_INKNAMES)) {
 		char* cp;
 		uint16_t i;
 		fprintf(fd, "  Ink Names: ");
@@ -372,12 +372,12 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 			size_t max_chars = 
 				td->td_inknameslen - (cp - td->td_inknames);
 			fputs(sep, fd);
-			_TIFFprintAsciiBounded(fd, cp, max_chars);
+			_NDPIprintAsciiBounded(fd, cp, max_chars);
 			sep = ", ";
 		}
                 fputs("\n", fd);
 	}
-	if (TIFFFieldSet(tif,FIELD_THRESHHOLDING)) {
+	if (NDPIFieldSet(tif,FIELD_THRESHHOLDING)) {
 		fprintf(fd, "  Thresholding: ");
 		switch (td->td_threshholding) {
 		case THRESHHOLD_BILEVEL:
@@ -395,7 +395,7 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 			break;
 		}
 	}
-	if (TIFFFieldSet(tif,FIELD_FILLORDER)) {
+	if (NDPIFieldSet(tif,FIELD_FILLORDER)) {
 		fprintf(fd, "  FillOrder: ");
 		switch (td->td_fillorder) {
 		case FILLORDER_MSB2LSB:
@@ -410,12 +410,12 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 			break;
 		}
 	}
-	if (TIFFFieldSet(tif,FIELD_YCBCRSUBSAMPLING))
+	if (NDPIFieldSet(tif,FIELD_YCBCRSUBSAMPLING))
         {
 		fprintf(fd, "  YCbCr Subsampling: %"PRIu16", %"PRIu16"\n",
 			td->td_ycbcrsubsampling[0], td->td_ycbcrsubsampling[1] );
 	}
-	if (TIFFFieldSet(tif,FIELD_YCBCRPOSITIONING)) {
+	if (NDPIFieldSet(tif,FIELD_YCBCRPOSITIONING)) {
 		fprintf(fd, "  YCbCr Positioning: ");
 		switch (td->td_ycbcrpositioning) {
 		case YCBCRPOSITION_CENTERED:
@@ -430,10 +430,10 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 			break;
 		}
 	}
-	if (TIFFFieldSet(tif,FIELD_HALFTONEHINTS))
+	if (NDPIFieldSet(tif,FIELD_HALFTONEHINTS))
 		fprintf(fd, "  Halftone Hints: light %"PRIu16" dark %"PRIu16"\n",
 		    td->td_halftonehints[0], td->td_halftonehints[1]);
-	if (TIFFFieldSet(tif,FIELD_ORIENTATION)) {
+	if (NDPIFieldSet(tif,FIELD_ORIENTATION)) {
 		fprintf(fd, "  Orientation: ");
 		if (td->td_orientation < NORIENTNAMES)
 			fprintf(fd, "%s\n", orientNames[td->td_orientation]);
@@ -441,20 +441,20 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 			fprintf(fd, "%"PRIu16" (0x%"PRIx16")\n",
 			    td->td_orientation, td->td_orientation);
 	}
-	if (TIFFFieldSet(tif,FIELD_SAMPLESPERPIXEL))
+	if (NDPIFieldSet(tif,FIELD_SAMPLESPERPIXEL))
 		fprintf(fd, "  Samples/Pixel: %"PRIx16"\n", td->td_samplesperpixel);
-	if (TIFFFieldSet(tif,FIELD_ROWSPERSTRIP)) {
+	if (NDPIFieldSet(tif,FIELD_ROWSPERSTRIP)) {
 		fprintf(fd, "  Rows/Strip: ");
 		if (td->td_rowsperstrip == (uint32_t) -1)
 			fprintf(fd, "(infinite)\n");
 		else
 			fprintf(fd, "%"PRIu32"\n", td->td_rowsperstrip);
 	}
-	if (TIFFFieldSet(tif,FIELD_MINSAMPLEVALUE))
+	if (NDPIFieldSet(tif,FIELD_MINSAMPLEVALUE))
 		fprintf(fd, "  Min Sample Value: %"PRIu16"\n", td->td_minsamplevalue);
-	if (TIFFFieldSet(tif,FIELD_MAXSAMPLEVALUE))
+	if (NDPIFieldSet(tif,FIELD_MAXSAMPLEVALUE))
 		fprintf(fd, "  Max Sample Value: %"PRIu16"\n", td->td_maxsamplevalue);
-	if (TIFFFieldSet(tif,FIELD_SMINSAMPLEVALUE)) {
+	if (NDPIFieldSet(tif,FIELD_SMINSAMPLEVALUE)) {
 		int i;
 		int count = (tif->tif_flags & TIFF_PERSAMPLE) ? td->td_samplesperpixel : 1;
 		fprintf(fd, "  SMin Sample Value:");
@@ -462,7 +462,7 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 			fprintf(fd, " %g", td->td_sminsamplevalue[i]);
 		fprintf(fd, "\n");
 	}
-	if (TIFFFieldSet(tif,FIELD_SMAXSAMPLEVALUE)) {
+	if (NDPIFieldSet(tif,FIELD_SMAXSAMPLEVALUE)) {
 		int i;
 		int count = (tif->tif_flags & TIFF_PERSAMPLE) ? td->td_samplesperpixel : 1;
 		fprintf(fd, "  SMax Sample Value:");
@@ -470,7 +470,7 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 			fprintf(fd, " %g", td->td_smaxsamplevalue[i]);
 		fprintf(fd, "\n");
 	}
-	if (TIFFFieldSet(tif,FIELD_PLANARCONFIG)) {
+	if (NDPIFieldSet(tif,FIELD_PLANARCONFIG)) {
 		fprintf(fd, "  Planar Configuration: ");
 		switch (td->td_planarconfig) {
 		case PLANARCONFIG_CONTIG:
@@ -485,10 +485,10 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 			break;
 		}
 	}
-	if (TIFFFieldSet(tif,FIELD_PAGENUMBER))
+	if (NDPIFieldSet(tif,FIELD_PAGENUMBER))
 		fprintf(fd, "  Page Number: %"PRIu16"-%"PRIu16"\n",
 		    td->td_pagenumber[0], td->td_pagenumber[1]);
-	if (TIFFFieldSet(tif,FIELD_COLORMAP)) {
+	if (NDPIFieldSet(tif,FIELD_COLORMAP)) {
 		fprintf(fd, "  Color Map: ");
 		if (flags & TIFFPRINT_COLORMAP) {
 			fprintf(fd, "\n");
@@ -502,7 +502,7 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 		} else
 			fprintf(fd, "(present)\n");
 	}
-	if (TIFFFieldSet(tif,FIELD_REFBLACKWHITE)) {
+	if (NDPIFieldSet(tif,FIELD_REFBLACKWHITE)) {
 		int i;
 		fprintf(fd, "  Reference Black/White:\n");
 		for (i = 0; i < 3; i++)
@@ -510,7 +510,7 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 			td->td_refblackwhite[2*i+0],
 			td->td_refblackwhite[2*i+1]);
 	}
-	if (TIFFFieldSet(tif,FIELD_TRANSFERFUNCTION)) {
+	if (NDPIFieldSet(tif,FIELD_TRANSFERFUNCTION)) {
 		fprintf(fd, "  Transfer Function: ");
 		if (flags & TIFFPRINT_CURVES) {
 			fprintf(fd, "\n");
@@ -527,7 +527,7 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 		} else
 			fprintf(fd, "(present)\n");
 	}
-	if (TIFFFieldSet(tif, FIELD_SUBIFD) && (td->td_subifd)) {
+	if (NDPIFieldSet(tif, FIELD_SUBIFD) && (td->td_subifd)) {
 		uint16_t i;
 		fprintf(fd, "  SubIFD Offsets:");
 		for (i = 0; i < td->td_nsubifd; i++)
@@ -535,13 +535,13 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 				td->td_subifd[i]);
 		fputc('\n', fd);
 	}
-	if (TIFFFieldSet(tif, FIELD_NDPIMAGNIFICATION))
+	if (NDPIFieldSet(tif, FIELD_NDPIMAGNIFICATION))
 		fprintf(fd, "  NDPI Magnification: %f\n", td->td_ndpimagnification);
-	if (TIFFFieldSet(tif, FIELD_NDPIZOFFSET))
+	if (NDPIFieldSet(tif, FIELD_NDPIZOFFSET))
 		fprintf(fd, "  NDPI z-Offset: %d\n", td->td_ndpizoffset);
-	if (TIFFFieldSet(tif, FIELD_NDPIUSERGIVENSLIDELABEL))
+	if (NDPIFieldSet(tif, FIELD_NDPIUSERGIVENSLIDELABEL))
 		fprintf(fd, "  NDPI User-given slide label: \"%s\"\n", td->td_ndpiusergivenslidelabel);
-	if (TIFFFieldSet(tif, FIELD_NDPIBLANKLANES)) {
+	if (NDPIFieldSet(tif, FIELD_NDPIBLANKLANES)) {
 		uint32_t u;
 
 		fprintf(fd, "  NDPI Blank lanes: ");
@@ -551,9 +551,9 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 			fprintf(fd, ",%u", td->td_ndpiblanklanes[u]);
 		fprintf(fd, "\n");
 	}
-	if (TIFFFieldSet(tif, FIELD_NDPICOMMENTS))
+	if (NDPIFieldSet(tif, FIELD_NDPICOMMENTS))
 		fprintf(fd, "  NDPI Comments: \"%s\"\n", td->td_ndpicomments);
-	if (TIFFFieldSet(tif, FIELD_NDPIFLUORESCENCE))
+	if (NDPIFieldSet(tif, FIELD_NDPIFLUORESCENCE))
 		fprintf(fd, "  NDPI Fluorescence: \"%s\"\n", td->td_ndpifluorescence);
 
 	/*
@@ -563,25 +563,25 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 		int  i;
 		short count;
 
-		count = (short) TIFFGetTagListCount(tif);
+		count = (short) NDPIGetTagListCount(tif);
 		for(i = 0; i < count; i++) {
-			uint32_t tag = TIFFGetTagListEntry(tif, i);
+			uint32_t tag = NDPIGetTagListEntry(tif, i);
 			const TIFFField *fip;
 			uint32_t value_count;
 			int mem_alloc = 0;
 			void *raw_data;
 
-			fip = TIFFFieldWithTag(tif, tag);
+			fip = NDPIFieldWithTag(tif, tag);
 			if(fip == NULL)
 				continue;
 
 			if(fip->field_passcount) {
 				if (fip->field_readcount == TIFF_VARIABLE2 ) {
-					if(TIFFGetField(tif, tag, &value_count, &raw_data) != 1)
+					if(NDPIGetField(tif, tag, &value_count, &raw_data) != 1)
 						continue;
 				} else if (fip->field_readcount == TIFF_VARIABLE ) {
 					uint16_t small_value_count;
-					if(TIFFGetField(tif, tag, &small_value_count, &raw_data) != 1)
+					if(NDPIGetField(tif, tag, &small_value_count, &raw_data) != 1)
 						continue;
 					value_count = small_value_count;
 				} else {
@@ -605,21 +605,21 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 					   libtiff 4.1 and assign it a FIELD_ value */
 					static uint16_t dotrange[2];
 					raw_data = dotrange;
-					TIFFGetField(tif, tag, dotrange+0, dotrange+1);
+					NDPIGetField(tif, tag, dotrange+0, dotrange+1);
 				} else if (fip->field_type == TIFF_ASCII
 					   || fip->field_readcount == TIFF_VARIABLE
 					   || fip->field_readcount == TIFF_VARIABLE2
 					   || fip->field_readcount == TIFF_SPP
 					   || value_count > 1) {
-					if(TIFFGetField(tif, tag, &raw_data) != 1)
+					if(NDPIGetField(tif, tag, &raw_data) != 1)
 						continue;
 				} else {
-					raw_data = _TIFFmalloc(
-					    _TIFFDataSize(fip->field_type)
+					raw_data = _NDPImalloc(
+					    _NDPIDataSize(fip->field_type)
 					    * value_count);
 					mem_alloc = 1;
-					if(TIFFGetField(tif, tag, raw_data) != 1) {
-						_TIFFfree(raw_data);
+					if(NDPIGetField(tif, tag, raw_data) != 1) {
+						_NDPIfree(raw_data);
 						continue;
 					}
 				}
@@ -628,14 +628,14 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 			/*
 			 * Catch the tags which needs to be specially handled
 			 * and pretty print them. If tag not handled in
-			 * _TIFFPrettyPrintField() fall down and print it as
+			 * _NDPIPrettyPrintField() fall down and print it as
 			 * any other tag.
 			 */
-			if (!_TIFFPrettyPrintField(tif, fip, fd, tag, value_count, raw_data))
-				_TIFFPrintField(fd, fip, value_count, raw_data);
+			if (!_NDPIPrettyPrintField(tif, fip, fd, tag, value_count, raw_data))
+				_NDPIPrintField(fd, fip, value_count, raw_data);
 
 			if(mem_alloc)
-				_TIFFfree(raw_data);
+				_NDPIfree(raw_data);
 		}
 	}
         
@@ -643,7 +643,7 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 		(*tif->tif_tagmethods.printdir)(tif, fd, flags);
 
 	if ((flags & TIFFPRINT_STRIPS) &&
-	    TIFFFieldSet(tif,FIELD_STRIPOFFSETS)) {
+	    NDPIFieldSet(tif,FIELD_STRIPOFFSETS)) {
 		uint32_t s;
 
 		fprintf(fd, "  %"PRIu32" %s:\n",
@@ -652,19 +652,19 @@ TIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 		for (s = 0; s < td->td_nstrips; s++)
 			fprintf(fd, "    %3"PRIu32": [%8"PRIu64", %8"PRIu64"]\n",
 			    s,
-			    TIFFGetStrileOffset(tif, s),
-			    TIFFGetStrileByteCount(tif, s));
+			    NDPIGetStrileOffset(tif, s),
+			    NDPIGetStrileByteCount(tif, s));
 	}
 }
 
 void
-_TIFFprintAscii(FILE* fd, const char* cp)
+_NDPIprintAscii(FILE* fd, const char* cp)
 {
-	_TIFFprintAsciiBounded( fd, cp, strlen(cp));
+	_NDPIprintAsciiBounded( fd, cp, strlen(cp));
 }
 
 static void
-_TIFFprintAsciiBounded(FILE* fd, const char* cp, size_t max_chars)
+_NDPIprintAsciiBounded(FILE* fd, const char* cp, size_t max_chars)
 {
 	for (; max_chars > 0 && *cp != '\0'; cp++, max_chars--) {
 		const char* tp;
@@ -684,10 +684,10 @@ _TIFFprintAsciiBounded(FILE* fd, const char* cp, size_t max_chars)
 }
 
 void
-_TIFFprintAsciiTag(FILE* fd, const char* name, const char* value)
+_NDPIprintAsciiTag(FILE* fd, const char* name, const char* value)
 {
 	fprintf(fd, "  %s: \"", name);
-	_TIFFprintAscii(fd, value);
+	_NDPIprintAscii(fd, value);
 	fprintf(fd, "\"\n");
 }
 

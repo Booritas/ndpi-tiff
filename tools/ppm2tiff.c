@@ -337,29 +337,29 @@ main(int argc, char* argv[])
 			break;
 		}
 	}
-	out = TIFFOpen(argv[optind], "w");
+	out = NDPIOpen(argv[optind], "w");
 	if (out == NULL)
 		return (EXIT_FAILURE);
-	TIFFSetField(out, TIFFTAG_IMAGEWIDTH, (uint32_t) w);
-	TIFFSetField(out, TIFFTAG_IMAGELENGTH, (uint32_t) h);
-	TIFFSetField(out, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
-	TIFFSetField(out, TIFFTAG_SAMPLESPERPIXEL, spp);
-	TIFFSetField(out, TIFFTAG_BITSPERSAMPLE, bpp);
-	TIFFSetField(out, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-	TIFFSetField(out, TIFFTAG_PHOTOMETRIC, photometric);
-	TIFFSetField(out, TIFFTAG_COMPRESSION, compression);
+	NDPISetField(out, TIFFTAG_IMAGEWIDTH, (uint32_t) w);
+	NDPISetField(out, TIFFTAG_IMAGELENGTH, (uint32_t) h);
+	NDPISetField(out, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
+	NDPISetField(out, TIFFTAG_SAMPLESPERPIXEL, spp);
+	NDPISetField(out, TIFFTAG_BITSPERSAMPLE, bpp);
+	NDPISetField(out, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+	NDPISetField(out, TIFFTAG_PHOTOMETRIC, photometric);
+	NDPISetField(out, TIFFTAG_COMPRESSION, compression);
 	switch (compression) {
 	case COMPRESSION_JPEG:
-		TIFFSetField(out, TIFFTAG_JPEGQUALITY, quality);
-		TIFFSetField(out, TIFFTAG_JPEGCOLORMODE, jpegcolormode);
+		NDPISetField(out, TIFFTAG_JPEGQUALITY, quality);
+		NDPISetField(out, TIFFTAG_JPEGCOLORMODE, jpegcolormode);
 		break;
 	case COMPRESSION_LZW:
 	case COMPRESSION_DEFLATE:
 		if (predictor != 0)
-			TIFFSetField(out, TIFFTAG_PREDICTOR, predictor);
+			NDPISetField(out, TIFFTAG_PREDICTOR, predictor);
 		break;
         case COMPRESSION_CCITTFAX3:
-		TIFFSetField(out, TIFFTAG_GROUP3OPTIONS, g3opts);
+		NDPISetField(out, TIFFTAG_GROUP3OPTIONS, g3opts);
 		break;
 	}
 	if (pbm) {
@@ -371,35 +371,35 @@ main(int argc, char* argv[])
 		linebytes = multiply_ms(2 * spp, w);
 	}
 	if (rowsperstrip == (uint32_t) -1) {
-		TIFFSetField(out, TIFFTAG_ROWSPERSTRIP, h);
+		NDPISetField(out, TIFFTAG_ROWSPERSTRIP, h);
 	} else {
-		TIFFSetField(out, TIFFTAG_ROWSPERSTRIP,
-		    TIFFDefaultStripSize(out, rowsperstrip));
+		NDPISetField(out, TIFFTAG_ROWSPERSTRIP,
+		    NDPIDefaultStripSize(out, rowsperstrip));
 	}
 	if (linebytes == 0) {
 		fprintf(stderr, "%s: scanline size overflow\n", infile);
-		(void) TIFFClose(out);
+		(void) NDPIClose(out);
 		exit(EXIT_FAILURE);
 	}
-	scanline_size = TIFFScanlineSize(out);
+	scanline_size = NDPIScanlineSize(out);
 	if (scanline_size == 0) {
-		/* overflow - TIFFScanlineSize already printed a message */
-		(void) TIFFClose(out);
+		/* overflow - NDPIScanlineSize already printed a message */
+		(void) NDPIClose(out);
 		exit(EXIT_FAILURE);
 	}
 	if (scanline_size < linebytes)
-		buf = (unsigned char *)_TIFFmalloc(linebytes);
+		buf = (unsigned char *)_NDPImalloc(linebytes);
 	else
-		buf = (unsigned char *)_TIFFmalloc(scanline_size);
+		buf = (unsigned char *)_NDPImalloc(scanline_size);
 	if (buf == NULL) {
 		fprintf(stderr, "%s: Not enough memory\n", infile);
-		(void) TIFFClose(out);
+		(void) NDPIClose(out);
 		exit(EXIT_FAILURE);
 	}
 	if (resolution > 0) {
-		TIFFSetField(out, TIFFTAG_XRESOLUTION, resolution);
-		TIFFSetField(out, TIFFTAG_YRESOLUTION, resolution);
-		TIFFSetField(out, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH);
+		NDPISetField(out, TIFFTAG_XRESOLUTION, resolution);
+		NDPISetField(out, TIFFTAG_YRESOLUTION, resolution);
+		NDPISetField(out, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH);
 	}
 	for (row = 0; row < h; row++) {
 		if (fread(buf, linebytes, 1, in) != 1) {
@@ -413,9 +413,9 @@ main(int argc, char* argv[])
 	}
 	if (in != stdin)
 		fclose(in);
-	(void) TIFFClose(out);
+	(void) NDPIClose(out);
 	if (buf)
-		_TIFFfree(buf);
+		_NDPIfree(buf);
 	return (EXIT_SUCCESS);
 }
 

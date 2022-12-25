@@ -4,11 +4,11 @@
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
 <meta name="Content-Style" content="text/css">
-<title>TIFFWriteDirectory</title>
+<title>NDPIWriteDirectory</title>
 </head>
 <body>
 
-<h1 align=center>TIFFWriteDirectory</h1>
+<h1 align=center>NDPIWriteDirectory</h1>
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
@@ -25,8 +25,8 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>TIFFWriteDirectory, TIFFRewriteDirectory,
-TIFFCheckpointDirectory &minus; write the current directory
+<p>NDPIWriteDirectory, NDPIRewriteDirectory,
+NDPICheckpointDirectory &minus; write the current directory
 in an open <small>TIFF</small> file</p>
 </td>
 </table>
@@ -40,9 +40,9 @@ in an open <small>TIFF</small> file</p>
 <td width="91%">
 <p><b>#include &lt;tiffio.h&gt;</b></p>
 <!-- INDENTATION -->
-<p><b>int TIFFWriteDirectory(TIFF *</b><i>tif</i><b>)<br>
-int TIFFRewriteDirectory(TIFF *</b><i>tif</i><b>)<br>
-int TIFFCheckpointDirectory(TIFF *</b><i>tif</i><b>)</b></p>
+<p><b>int NDPIWriteDirectory(TIFF *</b><i>tif</i><b>)<br>
+int NDPIRewriteDirectory(TIFF *</b><i>tif</i><b>)<br>
+int NDPICheckpointDirectory(TIFF *</b><i>tif</i><b>)</b></p>
 </td>
 </table>
 <a name="DESCRIPTION"></a>
@@ -53,21 +53,21 @@ int TIFFCheckpointDirectory(TIFF *</b><i>tif</i><b>)</b></p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><i>TIFFWriteDirectory</i> will write the contents of the
+<p><i>NDPIWriteDirectory</i> will write the contents of the
 current directory to the file and setup to create a new
 subfile in the same file. Applications only need to call
-<i>TIFFWriteDirectory</i> when writing multiple subfiles to
-a single <small>TIFF</small> file. <i>TIFFWriteDirectory</i>
-is automatically called by <i>TIFFClose</i> and
-<i>TIFFFlush</i> to write a modified directory if the file
+<i>NDPIWriteDirectory</i> when writing multiple subfiles to
+a single <small>TIFF</small> file. <i>NDPIWriteDirectory</i>
+is automatically called by <i>NDPIClose</i> and
+<i>NDPIFlush</i> to write a modified directory if the file
 is open for writing.</p>
 <!-- INDENTATION -->
-<p>The <i>TIFFRewriteDirectory</i> function operates
-similarly to <i>TIFFWriteDirectory,</i> but can be called
+<p>The <i>NDPIRewriteDirectory</i> function operates
+similarly to <i>NDPIWriteDirectory,</i> but can be called
 with directories previously read or written that already
 have an established location in the file. It will rewrite
 the directory, but instead of place it at it&rsquo;s old
-location (as <i>TIFFWriteDirectory</i> would) it will place
+location (as <i>NDPIWriteDirectory</i> would) it will place
 them at the end of the file, correcting the pointer from the
 preceding directory or file header to point to it&rsquo;s
 new location. This is particularly important in cases where
@@ -75,17 +75,17 @@ the size of the directory and pointed to data has grown, so
 it won&rsquo;t fit in the space available at the old
 location.</p>
 <!-- INDENTATION -->
-<p>The <i>TIFFCheckpointDirectory</i> writes the current
+<p>The <i>NDPICheckpointDirectory</i> writes the current
 state of the tiff directory into the file to make what is
 currently in the file readable. Unlike
-<i>TIFFWriteDirectory, TIFFCheckpointDirectory</i> does not
+<i>NDPIWriteDirectory, NDPICheckpointDirectory</i> does not
 free up the directory data structures in memory, so they can
 be updated (as strips/tiles are written) and written again.
 Reading such a partial file you will at worst get a tiff
 read error for the first strip/tile encountered that is
 incomplete, but you will at least get all the valid data in
 the file before that. When the file is complete, just use
-<i>TIFFWriteDirectory</i> as usual to finish it off
+<i>NDPIWriteDirectory</i> as usual to finish it off
 cleanly.</p>
 </td>
 </table>
@@ -111,7 +111,7 @@ encountered when writing the directory contents.</p>
 <td width="8%"></td>
 <td width="91%">
 <p>All error messages are directed to the
-<i>TIFFError</i>(3TIFF) routine.</p>
+<i>NDPIError</i>(3TIFF) routine.</p>
 <!-- INDENTATION -->
 <p><b>Error post-encoding before directory write</b>. Before
 writing the contents of the current directory, any pending
@@ -163,9 +163,9 @@ the directory that is being written.</p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><b>TIFFOpen</b>(3TIFF), <b>TIFFError</b>(3TIFF),
-<b>TIFFReadDirectory</b>(3TIFF),
-<b>TIFFSetDirectory</b>(3TIFF), <b>libtiff</b>(3TIFF)</p>
+<p><b>NDPIOpen</b>(3TIFF), <b>NDPIError</b>(3TIFF),
+<b>NDPIReadDirectory</b>(3TIFF),
+<b>NDPISetDirectory</b>(3TIFF), <b>libtiff</b>(3TIFF)</p>
 <!-- INDENTATION -->
 <p>Libtiff library home page:
 <b>http://www.simplesystems.org/libtiff/</b></p>

@@ -168,7 +168,7 @@ static int GetLercDataType(TIFF* tif)
         return 7;
     }
 
-    TIFFErrorExt(tif->tif_clientdata, module,
+    NDPIErrorExt(tif->tif_clientdata, module,
         "Unsupported combination of SampleFormat and td_bitspersample");
     return -1;
 }
@@ -218,9 +218,9 @@ static int SetupUncompressedBuffer(TIFF* tif, LERCState* sp,
     new_alloc = (unsigned int)new_alloc_64;
     if( new_alloc != new_alloc_64 )
     {
-        TIFFErrorExt(tif->tif_clientdata, module,
+        NDPIErrorExt(tif->tif_clientdata, module,
                         "Too large uncompressed strip/tile");
-        _TIFFfree(sp->uncompressed_buffer);
+        _NDPIfree(sp->uncompressed_buffer);
         sp->uncompressed_buffer = 0;
         sp->uncompressed_alloc = 0;
         return 0;
@@ -228,13 +228,13 @@ static int SetupUncompressedBuffer(TIFF* tif, LERCState* sp,
 
     if( sp->uncompressed_alloc < new_alloc )
     {
-        _TIFFfree(sp->uncompressed_buffer);
-        sp->uncompressed_buffer = _TIFFmalloc(new_alloc);
+        _NDPIfree(sp->uncompressed_buffer);
+        sp->uncompressed_buffer = _NDPImalloc(new_alloc);
         if( !sp->uncompressed_buffer )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                             "Cannot allocate buffer");
-            _TIFFfree(sp->uncompressed_buffer);
+            _NDPIfree(sp->uncompressed_buffer);
             sp->uncompressed_buffer = 0;
             sp->uncompressed_alloc = 0;
             return 0;
@@ -254,13 +254,13 @@ static int SetupUncompressedBuffer(TIFF* tif, LERCState* sp,
         unsigned int mask_size = sp->segment_width * sp->segment_height;
         if( sp->mask_size < mask_size )
         {
-            void* mask_buffer = _TIFFrealloc(sp->mask_buffer, mask_size);
+            void* mask_buffer = _NDPIrealloc(sp->mask_buffer, mask_size);
             if( mask_buffer == NULL )
             {
-                TIFFErrorExt(tif->tif_clientdata, module,
+                NDPIErrorExt(tif->tif_clientdata, module,
                                 "Cannot allocate buffer");
                 sp->mask_size = 0;
-                _TIFFfree(sp->uncompressed_buffer);
+                _NDPIfree(sp->uncompressed_buffer);
                 sp->uncompressed_buffer = 0;
                 sp->uncompressed_alloc = 0;
                 return 0;
@@ -307,8 +307,8 @@ LERCPreDecode(TIFF* tif, uint16_t s)
         {
             if( sp->compressed_size < sp->uncompressed_alloc )
             {
-                _TIFFfree(sp->compressed_buffer);
-                sp->compressed_buffer = _TIFFmalloc(sp->uncompressed_alloc);
+                _NDPIfree(sp->compressed_buffer);
+                sp->compressed_buffer = _NDPImalloc(sp->uncompressed_alloc);
                 if( !sp->compressed_buffer )
                 {
                     sp->compressed_size = 0;
@@ -328,7 +328,7 @@ LERCPreDecode(TIFF* tif, uint16_t s)
                 sp->libdeflate_dec = libdeflate_alloc_decompressor();
                 if( sp->libdeflate_dec == NULL )
                 {
-                    TIFFErrorExt(tif->tif_clientdata, module,
+                    NDPIErrorExt(tif->tif_clientdata, module,
                                  "Cannot allocate decompressor");
                     return 0;
                 }
@@ -340,7 +340,7 @@ LERCPreDecode(TIFF* tif, uint16_t s)
                 &lerc_data_sizet);
             if( res != LIBDEFLATE_SUCCESS )
             {
-                TIFFErrorExt(tif->tif_clientdata, module,
+                NDPIErrorExt(tif->tif_clientdata, module,
                                 "Decoding error at scanline %lu",
                                 (unsigned long) tif->tif_row);
                 return 0;
@@ -359,7 +359,7 @@ LERCPreDecode(TIFF* tif, uint16_t s)
             zlib_ret = inflateInit(&strm);
             if( zlib_ret != Z_OK )
             {
-                TIFFErrorExt(tif->tif_clientdata, module,
+                NDPIErrorExt(tif->tif_clientdata, module,
                          "inflateInit() failed");
                 inflateEnd(&strm);
                 return 0;
@@ -372,7 +372,7 @@ LERCPreDecode(TIFF* tif, uint16_t s)
             zlib_ret = inflate(&strm, Z_FINISH);
             if( zlib_ret != Z_STREAM_END && zlib_ret != Z_OK )
             {
-                TIFFErrorExt(tif->tif_clientdata, module,
+                NDPIErrorExt(tif->tif_clientdata, module,
                          "inflate() failed");
                 inflateEnd(&strm);
                 return 0;
@@ -392,7 +392,7 @@ LERCPreDecode(TIFF* tif, uint16_t s)
                                        tif->tif_rawcp,
                                        tif->tif_rawcc);
             if( ZSTD_isError(zstd_ret) ) {
-                TIFFErrorExt(tif->tif_clientdata, module,
+                NDPIErrorExt(tif->tif_clientdata, module,
                             "Error in ZSTD_decompress(): %s",
                             ZSTD_getErrorName(zstd_ret));
                 return 0;
@@ -401,13 +401,13 @@ LERCPreDecode(TIFF* tif, uint16_t s)
             lerc_data = sp->compressed_buffer;
             lerc_data_size = (unsigned int)zstd_ret;
 #else
-            TIFFErrorExt(tif->tif_clientdata, module, "ZSTD support missing");
+            NDPIErrorExt(tif->tif_clientdata, module, "ZSTD support missing");
             return 0;
 #endif
         }
         else if( sp->additional_compression != LERC_ADD_COMPRESSION_NONE )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "Unhandled additional compression");
             return 0;
         }
@@ -421,7 +421,7 @@ LERCPreDecode(TIFF* tif, uint16_t s)
             0);
         if( lerc_ret != 0 )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "lerc_getBlobInfo() failed");
             return 0;
         }
@@ -453,48 +453,48 @@ LERCPreDecode(TIFF* tif, uint16_t s)
             nRows, nBands, nValidPixels, blobSize } */
         if( infoArray[0] != (unsigned)sp->lerc_version )
         {
-            TIFFWarningExt(tif->tif_clientdata, module,
+            NDPIWarningExt(tif->tif_clientdata, module,
                          "Unexpected version number: %d. Expected: %d",
                          infoArray[0], sp->lerc_version);
         }
         if( infoArray[1] != (unsigned)lerc_data_type )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "Unexpected dataType: %d. Expected: %d",
                          infoArray[1], lerc_data_type);
             return 0;
         }
         if( infoArray[2] != (unsigned)ndims )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "Unexpected nDim: %d. Expected: %d",
                          infoArray[2], ndims);
             return 0;
         }
         if( infoArray[3] != sp->segment_width )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "Unexpected nCols: %d. Expected: %du",
                          infoArray[3], sp->segment_width);
             return 0;
         }
         if( infoArray[4] != sp->segment_height )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "Unexpected nRows: %d. Expected: %u",
                          infoArray[4], sp->segment_height);
             return 0;
         }
         if( infoArray[5] != 1 )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "Unexpected nBands: %d. Expected: %d",
                          infoArray[5], 1);
             return 0;
         }
         if( infoArray[7] != lerc_data_size )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "Unexpected blobSize: %d. Expected: %u",
                          infoArray[7],
                          lerc_data_size);
@@ -516,7 +516,7 @@ LERCPreDecode(TIFF* tif, uint16_t s)
             sp->uncompressed_buffer);
         if( lerc_ret != 0 )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "lerc_decode() failed");
             return 0;
         }
@@ -601,7 +601,7 @@ LERCDecode(TIFF* tif, uint8_t* op, tmsize_t occ, uint16_t s)
 
         if( sp->uncompressed_buffer == 0 )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "Uncompressed buffer not allocated");
             return 0;
         }
@@ -609,7 +609,7 @@ LERCDecode(TIFF* tif, uint8_t* op, tmsize_t occ, uint16_t s)
         if( (uint64_t)sp->uncompressed_offset +
                                         (uint64_t)occ > sp->uncompressed_size )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "Too many bytes read");
             return 0;
         }
@@ -678,7 +678,7 @@ LERCEncode(TIFF* tif, uint8_t* bp, tmsize_t cc, uint16_t s)
         if( (uint64_t)sp->uncompressed_offset +
                                     (uint64_t)cc > sp->uncompressed_size )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "Too many bytes written");
             return 0;
         }
@@ -707,7 +707,7 @@ LERCPostEncode(TIFF* tif)
 
         if( sp->uncompressed_offset != sp->uncompressed_size )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "Unexpected number of bytes in the buffer");
             return 0;
         }
@@ -830,7 +830,7 @@ LERCPostEncode(TIFF* tif)
             &numBytes);
         if( lerc_ret != 0 )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "lerc_computeCompressedSize() failed");
             return 0;
         }
@@ -840,8 +840,8 @@ LERCPostEncode(TIFF* tif)
 
         if( sp->compressed_size < numBytes )
         {
-            _TIFFfree(sp->compressed_buffer);
-            sp->compressed_buffer = _TIFFmalloc(numBytes);
+            _NDPIfree(sp->compressed_buffer);
+            sp->compressed_buffer = _NDPImalloc(numBytes);
             if( !sp->compressed_buffer )
             {
                 sp->compressed_size = 0;
@@ -869,7 +869,7 @@ LERCPostEncode(TIFF* tif)
             &numBytesWritten);
         if( lerc_ret != 0 )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "lerc_encode() failed");
             return 0;
         }
@@ -888,7 +888,7 @@ LERCPostEncode(TIFF* tif)
                     sp->zipquality);
                 if( sp->libdeflate_enc == NULL )
                 {
-                    TIFFErrorExt(tif->tif_clientdata, module,
+                    NDPIErrorExt(tif->tif_clientdata, module,
                                  "Cannot allocate compressor");
                     return 0;
                 }
@@ -898,7 +898,7 @@ LERCPostEncode(TIFF* tif)
             if( libdeflate_zlib_compress_bound(sp->libdeflate_enc, numBytesWritten) >
                      sp->uncompressed_alloc )
             {
-                TIFFErrorExt(tif->tif_clientdata, module,
+                NDPIErrorExt(tif->tif_clientdata, module,
                              "Output buffer for libdeflate too small");
                 return 0;
             }
@@ -910,7 +910,7 @@ LERCPostEncode(TIFF* tif)
 
             if( tif->tif_rawcc == 0 )
             {
-                TIFFErrorExt(tif->tif_clientdata, module,
+                NDPIErrorExt(tif->tif_clientdata, module,
                                 "Encoder error at scanline %lu",
                                 (unsigned long) tif->tif_row);
                 return 0;
@@ -929,7 +929,7 @@ LERCPostEncode(TIFF* tif)
             zlib_ret = deflateInit(&strm, cappedQuality);
             if( zlib_ret != Z_OK )
             {
-                TIFFErrorExt(tif->tif_clientdata, module,
+                NDPIErrorExt(tif->tif_clientdata, module,
                          "deflateInit() failed");
                 return 0;
             }
@@ -946,7 +946,7 @@ LERCPostEncode(TIFF* tif)
             deflateEnd(&strm);
             if( zlib_ret != Z_STREAM_END )
             {
-                TIFFErrorExt(tif->tif_clientdata, module,
+                NDPIErrorExt(tif->tif_clientdata, module,
                          "deflate() failed");
                 return 0;
             }
@@ -955,7 +955,7 @@ LERCPostEncode(TIFF* tif)
                 int ret;
                 uint8_t* tif_rawdata_backup = tif->tif_rawdata;
                 tif->tif_rawdata = sp->uncompressed_buffer;
-                ret = TIFFFlushData1(tif);
+                ret = NDPIFlushData1(tif);
                 tif->tif_rawdata = tif_rawdata_backup;
                 if( !ret )
                 {
@@ -972,7 +972,7 @@ LERCPostEncode(TIFF* tif)
                                              numBytesWritten,
                                              sp->zstd_compress_level );
             if( ZSTD_isError(zstd_ret) ) {
-                TIFFErrorExt(tif->tif_clientdata, module,
+                NDPIErrorExt(tif->tif_clientdata, module,
                             "Error in ZSTD_compress(): %s",
                             ZSTD_getErrorName(zstd_ret));
                 return 0;
@@ -983,7 +983,7 @@ LERCPostEncode(TIFF* tif)
                 uint8_t* tif_rawdata_backup = tif->tif_rawdata;
                 tif->tif_rawdata = sp->uncompressed_buffer;
                 tif->tif_rawcc = zstd_ret;
-                ret = TIFFFlushData1(tif);
+                ret = NDPIFlushData1(tif);
                 tif->tif_rawdata = tif_rawdata_backup;
                 if( !ret )
                 {
@@ -991,13 +991,13 @@ LERCPostEncode(TIFF* tif)
                 }
             }
 #else
-            TIFFErrorExt(tif->tif_clientdata, module, "ZSTD support missing");
+            NDPIErrorExt(tif->tif_clientdata, module, "ZSTD support missing");
             return 0;
 #endif
         }
         else if( sp->additional_compression != LERC_ADD_COMPRESSION_NONE )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "Unhandled additional compression");
             return 0;
         }
@@ -1007,7 +1007,7 @@ LERCPostEncode(TIFF* tif)
             uint8_t* tif_rawdata_backup = tif->tif_rawdata;
             tif->tif_rawdata = sp->compressed_buffer;
             tif->tif_rawcc = numBytesWritten;
-            ret = TIFFFlushData1(tif);
+            ret = NDPIFlushData1(tif);
             tif->tif_rawdata = tif_rawdata_backup;
             if( !ret )
                 return 0;
@@ -1026,9 +1026,9 @@ LERCCleanup(TIFF* tif)
         tif->tif_tagmethods.vgetfield = sp->vgetparent;
         tif->tif_tagmethods.vsetfield = sp->vsetparent;
 
-        _TIFFfree(sp->uncompressed_buffer);
-        _TIFFfree(sp->compressed_buffer);
-        _TIFFfree(sp->mask_buffer);
+        _NDPIfree(sp->uncompressed_buffer);
+        _NDPIfree(sp->compressed_buffer);
+        _NDPIfree(sp->mask_buffer);
 
 #if LIBDEFLATE_SUPPORT
         if( sp->libdeflate_dec )
@@ -1037,10 +1037,10 @@ LERCCleanup(TIFF* tif)
             libdeflate_free_compressor(sp->libdeflate_enc);
 #endif
 
-        _TIFFfree(sp);
+        _NDPIfree(sp);
         tif->tif_data = NULL;
 
-        _TIFFSetDefaultCompressionState(tif);
+        _NDPISetDefaultCompressionState(tif);
 }
 
 static const TIFFField LERCFields[] = {
@@ -1087,7 +1087,7 @@ LERCVSetField(TIFF* tif, uint32_t tag, va_list ap)
                 int* params = va_arg(ap, int*);
                 if( count < 2 )
                 {
-                    TIFFErrorExt(tif->tif_clientdata, module,
+                    NDPIErrorExt(tif->tif_clientdata, module,
                             "Invalid count for LercParameters: %u", count);
                     return 0;
                 }
@@ -1105,7 +1105,7 @@ LERCVSetField(TIFF* tif, uint32_t tag, va_list ap)
                 int version = va_arg(ap, int);
                 if( version != LERC_VERSION_2_4 )
                 {
-                    TIFFErrorExt(tif->tif_clientdata, module,
+                    NDPIErrorExt(tif->tif_clientdata, module,
                             "Invalid value for LercVersion: %d", version);
                     return 0;
                 }
@@ -1122,7 +1122,7 @@ LERCVSetField(TIFF* tif, uint32_t tag, va_list ap)
 #ifndef ZSTD_SUPPORT
                 if( additional_compression == LERC_ADD_COMPRESSION_ZSTD )
                 {
-                    TIFFErrorExt(tif->tif_clientdata, module,
+                    NDPIErrorExt(tif->tif_clientdata, module,
                                  "LERC_ZSTD requested, but ZSTD not available");
                     return 0;
                 }
@@ -1131,7 +1131,7 @@ LERCVSetField(TIFF* tif, uint32_t tag, va_list ap)
                     additional_compression != LERC_ADD_COMPRESSION_DEFLATE &&
                     additional_compression != LERC_ADD_COMPRESSION_ZSTD )
                 {
-                    TIFFErrorExt(tif->tif_clientdata, module,
+                    NDPIErrorExt(tif->tif_clientdata, module,
                             "Invalid value for LercAdditionalCompression: %d",
                             additional_compression);
                     return 0;
@@ -1149,7 +1149,7 @@ LERCVSetField(TIFF* tif, uint32_t tag, va_list ap)
             if( sp->zstd_compress_level <= 0 ||
                 sp->zstd_compress_level > ZSTD_maxCLevel() )
             {
-                TIFFWarningExt(tif->tif_clientdata, module,
+                NDPIWarningExt(tif->tif_clientdata, module,
                                 "ZSTD_LEVEL should be between 1 and %d",
                                 ZSTD_maxCLevel());
             }
@@ -1161,7 +1161,7 @@ LERCVSetField(TIFF* tif, uint32_t tag, va_list ap)
                 sp->zipquality = (int) va_arg(ap, int);
                 if( sp->zipquality < Z_DEFAULT_COMPRESSION ||
                     sp->zipquality > LIBDEFLATE_MAX_COMPRESSION_LEVEL ) {
-                    TIFFErrorExt(tif->tif_clientdata, module,
+                    NDPIErrorExt(tif->tif_clientdata, module,
                                  "Invalid ZipQuality value. Should be in [-1,%d] range",
                                  LIBDEFLATE_MAX_COMPRESSION_LEVEL);
                     return 0;
@@ -1221,8 +1221,8 @@ int TIFFInitLERC(TIFF* tif, int scheme)
         /*
         * Merge codec-specific tag information.
         */
-        if (!_TIFFMergeFields(tif, LERCFields, TIFFArrayCount(LERCFields))) {
-                TIFFErrorExt(tif->tif_clientdata, module,
+        if (!_NDPIMergeFields(tif, LERCFields, TIFFArrayCount(LERCFields))) {
+                NDPIErrorExt(tif->tif_clientdata, module,
                             "Merging LERC codec-specific tags failed");
                 return 0;
         }
@@ -1261,8 +1261,8 @@ int TIFFInitLERC(TIFF* tif, int scheme)
         tif->tif_cleanup = LERCCleanup;
 
         /* Default values for codec-specific fields */
-        TIFFSetField(tif, TIFFTAG_LERC_VERSION, LERC_VERSION_2_4);
-        TIFFSetField(tif, TIFFTAG_LERC_ADD_COMPRESSION, LERC_ADD_COMPRESSION_NONE);
+        NDPISetField(tif, TIFFTAG_LERC_VERSION, LERC_VERSION_2_4);
+        NDPISetField(tif, TIFFTAG_LERC_ADD_COMPRESSION, LERC_ADD_COMPRESSION_NONE);
         sp->maxzerror = 0.0;
         sp->zstd_compress_level = 9;		/* default comp. level */
         sp->zipquality = Z_DEFAULT_COMPRESSION;	/* default comp. level */
@@ -1270,7 +1270,7 @@ int TIFFInitLERC(TIFF* tif, int scheme)
 
         return 1;
 bad:
-        TIFFErrorExt(tif->tif_clientdata, module,
+        NDPIErrorExt(tif->tif_clientdata, module,
                     "No space for LERC state block");
         return 0;
 }

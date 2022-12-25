@@ -24,12 +24,12 @@
 .if n .po 0
 .TH TIFFBUFFER 3TIFF "November 1, 2005" "libtiff"
 .SH NAME
-TIFFReadBufferSetup, TIFFWriteBufferSetup \- I/O buffering control routines
+NDPIReadBufferSetup, TIFFWriteBufferSetup \- I/O buffering control routines
 .SH SYNOPSIS
 .nf
 .B "#include <tiffio.h>"
 .sp
-.BI "int TIFFReadBufferSetup(TIFF *" tif ", tdata_t " buffer ", tsize_t " size ");"
+.BI "int NDPIReadBufferSetup(TIFF *" tif ", tdata_t " buffer ", tsize_t " size ");"
 .BI "int TIFFWriteBufferSetup(TIFF *" tif ", tdata_t " buffer ", tsize_t " size ");"
 .fi
 .SH DESCRIPTION
@@ -39,14 +39,14 @@ only for ``intelligent clients'' that wish to optimize memory usage and/or
 eliminate potential copy operations that can occur when working with images
 that have data stored without compression.
 .PP
-.I TIFFReadBufferSetup
+.I NDPIReadBufferSetup
 sets up the data buffer used to read raw (encoded) data from a file. If the
 specified pointer is
 .SM NULL
 (zero), then a buffer of the appropriate size is allocated. Otherwise the
 caller must guarantee that the buffer is large enough to hold any individual
 strip of raw data.
-.I TIFFReadBufferSetup
+.I NDPIReadBufferSetup
 returns a non-zero value if the setup was successful and zero otherwise.
 .PP
 .I TIFFWriteBufferSetup
@@ -63,7 +63,7 @@ is
 returns a non-zero value if the setup was successful and zero otherwise.
 .SH DIAGNOSTICS
 .BR "%s: No space for data buffer at scanline %ld" .
-.I TIFFReadBufferSetup
+.I NDPIReadBufferSetup
 was unable to dynamically allocate space for a data buffer.
 .PP
 .BR "%s: No space for output buffer" .

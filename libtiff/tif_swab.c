@@ -29,9 +29,9 @@
  */
 #include "tiffiop.h"
 
-#if defined(DISABLE_CHECK_TIFFSWABMACROS) || !defined(TIFFSwabShort)
+#if defined(DISABLE_CHECK_TIFFSWABMACROS) || !defined(NDPISwabShort)
 void
-TIFFSwabShort(uint16_t* wp)
+NDPISwabShort(uint16_t* wp)
 {
 	register unsigned char* cp = (unsigned char*) wp;
 	unsigned char t;
@@ -40,9 +40,9 @@ TIFFSwabShort(uint16_t* wp)
 }
 #endif
 
-#if defined(DISABLE_CHECK_TIFFSWABMACROS) || !defined(TIFFSwabLong)
+#if defined(DISABLE_CHECK_TIFFSWABMACROS) || !defined(NDPISwabLong)
 void
-TIFFSwabLong(uint32_t* lp)
+NDPISwabLong(uint32_t* lp)
 {
 	register unsigned char* cp = (unsigned char*) lp;
 	unsigned char t;
@@ -52,9 +52,9 @@ TIFFSwabLong(uint32_t* lp)
 }
 #endif
 
-#if defined(DISABLE_CHECK_TIFFSWABMACROS) || !defined(TIFFSwabLong8)
+#if defined(DISABLE_CHECK_TIFFSWABMACROS) || !defined(NDPISwabLong8)
 void
-TIFFSwabLong8(uint64_t* lp)
+NDPISwabLong8(uint64_t* lp)
 {
 	register unsigned char* cp = (unsigned char*) lp;
 	unsigned char t;
@@ -66,9 +66,9 @@ TIFFSwabLong8(uint64_t* lp)
 }
 #endif
 
-#if defined(DISABLE_CHECK_TIFFSWABMACROS) || !defined(TIFFSwabArrayOfShort)
+#if defined(DISABLE_CHECK_TIFFSWABMACROS) || !defined(NDPISwabArrayOfShort)
 void
-TIFFSwabArrayOfShort(register uint16_t* wp, tmsize_t n)
+NDPISwabArrayOfShort(register uint16_t* wp, tmsize_t n)
 {
 	register unsigned char* cp;
 	register unsigned char t;
@@ -82,9 +82,9 @@ TIFFSwabArrayOfShort(register uint16_t* wp, tmsize_t n)
 }
 #endif
 
-#if defined(DISABLE_CHECK_TIFFSWABMACROS) || !defined(TIFFSwabArrayOfTriples)
+#if defined(DISABLE_CHECK_TIFFSWABMACROS) || !defined(NDPISwabArrayOfTriples)
 void
-TIFFSwabArrayOfTriples(register uint8_t* tp, tmsize_t n)
+NDPISwabArrayOfTriples(register uint8_t* tp, tmsize_t n)
 {
 	unsigned char* cp;
 	unsigned char t;
@@ -98,9 +98,9 @@ TIFFSwabArrayOfTriples(register uint8_t* tp, tmsize_t n)
 }
 #endif
 
-#if defined(DISABLE_CHECK_TIFFSWABMACROS) || !defined(TIFFSwabArrayOfLong)
+#if defined(DISABLE_CHECK_TIFFSWABMACROS) || !defined(NDPISwabArrayOfLong)
 void
-TIFFSwabArrayOfLong(register uint32_t* lp, tmsize_t n)
+NDPISwabArrayOfLong(register uint32_t* lp, tmsize_t n)
 {
 	register unsigned char *cp;
 	register unsigned char t;
@@ -177,9 +177,9 @@ TIFFSwabDouble(double *dp)
 }
 #endif
 
-#if defined(DISABLE_CHECK_TIFFSWABMACROS) || !defined(TIFFSwabArrayOfDouble)
+#if defined(DISABLE_CHECK_TIFFSWABMACROS) || !defined(NDPISwabArrayOfDouble)
 void
-TIFFSwabArrayOfDouble(double* dp, tmsize_t n)
+NDPISwabArrayOfDouble(double* dp, tmsize_t n)
 {
 	register unsigned char *cp;
 	register unsigned char t;
@@ -281,7 +281,7 @@ TIFFGetBitRevTable(int reversed)
 }
 
 void
-TIFFReverseBits(uint8_t* cp, tmsize_t n)
+NDPIReverseBits(uint8_t* cp, tmsize_t n)
 {
 	for (; n > 8; n -= 8) {
 		cp[0] = TIFFBitRevTable[cp[0]];

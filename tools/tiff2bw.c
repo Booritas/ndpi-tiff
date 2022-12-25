@@ -83,7 +83,7 @@ checkcmap(TIFF* tif, int n, uint16_t* r, uint16_t* g, uint16_t* b)
 	while (n-- > 0)
 		if (*r++ >= 256 || *g++ >= 256 || *b++ >= 256)
 			return (16);
-	TIFFWarning(TIFFFileName(tif), "Assuming 8-bit colormap");
+	TIFFWarning(NDPIFileName(tif), "Assuming 8-bit colormap");
 	return (8);
 }
 
@@ -166,18 +166,18 @@ main(int argc, char* argv[])
 		}
 	if (argc - optind < 2)
 		usage(EXIT_FAILURE);
-	in = TIFFOpen(argv[optind], "r");
+	in = NDPIOpen(argv[optind], "r");
 	if (in == NULL)
 		return (EXIT_FAILURE);
 	photometric = 0;
-	TIFFGetField(in, TIFFTAG_PHOTOMETRIC, &photometric);
+	NDPIGetField(in, TIFFTAG_PHOTOMETRIC, &photometric);
 	if (photometric != PHOTOMETRIC_RGB && photometric != PHOTOMETRIC_PALETTE ) {
 		fprintf(stderr,
 	    "%s: Bad photometric; can only handle RGB and Palette images.\n",
 		    argv[optind]);
                 goto tiff2bw_error;
 	}
-	TIFFGetField(in, TIFFTAG_SAMPLESPERPIXEL, &samplesperpixel);
+	NDPIGetField(in, TIFFTAG_SAMPLESPERPIXEL, &samplesperpixel);
 	if (samplesperpixel != 1 && samplesperpixel != 3) {
 		fprintf(stderr, "%s: Bad samples/pixel %u.\n",
 		    argv[optind], samplesperpixel);
@@ -188,59 +188,59 @@ main(int argc, char* argv[])
 		    argv[optind], samplesperpixel);
                 goto tiff2bw_error;
 	}
-	TIFFGetField(in, TIFFTAG_BITSPERSAMPLE, &bitspersample);
+	NDPIGetField(in, TIFFTAG_BITSPERSAMPLE, &bitspersample);
 	if (bitspersample != 8) {
 		fprintf(stderr,
 		    " %s: Sorry, only handle 8-bit samples.\n", argv[optind]);
                 goto tiff2bw_error;
 	}
-	TIFFGetField(in, TIFFTAG_IMAGEWIDTH, &w);
-	TIFFGetField(in, TIFFTAG_IMAGELENGTH, &h);
-	TIFFGetField(in, TIFFTAG_PLANARCONFIG, &config);
+	NDPIGetField(in, TIFFTAG_IMAGEWIDTH, &w);
+	NDPIGetField(in, TIFFTAG_IMAGELENGTH, &h);
+	NDPIGetField(in, TIFFTAG_PLANARCONFIG, &config);
 
-	out = TIFFOpen(argv[optind+1], "w");
+	out = NDPIOpen(argv[optind+1], "w");
 	if (out == NULL)
 	{
                 goto tiff2bw_error;
 	}
-	TIFFSetField(out, TIFFTAG_IMAGEWIDTH, w);
-	TIFFSetField(out, TIFFTAG_IMAGELENGTH, h);
-	TIFFSetField(out, TIFFTAG_BITSPERSAMPLE, 8);
-	TIFFSetField(out, TIFFTAG_SAMPLESPERPIXEL, 1);
-	TIFFSetField(out, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+	NDPISetField(out, TIFFTAG_IMAGEWIDTH, w);
+	NDPISetField(out, TIFFTAG_IMAGELENGTH, h);
+	NDPISetField(out, TIFFTAG_BITSPERSAMPLE, 8);
+	NDPISetField(out, TIFFTAG_SAMPLESPERPIXEL, 1);
+	NDPISetField(out, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
 	cpTags(in, out);
 	if (compression != (uint16_t) -1) {
-		TIFFSetField(out, TIFFTAG_COMPRESSION, compression);
+		NDPISetField(out, TIFFTAG_COMPRESSION, compression);
 		switch (compression) {
 		case COMPRESSION_JPEG:
-			TIFFSetField(out, TIFFTAG_JPEGQUALITY, quality);
-			TIFFSetField(out, TIFFTAG_JPEGCOLORMODE, jpegcolormode);
+			NDPISetField(out, TIFFTAG_JPEGQUALITY, quality);
+			NDPISetField(out, TIFFTAG_JPEGCOLORMODE, jpegcolormode);
 			break;
 		case COMPRESSION_LZW:
 		case COMPRESSION_DEFLATE:
 			if (predictor != 0)
-				TIFFSetField(out, TIFFTAG_PREDICTOR, predictor);
+				NDPISetField(out, TIFFTAG_PREDICTOR, predictor);
 			break;
 		}
 	}
-	TIFFSetField(out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
+	NDPISetField(out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
 	snprintf(thing, sizeof(thing), "B&W version of %s", argv[optind]);
-	TIFFSetField(out, TIFFTAG_IMAGEDESCRIPTION, thing);
-	TIFFSetField(out, TIFFTAG_SOFTWARE, "tiff2bw");
-	outbuf = (unsigned char *)_TIFFmalloc(TIFFScanlineSize(out));
+	NDPISetField(out, TIFFTAG_IMAGEDESCRIPTION, thing);
+	NDPISetField(out, TIFFTAG_SOFTWARE, "tiff2bw");
+	outbuf = (unsigned char *)_NDPImalloc(NDPIScanlineSize(out));
         if( !outbuf )
         {
             fprintf(stderr, "Out of memory\n");
             goto tiff2bw_error;
         }
-	TIFFSetField(out, TIFFTAG_ROWSPERSTRIP,
-	    TIFFDefaultStripSize(out, rowsperstrip));
+	NDPISetField(out, TIFFTAG_ROWSPERSTRIP,
+	    NDPIDefaultStripSize(out, rowsperstrip));
 
 #define	pack(a,b)	((a)<<8 | (b))
 	switch (pack(photometric, config)) {
 	case pack(PHOTOMETRIC_PALETTE, PLANARCONFIG_CONTIG):
 	case pack(PHOTOMETRIC_PALETTE, PLANARCONFIG_SEPARATE):
-		TIFFGetField(in, TIFFTAG_COLORMAP, &red, &green, &blue);
+		NDPIGetField(in, TIFFTAG_COLORMAP, &red, &green, &blue);
 		/*
 		 * Convert 16-bit colormap to 8-bit (unless it looks
 		 * like an old-style 8-bit colormap).
@@ -255,14 +255,14 @@ main(int argc, char* argv[])
 			}
 #undef CVT
 		}
-		inbuf = (unsigned char *)_TIFFmalloc(TIFFScanlineSize(in));
+		inbuf = (unsigned char *)_NDPImalloc(NDPIScanlineSize(in));
                 if( !inbuf )
                 {
                     fprintf(stderr, "Out of memory\n");
                     goto tiff2bw_error;
                 }
 		for (row = 0; row < h; row++) {
-			if (TIFFReadScanline(in, inbuf, row, 0) < 0)
+			if (NDPIReadScanline(in, inbuf, row, 0) < 0)
 				break;
 			compresspalette(outbuf, inbuf, w, red, green, blue);
 			if (TIFFWriteScanline(out, outbuf, row, 0) < 0)
@@ -270,14 +270,14 @@ main(int argc, char* argv[])
 		}
 		break;
 	case pack(PHOTOMETRIC_RGB, PLANARCONFIG_CONTIG):
-		inbuf = (unsigned char *)_TIFFmalloc(TIFFScanlineSize(in));
+		inbuf = (unsigned char *)_NDPImalloc(NDPIScanlineSize(in));
                 if( !inbuf )
                 {
                     fprintf(stderr, "Out of memory\n");
                     goto tiff2bw_error;
                 }
 		for (row = 0; row < h; row++) {
-			if (TIFFReadScanline(in, inbuf, row, 0) < 0)
+			if (NDPIReadScanline(in, inbuf, row, 0) < 0)
 				break;
 			compresscontig(outbuf, inbuf, w);
 			if (TIFFWriteScanline(out, outbuf, row, 0) < 0)
@@ -287,9 +287,9 @@ main(int argc, char* argv[])
 	case pack(PHOTOMETRIC_RGB, PLANARCONFIG_SEPARATE):
         {
                 tmsize_t inbufsize;
-		rowsize = TIFFScanlineSize(in);
+		rowsize = NDPIScanlineSize(in);
                 inbufsize = TIFFSafeMultiply(tmsize_t, 3, rowsize);
-		inbuf = (unsigned char *)_TIFFmalloc(inbufsize);
+		inbuf = (unsigned char *)_NDPImalloc(inbufsize);
                 if( !inbuf )
                 {
                     fprintf(stderr, "Out of memory\n");
@@ -297,7 +297,7 @@ main(int argc, char* argv[])
                 }
 		for (row = 0; row < h; row++) {
 			for (s = 0; s < 3; s++)
-				if (TIFFReadScanline(in,
+				if (NDPIReadScanline(in,
 				    inbuf+s*rowsize, row, s) < 0)
                                         goto tiff2bw_error;
 			compresssep(outbuf,
@@ -310,22 +310,22 @@ main(int argc, char* argv[])
 	}
 #undef pack
         if (inbuf)
-                _TIFFfree(inbuf);
+                _NDPIfree(inbuf);
         if (outbuf)
-                _TIFFfree(outbuf);
-        TIFFClose(in);
-	TIFFClose(out);
+                _NDPIfree(outbuf);
+        NDPIClose(in);
+	NDPIClose(out);
 	return (EXIT_SUCCESS);
 
  tiff2bw_error:
         if (inbuf)
-                _TIFFfree(inbuf);
+                _NDPIfree(inbuf);
         if (outbuf)
-                _TIFFfree(outbuf);
+                _NDPIfree(outbuf);
         if (out)
-                TIFFClose(out);
+                NDPIClose(out);
         if (in)
-                TIFFClose(in);
+                NDPIClose(in);
         return (EXIT_FAILURE);
 }
 
@@ -367,13 +367,13 @@ processCompressOptions(char* opt)
 }
 
 #define	CopyField(tag, v) \
-    if (TIFFGetField(in, tag, &v)) TIFFSetField(out, tag, v)
+    if (NDPIGetField(in, tag, &v)) NDPISetField(out, tag, v)
 #define	CopyField2(tag, v1, v2) \
-    if (TIFFGetField(in, tag, &v1, &v2)) TIFFSetField(out, tag, v1, v2)
+    if (NDPIGetField(in, tag, &v1, &v2)) NDPISetField(out, tag, v1, v2)
 #define	CopyField3(tag, v1, v2, v3) \
-    if (TIFFGetField(in, tag, &v1, &v2, &v3)) TIFFSetField(out, tag, v1, v2, v3)
+    if (NDPIGetField(in, tag, &v1, &v2, &v3)) NDPISetField(out, tag, v1, v2, v3)
 #define	CopyField4(tag, v1, v2, v3, v4) \
-    if (TIFFGetField(in, tag, &v1, &v2, &v3, &v4)) TIFFSetField(out, tag, v1, v2, v3, v4)
+    if (NDPIGetField(in, tag, &v1, &v2, &v3, &v4)) NDPISetField(out, tag, v1, v2, v3, v4)
 
 static void
 cpTag(TIFF* in, TIFF* out, uint16_t tag, uint16_t count, TIFFDataType type)
@@ -424,7 +424,7 @@ cpTag(TIFF* in, TIFF* out, uint16_t tag, uint16_t count, TIFFDataType type)
 		}
 		break;
           default:
-                TIFFError(TIFFFileName(in),
+                NDPIError(NDPIFileName(in),
                           "Data type %d is not supported, tag %d skipped.",
                           tag, type);
 	}
@@ -485,14 +485,14 @@ cpTags(TIFF* in, TIFF* out)
         if( p->tag == TIFFTAG_GROUP3OPTIONS )
         {
             uint16_t compression;
-            if( !TIFFGetField(in, TIFFTAG_COMPRESSION, &compression) ||
+            if( !NDPIGetField(in, TIFFTAG_COMPRESSION, &compression) ||
                     compression != COMPRESSION_CCITTFAX3 )
                 continue;
         }
         if( p->tag == TIFFTAG_GROUP4OPTIONS )
         {
             uint16_t compression;
-            if( !TIFFGetField(in, TIFFTAG_COMPRESSION, &compression) ||
+            if( !NDPIGetField(in, TIFFTAG_COMPRESSION, &compression) ||
                     compression != COMPRESSION_CCITTFAX4 )
                 continue;
         }

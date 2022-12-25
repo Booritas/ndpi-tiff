@@ -22,15 +22,15 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFReadTile 3TIFF "December 16, 1991" "libtiff"
+.TH NDPIReadTile 3TIFF "December 16, 1991" "libtiff"
 .SH NAME
-TIFFReadTile \- read and decode a tile of data from an open
+NDPIReadTile \- read and decode a tile of data from an open
 .SM TIFF
 file
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "tsize_t TIFFReadTile(TIFF *" tif ", tdata_t " buf ", uint32_t " x ", uint32_t " y ", uint32_t " z ", tsample_t " sample ")"
+.BI "tsize_t NDPIReadTile(TIFF *" tif ", tdata_t " buf ", uint32_t " x ", uint32_t " y ", uint32_t " z ", tsample_t " sample ")"
 .SH DESCRIPTION
 Return the data for the tile
 .I containing
@@ -40,13 +40,13 @@ are returned decompressed and, typically, in the native byte- and
 bit-ordering, but are otherwise packed (see further below). The buffer must be
 large enough to hold an entire tile of data. Applications should call the
 routine
-.IR TIFFTileSize
+.IR NDPITileSize
 to find out the size (in bytes) of a tile buffer. The
 .I x
 and
 .I y
 parameters are always used by
-.IR TIFFReadTile .
+.IR NDPIReadTile .
 The
 .I z
 parameter is used if the image is deeper than 1 slice (\c
@@ -64,19 +64,19 @@ tag is opposite to the native machine bit order. 16- and 32-bit samples are
 automatically byte-swapped if the file was written with a byte order opposite
 to the native machine byte order,
 .SH "RETURN VALUES"
-.IR TIFFReadTile
+.IR NDPIReadTile
 returns \-1 if it detects an error; otherwise the number of bytes in the
 decoded tile is returned.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.BR TIFFError (3TIFF)
+.BR NDPIError (3TIFF)
 routine.
 .SH "SEE ALSO"
-.BR TIFFCheckTile (3TIFF),
-.BR TIFFComputeTile (3TIFF),
-.BR TIFFOpen (3TIFF),
-.BR TIFFReadEncodedTile (3TIFF),
-.BR TIFFReadRawTile (3TIFF),
+.BR NDPICheckTile (3TIFF),
+.BR NDPIComputeTile (3TIFF),
+.BR NDPIOpen (3TIFF),
+.BR NDPIReadEncodedTile (3TIFF),
+.BR NDPIReadRawTile (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

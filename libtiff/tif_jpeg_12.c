@@ -4,7 +4,7 @@
 #if defined(JPEG_DUAL_MODE_8_12)
 
 #  define TIFFInitJPEG TIFFInitJPEG_12
-#  define TIFFJPEGIsFullStripRequired TIFFJPEGIsFullStripRequired_12
+#  define NDPIJPEGIsFullStripRequired NDPIJPEGIsFullStripRequired_12
 
 int
 TIFFInitJPEG_12(TIFF* tif, int scheme);
@@ -13,7 +13,7 @@ TIFFInitJPEG_12(TIFF* tif, int scheme);
 
 #  include "tif_jpeg.c"
 
-int TIFFReInitJPEG_12( TIFF *tif, int scheme, int is_encode )
+int NDPIReInitJPEG_12( TIFF *tif, int scheme, int is_encode )
 
 {
     JPEGState* sp;

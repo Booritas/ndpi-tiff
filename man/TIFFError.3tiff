@@ -22,21 +22,21 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFError 3TIFF "October 15, 1995" "libtiff"
+.TH NDPIError 3TIFF "October 15, 1995" "libtiff"
 .SH NAME
-TIFFError, TIFFSetErrorHandler \- library error handling interface
+NDPIError, NDPISetErrorHandler \- library error handling interface
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "void TIFFError(const char *" module ", const char *" fmt ", " ... ")"
+.BI "void NDPIError(const char *" module ", const char *" fmt ", " ... ")"
 .sp
 .B "#include <stdarg.h>"
 .sp
 .BI "typedef void (*TIFFErrorHandler)(const char *" module ", const char *" fmt ", va_list " ap ");"
 .br
-.B "TIFFErrorHandler TIFFSetErrorHandler(TIFFErrorHandler handler);"
+.B "TIFFErrorHandler NDPISetErrorHandler(TIFFErrorHandler handler);"
 .SH DESCRIPTION
-.I TIFFError
+.I NDPIError
 invokes the library-wide error handling function to (normally) write an error
 message to the
 .BR stderr .
@@ -51,13 +51,13 @@ identify the software module in which an error is detected.
 .PP
 Applications that desire to capture control in the event of an error should
 use
-.IR TIFFSetErrorHandler
+.IR NDPISetErrorHandler
 to override the default error handler.
 A
 .SM NULL
 (0) error handling function may be installed to suppress error messages.
 .SH "RETURN VALUES"
-.IR TIFFSetErrorHandler
+.IR NDPISetErrorHandler
 returns a reference to the previous error handling function.
 .SH "SEE ALSO"
 .BR TIFFWarning (3TIFF),

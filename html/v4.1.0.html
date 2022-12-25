@@ -97,7 +97,7 @@ history:
     and add per-strile offset/bytecount loading capabilities. Part of
     this commit makes the behaviour that was previously met when libtiff
     was compiled with -DDEFER_STRILE_LOAD available for default builds
-    when specifying the new 'D' (Deferred) TIFFOpen() flag. In that
+    when specifying the new 'D' (Deferred) NDPIOpen() flag. In that
     mode, the [Tile/Strip][ByteCounts/Offsets] arrays are only loaded
     when first accessed. This can speed-up the opening of files stored
     on the network when just metadata retrieval is needed.
@@ -105,10 +105,10 @@ history:
     Another addition is the capability of loading only the values of
     the offset/bytecount of the strile of interest instead of the
     whole array. This is enabled with the new 'O' (Ondemand) flag of
-    TIFFOpen() (which implies 'D').
+    NDPIOpen() (which implies 'D').
 
-    The public TIFFGetStrileOffset[WithErr]() and
-    TIFFGetStrileByteCount[WithErr]() functions have been added to
+    The public NDPIGetStrileOffset[WithErr]() and
+    NDPIGetStrileByteCount[WithErr]() functions have been added to
     API. They are of particular interest when using sparse files (with
     offset == bytecount == 0) and you want to detect if a strile is
     present or not without decompressing the data, or updating an
@@ -153,15 +153,15 @@ history:
   </LI>
 
   <LI>
-    New function TIFFReadFromUserBuffer() which replaces the use of
-    TIFFReadEncodedStrip()/TIFFReadEncodedTile() when the user can
+    New function NDPIReadFromUserBuffer() which replaces the use of
+    NDPIReadEncodedStrip()/NDPIReadEncodedTile() when the user can
     provide the buffer for the input data, for example when he wants
     to avoid libtiff to read the strile offset/count values from the
     [Strip|Tile][Offsets/ByteCounts] array.
   </LI>
 
   <LI>
-    New functions TIFFDeferStrileArrayWriting() and TIFFForceStrileArrayWriting()
+    New functions NDPIDeferStrileArrayWriting() and NDPIForceStrileArrayWriting()
     Those advanced writing functions must be used in a particular sequence
     to make their intended effect. Their aim is to control when/where
     the [Strip/Tile][Offsets/ByteCounts] arrays are written into the file.

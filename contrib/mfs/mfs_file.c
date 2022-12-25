@@ -105,7 +105,7 @@ static void mem_init ();
 -   Description :   Register this area of memory (which has been allocated
 -                   and has a file read into it) under the mem_file library.
 -                   A file descriptor is returned which can the be passed
--                   back to TIFFClientOpen and used as if it was a disk
+-                   back to NDPIClientOpen and used as if it was a disk
 -                   based fd.
 -                   If the call is for mode 'w' then pass (void *)NULL as
 -                   the buffer and zero size and the library will 

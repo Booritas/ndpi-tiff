@@ -206,7 +206,7 @@ TIFFFdOpen(int fd, const char* name, const char* mode)
 
 	fd_as_handle_union_t fdh;
 	fdh.fd = fd;
-	tif = TIFFClientOpen(name, mode,
+	tif = NDPIClientOpen(name, mode,
 	    fdh.h,
 	    _tiffReadProc, _tiffWriteProc,
 	    _tiffSeekProc, _tiffCloseProc, _tiffSizeProc,
@@ -220,13 +220,13 @@ TIFFFdOpen(int fd, const char* name, const char* mode)
  * Open a TIFF file for read/writing.
  */
 TIFF*
-TIFFOpen(const char* name, const char* mode)
+NDPIOpen(const char* name, const char* mode)
 {
-	static const char module[] = "TIFFOpen";
+	static const char module[] = "NDPIOpen";
 	int m, fd;
 	TIFF* tif;
 
-	m = _TIFFgetMode(mode, module);
+	m = _NDPIgetMode(mode, module);
 	if (m == -1)
 		return ((TIFF*)0);
 
@@ -238,9 +238,9 @@ TIFFOpen(const char* name, const char* mode)
 	fd = open(name, m, 0666);
 	if (fd < 0) {
 		if (errno > 0 && strerror(errno) != NULL ) {
-			TIFFErrorExt(0, module, "%s: %s", name, strerror(errno) );
+			NDPIErrorExt(0, module, "%s: %s", name, strerror(errno) );
 		} else {
-			TIFFErrorExt(0, module, "%s: Cannot open", name);
+			NDPIErrorExt(0, module, "%s: Cannot open", name);
 		}
 		return ((TIFF *)0);
 	}
@@ -265,7 +265,7 @@ TIFFOpenW(const wchar_t* name, const char* mode)
 	char *mbname;
 	TIFF* tif;
 
-	m = _TIFFgetMode(mode, module);
+	m = _NDPIgetMode(mode, module);
 	if (m == -1)
 		return ((TIFF*)0);
 
@@ -276,16 +276,16 @@ TIFFOpenW(const wchar_t* name, const char* mode)
 
 	fd = _wopen(name, m, 0666);
 	if (fd < 0) {
-		TIFFErrorExt(0, module, "%ls: Cannot open", name);
+		NDPIErrorExt(0, module, "%ls: Cannot open", name);
 		return ((TIFF *)0);
 	}
 
 	mbname = NULL;
 	mbsize = WideCharToMultiByte(CP_ACP, 0, name, -1, NULL, 0, NULL, NULL);
 	if (mbsize > 0) {
-		mbname = _TIFFmalloc(mbsize);
+		mbname = _NDPImalloc(mbsize);
 		if (!mbname) {
-			TIFFErrorExt(0, module,
+			NDPIErrorExt(0, module,
 			"Can't allocate space for filename conversion buffer");
 			return ((TIFF*)0);
 		}
@@ -297,7 +297,7 @@ TIFFOpenW(const wchar_t* name, const char* mode)
 	tif = TIFFFdOpen((int)fd, (mbname != NULL) ? mbname : "<unknown>",
 			 mode);
 	
-	_TIFFfree(mbname);
+	_NDPIfree(mbname);
 	
 	if(!tif)
 		close(fd);
@@ -306,7 +306,7 @@ TIFFOpenW(const wchar_t* name, const char* mode)
 #endif
 
 void*
-_TIFFmalloc(tmsize_t s)
+_NDPImalloc(tmsize_t s)
 {
         if (s == 0)
                 return ((void *) NULL);
@@ -323,25 +323,25 @@ void* _TIFFcalloc(tmsize_t nmemb, tmsize_t siz)
 }
 
 void
-_TIFFfree(void* p)
+_NDPIfree(void* p)
 {
 	free(p);
 }
 
 void*
-_TIFFrealloc(void* p, tmsize_t s)
+_NDPIrealloc(void* p, tmsize_t s)
 {
 	return (realloc(p, (size_t) s));
 }
 
 void
-_TIFFmemset(void* p, int v, tmsize_t c)
+_NDPImemset(void* p, int v, tmsize_t c)
 {
 	memset(p, v, (size_t) c);
 }
 
 void
-_TIFFmemcpy(void* d, const void* s, tmsize_t c)
+_NDPImemcpy(void* d, const void* s, tmsize_t c)
 {
 	memcpy(d, s, (size_t) c);
 }

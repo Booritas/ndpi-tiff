@@ -214,60 +214,60 @@ main(int argc, char* argv[])
 
 	if (outfilename == NULL)
 		outfilename = argv[optind+1];
-	out = TIFFOpen(outfilename, "w");
+	out = NDPIOpen(outfilename, "w");
 	if (out == NULL) {
 		fprintf(stderr, "%s: %s: Cannot open file for output.\n",
 			argv[0], outfilename);
 		return (EXIT_FAILURE);
 	}
-	TIFFSetField(out, TIFFTAG_IMAGEWIDTH, width);
-	TIFFSetField(out, TIFFTAG_IMAGELENGTH, length);
-	TIFFSetField(out, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
-	TIFFSetField(out, TIFFTAG_SAMPLESPERPIXEL, nbands);
-	TIFFSetField(out, TIFFTAG_BITSPERSAMPLE, depth * 8);
-	TIFFSetField(out, TIFFTAG_FILLORDER, fillorder);
-	TIFFSetField(out, TIFFTAG_PLANARCONFIG, config);
-	TIFFSetField(out, TIFFTAG_PHOTOMETRIC, photometric);
+	NDPISetField(out, TIFFTAG_IMAGEWIDTH, width);
+	NDPISetField(out, TIFFTAG_IMAGELENGTH, length);
+	NDPISetField(out, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
+	NDPISetField(out, TIFFTAG_SAMPLESPERPIXEL, nbands);
+	NDPISetField(out, TIFFTAG_BITSPERSAMPLE, depth * 8);
+	NDPISetField(out, TIFFTAG_FILLORDER, fillorder);
+	NDPISetField(out, TIFFTAG_PLANARCONFIG, config);
+	NDPISetField(out, TIFFTAG_PHOTOMETRIC, photometric);
 	switch (dtype) {
 	case TIFF_BYTE:
 	case TIFF_SHORT:
 	case TIFF_LONG:
-		TIFFSetField(out, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_UINT);
+		NDPISetField(out, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_UINT);
 		break;
 	case TIFF_SBYTE:
 	case TIFF_SSHORT:
 	case TIFF_SLONG:
-		TIFFSetField(out, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_INT);
+		NDPISetField(out, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_INT);
 		break;
 	case TIFF_FLOAT:
 	case TIFF_DOUBLE:
-		TIFFSetField(out, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_IEEEFP);
+		NDPISetField(out, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_IEEEFP);
 		break;
 	default:
-		TIFFSetField(out, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_VOID);
+		NDPISetField(out, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_VOID);
 		break;
 	}
 	if (compression == (uint16_t) -1)
 		compression = COMPRESSION_PACKBITS;
-	TIFFSetField(out, TIFFTAG_COMPRESSION, compression);
+	NDPISetField(out, TIFFTAG_COMPRESSION, compression);
 	switch (compression) {
 	case COMPRESSION_JPEG:
 		if (photometric == PHOTOMETRIC_RGB
 		    && jpegcolormode == JPEGCOLORMODE_RGB)
 			photometric = PHOTOMETRIC_YCBCR;
-		TIFFSetField(out, TIFFTAG_JPEGQUALITY, quality);
-		TIFFSetField(out, TIFFTAG_JPEGCOLORMODE, jpegcolormode);
+		NDPISetField(out, TIFFTAG_JPEGQUALITY, quality);
+		NDPISetField(out, TIFFTAG_JPEGCOLORMODE, jpegcolormode);
 		break;
 	case COMPRESSION_LZW:
 	case COMPRESSION_DEFLATE:
 		if (predictor != 0)
-			TIFFSetField(out, TIFFTAG_PREDICTOR, predictor);
+			NDPISetField(out, TIFFTAG_PREDICTOR, predictor);
 		break;
 	}
 	switch(interleaving) {
 	case BAND:				/* band interleaved data */
 		linebytes = width * depth;
-		buf = (unsigned char *)_TIFFmalloc(linebytes);
+		buf = (unsigned char *)_NDPImalloc(linebytes);
 		break;
 	case PIXEL:				/* pixel interleaved data */
 	default:
@@ -275,13 +275,13 @@ main(int argc, char* argv[])
 		break;
 	}
 	bufsize = width * nbands * depth;
-	buf1 = (unsigned char *)_TIFFmalloc(bufsize);
+	buf1 = (unsigned char *)_NDPImalloc(bufsize);
 
-	rowsperstrip = TIFFDefaultStripSize(out, rowsperstrip);
+	rowsperstrip = NDPIDefaultStripSize(out, rowsperstrip);
 	if (rowsperstrip > length) {
 		rowsperstrip = length;
 	}
-	TIFFSetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip );
+	NDPISetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip );
 
 	_TIFF_lseek_f(fd, hdr_size, SEEK_SET);		/* Skip the file header */
 	for (row = 0; row < length; row++) {
@@ -329,10 +329,10 @@ main(int argc, char* argv[])
 		}
 	}
 	if (buf)
-		_TIFFfree(buf);
+		_NDPIfree(buf);
 	if (buf1)
-		_TIFFfree(buf1);
-	TIFFClose(out);
+		_NDPIfree(buf1);
+	NDPIClose(out);
 	return (EXIT_SUCCESS);
 }
 
@@ -342,17 +342,17 @@ swapBytesInScanline(void *buf, uint32_t width, TIFFDataType dtype)
 	switch (dtype) {
 		case TIFF_SHORT:
 		case TIFF_SSHORT:
-			TIFFSwabArrayOfShort((uint16_t*)buf,
+			NDPISwabArrayOfShort((uint16_t*)buf,
                                              (unsigned long)width);
 			break;
 		case TIFF_LONG:
 		case TIFF_SLONG:
-			TIFFSwabArrayOfLong((uint32_t*)buf,
+			NDPISwabArrayOfLong((uint32_t*)buf,
                                             (unsigned long)width);
 			break;
 		/* case TIFF_FLOAT: */	/* FIXME */
 		case TIFF_DOUBLE:
-			TIFFSwabArrayOfDouble((double*)buf,
+			NDPISwabArrayOfDouble((double*)buf,
                                               (unsigned long)width);
 			break;
 		default:
@@ -421,8 +421,8 @@ guessSize(int fd, TIFFDataType dtype, _TIFF_off_t hdr_size, uint32_t nbands,
 					continue;
 				/* reads 2 lines at the middle of the image and calculate their correlation.
 				 * it works for h >= 2. (in this case it will compare line 0 and line 1 */
-				buf1 = _TIFFmalloc(scanlinesize);
-				buf2 = _TIFFmalloc(scanlinesize);
+				buf1 = _NDPImalloc(scanlinesize);
+				buf2 = _NDPImalloc(scanlinesize);
                                 do {
                                         if (_TIFF_lseek_f(fd, hdr_size + (int)((h - 1)/2)*scanlinesize,
                                                   SEEK_SET) == (_TIFF_off_t)-1) {
@@ -460,8 +460,8 @@ guessSize(int fd, TIFFDataType dtype, _TIFF_off_t hdr_size, uint32_t nbands,
                                         }
                                 } while (0);
 
-                                _TIFFfree(buf1);
-				_TIFFfree(buf2);
+                                _NDPIfree(buf1);
+				_NDPIfree(buf2);
 			}
 		}
 

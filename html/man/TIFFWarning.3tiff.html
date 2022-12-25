@@ -24,7 +24,7 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>TIFFWarning, TIFFSetWarningHandler &minus; library
+<p>TIFFWarning, NDPISetWarningHandler &minus; library
 warning interface</p>
 </td>
 </table>
@@ -48,7 +48,7 @@ const char *</b><i>fmt</i><b>,</b> <i>...</i><b>)</b></p>
 va_list</b> <i>ap</i><b>);</b></p>
 <!-- INDENTATION -->
 <p><b>TIFFWarningHandler
-TIFFSetWarningHandler(TIFFWarningHandler</b>
+NDPISetWarningHandler(TIFFWarningHandler</b>
 <i>handler</i><b>);</b></p>
 </td>
 </table>
@@ -70,7 +70,7 @@ message; it typically is used to identify the software
 module in which a warning is detected.</p>
 <!-- INDENTATION -->
 <p>Applications that desire to capture control in the event
-of a warning should use <i>TIFFSetWarningHandler</i> to
+of a warning should use <i>NDPISetWarningHandler</i> to
 override the default warning handler. A <small>NULL</small>
 (0) warning handler function may be installed to suppress
 error messages.</p>
@@ -84,7 +84,7 @@ error messages.</p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><i>TIFFSetWarningHandler</i> returns a reference to the
+<p><i>NDPISetWarningHandler</i> returns a reference to the
 previous error handling function.</p>
 </td>
 </table>
@@ -96,7 +96,7 @@ previous error handling function.</p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><b>TIFFError</b>(3TIFF), <b>libtiff</b>(3TIFF),
+<p><b>NDPIError</b>(3TIFF), <b>libtiff</b>(3TIFF),
 <b>printf</b>(3)</p>
 <!-- INDENTATION -->
 <p>Libtiff library home page:

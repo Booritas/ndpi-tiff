@@ -358,7 +358,7 @@ _tiffStreamOpen(const char* name, const char* mode, void *fd)
 		data->start_pos = data->stream->tellp();
 
 		// Open for writing.
-		tif = TIFFClientOpen(name, mode,
+		tif = NDPIClientOpen(name, mode,
 				reinterpret_cast<thandle_t>(data),
 				_tiffosReadProc,
                                 _tiffosWriteProc,
@@ -375,7 +375,7 @@ _tiffStreamOpen(const char* name, const char* mode, void *fd)
 		data->stream = reinterpret_cast<istream *>(fd);
 		data->start_pos = data->stream->tellg();
 		// Open for reading.
-		tif = TIFFClientOpen(name, mode,
+		tif = NDPIClientOpen(name, mode,
 				reinterpret_cast<thandle_t>(data),
 				_tiffisReadProc,
                                 _tiffisWriteProc,

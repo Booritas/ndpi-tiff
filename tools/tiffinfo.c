@@ -138,34 +138,34 @@ main(int argc, char* argv[])
 	if (optind >= argc)
 		usage(EXIT_FAILURE);
 
-	old_error_handler = TIFFSetErrorHandler(PrivateErrorHandler);
+	old_error_handler = NDPISetErrorHandler(PrivateErrorHandler);
 
 	multiplefiles = (argc - optind > 1);
 	for (; optind < argc; optind++) {
 		if (multiplefiles)
 			printf("%s:\n", argv[optind]);
-		tif = TIFFOpen(argv[optind], chopstrips ? "rC" : "rc");
+		tif = NDPIOpen(argv[optind], chopstrips ? "rC" : "rc");
 		if (tif != NULL) {
 			if (dirnum != -1) {
-				if (TIFFSetDirectory(tif, (tdir_t) dirnum))
+				if (NDPISetDirectory(tif, (tdir_t) dirnum))
 					tiffinfo(tif, order, flags, 1);
 			} else if (diroff != 0) {
-				if (TIFFSetSubDirectory(tif, diroff))
+				if (NDPISetSubDirectory(tif, diroff))
 					tiffinfo(tif, order, flags, 1);
 			} else {
 				do {
 					toff_t offset=0;
 
 					tiffinfo(tif, order, flags, 1);
-					if (TIFFGetField(tif, TIFFTAG_EXIFIFD,
+					if (NDPIGetField(tif, TIFFTAG_EXIFIFD,
 							 &offset)) {
 						if (TIFFReadEXIFDirectory(tif, offset)) {
 							tiffinfo(tif, order, flags, 0);
 						}
 					}
-				} while (TIFFReadDirectory(tif));
+				} while (NDPIReadDirectory(tif));
 			}
-			TIFFClose(tif);
+			NDPIClose(tif);
 		}
 	}
 	return (status);
@@ -220,26 +220,26 @@ void
 TIFFReadContigStripData(TIFF* tif)
 {
 	unsigned char *buf;
-	tsize_t scanline = TIFFScanlineSize(tif);
+	tsize_t scanline = NDPIScanlineSize(tif);
 
-	buf = (unsigned char *)_TIFFmalloc(TIFFStripSize(tif));
+	buf = (unsigned char *)_NDPImalloc(NDPIStripSize(tif));
 	if (buf) {
 		uint32_t row, h=0;
 		uint32_t rowsperstrip = (uint32_t)-1;
 
-		TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &h);
-		TIFFGetField(tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
+		NDPIGetField(tif, TIFFTAG_IMAGELENGTH, &h);
+		NDPIGetField(tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
 		for (row = 0; row < h; row += rowsperstrip) {
 			uint32_t nrow = (row + rowsperstrip > h ?
 			    h-row : rowsperstrip);
-			tstrip_t strip = TIFFComputeStrip(tif, row, 0);
-			if (TIFFReadEncodedStrip(tif, strip, buf, nrow*scanline) < 0) {
+			tstrip_t strip = NDPIComputeStrip(tif, row, 0);
+			if (NDPIReadEncodedStrip(tif, strip, buf, nrow*scanline) < 0) {
 				if (stoponerr)
 					break;
 			} else if (showdata)
 				ShowStrip(strip, buf, nrow, scanline);
 		}
-		_TIFFfree(buf);
+		_NDPIfree(buf);
 	}
 }
 
@@ -247,30 +247,30 @@ void
 TIFFReadSeparateStripData(TIFF* tif)
 {
 	unsigned char *buf;
-	tsize_t scanline = TIFFScanlineSize(tif);
+	tsize_t scanline = NDPIScanlineSize(tif);
 
-	buf = (unsigned char *)_TIFFmalloc(TIFFStripSize(tif));
+	buf = (unsigned char *)_NDPImalloc(NDPIStripSize(tif));
 	if (buf) {
 		uint32_t row, h=0;
 		uint32_t rowsperstrip = (uint32_t)-1;
 		tsample_t s, samplesperpixel=0;
 
-		TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &h);
-		TIFFGetField(tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
-		TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samplesperpixel);
+		NDPIGetField(tif, TIFFTAG_IMAGELENGTH, &h);
+		NDPIGetField(tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
+		NDPIGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samplesperpixel);
 		for (row = 0; row < h; row += rowsperstrip) {
 			for (s = 0; s < samplesperpixel; s++) {
 				uint32_t nrow = (row + rowsperstrip > h ?
 				    h-row : rowsperstrip);
-				tstrip_t strip = TIFFComputeStrip(tif, row, s);
-				if (TIFFReadEncodedStrip(tif, strip, buf, nrow*scanline) < 0) {
+				tstrip_t strip = NDPIComputeStrip(tif, row, s);
+				if (NDPIReadEncodedStrip(tif, strip, buf, nrow*scanline) < 0) {
 					if (stoponerr)
 						break;
 				} else if (showdata)
 					ShowStrip(strip, buf, nrow, scanline);
 			}
 		}
-		_TIFFfree(buf);
+		_NDPIfree(buf);
 	}
 }
 
@@ -298,34 +298,34 @@ void
 TIFFReadContigTileData(TIFF* tif)
 {
 	unsigned char *buf;
-	tmsize_t rowsize = TIFFTileRowSize(tif);
-        tmsize_t tilesize = TIFFTileSize(tif);
+	tmsize_t rowsize = NDPITileRowSize(tif);
+        tmsize_t tilesize = NDPITileSize(tif);
 
-	buf = (unsigned char *)_TIFFmalloc(tilesize);
+	buf = (unsigned char *)_NDPImalloc(tilesize);
 	if (buf) {
 		uint32_t tw=0, th=0, w=0, h=0;
 		uint32_t row, col;
 
-		TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &w);
-		TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &h);
-		TIFFGetField(tif, TIFFTAG_TILEWIDTH, &tw);
-		TIFFGetField(tif, TIFFTAG_TILELENGTH, &th);
+		NDPIGetField(tif, TIFFTAG_IMAGEWIDTH, &w);
+		NDPIGetField(tif, TIFFTAG_IMAGELENGTH, &h);
+		NDPIGetField(tif, TIFFTAG_TILEWIDTH, &tw);
+		NDPIGetField(tif, TIFFTAG_TILELENGTH, &th);
                 if ( rowsize == 0 || th > (size_t) (tilesize / rowsize) )
         {
             fprintf(stderr, "Cannot display data: th * rowsize > tilesize\n");
-            _TIFFfree(buf);
+            _NDPIfree(buf);
             return;
         }
 		for (row = 0; row < h; row += th) {
 			for (col = 0; col < w; col += tw) {
-				if (TIFFReadTile(tif, buf, col, row, 0, 0) < 0) {
+				if (NDPIReadTile(tif, buf, col, row, 0, 0) < 0) {
 					if (stoponerr)
 						break;
 				} else if (showdata)
 					ShowTile(row, col, (tsample_t) -1, buf, th, rowsize);
 			}
 		}
-		_TIFFfree(buf);
+		_NDPIfree(buf);
 	}
 }
 
@@ -333,30 +333,30 @@ void
 TIFFReadSeparateTileData(TIFF* tif)
 {
 	unsigned char *buf;
-        tmsize_t rowsize = TIFFTileRowSize(tif);
-        tmsize_t tilesize = TIFFTileSize(tif);
+        tmsize_t rowsize = NDPITileRowSize(tif);
+        tmsize_t tilesize = NDPITileSize(tif);
 
-	buf = (unsigned char *)_TIFFmalloc(tilesize);
+	buf = (unsigned char *)_NDPImalloc(tilesize);
 	if (buf) {
 		uint32_t tw=0, th=0, w=0, h=0;
 		uint32_t row, col;
 		tsample_t s, samplesperpixel=0;
 
-		TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &w);
-		TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &h);
-		TIFFGetField(tif, TIFFTAG_TILEWIDTH, &tw);
-		TIFFGetField(tif, TIFFTAG_TILELENGTH, &th);
-		TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samplesperpixel);
+		NDPIGetField(tif, TIFFTAG_IMAGEWIDTH, &w);
+		NDPIGetField(tif, TIFFTAG_IMAGELENGTH, &h);
+		NDPIGetField(tif, TIFFTAG_TILEWIDTH, &tw);
+		NDPIGetField(tif, TIFFTAG_TILELENGTH, &th);
+		NDPIGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samplesperpixel);
                 if ( rowsize == 0 || th > (size_t) (tilesize / rowsize) )
         {
             fprintf(stderr, "Cannot display data: th * rowsize > tilesize\n");
-            _TIFFfree(buf);
+            _NDPIfree(buf);
             return;
         }
 		for (row = 0; row < h; row += th) {
 			for (col = 0; col < w; col += tw) {
 				for (s = 0; s < samplesperpixel; s++) {
-					if (TIFFReadTile(tif, buf, col, row, 0, s) < 0) {
+					if (NDPIReadTile(tif, buf, col, row, 0, s) < 0) {
 						if (stoponerr)
 							break;
 					} else if (showdata)
@@ -364,7 +364,7 @@ TIFFReadSeparateTileData(TIFF* tif)
 				}
 			}
 		}
-		_TIFFfree(buf);
+		_NDPIfree(buf);
 	}
 }
 
@@ -373,8 +373,8 @@ TIFFReadData(TIFF* tif)
 {
 	uint16_t config = PLANARCONFIG_CONTIG;
 
-	TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &config);
-	if (TIFFIsTiled(tif)) {
+	NDPIGetField(tif, TIFFTAG_PLANARCONFIG, &config);
+	if (NDPIIsTiled(tif)) {
 		if (config == PLANARCONFIG_CONTIG)
 			TIFFReadContigTileData(tif);
 		else
@@ -416,19 +416,19 @@ ShowRawWords(uint16_t* pp, uint32_t n)
 static void
 TIFFReadRawDataStriped(TIFF* tif, int bitrev)
 {
-	tstrip_t nstrips = TIFFNumberOfStrips(tif);
+	tstrip_t nstrips = NDPINumberOfStrips(tif);
 	const char* what = "Strip";
 	uint64_t* stripbc=NULL;
 
-	TIFFGetField(tif, TIFFTAG_STRIPBYTECOUNTS, &stripbc);
+	NDPIGetField(tif, TIFFTAG_STRIPBYTECOUNTS, &stripbc);
 	if (stripbc != NULL && nstrips > 0) {
 		uint32_t bufsize = (uint32_t) stripbc[0];
-		tdata_t buf = _TIFFmalloc(bufsize);
+		tdata_t buf = _NDPImalloc(bufsize);
 		tstrip_t s;
 
 		for (s = 0; s < nstrips; s++) {
 			if (stripbc[s] > bufsize) {
-				buf = _TIFFrealloc(buf, (tmsize_t)stripbc[s]);
+				buf = _NDPIrealloc(buf, (tmsize_t)stripbc[s]);
 				bufsize = (uint32_t) stripbc[s];
 			}
 			if (buf == NULL) {
@@ -437,14 +437,14 @@ TIFFReadRawDataStriped(TIFF* tif, int bitrev)
 				    s);
 				break;
 			}
-			if (TIFFReadRawStrip(tif, s, buf, (tmsize_t) stripbc[s]) < 0) {
+			if (NDPIReadRawStrip(tif, s, buf, (tmsize_t) stripbc[s]) < 0) {
 				fprintf(stderr, "Error reading strip %"PRIu32"\n",
 				    s);
 				if (stoponerr)
 					break;
 			} else if (showdata) {
 				if (bitrev) {
-					TIFFReverseBits(buf, (tmsize_t)stripbc[s]);
+					NDPIReverseBits(buf, (tmsize_t)stripbc[s]);
 					printf("%s %"PRIu32": (bit reversed)\n ",
 					    what, s);
 				} else
@@ -457,7 +457,7 @@ TIFFReadRawDataStriped(TIFF* tif, int bitrev)
 			}
 		}
 		if (buf != NULL)
-			_TIFFfree(buf);
+			_NDPIfree(buf);
 	}
 }
 
@@ -465,10 +465,10 @@ static void
 TIFFReadRawDataTiled(TIFF* tif, int bitrev)
 {
 	const char* what = "Tile";
-	uint32_t ntiles = TIFFNumberOfTiles(tif);
+	uint32_t ntiles = NDPINumberOfTiles(tif);
 	uint64_t *tilebc;
 
-	TIFFGetField(tif, TIFFTAG_TILEBYTECOUNTS, &tilebc);
+	NDPIGetField(tif, TIFFTAG_TILEBYTECOUNTS, &tilebc);
 	if (tilebc != NULL && ntiles > 0) {
 		uint64_t bufsize = 0;
 		tdata_t buf = NULL;
@@ -476,7 +476,7 @@ TIFFReadRawDataTiled(TIFF* tif, int bitrev)
 
 		for (t = 0; t < ntiles; t++) {
 			if (buf == NULL || tilebc[t] > bufsize) {
-				buf = _TIFFrealloc(buf, (tmsize_t)tilebc[t]);
+				buf = _NDPIrealloc(buf, (tmsize_t)tilebc[t]);
 				bufsize = tilebc[t];
 			}
 			if (buf == NULL) {
@@ -485,14 +485,14 @@ TIFFReadRawDataTiled(TIFF* tif, int bitrev)
 				    t);
 				break;
 			}
-			if (TIFFReadRawTile(tif, t, buf, (tmsize_t)tilebc[t]) < 0) {
+			if (NDPIReadRawTile(tif, t, buf, (tmsize_t)tilebc[t]) < 0) {
 				fprintf(stderr, "Error reading tile %"PRIu32"\n",
 				    t);
 				if (stoponerr)
 					break;
 			} else if (showdata) {
 				if (bitrev) {
-					TIFFReverseBits(buf, (tmsize_t)tilebc[t]);
+					NDPIReverseBits(buf, (tmsize_t)tilebc[t]);
 					printf("%s %"PRIu32": (bit reversed)\n ",
 					    what, t);
 				} else {
@@ -507,14 +507,14 @@ TIFFReadRawDataTiled(TIFF* tif, int bitrev)
 			}
 		}
 		if (buf != NULL)
-			_TIFFfree(buf);
+			_NDPIfree(buf);
 	}
 }
 
 void
 TIFFReadRawData(TIFF* tif, int bitrev)
 {
-	if (TIFFIsTiled(tif)) {
+	if (NDPIIsTiled(tif)) {
 		TIFFReadRawDataTiled(tif, bitrev);
 	} else {
 		TIFFReadRawDataStriped(tif, bitrev);
@@ -524,20 +524,20 @@ TIFFReadRawData(TIFF* tif, int bitrev)
 static void
 tiffinfo(TIFF* tif, uint16_t order, long flags, int is_image)
 {
-	TIFFPrintDirectory(tif, stdout, flags);
+	NDPIPrintDirectory(tif, stdout, flags);
 	if (!readdata || !is_image)
 		return;
 	if (rawdata) {
 		if (order) {
 			uint16_t o;
-			TIFFGetFieldDefaulted(tif,
+			NDPIGetFieldDefaulted(tif,
 			    TIFFTAG_FILLORDER, &o);
 			TIFFReadRawData(tif, o != order);
 		} else
 			TIFFReadRawData(tif, 0);
 	} else {
 		if (order)
-			TIFFSetField(tif, TIFFTAG_FILLORDER, order);
+			NDPISetField(tif, TIFFTAG_FILLORDER, order);
 		TIFFReadData(tif);
 	}
 }

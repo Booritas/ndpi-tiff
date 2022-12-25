@@ -24,7 +24,7 @@
 .if n .po 0
 .TH TIFFWarning 3TIFF "October 15, 1995" "libtiff"
 .SH NAME
-TIFFWarning, TIFFSetWarningHandler \- library warning interface
+TIFFWarning, NDPISetWarningHandler \- library warning interface
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
@@ -34,7 +34,7 @@ TIFFWarning, TIFFSetWarningHandler \- library warning interface
 .sp
 .BI "typedef void (*TIFFWarningHandler)(const char *" module ", const char *" fmt ", va_list " ap ");"
 .sp
-.BI "TIFFWarningHandler TIFFSetWarningHandler(TIFFWarningHandler " handler ");"
+.BI "TIFFWarningHandler NDPISetWarningHandler(TIFFWarningHandler " handler ");"
 .SH DESCRIPTION
 .I TIFFWarning
 invokes the library-wide warning handler function to (normally) write a
@@ -52,16 +52,16 @@ which a warning is detected.
 .PP
 Applications that desire to capture control in the event of a warning should
 use
-.IR TIFFSetWarningHandler
+.IR NDPISetWarningHandler
 to override the default warning handler.
 A
 .SM NULL
 (0) warning handler function may be installed to suppress error messages.
 .SH "RETURN VALUES"
-.IR TIFFSetWarningHandler
+.IR NDPISetWarningHandler
 returns a reference to the previous error handling function.
 .SH "SEE ALSO"
-.BR TIFFError (3TIFF),
+.BR NDPIError (3TIFF),
 .BR libtiff (3TIFF),
 .BR printf (3)
 .PP

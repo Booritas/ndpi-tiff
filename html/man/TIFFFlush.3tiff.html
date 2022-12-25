@@ -4,11 +4,11 @@
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
 <meta name="Content-Style" content="text/css">
-<title>TIFFFlush</title>
+<title>NDPIFlush</title>
 </head>
 <body>
 
-<h1 align=center>TIFFFlush</h1>
+<h1 align=center>NDPIFlush</h1>
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
@@ -25,7 +25,7 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>TIFFFlush, TIFFFlushData &minus; flush pending writes to
+<p>NDPIFlush, NDPIFlushData &minus; flush pending writes to
 an open <small>TIFF</small> file</p>
 </td>
 </table>
@@ -39,8 +39,8 @@ an open <small>TIFF</small> file</p>
 <td width="91%">
 <p><b>#include &lt;tiffio.h&gt;</b></p>
 <!-- INDENTATION -->
-<p><b>int TIFFFlush(TIFF *</b><i>tif</i><b>)<br>
-int TIFFFlushData(TIFF *</b><i>tif</i><b>)</b></p>
+<p><b>int NDPIFlush(TIFF *</b><i>tif</i><b>)<br>
+int NDPIFlushData(TIFF *</b><i>tif</i><b>)</b></p>
 </td>
 </table>
 <a name="DESCRIPTION"></a>
@@ -51,13 +51,13 @@ int TIFFFlushData(TIFF *</b><i>tif</i><b>)</b></p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><i>TIFFFlush</i> causes any pending writes for the
+<p><i>NDPIFlush</i> causes any pending writes for the
 specified file (including writes for the current directory)
 to be done. In normal operation this call is never needed
 &minus; the library automatically does any flushing
 required.</p>
 <!-- INDENTATION -->
-<p><i>TIFFFlushData</i> flushes any pending image data for
+<p><i>NDPIFlushData</i> flushes any pending image data for
 the specified file to be written out; directory-related data
 are not flushed. In normal operation this call is never
 needed &minus; the library automatically does any flushing
@@ -85,7 +85,7 @@ returned.</p>
 <td width="8%"></td>
 <td width="91%">
 <p>All error messages are directed to the
-<b>TIFFError</b>(3TIFF) routine.</p>
+<b>NDPIError</b>(3TIFF) routine.</p>
 </td>
 </table>
 <a name="SEE ALSO"></a>
@@ -96,7 +96,7 @@ returned.</p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><b>TIFFOpen</b>(3TIFF),
+<p><b>NDPIOpen</b>(3TIFF),
 <b>TIFFWriteEncodedStrip</b>(3TIFF),
 <b>TIFFWriteEncodedTile</b>(3TIFF),
 <b>TIFFWriteRawStrip</b>(3TIFF),

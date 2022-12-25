@@ -23,8 +23,8 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>TIFFYCbCrToRGBInit, TIFFYCbCrtoRGB, TIFFCIELabToRGBInit,
-TIFFCIELabToXYZ, TIFFXYZToRGB &minus; color conversion
+<p>NDPIYCbCrToRGBInit, NDPIYCbCrtoRGB, NDPICIELabToRGBInit,
+NDPICIELabToXYZ, NDPIXYZToRGB &minus; color conversion
 routines.</p>
 </td>
 </table>
@@ -38,22 +38,22 @@ routines.</p>
 <td width="91%">
 <p><b>#include &lt;tiffio.h&gt;</b></p>
 <!-- INDENTATION -->
-<p><b>int TIFFYCbCrToRGBInit(TIFFYCbCrToRGB
+<p><b>int NDPIYCbCrToRGBInit(TIFFYCbCrToRGB
 *</b><i>ycbcr</i><b>, float *</b><i>luma</i><b>, float
 *</b><i>refBlackWhite&quot;</i><b>);&quot;<br>
-void TIFFYCbCrtoRGB(TIFFYCbCrToRGB *</b><i>ycbcr</i><b>,
+void NDPIYCbCrtoRGB(TIFFYCbCrToRGB *</b><i>ycbcr</i><b>,
 uint32_t</b> <i>Y</i><b>, int32_t</b> <i>Cb</i><b>, int32_t</b>
 <i>Cr</i><b>, uint32_t *</b><i>R</i><b>, uint32_t
 *</b><i>G</i><b>, uint32_t *</b><i>B</i> <b>);</b></p>
 <!-- INDENTATION -->
-<p><b>int TIFFCIELabToRGBInit(TIFFCIELabToRGB
+<p><b>int NDPICIELabToRGBInit(TIFFCIELabToRGB
 *</b><i>cielab</i><b>, TIFFDisplay *</b><i>display</i><b>,
 float *</b><i>refWhite</i><b>);<br>
-void TIFFCIELabToXYZ(TIFFCIELabToRGB *</b><i>cielab</i><b>,
+void NDPICIELabToXYZ(TIFFCIELabToRGB *</b><i>cielab</i><b>,
 uint32_t</b> <i>L</i><b>, int32_t</b> <i>a</i><b>, int32_t</b>
 <i>b</i><b>, float *</b><i>X</i><b>, float *</b><i>Y</i><b>,
 float *</b><i>Z</i><b>);<br>
-void TIFFXYZToRGB(TIFFCIELabToRGB *</b><i>cielab</i><b>,
+void NDPIXYZToRGB(TIFFCIELabToRGB *</b><i>cielab</i><b>,
 float</b> <i>X</i><b>, float</b> <i>Y</i><b>, float</b>
 <i>Z&quot;</i><b>,</b><i>uint32_t</i><b>*&quot;</b><i>R</i><b>,
 uint32_t *</b><i>G</i><b>, uint32_t *</b><i>B</i><b>);</b></p>
@@ -75,7 +75,7 @@ simplify this task libtiff implements several color
 conversion routines itself. In particular, these routines
 used in <b>TIFFRGBAImage(3TIFF)</b> interface.</p>
 <!-- INDENTATION -->
-<p><b>TIFFYCbCrToRGBInit()</b> used to initialize
+<p><b>NDPIYCbCrToRGBInit()</b> used to initialize
 <i>YCbCr</i> to <i>RGB</i> conversion state. Allocating and
 freeing of the <i>ycbcr</i> structure belongs to programmer.
 <i>TIFFYCbCrToRGB</i> defined in <b>tiffio.h</b> as</p>
@@ -193,7 +193,7 @@ ycbcr = (TIFFYCbCrToRGB*)
 <td width="24%"></td>
 <td width="75%">
 
-<p>_TIFFmalloc(TIFFroundup(sizeof(TIFFYCbCrToRGB),
+<p>_NDPImalloc(TIFFroundup(sizeof(TIFFYCbCrToRGB),
 sizeof(long))</p>
 </td>
 <tr valign="top" align="left">
@@ -222,7 +222,7 @@ sizeof(long))</p>
 <td width="17%"></td>
 <td width="82%">
 <p>if (ycbcr == NULL) {<br>
-TIFFError(&quot;YCbCr-&gt;RGB&quot;,</p></td>
+NDPIError(&quot;YCbCr-&gt;RGB&quot;,</p></td>
 </table>
 <!-- TABS -->
 <table width="100%" border=0 rules="none" frame="void"
@@ -248,11 +248,11 @@ state&quot;);</p>
 <p>exit(0);<br>
 }</p>
 <!-- INDENTATION -->
-<p>TIFFGetFieldDefaulted(tif, TIFFTAG_YCBCRCOEFFICIENTS,
+<p>NDPIGetFieldDefaulted(tif, TIFFTAG_YCBCRCOEFFICIENTS,
 &amp;luma);<br>
-TIFFGetFieldDefaulted(tif, TIFFTAG_REFERENCEBLACKWHITE,
+NDPIGetFieldDefaulted(tif, TIFFTAG_REFERENCEBLACKWHITE,
 &amp;refBlackWhite);<br>
-if (TIFFYCbCrToRGBInit(ycbcr, luma, refBlackWhite) &lt;
+if (NDPIYCbCrToRGBInit(ycbcr, luma, refBlackWhite) &lt;
 0)</p></td>
 </table>
 <!-- TABS -->
@@ -285,7 +285,7 @@ int32_t Cb, Cr;</p>
 <td width="24%"></td>
 <td width="75%">
 
-<p>TIFFYCbCrtoRGB(img-&gt;ycbcr, Y, Cb, Cr, &amp;r, &amp;g,
+<p>NDPIYCbCrtoRGB(img-&gt;ycbcr, Y, Cb, Cr, &amp;r, &amp;g,
 &amp;b);</p>
 </td>
 </table>
@@ -296,7 +296,7 @@ int32_t Cb, Cr;</p>
 <td width="17%"></td>
 <td width="82%">
 <p>/* Free state structure */<br>
-_TIFFfree(ycbcr);</p></td>
+_NDPIfree(ycbcr);</p></td>
 </table>
 <!-- INDENTATION -->
 <table width="100%" border=0 rules="none" frame="void"
@@ -304,7 +304,7 @@ _TIFFfree(ycbcr);</p></td>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><b>TIFFCIELabToRGBInit()</b> initializes the <i>CIE
+<p><b>NDPICIELabToRGBInit()</b> initializes the <i>CIE
 L*a*b* 1976</i> to <i>RGB</i> conversion state.
 <b>TIFFCIELabToRGB</b> defined as</p>
 </td>
@@ -757,9 +757,9 @@ whitePoint_y * refWhite_X</p></td>
 <td width="91%">
 <p>The conversion itself performed in two steps: at the
 first one we will convert <i>CIE L*a*b* 1976</i> to <i>CIE
-XYZ</i> using <b>TIFFCIELabToXYZ()</b> routine, and at the
+XYZ</i> using <b>NDPICIELabToXYZ()</b> routine, and at the
 second step we will convert <i>CIE XYZ</i> to <i>RGB</i>
-using <b>TIFFXYZToRGB().</b> Look at the code sample
+using <b>NDPIXYZToRGB().</b> Look at the code sample
 below:</p>
 </td>
 </table>
@@ -785,7 +785,7 @@ img-&gt;cielab = (TIFFCIELabToRGB *)
 <td width="24%"></td>
 <td width="75%">
 
-<p>_TIFFmalloc(sizeof(TIFFCIELabToRGB));</p>
+<p>_NDPImalloc(sizeof(TIFFCIELabToRGB));</p>
 </td>
 </table>
 <!-- INDENTATION -->
@@ -804,7 +804,7 @@ img-&gt;cielab = (TIFFCIELabToRGB *)
 <td width="0%"></td>
 <td width="6%">
 
-<p>TIFFError(&quot;CIE L*a*b*-&gt;RGB&quot;,</p>
+<p>NDPIError(&quot;CIE L*a*b*-&gt;RGB&quot;,</p>
 </td>
 <td width="6%"></td>
 <td width="62%">
@@ -840,7 +840,7 @@ state.&quot;);</p>
 <td width="82%">
 <p>}</p>
 <!-- INDENTATION -->
-<p>TIFFGetFieldDefaulted(tif, TIFFTAG_WHITEPOINT,
+<p>NDPIGetFieldDefaulted(tif, TIFFTAG_WHITEPOINT,
 &amp;whitePoint);<br>
 refWhite[1] = 100.0F;<br>
 refWhite[0] = whitePoint[0] / whitePoint[1] *
@@ -864,7 +864,7 @@ whitePoint[1])</p></td>
 <tr valign="top" align="left">
 <td width="17%"></td>
 <td width="82%">
-<p>if (TIFFCIELabToRGBInit(cielab, &amp;display_sRGB,
+<p>if (NDPICIELabToRGBInit(cielab, &amp;display_sRGB,
 refWhite) &lt; 0) {</p></td>
 </table>
 <!-- TABS -->
@@ -875,7 +875,7 @@ refWhite) &lt; 0) {</p></td>
 <td width="0%"></td>
 <td width="6%">
 
-<p>TIFFError(&quot;CIE L*a*b*-&gt;RGB&quot;,</p>
+<p>NDPIError(&quot;CIE L*a*b*-&gt;RGB&quot;,</p>
 </td>
 <td width="6%"></td>
 <td width="62%">
@@ -897,7 +897,7 @@ state.&quot;);</p>
 <td width="0%"></td>
 <td width="6%">
 
-<p>_TIFFfree(cielab);</p>
+<p>_NDPIfree(cielab);</p>
 </td>
 <td width="6%"></td>
 <td width="62%">
@@ -936,14 +936,14 @@ float X, Y, Z;</p>
 <td width="24%"></td>
 <td width="75%">
 
-<p>TIFFCIELabToXYZ(cielab, L, a, b, &amp;X, &amp;Y,
+<p>NDPICIELabToXYZ(cielab, L, a, b, &amp;X, &amp;Y,
 &amp;Z);</p>
 </td>
 <tr valign="top" align="left">
 <td width="24%"></td>
 <td width="75%">
 
-<p>TIFFXYZToRGB(cielab, X, Y, Z, &amp;r, &amp;g,
+<p>NDPIXYZToRGB(cielab, X, Y, Z, &amp;r, &amp;g,
 &amp;b);</p>
 </td>
 </table>
@@ -954,7 +954,7 @@ float X, Y, Z;</p>
 <td width="17%"></td>
 <td width="82%">
 <p>/* Don&rsquo;t forget to free the state structure */<br>
-_TIFFfree(cielab);</p></td>
+_NDPIfree(cielab);</p></td>
 </table>
 <a name="SEE ALSO"></a>
 <h2>SEE ALSO</h2>

@@ -45,7 +45,7 @@
 
 #define	streq(a,b)	(strcmp(a,b) == 0)
 #define	CopyField(tag, v) \
-    if (TIFFGetField(in, tag, &v)) TIFFSetField(out, tag, v)
+    if (NDPIGetField(in, tag, &v)) NDPISetField(out, tag, v)
 
 #ifndef howmany
 #define	howmany(x, y)	(((x)+((y)-1))/(y))
@@ -122,25 +122,25 @@ main(int argc, char* argv[])
 		}
 	if (argc - optind < 2)
 		usage(EXIT_FAILURE);
-	out = TIFFOpen(argv[argc-1], "w");
+	out = NDPIOpen(argv[argc-1], "w");
 	if (out == NULL)
 		return (EXIT_FAILURE);
 	setupLumaTables();
 	for (; optind < argc-1; optind++) {
-		in = TIFFOpen(argv[optind], "r");
+		in = NDPIOpen(argv[optind], "r");
 		if (in != NULL) {
 			do {
 				if (!tiffcvt(in, out) ||
-				    !TIFFWriteDirectory(out)) {
-					(void) TIFFClose(out);
-					(void) TIFFClose(in);
+				    !NDPIWriteDirectory(out)) {
+					(void) NDPIClose(out);
+					(void) NDPIClose(in);
 					return (1);
 				}
-			} while (TIFFReadDirectory(in));
-			(void) TIFFClose(in);
+			} while (NDPIReadDirectory(in));
+			(void) NDPIClose(in);
 		}
 	}
-	(void) TIFFClose(out);
+	(void) NDPIClose(out);
 	return (EXIT_SUCCESS);
 }
 
@@ -153,7 +153,7 @@ int	Yzero;
 static float*
 setupLuma(float c)
 {
-	float *v = (float *)_TIFFmalloc(256 * sizeof (float));
+	float *v = (float *)_NDPImalloc(256 * sizeof (float));
 	int i;
 	for (i = 0; i < 256; i++)
 		v[i] = c * i;
@@ -267,7 +267,7 @@ cvtRaster(TIFF* tif, uint32_t* raster, uint32_t width, uint32_t height)
 
 	cc = rnrows*rwidth +
 	    2*((rnrows*rwidth) / (horizSubSampling*vertSubSampling));
-	buf = (unsigned char*)_TIFFmalloc(cc);
+	buf = (unsigned char*)_NDPImalloc(cc);
 	// FIXME unchecked malloc
 	for (y = height; (int32_t) y > 0; y -= nrows) {
 		uint32_t nr = (y > nrows ? nrows : y);
@@ -276,11 +276,11 @@ cvtRaster(TIFF* tif, uint32_t* raster, uint32_t width, uint32_t height)
 		acc = nr*rwidth +
 			2*((nr*rwidth)/(horizSubSampling*vertSubSampling));
 		if (!TIFFWriteEncodedStrip(tif, strip++, buf, acc)) {
-			_TIFFfree(buf);
+			_NDPIfree(buf);
 			return (0);
 		}
 	}
-	_TIFFfree(buf);
+	_NDPIfree(buf);
 	return (1);
 }
 
@@ -296,68 +296,68 @@ tiffcvt(TIFF* in, TIFF* out)
 	int result;
 	size_t pixel_count;
 
-	TIFFGetField(in, TIFFTAG_IMAGEWIDTH, &width);
-	TIFFGetField(in, TIFFTAG_IMAGELENGTH, &height);
+	NDPIGetField(in, TIFFTAG_IMAGEWIDTH, &width);
+	NDPIGetField(in, TIFFTAG_IMAGELENGTH, &height);
 	pixel_count = width * height;
 
  	/* XXX: Check the integer overflow. */
  	if (!width || !height || pixel_count / width != height) {
- 		TIFFError(TIFFFileName(in),
+ 		NDPIError(NDPIFileName(in),
  			  "Malformed input file; "
  			  "can't allocate buffer for raster of %"PRIu32"x%"PRIu32" size",
  			  width, height);
  		return 0;
  	}
  
- 	raster = (uint32_t*)_TIFFCheckMalloc(in, pixel_count, sizeof(uint32_t),
+ 	raster = (uint32_t*)_NDPICheckMalloc(in, pixel_count, sizeof(uint32_t),
                                          "raster buffer");
   	if (raster == 0) {
- 		TIFFError(TIFFFileName(in),
+ 		NDPIError(NDPIFileName(in),
  			  "Failed to allocate buffer (%"TIFF_SIZE_FORMAT" elements of %"TIFF_SIZE_FORMAT" each)",
  			  pixel_count,
  			  sizeof(uint32_t));
   		return (0);
   	}
 
-	if (!TIFFReadRGBAImage(in, width, height, raster, 0)) {
-		_TIFFfree(raster);
+	if (!NDPIReadRGBAImage(in, width, height, raster, 0)) {
+		_NDPIfree(raster);
 		return (0);
 	}
 
 	CopyField(TIFFTAG_SUBFILETYPE, longv);
-	TIFFSetField(out, TIFFTAG_IMAGEWIDTH, width);
-	TIFFSetField(out, TIFFTAG_IMAGELENGTH, height);
-	TIFFSetField(out, TIFFTAG_BITSPERSAMPLE, 8);
-	TIFFSetField(out, TIFFTAG_COMPRESSION, compression);
-	TIFFSetField(out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_YCBCR);
+	NDPISetField(out, TIFFTAG_IMAGEWIDTH, width);
+	NDPISetField(out, TIFFTAG_IMAGELENGTH, height);
+	NDPISetField(out, TIFFTAG_BITSPERSAMPLE, 8);
+	NDPISetField(out, TIFFTAG_COMPRESSION, compression);
+	NDPISetField(out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_YCBCR);
 	if (compression == COMPRESSION_JPEG)
-		TIFFSetField(out, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RAW);
+		NDPISetField(out, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RAW);
 	CopyField(TIFFTAG_FILLORDER, shortv);
-	TIFFSetField(out, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
-	TIFFSetField(out, TIFFTAG_SAMPLESPERPIXEL, 3);
+	NDPISetField(out, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
+	NDPISetField(out, TIFFTAG_SAMPLESPERPIXEL, 3);
 	CopyField(TIFFTAG_XRESOLUTION, floatv);
 	CopyField(TIFFTAG_YRESOLUTION, floatv);
 	CopyField(TIFFTAG_RESOLUTIONUNIT, shortv);
-	TIFFSetField(out, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+	NDPISetField(out, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
 	{ char buf[2048];
-	  char *cp = strrchr(TIFFFileName(in), '/');
+	  char *cp = strrchr(NDPIFileName(in), '/');
 	  snprintf(buf, sizeof(buf), "YCbCr conversion of %s",
-		   cp ? cp+1 : TIFFFileName(in));
-	  TIFFSetField(out, TIFFTAG_IMAGEDESCRIPTION, buf);
+		   cp ? cp+1 : NDPIFileName(in));
+	  NDPISetField(out, TIFFTAG_IMAGEDESCRIPTION, buf);
 	}
-	TIFFSetField(out, TIFFTAG_SOFTWARE, TIFFGetVersion());
+	NDPISetField(out, TIFFTAG_SOFTWARE, TIFFGetVersion());
 	CopyField(TIFFTAG_DOCUMENTNAME, stringv);
 
-	TIFFSetField(out, TIFFTAG_REFERENCEBLACKWHITE, refBlackWhite);
-	TIFFSetField(out, TIFFTAG_YCBCRSUBSAMPLING,
+	NDPISetField(out, TIFFTAG_REFERENCEBLACKWHITE, refBlackWhite);
+	NDPISetField(out, TIFFTAG_YCBCRSUBSAMPLING,
 	    horizSubSampling, vertSubSampling);
-	TIFFSetField(out, TIFFTAG_YCBCRPOSITIONING, YCBCRPOSITION_CENTERED);
-	TIFFSetField(out, TIFFTAG_YCBCRCOEFFICIENTS, ycbcrCoeffs);
-	rowsperstrip = TIFFDefaultStripSize(out, rowsperstrip);
-	TIFFSetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
+	NDPISetField(out, TIFFTAG_YCBCRPOSITIONING, YCBCRPOSITION_CENTERED);
+	NDPISetField(out, TIFFTAG_YCBCRCOEFFICIENTS, ycbcrCoeffs);
+	rowsperstrip = NDPIDefaultStripSize(out, rowsperstrip);
+	NDPISetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
 
 	result = cvtRaster(out, raster, width, height);
-        _TIFFfree(raster);
+        _NDPIfree(raster);
         return result;
 }
 

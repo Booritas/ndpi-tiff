@@ -70,37 +70,37 @@ main()
 	
 
 	/* We write the main directory as a simple image. */
-	tif = TIFFOpen(filename, "w+");
+	tif = NDPIOpen(filename, "w+");
 	if (!tif) {
 		fprintf (stderr, "Can't create test TIFF file %s.\n", filename);
 		return 1;
 	}
 
-	if (!TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, width)) {
+	if (!NDPISetField(tif, TIFFTAG_IMAGEWIDTH, width)) {
 		fprintf (stderr, "Can't set ImageWidth tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_IMAGELENGTH, length)) {
+	if (!NDPISetField(tif, TIFFTAG_IMAGELENGTH, length)) {
 		fprintf (stderr, "Can't set ImageLength tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, bps)) {
+	if (!NDPISetField(tif, TIFFTAG_BITSPERSAMPLE, bps)) {
 		fprintf (stderr, "Can't set BitsPerSample tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, SPP)) {
+	if (!NDPISetField(tif, TIFFTAG_SAMPLESPERPIXEL, SPP)) {
 		fprintf (stderr, "Can't set SamplesPerPixel tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, rows_per_strip)) {
+	if (!NDPISetField(tif, TIFFTAG_ROWSPERSTRIP, rows_per_strip)) {
 		fprintf (stderr, "Can't set SamplesPerPixel tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_PLANARCONFIG, planarconfig)) {
+	if (!NDPISetField(tif, TIFFTAG_PLANARCONFIG, planarconfig)) {
 		fprintf (stderr, "Can't set PlanarConfiguration tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, photometric)) {
+	if (!NDPISetField(tif, TIFFTAG_PHOTOMETRIC, photometric)) {
 		fprintf (stderr, "Can't set PhotometricInterpretation tag.\n");
 		goto failure;
 	}
@@ -111,26 +111,26 @@ main()
 		goto failure;
 	}
 
-        if (!TIFFWriteDirectory( tif )) {
-		fprintf (stderr, "TIFFWriteDirectory() failed.\n");
+        if (!NDPIWriteDirectory( tif )) {
+		fprintf (stderr, "NDPIWriteDirectory() failed.\n");
 		goto failure;
 	}
 
 	/* 
 	 * Now create an EXIF directory. 
 	 */
-	if (TIFFCreateEXIFDirectory(tif) != 0) {
-		fprintf (stderr, "TIFFCreateEXIFDirectory() failed.\n" );
+	if (NDPICreateEXIFDirectory(tif) != 0) {
+		fprintf (stderr, "NDPICreateEXIFDirectory() failed.\n" );
 		goto failure;
 	}
 
-	if (!TIFFSetField( tif, EXIFTAG_SPECTRALSENSITIVITY, "EXIF Spectral Sensitivity")) {
+	if (!NDPISetField( tif, EXIFTAG_SPECTRALSENSITIVITY, "EXIF Spectral Sensitivity")) {
 		fprintf (stderr, "Can't write SPECTRALSENSITIVITY\n" );
 		goto failure;
 	}		
 	
-        if (!TIFFWriteCustomDirectory( tif, &dir_offset )) {
-		fprintf (stderr, "TIFFWriteCustomDirectory() with EXIF failed.\n");
+        if (!NDPIWriteCustomDirectory( tif, &dir_offset )) {
+		fprintf (stderr, "NDPIWriteCustomDirectory() with EXIF failed.\n");
 		goto failure;
 	}
 
@@ -139,46 +139,46 @@ main()
 	 * TIFF tags.
 	 */
 	
-	TIFFFreeDirectory( tif );
-	if (TIFFCreateCustomDirectory(tif, &customFieldArray) != 0) {
-		fprintf (stderr, "TIFFCreateEXIFDirectory() failed.\n" );
+	NDPIFreeDirectory( tif );
+	if (NDPICreateCustomDirectory(tif, &customFieldArray) != 0) {
+		fprintf (stderr, "NDPICreateEXIFDirectory() failed.\n" );
 		goto failure;
 	}
 
-	if (!TIFFSetField( tif, TIFFTAG_IMAGEWIDTH, "*Custom1")) { /* not really IMAGEWIDTH */
+	if (!NDPISetField( tif, TIFFTAG_IMAGEWIDTH, "*Custom1")) { /* not really IMAGEWIDTH */
 		fprintf (stderr, "Can't write pseudo-IMAGEWIDTH.\n" );
 		goto failure;
 	}		
 	
-	if (!TIFFSetField( tif, TIFFTAG_DOTRANGE, "*Custom2")) { /* not really DOTWIDTH */
+	if (!NDPISetField( tif, TIFFTAG_DOTRANGE, "*Custom2")) { /* not really DOTWIDTH */
 		fprintf (stderr, "Can't write pseudo-DOTWIDTH.\n" );
 		goto failure;
 	}		
 	
-        if (!TIFFWriteCustomDirectory( tif, &dir_offset2 )) {
-		fprintf (stderr, "TIFFWriteCustomDirectory() with EXIF failed.\n");
+        if (!NDPIWriteCustomDirectory( tif, &dir_offset2 )) {
+		fprintf (stderr, "NDPIWriteCustomDirectory() with EXIF failed.\n");
 		goto failure;
 	}
 
 	/*
 	 * Go back to the first directory, and add the EXIFIFD pointer. 
 	 */
-	TIFFSetDirectory(tif, 0);
-	TIFFSetField(tif, TIFFTAG_EXIFIFD, dir_offset );
-	TIFFSetField(tif, TIFFTAG_SUBIFD, 1, &dir_offset2 );
+	NDPISetDirectory(tif, 0);
+	NDPISetField(tif, TIFFTAG_EXIFIFD, dir_offset );
+	NDPISetField(tif, TIFFTAG_SUBIFD, 1, &dir_offset2 );
 
-	TIFFClose(tif);
+	NDPIClose(tif);
 	
 	/* Ok, now test whether we can read written values in the EXIF directory. */
-	tif = TIFFOpen(filename, "r");
+	tif = NDPIOpen(filename, "r");
 	
-	TIFFGetField(tif, TIFFTAG_EXIFIFD, &read_dir_offset );
+	NDPIGetField(tif, TIFFTAG_EXIFIFD, &read_dir_offset );
 	if( read_dir_offset != dir_offset ) {
 		fprintf (stderr, "Did not get expected EXIFIFD.\n" );
 		goto failure;
 	}
 
-	TIFFGetField(tif, TIFFTAG_SUBIFD, &count16, &dir_offset2_ptr );
+	NDPIGetField(tif, TIFFTAG_SUBIFD, &count16, &dir_offset2_ptr );
 	read_dir_offset2 = dir_offset2_ptr[0];
 	if( read_dir_offset2 != dir_offset2 || count16 != 1) {
 		fprintf (stderr, "Did not get expected SUBIFD.\n" );
@@ -190,7 +190,7 @@ main()
 		goto failure;
 	}
 	
-	if (!TIFFGetField( tif, EXIFTAG_SPECTRALSENSITIVITY, &ascii_value) ) {
+	if (!NDPIGetField( tif, EXIFTAG_SPECTRALSENSITIVITY, &ascii_value) ) {
 		fprintf (stderr, "reading SPECTRALSENSITIVITY failed.\n" );
 		goto failure;
 	}
@@ -207,7 +207,7 @@ main()
 		goto failure;
 	}
 	
-	if (!TIFFGetField( tif, TIFFTAG_IMAGEWIDTH, &ascii_value) ) {
+	if (!NDPIGetField( tif, TIFFTAG_IMAGEWIDTH, &ascii_value) ) {
 		fprintf (stderr, "reading pseudo-IMAGEWIDTH failed.\n" );
 		goto failure;
 	}
@@ -217,7 +217,7 @@ main()
 		goto failure;
 	}
 
-	if (!TIFFGetField( tif, TIFFTAG_DOTRANGE, &ascii_value) ) {
+	if (!NDPIGetField( tif, TIFFTAG_DOTRANGE, &ascii_value) ) {
 		fprintf (stderr, "reading pseudo-DOTRANGE failed.\n" );
 		goto failure;
 	}
@@ -227,7 +227,7 @@ main()
 		goto failure;
 	}
 
-	TIFFClose(tif);
+	NDPIClose(tif);
 	
 	/* All tests passed; delete file and exit with success status. */
 	unlink(filename);
@@ -238,7 +238,7 @@ failure:
 	 * Something goes wrong; close file and return unsuccessful status.
 	 * Do not remove the file for further manual investigation.
 	 */
-	TIFFClose(tif);
+	NDPIClose(tif);
 	return 1;
 }
 

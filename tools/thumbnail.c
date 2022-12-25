@@ -100,16 +100,16 @@ main(int argc, char* argv[])
     if (argc-optind != 2)
 	usage(EXIT_FAILURE);
 
-    out = TIFFOpen(argv[optind+1], "w");
+    out = NDPIOpen(argv[optind+1], "w");
     if (out == NULL)
 	return 2;
-    in = TIFFOpen(argv[optind], "r");
+    in = NDPIOpen(argv[optind], "r");
     if( in == NULL )
         return 2;
 
-    thumbnail = (uint8_t*) _TIFFmalloc(tnw * tnh);
+    thumbnail = (uint8_t*) _NDPImalloc(tnw * tnh);
     if (!thumbnail) {
-	    TIFFError(TIFFFileName(in),
+	    NDPIError(NDPIFileName(in),
 		      "Can't allocate space for thumbnail buffer.");
 	    return EXIT_FAILURE;
     }
@@ -119,26 +119,26 @@ main(int argc, char* argv[])
 	do {
 	    if (!generateThumbnail(in, out))
 		goto bad;
-	    if (!cpIFD(in, out) || !TIFFWriteDirectory(out))
+	    if (!cpIFD(in, out) || !NDPIWriteDirectory(out))
 		goto bad;
-	} while (TIFFReadDirectory(in));
-	(void) TIFFClose(in);
+	} while (NDPIReadDirectory(in));
+	(void) NDPIClose(in);
     }
-    (void) TIFFClose(out);
+    (void) NDPIClose(out);
     return EXIT_SUCCESS;
 bad:
-    (void) TIFFClose(out);
+    (void) NDPIClose(out);
     return EXIT_FAILURE;
 }
 
 #define	CopyField(tag, v) \
-    if (TIFFGetField(in, tag, &v)) TIFFSetField(out, tag, v)
+    if (NDPIGetField(in, tag, &v)) NDPISetField(out, tag, v)
 #define	CopyField2(tag, v1, v2) \
-    if (TIFFGetField(in, tag, &v1, &v2)) TIFFSetField(out, tag, v1, v2)
+    if (NDPIGetField(in, tag, &v1, &v2)) NDPISetField(out, tag, v1, v2)
 #define	CopyField3(tag, v1, v2, v3) \
-    if (TIFFGetField(in, tag, &v1, &v2, &v3)) TIFFSetField(out, tag, v1, v2, v3)
+    if (NDPIGetField(in, tag, &v1, &v2, &v3)) NDPISetField(out, tag, v1, v2, v3)
 #define	CopyField4(tag, v1, v2, v3, v4) \
-    if (TIFFGetField(in, tag, &v1, &v2, &v3, &v4)) TIFFSetField(out, tag, v1, v2, v3, v4)
+    if (NDPIGetField(in, tag, &v1, &v2, &v3, &v4)) NDPISetField(out, tag, v1, v2, v3, v4)
 
 static void
 cpTag(TIFF* in, TIFF* out, uint16_t tag, uint16_t count, TIFFDataType type)
@@ -203,7 +203,7 @@ cpTag(TIFF* in, TIFF* out, uint16_t tag, uint16_t count, TIFFDataType type)
 		  CopyField(tag, ifd8);
 		}
 		break;          default:
-                TIFFError(TIFFFileName(in),
+                NDPIError(NDPIFileName(in),
                           "Data type %d is not supported, tag %d skipped.",
                           tag, type);
 	}
@@ -275,20 +275,20 @@ cpTags(TIFF* in, TIFF* out)
     const struct cpTag *p;
     for (p = tags; p < &tags[NTAGS]; p++)
 	{
-		/* Horrible: but TIFFGetField() expects 2 arguments to be passed */
+		/* Horrible: but NDPIGetField() expects 2 arguments to be passed */
 		/* if we request a tag that is defined in a codec, but that codec */
 		/* isn't used */
 		if( p->tag == TIFFTAG_GROUP3OPTIONS )
 		{
 			uint16_t compression;
-			if( !TIFFGetField(in, TIFFTAG_COMPRESSION, &compression) ||
+			if( !NDPIGetField(in, TIFFTAG_COMPRESSION, &compression) ||
 				compression != COMPRESSION_CCITTFAX3 )
 				continue;
 		}
 		if( p->tag == TIFFTAG_GROUP4OPTIONS )
 		{
 			uint16_t compression;
-			if( !TIFFGetField(in, TIFFTAG_COMPRESSION, &compression) ||
+			if( !NDPIGetField(in, TIFFTAG_COMPRESSION, &compression) ||
 				compression != COMPRESSION_CCITTFAX4 )
 				continue;
 		}
@@ -300,33 +300,33 @@ cpTags(TIFF* in, TIFF* out)
 static int
 cpStrips(TIFF* in, TIFF* out)
 {
-    tsize_t bufsize  = TIFFStripSize(in);
-    unsigned char *buf = (unsigned char *)_TIFFmalloc(bufsize);
+    tsize_t bufsize  = NDPIStripSize(in);
+    unsigned char *buf = (unsigned char *)_NDPImalloc(bufsize);
 
     if (buf) {
-	tstrip_t s, ns = TIFFNumberOfStrips(in);
+	tstrip_t s, ns = NDPINumberOfStrips(in);
 	uint64_t *bytecounts;
 
-	TIFFGetField(in, TIFFTAG_STRIPBYTECOUNTS, &bytecounts);
+	NDPIGetField(in, TIFFTAG_STRIPBYTECOUNTS, &bytecounts);
 	for (s = 0; s < ns; s++) {
 	  if (bytecounts[s] > (uint64_t) bufsize) {
-		buf = (unsigned char *)_TIFFrealloc(buf, (tmsize_t)bytecounts[s]);
+		buf = (unsigned char *)_NDPIrealloc(buf, (tmsize_t)bytecounts[s]);
 		if (!buf)
 		    goto bad;
 		bufsize = (tmsize_t)bytecounts[s];
 	    }
-	    if (TIFFReadRawStrip(in, s, buf, (tmsize_t)bytecounts[s]) < 0 ||
+	    if (NDPIReadRawStrip(in, s, buf, (tmsize_t)bytecounts[s]) < 0 ||
 		TIFFWriteRawStrip(out, s, buf, (tmsize_t)bytecounts[s]) < 0) {
-		_TIFFfree(buf);
+		_NDPIfree(buf);
 		return 0;
 	    }
 	}
-	_TIFFfree(buf);
+	_NDPIfree(buf);
 	return 1;
     }
 
 bad:
-	TIFFError(TIFFFileName(in),
+	NDPIError(NDPIFileName(in),
 		  "Can't allocate space for strip buffer.");
 	return 0;
 }
@@ -334,33 +334,33 @@ bad:
 static int
 cpTiles(TIFF* in, TIFF* out)
 {
-    tsize_t bufsize = TIFFTileSize(in);
-    unsigned char *buf = (unsigned char *)_TIFFmalloc(bufsize);
+    tsize_t bufsize = NDPITileSize(in);
+    unsigned char *buf = (unsigned char *)_NDPImalloc(bufsize);
 
     if (buf) {
-	ttile_t t, nt = TIFFNumberOfTiles(in);
+	ttile_t t, nt = NDPINumberOfTiles(in);
 	uint64_t *bytecounts;
 
-	TIFFGetField(in, TIFFTAG_TILEBYTECOUNTS, &bytecounts);
+	NDPIGetField(in, TIFFTAG_TILEBYTECOUNTS, &bytecounts);
 	for (t = 0; t < nt; t++) {
 	    if (bytecounts[t] > (uint64_t) bufsize) {
-		buf = (unsigned char *)_TIFFrealloc(buf, (tmsize_t)bytecounts[t]);
+		buf = (unsigned char *)_NDPIrealloc(buf, (tmsize_t)bytecounts[t]);
 		if (!buf)
 		    goto bad;
 		bufsize = (tmsize_t)bytecounts[t];
 	    }
-	    if (TIFFReadRawTile(in, t, buf, (tmsize_t)bytecounts[t]) < 0 ||
+	    if (NDPIReadRawTile(in, t, buf, (tmsize_t)bytecounts[t]) < 0 ||
 		TIFFWriteRawTile(out, t, buf, (tmsize_t)bytecounts[t]) < 0) {
-		_TIFFfree(buf);
+		_NDPIfree(buf);
 		return 0;
 	    }
 	}
-	_TIFFfree(buf);
+	_NDPIfree(buf);
 	return 1;
     }
 
 bad:
-    TIFFError(TIFFFileName(in),
+    NDPIError(NDPIFileName(in),
 		  "Can't allocate space for tile buffer.");
 	return (0);
 }
@@ -369,7 +369,7 @@ static int
 cpIFD(TIFF* in, TIFF* out)
 {
     cpTags(in, out);
-    if (TIFFIsTiled(in)) {
+    if (NDPIIsTiled(in)) {
 	if (!cpTiles(in, out))
 	    return (0);
     } else {
@@ -459,10 +459,10 @@ setupCmap()
 static void
 initScale()
 {
-    src0 = (uint8_t*) _TIFFmalloc(sizeof (uint8_t) * tnw);
-    src1 = (uint8_t*) _TIFFmalloc(sizeof (uint8_t) * tnw);
-    src2 = (uint8_t*) _TIFFmalloc(sizeof (uint8_t) * tnw);
-    rowoff = (uint32_t*) _TIFFmalloc(sizeof (uint32_t) * tnw);
+    src0 = (uint8_t*) _NDPImalloc(sizeof (uint8_t) * tnw);
+    src1 = (uint8_t*) _NDPImalloc(sizeof (uint8_t) * tnw);
+    src2 = (uint8_t*) _NDPImalloc(sizeof (uint8_t) * tnw);
+    rowoff = (uint32_t*) _NDPImalloc(sizeof (uint32_t) * tnw);
     filterWidth = 0;
     stepDstWidth = stepSrcWidth = 0;
     setupBitsTables();
@@ -597,24 +597,24 @@ generateThumbnail(TIFF* in, TIFF* out)
     uint32_t sw, sh, rps;
     uint16_t bps, spp;
     tsize_t rowsize, rastersize;
-    tstrip_t s, ns = TIFFNumberOfStrips(in);
+    tstrip_t s, ns = NDPINumberOfStrips(in);
     toff_t diroff[1];
 
-    TIFFGetField(in, TIFFTAG_IMAGEWIDTH, &sw);
-    TIFFGetField(in, TIFFTAG_IMAGELENGTH, &sh);
-    TIFFGetFieldDefaulted(in, TIFFTAG_BITSPERSAMPLE, &bps);
-    TIFFGetFieldDefaulted(in, TIFFTAG_SAMPLESPERPIXEL, &spp);
-    TIFFGetFieldDefaulted(in, TIFFTAG_ROWSPERSTRIP, &rps);
+    NDPIGetField(in, TIFFTAG_IMAGEWIDTH, &sw);
+    NDPIGetField(in, TIFFTAG_IMAGELENGTH, &sh);
+    NDPIGetFieldDefaulted(in, TIFFTAG_BITSPERSAMPLE, &bps);
+    NDPIGetFieldDefaulted(in, TIFFTAG_SAMPLESPERPIXEL, &spp);
+    NDPIGetFieldDefaulted(in, TIFFTAG_ROWSPERSTRIP, &rps);
     if (spp != 1 || bps != 1)
 	return 0;
-    rowsize = TIFFScanlineSize(in);
+    rowsize = NDPIScanlineSize(in);
     rastersize = sh * rowsize;
     fprintf(stderr, "rastersize=%u\n", (unsigned int)rastersize);
 	/* +3 : add a few guard bytes since setrow() can read a bit */
 	/* outside buffer */
-    raster = (unsigned char*)_TIFFmalloc(rastersize+3);
+    raster = (unsigned char*)_NDPImalloc(rastersize+3);
     if (!raster) {
-	    TIFFError(TIFFFileName(in),
+	    NDPIError(NDPIFileName(in),
 		      "Can't allocate space for raster buffer.");
 	    return 0;
     }
@@ -623,31 +623,31 @@ generateThumbnail(TIFF* in, TIFF* out)
     raster[rastersize+2] = 0;
     rp = raster;
     for (s = 0; s < ns; s++) {
-	(void) TIFFReadEncodedStrip(in, s, rp, -1);
+	(void) NDPIReadEncodedStrip(in, s, rp, -1);
 	rp += rps * rowsize;
     }
-    TIFFGetField(in, TIFFTAG_PHOTOMETRIC, &photometric);
+    NDPIGetField(in, TIFFTAG_PHOTOMETRIC, &photometric);
     setupCmap();
     setImage(raster, sw, sh);
-    _TIFFfree(raster);
+    _NDPIfree(raster);
 
-    TIFFSetField(out, TIFFTAG_SUBFILETYPE, FILETYPE_REDUCEDIMAGE);
-    TIFFSetField(out, TIFFTAG_IMAGEWIDTH, (uint32_t) tnw);
-    TIFFSetField(out, TIFFTAG_IMAGELENGTH, (uint32_t) tnh);
-    TIFFSetField(out, TIFFTAG_BITSPERSAMPLE, (uint16_t) 8);
-    TIFFSetField(out, TIFFTAG_SAMPLESPERPIXEL, (uint16_t) 1);
-    TIFFSetField(out, TIFFTAG_COMPRESSION, COMPRESSION_PACKBITS);
-    TIFFSetField(out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISWHITE);
-    TIFFSetField(out, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-    TIFFSetField(out, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
+    NDPISetField(out, TIFFTAG_SUBFILETYPE, FILETYPE_REDUCEDIMAGE);
+    NDPISetField(out, TIFFTAG_IMAGEWIDTH, (uint32_t) tnw);
+    NDPISetField(out, TIFFTAG_IMAGELENGTH, (uint32_t) tnh);
+    NDPISetField(out, TIFFTAG_BITSPERSAMPLE, (uint16_t) 8);
+    NDPISetField(out, TIFFTAG_SAMPLESPERPIXEL, (uint16_t) 1);
+    NDPISetField(out, TIFFTAG_COMPRESSION, COMPRESSION_PACKBITS);
+    NDPISetField(out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISWHITE);
+    NDPISetField(out, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+    NDPISetField(out, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
     cpTag(in, out, TIFFTAG_SOFTWARE, (uint16_t) -1, TIFF_ASCII);
     cpTag(in, out, TIFFTAG_IMAGEDESCRIPTION, (uint16_t) -1, TIFF_ASCII);
     cpTag(in, out, TIFFTAG_DATETIME, (uint16_t) -1, TIFF_ASCII);
     cpTag(in, out, TIFFTAG_HOSTCOMPUTER, (uint16_t) -1, TIFF_ASCII);
     diroff[0] = 0UL;
-    TIFFSetField(out, TIFFTAG_SUBIFD, 1, diroff);
+    NDPISetField(out, TIFFTAG_SUBIFD, 1, diroff);
     return (TIFFWriteEncodedStrip(out, 0, thumbnail, tnw*tnh) != -1 &&
-            TIFFWriteDirectory(out) != -1);
+            NDPIWriteDirectory(out) != -1);
 }
 
 const char* usage_info[] = {

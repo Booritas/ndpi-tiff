@@ -39,11 +39,11 @@
 #endif
 
 #define	CopyField(tag, v) \
-    if (TIFFGetField(in, tag, &v)) TIFFSetField(out, tag, v)
+    if (NDPIGetField(in, tag, &v)) NDPISetField(out, tag, v)
 #define	CopyField2(tag, v1, v2) \
-    if (TIFFGetField(in, tag, &v1, &v2)) TIFFSetField(out, tag, v1, v2)
+    if (NDPIGetField(in, tag, &v1, &v2)) NDPISetField(out, tag, v1, v2)
 #define	CopyField3(tag, v1, v2, v3) \
-    if (TIFFGetField(in, tag, &v1, &v2, &v3)) TIFFSetField(out, tag, v1, v2, v3)
+    if (NDPIGetField(in, tag, &v1, &v2, &v3)) NDPISetField(out, tag, v1, v2, v3)
 
 #define PATH_LENGTH 8192
 
@@ -72,7 +72,7 @@ main(int argc, char* argv[])
 		fname[sizeof(fname) - 1] = '\0';
 	}
 
-	in = TIFFOpen(argv[1], "r");
+	in = NDPIOpen(argv[1], "r");
         if (in == NULL) {
                 return EXIT_FAILURE;
         }
@@ -84,21 +84,21 @@ main(int argc, char* argv[])
                 newfilename();
 
                 path_len = strlen(fname) + sizeof(TIFF_SUFFIX);
-                path = (char *) _TIFFmalloc(path_len);
+                path = (char *) _NDPImalloc(path_len);
                 strncpy(path, fname, path_len);
                 path[path_len - 1] = '\0';
                 strncat(path, TIFF_SUFFIX, path_len - strlen(path) - 1);
-                out = TIFFOpen(path, TIFFIsBigEndian(in)?"wb":"wl");
-                _TIFFfree(path);
+                out = NDPIOpen(path, NDPIIsBigEndian(in)?"wb":"wl");
+                _NDPIfree(path);
 
                 if (out == NULL)
                         return (EXIT_FAILURE);
                 if (!tiffcp(in, out))
                         return (EXIT_FAILURE);
-                TIFFClose(out);
-        } while (TIFFReadDirectory(in));
+                NDPIClose(out);
+        } while (NDPIReadDirectory(in));
 
-        (void) TIFFClose(in);
+        (void) NDPIClose(in);
 
         return (EXIT_SUCCESS);
 }
@@ -182,9 +182,9 @@ tiffcp(TIFF* in, TIFF* out)
 	if (compression == COMPRESSION_JPEG) {
 		uint32_t count = 0;
 		void *table = NULL;
-		if (TIFFGetField(in, TIFFTAG_JPEGTABLES, &count, &table)
+		if (NDPIGetField(in, TIFFTAG_JPEGTABLES, &count, &table)
 		    && count > 0 && table) {
-		    TIFFSetField(out, TIFFTAG_JPEGTABLES, count, table);
+		    NDPISetField(out, TIFFTAG_JPEGTABLES, count, table);
 		}
 	}
         CopyField(TIFFTAG_PHOTOMETRIC, shortv);
@@ -229,7 +229,7 @@ tiffcp(TIFF* in, TIFF* out)
 	CopyField(TIFFTAG_FAXRECVTIME, longv);
 	CopyField(TIFFTAG_FAXSUBADDRESS, stringv);
 	CopyField(TIFFTAG_FAXDCS, stringv);
-	if (TIFFIsTiled(in))
+	if (NDPIIsTiled(in))
 		return (cpTiles(in, out));
 	else
 		return (cpStrips(in, out));
@@ -238,32 +238,32 @@ tiffcp(TIFF* in, TIFF* out)
 static int
 cpStrips(TIFF* in, TIFF* out)
 {
-	tmsize_t bufsize  = TIFFStripSize(in);
-	unsigned char *buf = (unsigned char *)_TIFFmalloc(bufsize);
+	tmsize_t bufsize  = NDPIStripSize(in);
+	unsigned char *buf = (unsigned char *)_NDPImalloc(bufsize);
 
 	if (buf) {
-		tstrip_t s, ns = TIFFNumberOfStrips(in);
+		tstrip_t s, ns = NDPINumberOfStrips(in);
 		uint64_t *bytecounts;
 
-		if (!TIFFGetField(in, TIFFTAG_STRIPBYTECOUNTS, &bytecounts)) {
+		if (!NDPIGetField(in, TIFFTAG_STRIPBYTECOUNTS, &bytecounts)) {
 			fprintf(stderr, "tiffsplit: strip byte counts are missing\n");
-                        _TIFFfree(buf);
+                        _NDPIfree(buf);
 			return (0);
 		}
 		for (s = 0; s < ns; s++) {
 			if (bytecounts[s] > (uint64_t)bufsize) {
-				buf = (unsigned char *)_TIFFrealloc(buf, (tmsize_t)bytecounts[s]);
+				buf = (unsigned char *)_NDPIrealloc(buf, (tmsize_t)bytecounts[s]);
 				if (!buf)
 					return (0);
 				bufsize = (tmsize_t)bytecounts[s];
 			}
-			if (TIFFReadRawStrip(in, s, buf, (tmsize_t)bytecounts[s]) < 0 ||
+			if (NDPIReadRawStrip(in, s, buf, (tmsize_t)bytecounts[s]) < 0 ||
 			    TIFFWriteRawStrip(out, s, buf, (tmsize_t)bytecounts[s]) < 0) {
-				_TIFFfree(buf);
+				_NDPIfree(buf);
 				return (0);
 			}
 		}
-		_TIFFfree(buf);
+		_NDPIfree(buf);
 		return (1);
 	}
 	return (0);
@@ -272,32 +272,32 @@ cpStrips(TIFF* in, TIFF* out)
 static int
 cpTiles(TIFF* in, TIFF* out)
 {
-	tmsize_t bufsize = TIFFTileSize(in);
-	unsigned char *buf = (unsigned char *)_TIFFmalloc(bufsize);
+	tmsize_t bufsize = NDPITileSize(in);
+	unsigned char *buf = (unsigned char *)_NDPImalloc(bufsize);
 
 	if (buf) {
-		ttile_t t, nt = TIFFNumberOfTiles(in);
+		ttile_t t, nt = NDPINumberOfTiles(in);
 		uint64_t *bytecounts;
 
-		if (!TIFFGetField(in, TIFFTAG_TILEBYTECOUNTS, &bytecounts)) {
+		if (!NDPIGetField(in, TIFFTAG_TILEBYTECOUNTS, &bytecounts)) {
 			fprintf(stderr, "tiffsplit: tile byte counts are missing\n");
-                        _TIFFfree(buf);
+                        _NDPIfree(buf);
 			return (0);
 		}
 		for (t = 0; t < nt; t++) {
 			if (bytecounts[t] > (uint64_t) bufsize) {
-				buf = (unsigned char *)_TIFFrealloc(buf, (tmsize_t)bytecounts[t]);
+				buf = (unsigned char *)_NDPIrealloc(buf, (tmsize_t)bytecounts[t]);
 				if (!buf)
 					return (0);
 				bufsize = (tmsize_t)bytecounts[t];
 			}
-			if (TIFFReadRawTile(in, t, buf, (tmsize_t)bytecounts[t]) < 0 ||
+			if (NDPIReadRawTile(in, t, buf, (tmsize_t)bytecounts[t]) < 0 ||
 			    TIFFWriteRawTile(out, t, buf, (tmsize_t)bytecounts[t]) < 0) {
-				_TIFFfree(buf);
+				_NDPIfree(buf);
 				return (0);
 			}
 		}
-		_TIFFfree(buf);
+		_NDPIfree(buf);
 		return (1);
 	}
 	return (0);

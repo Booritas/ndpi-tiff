@@ -31,7 +31,7 @@
 
 #include "tiffiop.h"
 
-int TIFFGetTagListCount( TIFF *tif )
+int NDPIGetTagListCount( TIFF *tif )
 
 {
     TIFFDirectory* td = &tif->tif_dir;
@@ -39,7 +39,7 @@ int TIFFGetTagListCount( TIFF *tif )
     return td->td_customValueCount;
 }
 
-uint32_t TIFFGetTagListEntry(TIFF *tif, int tag_index )
+uint32_t NDPIGetTagListEntry(TIFF *tif, int tag_index )
 
 {
     TIFFDirectory* td = &tif->tif_dir;
@@ -55,13 +55,13 @@ uint32_t TIFFGetTagListEntry(TIFF *tif, int tag_index )
 ** structure to application code without giving access to the private
 ** TIFF structure.
 */
-TIFFTagMethods *TIFFAccessTagMethods( TIFF *tif )
+TIFFTagMethods *NDPIAccessTagMethods( TIFF *tif )
 
 {
     return &(tif->tif_tagmethods);
 }
 
-void *TIFFGetClientInfo( TIFF *tif, const char *name )
+void *NDPIGetClientInfo( TIFF *tif, const char *name )
 
 {
     TIFFClientInfoLink *psLink = tif->tif_clientinfo;
@@ -75,7 +75,7 @@ void *TIFFGetClientInfo( TIFF *tif, const char *name )
         return NULL;
 }
 
-void TIFFSetClientInfo( TIFF *tif, void *data, const char *name )
+void NDPISetClientInfo( TIFF *tif, void *data, const char *name )
 
 {
     TIFFClientInfoLink *psLink = tif->tif_clientinfo;
@@ -97,10 +97,10 @@ void TIFFSetClientInfo( TIFF *tif, void *data, const char *name )
     ** Create a new link.
     */
 
-    psLink = (TIFFClientInfoLink *) _TIFFmalloc(sizeof(TIFFClientInfoLink));
+    psLink = (TIFFClientInfoLink *) _NDPImalloc(sizeof(TIFFClientInfoLink));
     assert (psLink != NULL);
     psLink->next = tif->tif_clientinfo;
-    psLink->name = (char *) _TIFFmalloc((tmsize_t)(strlen(name)+1));
+    psLink->name = (char *) _NDPImalloc((tmsize_t)(strlen(name)+1));
     assert (psLink->name != NULL);
     strcpy(psLink->name, name);
     psLink->data = data;

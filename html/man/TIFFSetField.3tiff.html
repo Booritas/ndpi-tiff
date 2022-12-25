@@ -13,12 +13,12 @@
        table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
        h1      { text-align: center }
 </style>
-<title>TIFFSetField</title>
+<title>NDPISetField</title>
 
 </head>
 <body>
 
-<h1 align="center">TIFFSetField</h1>
+<h1 align="center">NDPISetField</h1>
 
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
@@ -35,8 +35,8 @@
 </h2>
 
 
-<p style="margin-left:11%; margin-top: 1em">TIFFSetField,
-TIFFVSetField &minus; set the value(s) of a tag in a
+<p style="margin-left:11%; margin-top: 1em">NDPISetField,
+NDPIVSetField &minus; set the value(s) of a tag in a
 <small>TIFF</small> file open for writing</p>
 
 <h2>SYNOPSIS
@@ -48,14 +48,14 @@ TIFFVSetField &minus; set the value(s) of a tag in a
 &lt;tiffio.h&gt;</b></p>
 
 <p style="margin-left:11%; margin-top: 1em"><b>int
-TIFFSetField(TIFF *</b><i>tif</i><b>, ttag_t</b>
+NDPISetField(TIFF *</b><i>tif</i><b>, ttag_t</b>
 <i>tag</i><b>,</b> <i>...</i><b>)</b></p>
 
 <p style="margin-left:11%; margin-top: 1em"><b>#include
 &lt;stdarg.h&gt;</b></p>
 
 <p style="margin-left:11%; margin-top: 1em"><b>int
-TIFFVSetField(TIFF *</b><i>tif</i><b>, ttag_t</b>
+NDPIVSetField(TIFF *</b><i>tif</i><b>, ttag_t</b>
 <i>tag</i><b>, va_list</b> <i>ap</i><b>)</b></p>
 
 <h2>DESCRIPTION
@@ -64,14 +64,14 @@ TIFFVSetField(TIFF *</b><i>tif</i><b>, ttag_t</b>
 
 
 
-<p style="margin-left:11%; margin-top: 1em"><b><i>TIFFSetField</i></b>
+<p style="margin-left:11%; margin-top: 1em"><b><i>NDPISetField</i></b>
 sets the value of a field or pseudo-tag in the current
 directory associated with the open <small>TIFF</small> file
 <i>tif</i>. (A <i>pseudo-tag</i> is a parameter that is used
 to control the operation of the <small>TIFF</small> library
 but whose value is not read or written to the underlying
 file.) To set the value of a field the file must have been
-previously opened for writing with <i>TIFFOpen</i>(3TIFF);
+previously opened for writing with <i>NDPIOpen</i>(3TIFF);
 pseudo-tags can be set whether the file was opened for
 reading or writing. The field is identified by <i>tag</i>,
 one of the values defined in the include file <b>tiff.h</b>
@@ -81,12 +81,12 @@ using a variable argument list, as prescribed by the
 <i>varargs</i>(3) interface.)</p>
 
 
-<p style="margin-left:11%; margin-top: 1em"><i>TIFFVSetField</i>
-is functionally equivalent to <i>TIFFSetField</i> except
+<p style="margin-left:11%; margin-top: 1em"><i>NDPIVSetField</i>
+is functionally equivalent to <i>NDPISetField</i> except
 that it takes a pointer to a variable argument list.
-<i>TIFFVSetField</i> is useful for writing routines that are
+<i>NDPIVSetField</i> is useful for writing routines that are
 layered on top of the functionality provided by
-<i>TIFFSetField</i>.</p>
+<i>NDPISetField</i>.</p>
 
 <p style="margin-left:11%; margin-top: 1em">The tags
 understood by <i>libtiff</i>, the number of parameter
@@ -1833,7 +1833,7 @@ an error was detected.</p>
 
 
 <p style="margin-left:11%; margin-top: 1em">All error
-messages are directed to the <b>TIFFError</b>(3TIFF)
+messages are directed to the <b>NDPIError</b>(3TIFF)
 routine.</p>
 
 <p style="margin-left:11%; margin-top: 1em"><b>%s: Cannot
@@ -1853,10 +1853,10 @@ for the named tag.</p>
 
 
 
-<p style="margin-left:11%; margin-top: 1em"><b>TIFFOpen</b>(3TIFF),
-<b>TIFFGetField</b>(3TIFF), <b>TIFFSetDirectory</b>(3TIFF),
-<b>TIFFWriteDirectory</b>(3TIFF),
-<b>TIFFReadDirectory</b>(3TIFF), <b>libtiff</b>(3TIFF)</p>
+<p style="margin-left:11%; margin-top: 1em"><b>NDPIOpen</b>(3TIFF),
+<b>NDPIGetField</b>(3TIFF), <b>NDPISetDirectory</b>(3TIFF),
+<b>NDPIWriteDirectory</b>(3TIFF),
+<b>NDPIReadDirectory</b>(3TIFF), <b>libtiff</b>(3TIFF)</p>
 
 <p style="margin-left:11%; margin-top: 1em">Libtiff library
 home page: <b>http://www.simplesystems.org/libtiff/</b></p>

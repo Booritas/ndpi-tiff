@@ -34,7 +34,7 @@ CheckShortField(TIFF *tif, const ttag_t field, const uint16_t value)
 {
 	uint16_t tmp = 123;
 
-	if (!TIFFGetField(tif, field, &tmp)) {
+	if (!NDPIGetField(tif, field, &tmp)) {
 		fprintf (stderr, "Problem fetching tag %"PRIu32".\n",
 			 field);
 		return -1;
@@ -53,7 +53,7 @@ CheckShortPairedField(TIFF *tif, const ttag_t field, const uint16_t *values)
 {
 	uint16_t tmp[2] = {123, 456 };
 
-	if (!TIFFGetField(tif, field, tmp, tmp + 1)) {
+	if (!NDPIGetField(tif, field, tmp, tmp + 1)) {
 		fprintf (stderr, "Problem fetching tag %"PRIu32".\n",
 			 field);
 		return -1;
@@ -72,7 +72,7 @@ CheckLongField(TIFF *tif, const ttag_t field, const uint32_t value)
 {
 	uint32_t tmp = 123;
 
-	if (!TIFFGetField(tif, field, &tmp)) {
+	if (!NDPIGetField(tif, field, &tmp)) {
 		fprintf (stderr, "Problem fetching tag %"PRIu32".\n",
 			 field);
 		return -1;

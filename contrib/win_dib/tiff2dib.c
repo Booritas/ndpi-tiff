@@ -76,19 +76,19 @@ HDIB LoadTIFFinDIB(LPSTR lpFileName)
     int           i,l;
     int           Align; 
     
-    tif = TIFFOpen(lpFileName, "r");
+    tif = NDPIOpen(lpFileName, "r");
     
     if (!tif)
         goto TiffOpenError;
     
-    TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &imageWidth);
-    TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &imageLength);  
-    TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &BitsPerSample);
-    TIFFGetField(tif, TIFFTAG_ROWSPERSTRIP, &RowsPerStrip);  
-    TIFFGetField(tif, TIFFTAG_ROWSPERSTRIP, &RowsPerStrip);   
-    TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &PhotometricInterpretation);
+    NDPIGetField(tif, TIFFTAG_IMAGEWIDTH, &imageWidth);
+    NDPIGetField(tif, TIFFTAG_IMAGELENGTH, &imageLength);  
+    NDPIGetField(tif, TIFFTAG_BITSPERSAMPLE, &BitsPerSample);
+    NDPIGetField(tif, TIFFTAG_ROWSPERSTRIP, &RowsPerStrip);  
+    NDPIGetField(tif, TIFFTAG_ROWSPERSTRIP, &RowsPerStrip);   
+    NDPIGetField(tif, TIFFTAG_PHOTOMETRIC, &PhotometricInterpretation);
            
-    LineSize = TIFFScanlineSize(tif); //Number of byte in ine line
+    LineSize = NDPIScanlineSize(tif); //Number of byte in ine line
 
     SamplePerPixel = (int) (LineSize/imageWidth);
 
@@ -117,7 +117,7 @@ HDIB LoadTIFFinDIB(LPSTR lpFileName)
         lpBits+=((imageWidth*SamplePerPixel)+Align)*(imageLength-1);
 		//now lpBits pointe on the bottom line
         
-        hStrip = GlobalAlloc(GHND,TIFFStripSize(tif));
+        hStrip = GlobalAlloc(GHND,NDPIStripSize(tif));
         buf = GlobalLock(hStrip);           
         
         if (!buf)
@@ -134,7 +134,7 @@ HDIB LoadTIFFinDIB(LPSTR lpFileName)
           LPBITMAPINFO lpbmi;   
           int   Palette16Bits;          
            
-          TIFFGetField(tif, TIFFTAG_COLORMAP, &red, &green, &blue); 
+          NDPIGetField(tif, TIFFTAG_COLORMAP, &red, &green, &blue); 
 
 		  //Is the palette 16 or 8 bits ?
           if (checkcmap(1<<BitsPerSample, red, green, blue) == 16) 
@@ -170,7 +170,7 @@ HDIB LoadTIFFinDIB(LPSTR lpFileName)
           {     
             nrow = (row + RowsPerStrip > imageLength ? imageLength - row :
 RowsPerStrip);
-            if (TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, row, 0),
+            if (NDPIReadEncodedStrip(tif, NDPIComputeStrip(tif, row, 0),
                 buf, nrow*LineSize)==-1)
                   {
                      goto TiffReadError;
@@ -201,7 +201,7 @@ imageWidth*SamplePerPixel);
         GlobalUnlock(hStrip);
         GlobalFree(hStrip);
         GlobalUnlock(hDIB); 
-        TIFFClose(tif);
+        NDPIClose(tif);
       }
       
     return hDIB;
@@ -212,7 +212,7 @@ imageWidth*SamplePerPixel);
        GlobalUnlock(hDIB); 
        GlobalFree(hStrip);
     OutOfDIBMemory:
-       TIFFClose(tif);
+       NDPIClose(tif);
     TiffOpenError:
        return (HANDLE) 0;
        

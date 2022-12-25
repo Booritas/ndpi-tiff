@@ -4,11 +4,11 @@
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
 <meta name="Content-Style" content="text/css">
-<title>TIFFReadDirectory</title>
+<title>NDPIReadDirectory</title>
 </head>
 <body>
 
-<h1 align=center>TIFFReadDirectory</h1>
+<h1 align=center>NDPIReadDirectory</h1>
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
@@ -26,7 +26,7 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><big>TIFFReadDirectory &minus; get the contents of the
+<p><big>NDPIReadDirectory &minus; get the contents of the
 next directory in an open</big> TIFF <big>file</big></p>
 </td>
 </table>
@@ -40,7 +40,7 @@ next directory in an open</big> TIFF <big>file</big></p>
 <td width="91%">
 <p><big><b>#include &lt;tiffio.h&gt;</b></big></p>
 <!-- INDENTATION -->
-<p><big><b>int TIFFReadDirectory(TIFF
+<p><big><b>int NDPIReadDirectory(TIFF
 *</b><i>tif</i><b>)</b></big></p>
 </td>
 </table>
@@ -54,9 +54,9 @@ next directory in an open</big> TIFF <big>file</big></p>
 <td width="91%">
 <p><big>Read the next directory in the specified file and
 make it the current directory. Applications only need to
-call <i>TIFFReadDirectory</i> to read multiple subfiles in a
+call <i>NDPIReadDirectory</i> to read multiple subfiles in a
 single</big> TIFF <big>file&mdash; the first directory in a
-file is automatically read when <i>TIFFOpen</i> is
+file is automatically read when <i>NDPIOpen</i> is
 called.</big></p>
 </td>
 </table>
@@ -77,8 +77,8 @@ only in-memory; it does not alter the contents of the file.
 However, the construction of the &lsquo;&lsquo;chopped
 strips&rsquo;&rsquo; is visible to the application through
 the number of strips [tiles] returned by
-<i>TIFFNumberOfStrips</i>
-[<i>TIFFNumberOfTiles</i>].</big></p>
+<i>NDPINumberOfStrips</i>
+[<i>NDPINumberOfTiles</i>].</big></p>
 </td>
 </table>
 <a name="RETURN VALUES"></a>
@@ -104,7 +104,7 @@ read.</big></p>
 <td width="8%"></td>
 <td width="91%">
 <p><big>All error messages are directed to the
-<i>TIFFError</i>(3TIFF) routine. All warning messages are
+<i>NDPIError</i>(3TIFF) routine. All warning messages are
 directed to the <i>TIFFWarning</i>(3TIFF) routine.</big></p>
 <!-- INDENTATION -->
 <p><big><b>Seek error accessing TIFF directory</b>. An error
@@ -203,10 +203,10 @@ size.</big></p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><big><b>TIFFOpen</b>(3TIFF),
-<b>TIFFWriteDirectory</b>(3TIFF),
-<b>TIFFSetDirectory</b>(3TIFF),
-<b>TIFFSetSubDirectory</b>(3TIFF),
+<p><big><b>NDPIOpen</b>(3TIFF),
+<b>NDPIWriteDirectory</b>(3TIFF),
+<b>NDPISetDirectory</b>(3TIFF),
+<b>NDPISetSubDirectory</b>(3TIFF),
 <b>libtiff</b>(3TIFF)</big></p>
 <!-- INDENTATION -->
 <p><big>Libtiff library home page:

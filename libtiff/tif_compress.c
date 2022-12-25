@@ -30,16 +30,16 @@
 #include "tiffiop.h"
 
 static int
-TIFFNoEncode(TIFF* tif, const char* method)
+NDPINoEncode(TIFF* tif, const char* method)
 {
-	const TIFFCodec* c = TIFFFindCODEC(tif->tif_dir.td_compression);
+	const TIFFCodec* c = NDPIFindCODEC(tif->tif_dir.td_compression);
 
 	if (c) {
-		TIFFErrorExt(tif->tif_clientdata, tif->tif_name,
+		NDPIErrorExt(tif->tif_clientdata, tif->tif_name,
 			     "%s %s encoding is not implemented",
 			     c->name, method);
 	} else {
-		TIFFErrorExt(tif->tif_clientdata, tif->tif_name,
+		NDPIErrorExt(tif->tif_clientdata, tif->tif_name,
 			"Compression scheme %"PRIu16" %s encoding is not implemented",
 			     tif->tif_dir.td_compression, method);
 	}
@@ -47,120 +47,120 @@ TIFFNoEncode(TIFF* tif, const char* method)
 }
 
 int
-_TIFFNoRowEncode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s)
+_NDPINoRowEncode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s)
 {
 	(void) pp; (void) cc; (void) s;
-	return (TIFFNoEncode(tif, "scanline"));
+	return (NDPINoEncode(tif, "scanline"));
 }
 
 int
-_TIFFNoStripEncode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s)
+_NDPINoStripEncode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s)
 {
 	(void) pp; (void) cc; (void) s;
-	return (TIFFNoEncode(tif, "strip"));
+	return (NDPINoEncode(tif, "strip"));
 }
 
 int
-_TIFFNoTileEncode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s)
+_NDPINoTileEncode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s)
 {
 	(void) pp; (void) cc; (void) s;
-	return (TIFFNoEncode(tif, "tile"));
+	return (NDPINoEncode(tif, "tile"));
 }
 
 static int
-TIFFNoDecode(TIFF* tif, const char* method)
+NDPINoDecode(TIFF* tif, const char* method)
 {
-	const TIFFCodec* c = TIFFFindCODEC(tif->tif_dir.td_compression);
+	const TIFFCodec* c = NDPIFindCODEC(tif->tif_dir.td_compression);
 
 	if (c)
-		TIFFErrorExt(tif->tif_clientdata, tif->tif_name,
+		NDPIErrorExt(tif->tif_clientdata, tif->tif_name,
 			     "%s %s decoding is not implemented",
 			     c->name, method);
 	else
-		TIFFErrorExt(tif->tif_clientdata, tif->tif_name,
+		NDPIErrorExt(tif->tif_clientdata, tif->tif_name,
 			     "Compression scheme %"PRIu16" %s decoding is not implemented",
 			     tif->tif_dir.td_compression, method);
 	return (0);
 }
 
 static int
-_TIFFNoFixupTags(TIFF* tif)
+_NDPINoFixupTags(TIFF* tif)
 {
 	(void) tif;
 	return (1);
 }
 
 int
-_TIFFNoRowDecode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s)
+_NDPINoRowDecode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s)
 {
 	(void) pp; (void) cc; (void) s;
-	return (TIFFNoDecode(tif, "scanline"));
+	return (NDPINoDecode(tif, "scanline"));
 }
 
 int
-_TIFFNoStripDecode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s)
+_NDPINoStripDecode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s)
 {
 	(void) pp; (void) cc; (void) s;
-	return (TIFFNoDecode(tif, "strip"));
+	return (NDPINoDecode(tif, "strip"));
 }
 
 int
-_TIFFNoTileDecode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s)
+_NDPINoTileDecode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s)
 {
 	(void) pp; (void) cc; (void) s;
-	return (TIFFNoDecode(tif, "tile"));
+	return (NDPINoDecode(tif, "tile"));
 }
 
 int
-_TIFFNoSeek(TIFF* tif, uint32_t off)
+_NDPINoSeek(TIFF* tif, uint32_t off)
 {
 	(void) off;
-	TIFFErrorExt(tif->tif_clientdata, tif->tif_name,
+	NDPIErrorExt(tif->tif_clientdata, tif->tif_name,
 		     "Compression algorithm does not support random access");
 	return (0);
 }
 
 int
-_TIFFNoPreCode(TIFF* tif, uint16_t s)
+_NDPINoPreCode(TIFF* tif, uint16_t s)
 {
 	(void) tif; (void) s;
 	return (1);
 }
 
-static int _TIFFtrue(TIFF* tif) { (void) tif; return (1); }
-static void _TIFFvoid(TIFF* tif) { (void) tif; }
+static int _NDPItrue(TIFF* tif) { (void) tif; return (1); }
+static void _NDPIvoid(TIFF* tif) { (void) tif; }
 
 void
-_TIFFSetDefaultCompressionState(TIFF* tif)
+_NDPISetDefaultCompressionState(TIFF* tif)
 {
-	tif->tif_fixuptags = _TIFFNoFixupTags; 
+	tif->tif_fixuptags = _NDPINoFixupTags; 
 	tif->tif_decodestatus = TRUE;
-	tif->tif_setupdecode = _TIFFtrue;
-	tif->tif_predecode = _TIFFNoPreCode;
-	tif->tif_decoderow = _TIFFNoRowDecode;  
-	tif->tif_decodestrip = _TIFFNoStripDecode;
-	tif->tif_decodetile = _TIFFNoTileDecode;  
+	tif->tif_setupdecode = _NDPItrue;
+	tif->tif_predecode = _NDPINoPreCode;
+	tif->tif_decoderow = _NDPINoRowDecode;  
+	tif->tif_decodestrip = _NDPINoStripDecode;
+	tif->tif_decodetile = _NDPINoTileDecode;  
 	tif->tif_encodestatus = TRUE;
-	tif->tif_setupencode = _TIFFtrue;
-	tif->tif_preencode = _TIFFNoPreCode;
-	tif->tif_postencode = _TIFFtrue;
-	tif->tif_encoderow = _TIFFNoRowEncode;
-	tif->tif_encodestrip = _TIFFNoStripEncode;  
-	tif->tif_encodetile = _TIFFNoTileEncode;  
-	tif->tif_close = _TIFFvoid;
-	tif->tif_seek = _TIFFNoSeek;
-	tif->tif_cleanup = _TIFFvoid;
-	tif->tif_defstripsize = _TIFFDefaultStripSize;
-	tif->tif_deftilesize = _TIFFDefaultTileSize;
+	tif->tif_setupencode = _NDPItrue;
+	tif->tif_preencode = _NDPINoPreCode;
+	tif->tif_postencode = _NDPItrue;
+	tif->tif_encoderow = _NDPINoRowEncode;
+	tif->tif_encodestrip = _NDPINoStripEncode;  
+	tif->tif_encodetile = _NDPINoTileEncode;  
+	tif->tif_close = _NDPIvoid;
+	tif->tif_seek = _NDPINoSeek;
+	tif->tif_cleanup = _NDPIvoid;
+	tif->tif_defstripsize = _NDPIDefaultStripSize;
+	tif->tif_deftilesize = _NDPIDefaultTileSize;
 	tif->tif_flags &= ~(TIFF_NOBITREV|TIFF_NOREADRAW);
 }
 
 int
-TIFFSetCompressionScheme(TIFF* tif, int scheme)
+NDPISetCompressionScheme(TIFF* tif, int scheme)
 {
-	const TIFFCodec *c = TIFFFindCODEC((uint16_t) scheme);
+	const TIFFCodec *c = NDPIFindCODEC((uint16_t) scheme);
 
-	_TIFFSetDefaultCompressionState(tif);
+	_NDPISetDefaultCompressionState(tif);
 	/*
 	 * Don't treat an unknown compression scheme as an error.
 	 * This permits applications to open files with data that
@@ -182,7 +182,7 @@ typedef struct _codec {
 static codec_t* registeredCODECS = NULL;
 
 const TIFFCodec*
-TIFFFindCODEC(uint16_t scheme)
+NDPIFindCODEC(uint16_t scheme)
 {
 	const TIFFCodec* c;
 	codec_t* cd;
@@ -197,10 +197,10 @@ TIFFFindCODEC(uint16_t scheme)
 }
 
 TIFFCodec*
-TIFFRegisterCODEC(uint16_t scheme, const char* name, TIFFInitMethod init)
+NDPIRegisterCODEC(uint16_t scheme, const char* name, TIFFInitMethod init)
 {
 	codec_t* cd = (codec_t*)
-	    _TIFFmalloc((tmsize_t)(sizeof (codec_t) + sizeof (TIFFCodec) + strlen(name)+1));
+	    _NDPImalloc((tmsize_t)(sizeof (codec_t) + sizeof (TIFFCodec) + strlen(name)+1));
 
 	if (cd != NULL) {
 		cd->info = (TIFFCodec*) ((uint8_t*) cd + sizeof (codec_t));
@@ -212,7 +212,7 @@ TIFFRegisterCODEC(uint16_t scheme, const char* name, TIFFInitMethod init)
 		cd->next = registeredCODECS;
 		registeredCODECS = cd;
 	} else {
-		TIFFErrorExt(0, "TIFFRegisterCODEC",
+		NDPIErrorExt(0, "NDPIRegisterCODEC",
 		    "No space to register compression scheme %s", name);
 		return NULL;
 	}
@@ -220,7 +220,7 @@ TIFFRegisterCODEC(uint16_t scheme, const char* name, TIFFInitMethod init)
 }
 
 void
-TIFFUnRegisterCODEC(TIFFCodec* c)
+NDPIUnRegisterCODEC(TIFFCodec* c)
 {
 	codec_t* cd;
 	codec_t** pcd;
@@ -228,10 +228,10 @@ TIFFUnRegisterCODEC(TIFFCodec* c)
 	for (pcd = &registeredCODECS; (cd = *pcd) != NULL; pcd = &cd->next)
 		if (cd->info == c) {
 			*pcd = cd->next;
-			_TIFFfree(cd);
+			_NDPIfree(cd);
 			return;
 		}
-	TIFFErrorExt(0, "TIFFUnRegisterCODEC",
+	NDPIErrorExt(0, "NDPIUnRegisterCODEC",
 	    "Cannot remove compression scheme %s; not registered", c->name);
 }
 
@@ -248,7 +248,7 @@ TIFFUnRegisterCODEC(TIFFCodec* c)
  */
 
 TIFFCodec*
-TIFFGetConfiguredCODECs()
+NDPIGetConfiguredCODECs()
 {
 	int i = 1;
 	codec_t *cd;
@@ -258,36 +258,36 @@ TIFFGetConfiguredCODECs()
 
 	for (cd = registeredCODECS; cd; cd = cd->next) {
 		new_codecs = (TIFFCodec *)
-			_TIFFrealloc(codecs, i * sizeof(TIFFCodec));
+			_NDPIrealloc(codecs, i * sizeof(TIFFCodec));
 		if (!new_codecs) {
-			_TIFFfree (codecs);
+			_NDPIfree (codecs);
 			return NULL;
 		}
 		codecs = new_codecs;
-		_TIFFmemcpy(codecs + i - 1, cd->info, sizeof(TIFFCodec));
+		_NDPImemcpy(codecs + i - 1, cd->info, sizeof(TIFFCodec));
 		i++;
 	}
 	for (c = _TIFFBuiltinCODECS; c->name; c++) {
-		if (TIFFIsCODECConfigured(c->scheme)) {
+		if (NDPIIsCODECConfigured(c->scheme)) {
 			new_codecs = (TIFFCodec *)
-				_TIFFrealloc(codecs, i * sizeof(TIFFCodec));
+				_NDPIrealloc(codecs, i * sizeof(TIFFCodec));
 			if (!new_codecs) {
-				_TIFFfree (codecs);
+				_NDPIfree (codecs);
 				return NULL;
 			}
 			codecs = new_codecs;
-			_TIFFmemcpy(codecs + i - 1, (const void*)c, sizeof(TIFFCodec));
+			_NDPImemcpy(codecs + i - 1, (const void*)c, sizeof(TIFFCodec));
 			i++;
 		}
 	}
 
-	new_codecs = (TIFFCodec *) _TIFFrealloc(codecs, i * sizeof(TIFFCodec));
+	new_codecs = (TIFFCodec *) _NDPIrealloc(codecs, i * sizeof(TIFFCodec));
 	if (!new_codecs) {
-		_TIFFfree (codecs);
+		_NDPIfree (codecs);
 		return NULL;
 	}
 	codecs = new_codecs;
-	_TIFFmemset(codecs + i - 1, 0, sizeof(TIFFCodec));
+	_NDPImemset(codecs + i - 1, 0, sizeof(TIFFCodec));
 
 	return codecs;
 }

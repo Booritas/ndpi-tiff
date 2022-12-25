@@ -22,24 +22,24 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFFlush 3TIFF "December 16, 1991" "libtiff"
+.TH NDPIFlush 3TIFF "December 16, 1991" "libtiff"
 .SH NAME
-TIFFFlush, TIFFFlushData \- flush pending writes to an open
+NDPIFlush, NDPIFlushData \- flush pending writes to an open
 .SM TIFF
 file
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "int TIFFFlush(TIFF *" tif ")"
+.BI "int NDPIFlush(TIFF *" tif ")"
 .br
-.BI "int TIFFFlushData(TIFF *" tif ")"
+.BI "int NDPIFlushData(TIFF *" tif ")"
 .SH DESCRIPTION
-.IR TIFFFlush
+.IR NDPIFlush
 causes any pending writes for the specified file (including writes for the
 current directory) to be done. In normal operation this call is never needed \-
 the library automatically does any flushing required.
 .PP
-.IR TIFFFlushData
+.IR NDPIFlushData
 flushes any pending image data for the specified file to be written out;
 directory-related data are not flushed. In normal operation this call is never
 needed \- the library automatically does any flushing required.
@@ -47,10 +47,10 @@ needed \- the library automatically does any flushing required.
 0 is returned if an error is encountered, otherwise 1 is returned.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.BR TIFFError (3TIFF)
+.BR NDPIError (3TIFF)
 routine.
 .SH "SEE ALSO"
-.BR TIFFOpen (3TIFF),
+.BR NDPIOpen (3TIFF),
 .BR TIFFWriteEncodedStrip (3TIFF),
 .BR TIFFWriteEncodedTile (3TIFF),
 .BR TIFFWriteRawStrip (3TIFF),

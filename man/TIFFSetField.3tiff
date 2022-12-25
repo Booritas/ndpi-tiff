@@ -22,21 +22,21 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFSetField 3TIFF "October 29, 2004" "libtiff"
+.TH NDPISetField 3TIFF "October 29, 2004" "libtiff"
 .SH NAME
-TIFFSetField, TIFFVSetField \- set the value(s) of a tag in a
+NDPISetField, NDPIVSetField \- set the value(s) of a tag in a
 .SM TIFF
 file open for writing
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "int TIFFSetField(TIFF *" tif ", ttag_t " tag ", " ... ")"
+.BI "int NDPISetField(TIFF *" tif ", ttag_t " tag ", " ... ")"
 .sp
 .B "#include <stdarg.h>"
 .sp
-.BI "int TIFFVSetField(TIFF *" tif ", ttag_t " tag ", va_list " ap ")"
+.BI "int NDPIVSetField(TIFF *" tif ", ttag_t " tag ", va_list " ap ")"
 .SH DESCRIPTION
-.IR TIFFSetField
+.IR NDPISetField
 sets the value of a field
 or pseudo-tag in the current directory associated with
 the open
@@ -50,7 +50,7 @@ is a parameter that is used to control the operation of the
 library but whose value is not read or written to the underlying file.)
 To set the value of a field
 the file must have been previously opened for writing with
-.IR TIFFOpen (3TIFF);
+.IR NDPIOpen (3TIFF);
 pseudo-tags can be set whether the file was opened for reading
 or writing.
 The field is identified by
@@ -66,15 +66,15 @@ or, on some machines, the
 .IR varargs (3)
 interface.)
 .PP
-.IR TIFFVSetField
+.IR NDPIVSetField
 is functionally equivalent to
-.IR TIFFSetField
+.IR NDPISetField
 except that it takes a pointer to a variable
 argument list.
-.I TIFFVSetField
+.I NDPIVSetField
 is useful for writing routines that are layered
 on top of the functionality provided by
-.IR TIFFSetField .
+.IR NDPISetField .
 .PP
 The tags understood by
 .IR libtiff ,
@@ -193,7 +193,7 @@ Annex B.3 "Embedding ICC Profiles in TIFF Files"
 Otherwise, 0 is returned if an error was detected.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.BR TIFFError (3TIFF)
+.BR NDPIError (3TIFF)
 routine.
 .PP
 \fB%s: Cannot modify tag "%s" while writing\fP.
@@ -205,11 +205,11 @@ the format of written data.
 \fB%d: Bad value for "%s"\fP.
 An invalid value was supplied for the named tag.
 .SH "SEE ALSO"
-.BR TIFFOpen (3TIFF),
-.BR TIFFGetField (3TIFF),
-.BR TIFFSetDirectory (3TIFF),
-.BR TIFFWriteDirectory (3TIFF),
-.BR TIFFReadDirectory (3TIFF),
+.BR NDPIOpen (3TIFF),
+.BR NDPIGetField (3TIFF),
+.BR NDPISetDirectory (3TIFF),
+.BR NDPIWriteDirectory (3TIFF),
+.BR NDPIReadDirectory (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

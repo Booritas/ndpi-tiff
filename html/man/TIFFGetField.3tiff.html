@@ -13,12 +13,12 @@
        table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
        h1      { text-align: center }
 </style>
-<title>TIFFGetField</title>
+<title>NDPIGetField</title>
 
 </head>
 <body>
 
-<h1 align="center">TIFFGetField</h1>
+<h1 align="center">NDPIGetField</h1>
 
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
@@ -36,8 +36,8 @@
 </h2>
 
 
-<p style="margin-left:11%; margin-top: 1em">TIFFGetField,
-TIFFVGetField &minus; get the value(s) of a tag in an open
+<p style="margin-left:11%; margin-top: 1em">NDPIGetField,
+NDPIVGetField &minus; get the value(s) of a tag in an open
 <small>TIFF</small> file</p>
 
 <h2>SYNOPSIS
@@ -49,18 +49,18 @@ TIFFVGetField &minus; get the value(s) of a tag in an open
 &lt;tiffio.h&gt;</b></p>
 
 <p style="margin-left:11%; margin-top: 1em"><b>int
-TIFFGetField(TIFF *</b><i>tif</i><b>, ttag_t</b>
+NDPIGetField(TIFF *</b><i>tif</i><b>, ttag_t</b>
 <i>tag</i><b>,</b> <i>...</i><b>)</b></p>
 
 <p style="margin-left:11%; margin-top: 1em"><b>#include
 &lt;stdarg.h&gt;</b></p>
 
 <p style="margin-left:11%; margin-top: 1em"><b>int
-TIFFVGetField(TIFF *</b><i>tif</i><b>, ttag_t</b>
+NDPIVGetField(TIFF *</b><i>tif</i><b>, ttag_t</b>
 <i>tag</i><b>, va_list</b> <i>ap</i><b>) <br>
-int TIFFGetFieldDefaulted(TIFF *</b><i>tif</i><b>,
+int NDPIGetFieldDefaulted(TIFF *</b><i>tif</i><b>,
 ttag_t</b> <i>tag</i><b>,</b> <i>...</i><b>) <br>
-int TIFFVGetFieldDefaulted(TIFF *</b><i>tif</i><b>,
+int NDPIVGetFieldDefaulted(TIFF *</b><i>tif</i><b>,
 ttag_t</b> <i>tag</i><b>, va_list</b> <i>ap</i><b>)</b></p>
 
 <h2>DESCRIPTION
@@ -69,34 +69,34 @@ ttag_t</b> <i>tag</i><b>, va_list</b> <i>ap</i><b>)</b></p>
 
 
 
-<p style="margin-left:11%; margin-top: 1em"><b><i>TIFFGetField</i></b>
+<p style="margin-left:11%; margin-top: 1em"><b><i>NDPIGetField</i></b>
 returns the value of a tag or pseudo-tag associated with the
 the current directory of the opened <small>TIFF</small> file
 <i>tif</i>. (A <i>pseudo-tag</i> is a parameter that is used
 to control the operation of the <small>TIFF</small> library
 but whose value is not read or written to the underlying
 file.) The file must have been previously opened with
-<i>TIFFOpen</i>(3TIFF). The tag is identified by <i>tag</i>,
+<i>NDPIOpen</i>(3TIFF). The tag is identified by <i>tag</i>,
 one of the values defined in the include file <b>tiff.h</b>
 (see also the table below). The type and number of values
 returned is dependent on the tag being requested. The
 programming interface uses a variable argument list as
 prescribed by the <i>stdarg</i>(3) interface. The returned
-values should only be interpreted if <i>TIFFGetField</i>
+values should only be interpreted if <i>NDPIGetField</i>
 returns 1.</p>
 
 
-<p style="margin-left:11%; margin-top: 1em"><i>TIFFVGetField</i>
-is functionally equivalent to <i>TIFFGetField</i> except
+<p style="margin-left:11%; margin-top: 1em"><i>NDPIVGetField</i>
+is functionally equivalent to <i>NDPIGetField</i> except
 that it takes a pointer to a variable argument list.
-<i>TIFFVGetField</i> is useful for layering interfaces on
+<i>NDPIVGetField</i> is useful for layering interfaces on
 top of the functionality provided by
-<i>TIFFGetField</i>.</p>
+<i>NDPIGetField</i>.</p>
 
 
-<p style="margin-left:11%; margin-top: 1em"><i>TIFFGetFieldDefaulted</i>
-and <i>TIFFVGetFieldDefaulted</i> are identical to
-<i>TIFFGetField</i> and <i>TIFFVGetField</i>, except that if
+<p style="margin-left:11%; margin-top: 1em"><i>NDPIGetFieldDefaulted</i>
+and <i>NDPIVGetFieldDefaulted</i> are identical to
+<i>NDPIGetField</i> and <i>NDPIVGetField</i>, except that if
 a tag is not defined in the current directory and it has a
 default value, then the default value is returned.</p>
 
@@ -105,8 +105,8 @@ understood by <i>libtiff(3TIFF),</i> the number of parameter
 values, and the types for the returned values are shown
 below. The data types are specified as in C and correspond
 to the types used to specify tag values to
-<i>TIFFSetField</i>(3TIFF). Remember that
-<i>TIFFGetField</i> returns parameter values, so all the
+<i>NDPISetField</i>(3TIFF). Remember that
+<i>NDPIGetField</i> returns parameter values, so all the
 listed data types are pointers to storage where values
 should be returned. Consult the <small>TIFF</small>
 specification (or relevant industry specification) for
@@ -1919,11 +1919,11 @@ code:</p>
 void *data;</p>
 
 
-<p style="margin-left:22%; margin-top: 1em">TIFFGetField(tiff,
+<p style="margin-left:22%; margin-top: 1em">NDPIGetField(tiff,
 33424, &amp;count, &amp;data); <br>
 printf(&quot;Tag %d: %d, count %d0, 33424, *(uint32_t *)data,
 count); <br>
-TIFFGetField(tiff, 36867, &amp;count, &amp;data); <br>
+NDPIGetField(tiff, 36867, &amp;count, &amp;data); <br>
 printf(&quot;Tag %d: %s, count %d0, 36867, (char *)data,
 count);</p>
 
@@ -1945,7 +1945,7 @@ if the tag is defined in the current directory; otherwise a
 
 
 <p style="margin-left:11%; margin-top: 1em">All error
-messages are directed to the <b>TIFFError</b>(3TIFF)
+messages are directed to the <b>NDPIError</b>(3TIFF)
 routine.</p>
 
 <p style="margin-left:11%; margin-top: 1em"><b>Unknown
@@ -1957,10 +1957,10 @@ field, tag 0x%x</b>. An unknown tag was supplied.</p>
 
 
 
-<p style="margin-left:11%; margin-top: 1em"><b>TIFFOpen</b>(3TIFF),
-<b>TIFFSetField</b>(3TIFF), <b>TIFFSetDirectory</b>(3TIFF),
-<b>TIFFReadDirectory</b>(3TIFF),
-<b>TIFFWriteDirectory</b>(3TIFF) <b>libtiff</b>(3TIFF),</p>
+<p style="margin-left:11%; margin-top: 1em"><b>NDPIOpen</b>(3TIFF),
+<b>NDPISetField</b>(3TIFF), <b>NDPISetDirectory</b>(3TIFF),
+<b>NDPIReadDirectory</b>(3TIFF),
+<b>NDPIWriteDirectory</b>(3TIFF) <b>libtiff</b>(3TIFF),</p>
 
 <p style="margin-left:11%; margin-top: 1em">Libtiff library
 home page: <b>http://www.simplesystems.org/libtiff/</b></p>

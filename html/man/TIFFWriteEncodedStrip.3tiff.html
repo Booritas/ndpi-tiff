@@ -105,7 +105,7 @@ Otherwise, the value of <i>size</i> is returned.</big></p>
 <td width="8%"></td>
 <td width="91%">
 <p><big>All error messages are directed to the
-<i>TIFFError</i>(3TIFF) routine.</big></p>
+<i>NDPIError</i>(3TIFF) routine.</big></p>
 <!-- INDENTATION -->
 <p><big><b>%s: File not open for writing</b>. The file was
 opened for reading, not writing.</big></p>
@@ -113,17 +113,17 @@ opened for reading, not writing.</big></p>
 <p><big><b>Can not write scanlines to a tiled image</b>. The
 image is assumed to be organized in tiles because the
 <i>TileWidth</i> and <i>TileLength</i> tags have been set
-with <i>TIFFSetField</i>(3TIFF).</big></p>
+with <i>NDPISetField</i>(3TIFF).</big></p>
 <!-- INDENTATION -->
 <p><big><b>%s: Must set &quot;ImageWidth&quot; before
 writing data</b>. The image&rsquo;s width has not be set
-before the first write. See <i>TIFFSetField</i>(3TIFF) for
+before the first write. See <i>NDPISetField</i>(3TIFF) for
 information on how to do this.</big></p>
 <!-- INDENTATION -->
 <p><big><b>%s: Must set &quot;PlanarConfiguration&quot;
 before writing data</b>. The organization of data has not be
 defined before the first write. See
-<i>TIFFSetField</i>(3TIFF) for information on how to do
+<i>NDPISetField</i>(3TIFF) for information on how to do
 this.</big></p>
 <!-- INDENTATION -->
 <p><big><b>%s: No space for strip arrays&quot;</b>. There
@@ -139,7 +139,7 @@ and byte counts.</big></p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><big><b>TIFFOpen</b>(3TIFF),
+<p><big><b>NDPIOpen</b>(3TIFF),
 <b>TIFFWriteScanline</b>(3TIFF),
 <b>TIFFWriteRawStrip</b>(3TIFF),
 <b>libtiff</b>(3TIFF)</big></p>

@@ -20,7 +20,7 @@ TiffStream::TiffStream()
 
 TiffStream::~TiffStream()
 {
-    if(m_tif != NULL) TIFFClose(m_tif);
+    if(m_tif != NULL) NDPIClose(m_tif);
 }
 
 TIFF*
@@ -31,7 +31,7 @@ TiffStream::makeFileStream(istream* str)
 	m_ioStream = NULL;
     m_streamLength = getSize(m_this);
 
-    m_tif =  TIFFClientOpen(m_name, 
+    m_tif =  NDPIClientOpen(m_name, 
                            "r",
 						   m_this,
 						   read,
@@ -52,7 +52,7 @@ TiffStream::makeFileStream(ostream* str)
 	m_ioStream = NULL;
 	m_streamLength = getSize(m_this);
 
-	m_tif =  TIFFClientOpen(m_name, 
+	m_tif =  NDPIClientOpen(m_name, 
                            "w",
 						   m_this,
 						   read,
@@ -73,7 +73,7 @@ TiffStream::makeFileStream(iostream* str)
     m_ioStream = str;
 	m_streamLength = getSize(m_this);
 
-    m_tif =  TIFFClientOpen(m_name, 
+    m_tif =  NDPIClientOpen(m_name, 
 	                       "r+w",
 						   m_this,
 						   read,

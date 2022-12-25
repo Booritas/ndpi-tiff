@@ -22,9 +22,9 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFReadRGBAImage 3TIFF "October 13, 2006" "libtiff"
+.TH NDPIReadRGBAImage 3TIFF "October 13, 2006" "libtiff"
 .SH NAME
-TIFFReadRGBAImage, TIFFReadRGBAImageOriented \- read and decode an image
+NDPIReadRGBAImage, NDPIReadRGBAImageOriented \- read and decode an image
 into a fixed-format raster
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
@@ -37,12 +37,12 @@ into a fixed-format raster
 .br
 .B "#define TIFFGetA(abgr) (((abgr) >> 24) & 0xff)"
 .sp
-.BI "int TIFFReadRGBAImage(TIFF *" tif ", uint32_t " width ", uint32_t " height ", uint32_t *" raster ", int " stopOnError ")"
+.BI "int NDPIReadRGBAImage(TIFF *" tif ", uint32_t " width ", uint32_t " height ", uint32_t *" raster ", int " stopOnError ")"
 .br
-.BI "int TIFFReadRGBAImageOriented(TIFF *" tif ", uint32_t " width ", uint32_t " height ", uint32_t *" raster ", int " orientation ", int " stopOnError ")"
+.BI "int NDPIReadRGBAImageOriented(TIFF *" tif ", uint32_t " width ", uint32_t " height ", uint32_t *" raster ", int " orientation ", int " stopOnError ")"
 .br
 .SH DESCRIPTION
-.IR TIFFReadRGBAImage
+.IR NDPIReadRGBAImage
 reads a strip- or tile-based image into memory, storing the
 result in the user supplied
 .IR raster .
@@ -63,9 +63,9 @@ image data are placed in the lower part of the raster.
 at location (\fIx\fP,\fIy\fP) is \fIraster\fP[\fIy\fP*\fIwidth\fP+\fIx\fP];
 with the raster origin in the lower-left hand corner.)
 .PP
-.IR TIFFReadRGBAImageOriented
+.IR NDPIReadRGBAImageOriented
 works like
-.IR TIFFReadRGBAImage
+.IR NDPIReadRGBAImage
 with except of that user can specify the raster origin position with the
 .I orientation
 parameter. Four orientations supported:
@@ -86,7 +86,7 @@ origin in bottom-right corner.
 If you choose
 .B ORIENTATION_BOTLEFT
 result will be the same as returned by the
-.IR TIFFReadRGBAImage.
+.IR NDPIReadRGBAImage.
 .PP
 Raster pixels are 8-bit packed red, green, blue, alpha samples.
 The macros
@@ -99,7 +99,7 @@ should be used to access individual samples.
 Images without Associated Alpha matting information have a constant
 Alpha of 1.0 (255).
 .PP
-.I TIFFReadRGBAImage
+.I NDPIReadRGBAImage
 converts non-8-bit images by scaling sample values.
 Palette, grayscale, bilevel, 
 .SM CMYK\c
@@ -116,7 +116,7 @@ the image.
 If
 .I stopOnError
 is non-zero, then an error will terminate the operation; otherwise
-.I TIFFReadRGBAImage
+.I NDPIReadRGBAImage
 will continue processing data until all the possible data in the
 image have been requested.
 .SH NOTES
@@ -133,7 +133,7 @@ minus
 Palettte image colormaps that appear to be incorrectly written
 as 8-bit values are automatically scaled to 16-bits.
 .PP
-.I TIFFReadRGBAImage
+.I NDPIReadRGBAImage
 is just a wrapper around the more general
 .IR TIFFRGBAImage (3TIFF)
 facilities.
@@ -144,7 +144,7 @@ Otherwise, 0 is returned if an error was encountered and
 is zero.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.IR TIFFError (3TIFF)
+.IR NDPIError (3TIFF)
 routine.
 .PP
 .BR "Sorry, can not handle %d-bit pictures" .
@@ -194,7 +194,7 @@ The image has a format (combination of
 and
 .IR PhotometricInterpretation )
 that
-.I TIFFReadRGBAImage
+.I NDPIReadRGBAImage
 can not handle.
 .PP
 .BR "No space for B&W mapping table" .
@@ -207,10 +207,10 @@ There was insufficient memory to allocate a table used to map
 data to 8-bit
 .SM RGB.
 .SH "SEE ALSO"
-.BR TIFFOpen (3TIFF),
+.BR NDPIOpen (3TIFF),
 .BR TIFFRGBAImage (3TIFF),
-.BR TIFFReadRGBAStrip (3TIFF),
-.BR TIFFReadRGBATile (3TIFF),
+.BR NDPIReadRGBAStrip (3TIFF),
+.BR NDPIReadRGBATile (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

@@ -24,7 +24,7 @@
 .if n .po 0
 .TH TIFFRGBAImage 3TIFF "October 29, 2004" "libtiff"
 .SH NAME
-TIFFRGBAImageOK, TIFFRGBAImageBegin, TIFFRGBAImageGet, TIFFRGBAImageEnd
+NDPIRGBAImageOK, NDPIRGBAImageBegin, NDPIRGBAImageGet, NDPIRGBAImageEnd
 \- read and decode an image into a raster
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
@@ -32,13 +32,13 @@ TIFFRGBAImageOK, TIFFRGBAImageBegin, TIFFRGBAImageGet, TIFFRGBAImageEnd
 .B "typedef unsigned char TIFFRGBValue;"
 .B "typedef struct _TIFFRGBAImage TIFFRGBAImage;"
 .sp
-.BI "int TIFFRGBAImageOK(TIFF *" tif ", char " emsg[1024] ")"
+.BI "int NDPIRGBAImageOK(TIFF *" tif ", char " emsg[1024] ")"
 .br
-.BI "int TIFFRGBAImageBegin(TIFFRGBAImage *" img ", TIFF* " tif ", int " stopOnError ", char " emsg[1024] ")"
+.BI "int NDPIRGBAImageBegin(TIFFRGBAImage *" img ", TIFF* " tif ", int " stopOnError ", char " emsg[1024] ")"
 .br
-.BI "int TIFFRGBAImageGet(TIFFRGBAImage *" img ", uint32_t* " raster ", uint32_t " width " , uint32_t " height ")"
+.BI "int NDPIRGBAImageGet(TIFFRGBAImage *" img ", uint32_t* " raster ", uint32_t " width " , uint32_t " height ")"
 .br
-.BI "void TIFFRGBAImageEnd(TIFFRGBAImage *" img ")"
+.BI "void NDPIRGBAImageEnd(TIFFRGBAImage *" img ")"
 .br
 .SH DESCRIPTION
 The routines described here provide a high-level interface
@@ -57,21 +57,21 @@ according to application requirements.
 .PP
 The default usage for these routines is: check if an image can
 be processed using
-.IR TIFFRGBAImageOK ,
+.IR NDPIRGBAImageOK ,
 construct a decoder state block using
-.IR TIFFRGBAImageBegin ,
+.IR NDPIRGBAImageBegin ,
 read and decode an image into a target raster using
-.IR TIFFRGBAImageGet ,
+.IR NDPIRGBAImageGet ,
 and then
 release resources using
-.IR TIFFRGBAImageEnd .
-.I TIFFRGBAImageGet
+.IR NDPIRGBAImageEnd .
+.I NDPIRGBAImageGet
 can be called multiple times to decode an image using different
 state parameters.
 If multiple images are to be displayed and there is not enough
 space for each of the decoded rasters, multiple state blocks can
 be managed and then calls can be made to
-.I TIFFRGBAImageGet
+.I NDPIRGBAImageGet
 as needed to display an image.
 .PP
 The generated raster is assumed to be an array of
@@ -104,7 +104,7 @@ should be used to access individual samples.
 Images without Associated Alpha matting information have a constant
 Alpha of 1.0 (255).
 .PP
-.I TIFFRGBAImageGet
+.I NDPIRGBAImageGet
 converts non-8-bit images by scaling sample values.
 Palette, grayscale, bilevel, 
 .SM CMYK\c
@@ -121,7 +121,7 @@ the image.
 If
 .I stopOnError
 is non-zero, then an error will terminate the operation; otherwise
-.I TIFFRGBAImageGet
+.I NDPIRGBAImageGet
 will continue processing data until all the possible data in the
 image have been requested.
 .SH "ALTERNATE RASTER FORMATS"
@@ -132,7 +132,7 @@ one need only override the ``\fIput methods\fP'' used to store raster data.
 These methods are are defined in the
 .I TIFFRGBAImage
 structure and initially setup by
-.I TIFFRGBAImageBegin
+.I NDPIRGBAImageBegin
 to point to routines that pack raster data in the default
 .SM ABGR
 pixel format.
@@ -152,7 +152,7 @@ It is simple to display an image as it is being read into memory
 by overriding the put methods as described above for supporting
 alternate raster formats.
 Simply keep a reference to the default put methods setup by
-.I TIFFRGBAImageBegin
+.I NDPIRGBAImageBegin
 and then invoke them before or after each display operation.
 For example, the
 .IR tiffgt (1)
@@ -189,7 +189,7 @@ routines support the most commonly encountered flavors of
 .SM TIFF.
 It is possible to extend this support by overriding the ``\fIget method\fP''
 invoked by
-.I TIFFRGBAImageGet
+.I NDPIRGBAImageGet
 to read 
 .SM TIFF
 image data.
@@ -213,7 +213,7 @@ Otherwise, 0 is returned if an error was encountered and
 is zero.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.IR TIFFError (3TIFF)
+.IR NDPIError (3TIFF)
 routine.
 .PP
 .BR "Sorry, can not handle %d-bit pictures" .
@@ -274,11 +274,11 @@ There was insufficient memory to allocate a table used to map
 data to 8-bit
 .SM RGB.
 .SH "SEE ALSO"
-.BR TIFFOpen (3TIFF),
-.BR TIFFReadRGBAImage (3TIFF),
-.BR TIFFReadRGBAImageOriented (3TIFF),
-.BR TIFFReadRGBAStrip (3TIFF),
-.BR TIFFReadRGBATile (3TIFF),
+.BR NDPIOpen (3TIFF),
+.BR NDPIReadRGBAImage (3TIFF),
+.BR NDPIReadRGBAImageOriented (3TIFF),
+.BR NDPIReadRGBAStrip (3TIFF),
+.BR NDPIReadRGBATile (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

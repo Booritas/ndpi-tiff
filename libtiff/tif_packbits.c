@@ -36,16 +36,16 @@ PackBitsPreEncode(TIFF* tif, uint16_t s)
 {
 	(void) s;
 
-        tif->tif_data = (uint8_t*)_TIFFmalloc(sizeof(tmsize_t));
+        tif->tif_data = (uint8_t*)_NDPImalloc(sizeof(tmsize_t));
 	if (tif->tif_data == NULL)
 		return (0);
 	/*
 	 * Calculate the scanline/tile-width size in bytes.
 	 */
 	if (isTiled(tif))
-		*(tmsize_t*)tif->tif_data = TIFFTileRowSize(tif);
+		*(tmsize_t*)tif->tif_data = NDPITileRowSize(tif);
 	else
-		*(tmsize_t*)tif->tif_data = TIFFScanlineSize(tif);
+		*(tmsize_t*)tif->tif_data = NDPIScanlineSize(tif);
 	return (1);
 }
 
@@ -53,7 +53,7 @@ static int
 PackBitsPostEncode(TIFF* tif)
 {
         if (tif->tif_data)
-            _TIFFfree(tif->tif_data);
+            _NDPIfree(tif->tif_data);
 	return (1);
 }
 
@@ -96,7 +96,7 @@ PackBitsEncode(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
 			if (state == LITERAL || state == LITERAL_RUN) {
 				slop = (long)(op - lastliteral);
 				tif->tif_rawcc += (tmsize_t)(lastliteral - tif->tif_rawcp);
-				if (!TIFFFlushData1(tif))
+				if (!NDPIFlushData1(tif))
 					return (0);
 				op = tif->tif_rawcp;
 				while (slop-- > 0)
@@ -104,7 +104,7 @@ PackBitsEncode(TIFF* tif, uint8_t* buf, tmsize_t cc, uint16_t s)
 				lastliteral = tif->tif_rawcp;
 			} else {
 				tif->tif_rawcc += (tmsize_t)(op - tif->tif_rawcp);
-				if (!TIFFFlushData1(tif))
+				if (!NDPIFlushData1(tif))
 					return (0);
 				op = tif->tif_rawcp;
 			}
@@ -237,14 +237,14 @@ PackBitsDecode(TIFF* tif, uint8_t* op, tmsize_t occ, uint16_t s)
 			n = -n + 1;
 			if( occ < (tmsize_t)n )
 			{
-				TIFFWarningExt(tif->tif_clientdata, module,
+				NDPIWarningExt(tif->tif_clientdata, module,
 				    "Discarding %"TIFF_SSIZE_FORMAT" bytes to avoid buffer overrun",
 				    (tmsize_t)n - occ);
 				n = (long)occ;
 			}
 			if( cc == 0 )
 			{
-				TIFFWarningExt(tif->tif_clientdata, module,
+				NDPIWarningExt(tif->tif_clientdata, module,
 					       "Terminating PackBitsDecode due to lack of data.");
 				break;
 			}
@@ -256,18 +256,18 @@ PackBitsDecode(TIFF* tif, uint8_t* op, tmsize_t occ, uint16_t s)
 		} else {		/* copy next n+1 bytes literally */
 			if (occ < (tmsize_t)(n + 1))
 			{
-				TIFFWarningExt(tif->tif_clientdata, module,
+				NDPIWarningExt(tif->tif_clientdata, module,
 				    "Discarding %"TIFF_SSIZE_FORMAT" bytes to avoid buffer overrun",
 				    (tmsize_t)n - occ + 1);
 				n = (long)occ - 1;
 			}
 			if (cc < (tmsize_t) (n+1)) 
 			{
-				TIFFWarningExt(tif->tif_clientdata, module,
+				NDPIWarningExt(tif->tif_clientdata, module,
 					       "Terminating PackBitsDecode due to lack of data.");
 				break;
 			}
-			_TIFFmemcpy(op, bp, ++n);
+			_NDPImemcpy(op, bp, ++n);
 			op += n; occ -= n;
 			bp += n; cc -= n;
 		}
@@ -275,7 +275,7 @@ PackBitsDecode(TIFF* tif, uint8_t* op, tmsize_t occ, uint16_t s)
 	tif->tif_rawcp = (uint8_t*) bp;
 	tif->tif_rawcc = cc;
 	if (occ > 0) {
-		TIFFErrorExt(tif->tif_clientdata, module,
+		NDPIErrorExt(tif->tif_clientdata, module,
 		    "Not enough data for scanline %"PRIu32,
 		    tif->tif_row);
 		return (0);

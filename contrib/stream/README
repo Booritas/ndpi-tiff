@@ -9,12 +9,12 @@ stream from the user and in return it deposits i/o operation method pointers
 (e.g. read, write, seek and close) into the tiff's library client state.
 
 The class TiffStream has an overloaded factory method - makeFileStream -
-which takes the C++ stream as an argument, calls TIFFClientOpen and returns
+which takes the C++ stream as an argument, calls NDPIClientOpen and returns
 a tiff handle. The class retains the tiff handle in its local state and
 provides a helper function (getTiffHandle) to query the handle at any time.
 Additional helper method - getStreamSize - provides the stream size to the
 user. The implementation assumes client responsibility to delete the stream
-object. The class calls TIFFClose at destruction time.
+object. The class calls NDPIClose at destruction time.
 
 Attached are a definition (tiffstream.h) and an implementation
 (tiffstream.cpp) files of the TiffStream class. No changes are required to

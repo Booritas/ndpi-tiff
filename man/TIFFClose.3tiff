@@ -22,31 +22,31 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFClose 3TIFF "November 2, 2005" "libtiff"
+.TH NDPIClose 3TIFF "November 2, 2005" "libtiff"
 .SH NAME
-TIFFClose \- close a previously opened
+NDPIClose \- close a previously opened
 .SM TIFF
 file
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "void TIFFClose(TIFF *" tif ")"
+.BI "void NDPIClose(TIFF *" tif ")"
 .SH DESCRIPTION
-.IR TIFFClose
+.IR NDPIClose
 closes a file that was previously opened with
-.BR TIFFOpen (3TIFF).
+.BR NDPIOpen (3TIFF).
 Any buffered data are flushed to the file, including the contents of the
 current directory (if modified); and all resources are reclaimed.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.BR TIFFError (3TIFF)
+.BR NDPIError (3TIFF)
 routine.
 Likewise, warning messages are directed to the
 .BR TIFFWarning (3TIFF)
 routine.
 .SH "SEE ALSO"
 .BR libtiff (3TIFF),
-.BR TIFFOpen (3TIFF)
+.BR NDPIOpen (3TIFF)
 .PP
 Libtiff library home page:
 .BR http://www.simplesystems.org/libtiff/

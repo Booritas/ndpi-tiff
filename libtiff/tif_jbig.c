@@ -37,9 +37,9 @@
 
 static int JBIGSetupDecode(TIFF* tif)
 {
-	if (TIFFNumberOfStrips(tif) != 1)
+	if (NDPINumberOfStrips(tif) != 1)
 	{
-		TIFFErrorExt(tif->tif_clientdata, "JBIG", "Multistrip images not supported in decoder");
+		NDPIErrorExt(tif->tif_clientdata, "JBIG", "Multistrip images not supported in decoder");
 		return 0;
 	}
 
@@ -56,7 +56,7 @@ static int JBIGDecode(TIFF* tif, uint8_t* buffer, tmsize_t size, uint16_t s)
 
 	if (isFillOrder(tif, tif->tif_dir.td_fillorder))
 	{
-		TIFFReverseBits(tif->tif_rawcp, tif->tif_rawcc);
+		NDPIReverseBits(tif->tif_rawcp, tif->tif_rawcc);
 	}
 
 	jbg_dec_init(&decoder);
@@ -84,7 +84,7 @@ static int JBIGDecode(TIFF* tif, uint8_t* buffer, tmsize_t size, uint16_t s)
 		 * JBIG-KIT. Since the 2.0 the error reporting functions were
 		 * changed. We will handle both cases here.
 		 */
-		TIFFErrorExt(tif->tif_clientdata,
+		NDPIErrorExt(tif->tif_clientdata,
 			     "JBIG", "Error (%d) decoding: %s",
 			     decodeStatus,
 #if defined(JBG_EN)
@@ -100,20 +100,20 @@ static int JBIGDecode(TIFF* tif, uint8_t* buffer, tmsize_t size, uint16_t s)
 	decodedSize = jbg_dec_getsize(&decoder);
 	if( (tmsize_t)decodedSize < size )
 	{
-	    TIFFWarningExt(tif->tif_clientdata, "JBIG",
+	    NDPIWarningExt(tif->tif_clientdata, "JBIG",
 	                   "Only decoded %lu bytes, whereas %"TIFF_SSIZE_FORMAT" requested",
 	                   decodedSize, size);
 	}
 	else if( (tmsize_t)decodedSize > size )
 	{
-	    TIFFErrorExt(tif->tif_clientdata, "JBIG",
+	    NDPIErrorExt(tif->tif_clientdata, "JBIG",
 	                 "Decoded %lu bytes, whereas %"TIFF_SSIZE_FORMAT" were requested",
 	                 decodedSize, size);
 	    jbg_dec_free(&decoder);
 	    return 0;
 	}
 	pImage = jbg_dec_getimage(&decoder, 0);
-	_TIFFmemcpy(buffer, pImage, decodedSize);
+	_NDPImemcpy(buffer, pImage, decodedSize);
 	jbg_dec_free(&decoder);
 
         tif->tif_rawcp += tif->tif_rawcc;
@@ -124,9 +124,9 @@ static int JBIGDecode(TIFF* tif, uint8_t* buffer, tmsize_t size, uint16_t s)
 
 static int JBIGSetupEncode(TIFF* tif)
 {
-	if (TIFFNumberOfStrips(tif) != 1)
+	if (NDPINumberOfStrips(tif) != 1)
 	{
-		TIFFErrorExt(tif->tif_clientdata, "JBIG", "Multistrip images not supported in encoder");
+		NDPIErrorExt(tif->tif_clientdata, "JBIG", "Multistrip images not supported in encoder");
 		return 0;
 	}
 
@@ -146,13 +146,13 @@ static int JBIGCopyEncodedData(TIFF* tif, unsigned char* pp, size_t cc, uint16_t
 		}
 
 		assert(n > 0);
-		_TIFFmemcpy(tif->tif_rawcp, pp, n);
+		_NDPImemcpy(tif->tif_rawcp, pp, n);
 		tif->tif_rawcp += n;
 		tif->tif_rawcc += n;
 		pp += n;
 		cc -= (size_t)n;
 		if (tif->tif_rawcc >= tif->tif_rawdatasize &&
-		    !TIFFFlushData1(tif))
+		    !NDPIFlushData1(tif))
 		{
 			return (-1);
 		}
@@ -167,7 +167,7 @@ static void JBIGOutputBie(unsigned char* buffer, size_t len, void* userData)
 
 	if (isFillOrder(tif, tif->tif_dir.td_fillorder))
 	{
-		TIFFReverseBits(buffer, (tmsize_t)len);
+		NDPIReverseBits(buffer, (tmsize_t)len);
 	}
 
 	JBIGCopyEncodedData(tif, buffer, len, 0);

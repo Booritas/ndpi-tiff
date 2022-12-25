@@ -98,8 +98,8 @@ typedef struct {
 	 * number of striles */
 	uint32_t  td_stripsperimage;
 	uint32_t  td_nstrips;              /* size of offset & bytecount arrays */
-	uint64_t* td_stripoffset_p;        /* should be accessed with TIFFGetStrileOffset */
-	uint64_t* td_stripbytecount_p;     /* should be accessed with TIFFGetStrileByteCount */
+	uint64_t* td_stripoffset_p;        /* should be accessed with NDPIGetStrileOffset */
+	uint64_t* td_stripbytecount_p;     /* should be accessed with NDPIGetStrileByteCount */
         uint32_t  td_stripoffsetbyteallocsize; /* number of elements currently allocated for td_stripoffset/td_stripbytecount. Only used if TIFF_LAZYSTRILELOAD is set */
 #ifdef STRIPBYTECOUNTSORTED_UNUSED
 	int     td_stripbytecountsorted; /* is the bytecount array sorted ascending? */
@@ -129,7 +129,7 @@ typedef struct {
 	int     td_customValueCount;
         TIFFTagValue *td_customValues;
 
-        unsigned char td_deferstrilearraywriting; /* see TIFFDeferStrileArrayWriting() */
+        unsigned char td_deferstrilearraywriting; /* see NDPIDeferStrileArrayWriting() */
 } TIFFDirectory;
 
 /*
@@ -207,9 +207,9 @@ typedef struct {
 
 #define BITn(n)				(((unsigned long)1L)<<((n)&0x1f))
 #define BITFIELDn(tif, n)		((tif)->tif_dir.td_fieldsset[(n)/32])
-#define TIFFFieldSet(tif, field)	(BITFIELDn(tif, field) & BITn(field))
+#define NDPIFieldSet(tif, field)	(BITFIELDn(tif, field) & BITn(field))
 #define TIFFSetFieldBit(tif, field)	(BITFIELDn(tif, field) |= BITn(field))
-#define TIFFClrFieldBit(tif, field)	(BITFIELDn(tif, field) &= ~BITn(field))
+#define NDPIClrFieldBit(tif, field)	(BITFIELDn(tif, field) &= ~BITn(field))
 
 #define FieldSet(fields, f)		(fields[(f)/32] & BITn(f))
 #define ResetFieldBit(fields, f)	(fields[(f)/32] &= ~BITn(f))
@@ -273,13 +273,13 @@ typedef enum {
 extern "C" {
 #endif
 
-extern const TIFFFieldArray* _TIFFGetFields(void);
-extern const TIFFFieldArray* _TIFFGetExifFields(void);
-extern const TIFFFieldArray* _TIFFGetGpsFields(void);
-extern void _TIFFSetupFields(TIFF* tif, const TIFFFieldArray* infoarray);
-extern void _TIFFPrintFieldInfo(TIFF*, FILE*);
+extern const TIFFFieldArray* _NDPIGetFields(void);
+extern const TIFFFieldArray* _NDPIGetExifFields(void);
+extern const TIFFFieldArray* _NDPIGetGpsFields(void);
+extern void _NDPISetupFields(TIFF* tif, const TIFFFieldArray* infoarray);
+extern void _NDPIPrintFieldInfo(TIFF*, FILE*);
 
-extern int _TIFFFillStriles(TIFF*);        
+extern int _NDPIFillStriles(TIFF*);        
 
 typedef enum {
 	tfiatImage,
@@ -301,8 +301,8 @@ struct _TIFFField {
 	short field_writecount;                 /* write count/TIFF_VARIABLE */
 	TIFFDataType field_type;                /* type of associated data */
 	uint32_t reserved;                        /* reserved for future extension */
-	TIFFSetGetFieldType set_field_type;     /* type to be passed to TIFFSetField */
-	TIFFSetGetFieldType get_field_type;     /* type to be passed to TIFFGetField */
+	TIFFSetGetFieldType set_field_type;     /* type to be passed to NDPISetField */
+	TIFFSetGetFieldType get_field_type;     /* type to be passed to NDPIGetField */
 	unsigned short field_bit;               /* bit in fieldsset bit vector */
 	unsigned char field_oktochange;         /* if true, can change while writing */
 	unsigned char field_passcount;          /* if true, pass dir count on set */
@@ -310,10 +310,10 @@ struct _TIFFField {
 	TIFFFieldArray* field_subfields;        /* if field points to child ifds, child ifd field definition array */
 };
 
-extern int _TIFFMergeFields(TIFF*, const TIFFField[], uint32_t);
-extern const TIFFField* _TIFFFindOrRegisterField(TIFF *, uint32_t, TIFFDataType);
-extern  TIFFField* _TIFFCreateAnonField(TIFF *, uint32_t, TIFFDataType);
-extern int _TIFFCheckFieldIsValidForCodec(TIFF *tif, ttag_t tag);
+extern int _NDPIMergeFields(TIFF*, const TIFFField[], uint32_t);
+extern const TIFFField* _NDPIFindOrRegisterField(TIFF *, uint32_t, TIFFDataType);
+extern  TIFFField* _NDPICreateAnonField(TIFF *, uint32_t, TIFFDataType);
+extern int _NDPICheckFieldIsValidForCodec(TIFF *tif, ttag_t tag);
 
 #if defined(__cplusplus)
 }

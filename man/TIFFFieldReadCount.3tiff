@@ -32,7 +32,7 @@ TIFFFieldReadCount \- Get number of values to be read from field
 .BR TIFFFieldReadCount
 returns the number of values available to be read from the specified
 TIFF field; that is, the number of arguments that should be supplied to
-.BR TIFFGetField .
+.BR NDPIGetField .
 For most field types this is a small positive integer, typically 1 or 2,
 but there are some special values:
 .br
@@ -43,7 +43,7 @@ indicates that a variable number of values is possible; then, a
 argument and a pointer
 .I data
 argument must be supplied to
-.BR TIFFGetField .
+.BR NDPIGetField .
 .br
 .BR TIFF_VARIABLE2
 is the same as
@@ -59,8 +59,8 @@ number of samples per pixel.
 .P
 .I fip
 is a field information pointer previously returned by
-.BR TIFFFindField ,
-.BR TIFFFieldWithTag ,
+.BR NDPIFindField ,
+.BR NDPIFieldWithTag ,
 or
 .BR TIFFFieldWithName .
 .br

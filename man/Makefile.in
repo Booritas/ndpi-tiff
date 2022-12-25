@@ -359,42 +359,42 @@ dist_man1_MANS = \
 dist_man3_MANS = \
 	libtiff.3tiff \
 	TIFFbuffer.3tiff \
-	TIFFClose.3tiff \
+	NDPIClose.3tiff \
 	TIFFcodec.3tiff \
 	TIFFcolor.3tiff \
 	TIFFDataWidth.3tiff \
-	TIFFError.3tiff \
+	NDPIError.3tiff \
 	TIFFFieldDataType.3tiff \
 	TIFFFieldName.3tiff \
 	TIFFFieldPassCount.3tiff \
 	TIFFFieldReadCount.3tiff \
 	TIFFFieldTag.3tiff \
 	TIFFFieldWriteCount.3tiff \
-	TIFFFlush.3tiff \
-	TIFFGetField.3tiff \
+	NDPIFlush.3tiff \
+	NDPIGetField.3tiff \
 	TIFFmemory.3tiff \
-	TIFFOpen.3tiff \
-	TIFFPrintDirectory.3tiff \
+	NDPIOpen.3tiff \
+	NDPIPrintDirectory.3tiff \
 	TIFFquery.3tiff \
-	TIFFReadDirectory.3tiff \
-	TIFFReadEncodedStrip.3tiff \
-	TIFFReadEncodedTile.3tiff \
-	TIFFReadRawStrip.3tiff \
-	TIFFReadRawTile.3tiff \
-	TIFFReadRGBAImage.3tiff \
-	TIFFReadRGBAStrip.3tiff \
-	TIFFReadRGBATile.3tiff \
-	TIFFReadScanline.3tiff \
-	TIFFReadTile.3tiff \
+	NDPIReadDirectory.3tiff \
+	NDPIReadEncodedStrip.3tiff \
+	NDPIReadEncodedTile.3tiff \
+	NDPIReadRawStrip.3tiff \
+	NDPIReadRawTile.3tiff \
+	NDPIReadRGBAImage.3tiff \
+	NDPIReadRGBAStrip.3tiff \
+	NDPIReadRGBATile.3tiff \
+	NDPIReadScanline.3tiff \
+	NDPIReadTile.3tiff \
 	TIFFRGBAImage.3tiff \
-	TIFFSetDirectory.3tiff \
-	TIFFSetField.3tiff \
+	NDPISetDirectory.3tiff \
+	NDPISetField.3tiff \
 	TIFFsize.3tiff \
 	TIFFstrip.3tiff \
 	TIFFswab.3tiff \
 	TIFFtile.3tiff \
 	TIFFWarning.3tiff \
-	TIFFWriteDirectory.3tiff \
+	NDPIWriteDirectory.3tiff \
 	TIFFWriteEncodedStrip.3tiff \
 	TIFFWriteEncodedTile.3tiff \
 	TIFFWriteRawStrip.3tiff \

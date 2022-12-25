@@ -41,7 +41,7 @@
  * Convert color value from the CIE L*a*b* 1976 space to CIE XYZ.
  */
 void
-TIFFCIELabToXYZ(TIFFCIELabToRGB *cielab, uint32_t l, int32_t a, int32_t b,
+NDPICIELabToXYZ(TIFFCIELabToRGB *cielab, uint32_t l, int32_t a, int32_t b,
                 float *X, float *Y, float *Z)
 {
 	float L = (float)l * 100.0F / 255.0F;
@@ -73,7 +73,7 @@ TIFFCIELabToXYZ(TIFFCIELabToRGB *cielab, uint32_t l, int32_t a, int32_t b,
  * Convert color value from the XYZ space to RGB.
  */
 void
-TIFFXYZToRGB(TIFFCIELabToRGB *cielab, float X, float Y, float Z,
+NDPIXYZToRGB(TIFFCIELabToRGB *cielab, float X, float Y, float Z,
              uint32_t *r, uint32_t *g, uint32_t *b)
 {
 	int i;
@@ -120,7 +120,7 @@ TIFFXYZToRGB(TIFFCIELabToRGB *cielab, float X, float Y, float Z,
  * the Yr,Yb,Yg <=> r,g,b conversions.
  */
 int
-TIFFCIELabToRGBInit(TIFFCIELabToRGB* cielab,
+NDPICIELabToRGBInit(TIFFCIELabToRGB* cielab,
 		    const TIFFDisplay *display, float *refWhite)
 {
 	int i;
@@ -128,7 +128,7 @@ TIFFCIELabToRGBInit(TIFFCIELabToRGB* cielab,
 
 	cielab->range = CIELABTORGB_TABLE_RANGE;
 
-	_TIFFmemcpy(&cielab->display, display, sizeof(TIFFDisplay));
+	_NDPImemcpy(&cielab->display, display, sizeof(TIFFDisplay));
 
 	/* Red */
 	dfGamma = 1.0 / cielab->display.d_gammaR ;
@@ -178,7 +178,7 @@ TIFFCIELabToRGBInit(TIFFCIELabToRGB* cielab,
 #define HICLAMP(f,max)		((f)>(max)?(max):(f))
 
 void
-TIFFYCbCrtoRGB(TIFFYCbCrToRGB *ycbcr, uint32_t Y, int32_t Cb, int32_t Cr,
+NDPIYCbCrtoRGB(TIFFYCbCrToRGB *ycbcr, uint32_t Y, int32_t Cb, int32_t Cr,
                uint32_t *r, uint32_t *g, uint32_t *b)
 {
 	int32_t i;
@@ -231,7 +231,7 @@ static float CLAMPw(float v, float vmin, float vmax)
  * assumes conversion is being done for 8-bit samples).
  */
 int
-TIFFYCbCrToRGBInit(TIFFYCbCrToRGB* ycbcr, float *luma, float *refBlackWhite)
+NDPIYCbCrToRGBInit(TIFFYCbCrToRGB* ycbcr, float *luma, float *refBlackWhite)
 {
     TIFFRGBValue* clamptab;
     int i;
@@ -242,11 +242,11 @@ TIFFYCbCrToRGBInit(TIFFYCbCrToRGB* ycbcr, float *luma, float *refBlackWhite)
 
     clamptab = (TIFFRGBValue*)(
             (uint8_t*) ycbcr + TIFFroundup_32(sizeof (TIFFYCbCrToRGB), sizeof (long)));
-    _TIFFmemset(clamptab, 0, 256);		/* v < 0 => 0 */
+    _NDPImemset(clamptab, 0, 256);		/* v < 0 => 0 */
     ycbcr->clamptab = (clamptab += 256);
     for (i = 0; i < 256; i++)
 	clamptab[i] = (TIFFRGBValue) i;
-    _TIFFmemset(clamptab+256, 255, 2*256);	/* v > 255 => 255 */
+    _NDPImemset(clamptab+256, 255, 2*256);	/* v > 255 => 255 */
     ycbcr->Cr_r_tab = (int*) (clamptab + 3*256);
     ycbcr->Cb_b_tab = ycbcr->Cr_r_tab + 256;
     ycbcr->Cr_g_tab = (int32_t*) (ycbcr->Cb_b_tab + 256);

@@ -98,30 +98,30 @@ main(int argc, char* argv[])
 		}
 	if (argc - optind < 2)
 		usage(2);
-	tif1 = TIFFOpen(argv[optind], "r");
+	tif1 = NDPIOpen(argv[optind], "r");
 	if (tif1 == NULL)
 		return (2);
-	tif2 = TIFFOpen(argv[optind+1], "r");
+	tif2 = NDPIOpen(argv[optind+1], "r");
 	if (tif2 == NULL)
 		return (2);
 	dirnum = 0;
 	while (tiffcmp(tif1, tif2)) {
-		if (!TIFFReadDirectory(tif1)) {
-			if (!TIFFReadDirectory(tif2))
+		if (!NDPIReadDirectory(tif1)) {
+			if (!NDPIReadDirectory(tif2))
 				break;
 			printf("No more directories for %s\n",
-			    TIFFFileName(tif1));
+			    NDPIFileName(tif1));
 			return (1);
-		} else if (!TIFFReadDirectory(tif2)) {
+		} else if (!NDPIReadDirectory(tif2)) {
 			printf("No more directories for %s\n",
-			    TIFFFileName(tif2));
+			    NDPIFileName(tif2));
 			return (1);
 		}
 		printf("Directory %d:\n", ++dirnum);
 	}
 
-	TIFFClose(tif1);
-	TIFFClose(tif2);
+	NDPIClose(tif1);
+	NDPIClose(tif2);
 	return (0);
 }
 
@@ -145,7 +145,7 @@ usage(int code)
 }
 
 #define	checkEOF(tif, row, sample) { \
-	leof(TIFFFileName(tif), row, sample); \
+	leof(NDPIFileName(tif), row, sample); \
 	goto bad; \
 }
 
@@ -173,15 +173,15 @@ tiffcmp(TIFF* tif1, TIFF* tif2)
 		return (0);
 	if (!cmptags(tif1, tif2))
 		return (1);
-	(void) TIFFGetField(tif1, TIFFTAG_BITSPERSAMPLE, &bitspersample);
-	(void) TIFFGetField(tif1, TIFFTAG_SAMPLESPERPIXEL, &samplesperpixel);
-	(void) TIFFGetField(tif1, TIFFTAG_SAMPLEFORMAT, &sampleformat);
-	(void) TIFFGetField(tif1, TIFFTAG_IMAGEWIDTH, &imagewidth);
-	(void) TIFFGetField(tif1, TIFFTAG_IMAGELENGTH, &imagelength);
-	(void) TIFFGetField(tif1, TIFFTAG_PLANARCONFIG, &config1);
-	(void) TIFFGetField(tif2, TIFFTAG_PLANARCONFIG, &config2);
-	buf1 = (unsigned char *)_TIFFmalloc(size1 = TIFFScanlineSize(tif1));
-	buf2 = (unsigned char *)_TIFFmalloc(TIFFScanlineSize(tif2));
+	(void) NDPIGetField(tif1, TIFFTAG_BITSPERSAMPLE, &bitspersample);
+	(void) NDPIGetField(tif1, TIFFTAG_SAMPLESPERPIXEL, &samplesperpixel);
+	(void) NDPIGetField(tif1, TIFFTAG_SAMPLEFORMAT, &sampleformat);
+	(void) NDPIGetField(tif1, TIFFTAG_IMAGEWIDTH, &imagewidth);
+	(void) NDPIGetField(tif1, TIFFTAG_IMAGELENGTH, &imagelength);
+	(void) NDPIGetField(tif1, TIFFTAG_PLANARCONFIG, &config1);
+	(void) NDPIGetField(tif2, TIFFTAG_PLANARCONFIG, &config2);
+	buf1 = (unsigned char *)_NDPImalloc(size1 = NDPIScanlineSize(tif1));
+	buf2 = (unsigned char *)_NDPImalloc(NDPIScanlineSize(tif2));
 	if (buf1 == NULL || buf2 == NULL) {
 		fprintf(stderr, "No space for scanline buffers\n");
 		exit(2);
@@ -195,10 +195,10 @@ tiffcmp(TIFF* tif1, TIFF* tif2)
 	switch (pack(config1, config2)) {
 	case pack(PLANARCONFIG_SEPARATE, PLANARCONFIG_CONTIG):
 		for (row = 0; row < imagelength; row++) {
-			if (TIFFReadScanline(tif2, buf2, row, 0) < 0)
+			if (NDPIReadScanline(tif2, buf2, row, 0) < 0)
 				checkEOF(tif2, row, -1)
 			for (s = 0; s < samplesperpixel; s++) {
-				if (TIFFReadScanline(tif1, buf1, row, s) < 0)
+				if (NDPIReadScanline(tif1, buf1, row, s) < 0)
 					checkEOF(tif1, row, s)
 				if (SeparateCompare(1, s, row, buf2, buf1) < 0)
 					goto bad1;
@@ -207,10 +207,10 @@ tiffcmp(TIFF* tif1, TIFF* tif2)
 		break;
 	case pack(PLANARCONFIG_CONTIG, PLANARCONFIG_SEPARATE):
 		for (row = 0; row < imagelength; row++) {
-			if (TIFFReadScanline(tif1, buf1, row, 0) < 0)
+			if (NDPIReadScanline(tif1, buf1, row, 0) < 0)
 				checkEOF(tif1, row, -1)
 			for (s = 0; s < samplesperpixel; s++) {
-				if (TIFFReadScanline(tif2, buf2, row, s) < 0)
+				if (NDPIReadScanline(tif2, buf2, row, s) < 0)
 					checkEOF(tif2, row, s)
 				if (SeparateCompare(0, s, row, buf1, buf2) < 0)
 					goto bad1;
@@ -220,9 +220,9 @@ tiffcmp(TIFF* tif1, TIFF* tif2)
 	case pack(PLANARCONFIG_SEPARATE, PLANARCONFIG_SEPARATE):
 		for (s = 0; s < samplesperpixel; s++)
 			for (row = 0; row < imagelength; row++) {
-				if (TIFFReadScanline(tif1, buf1, row, s) < 0)
+				if (NDPIReadScanline(tif1, buf1, row, s) < 0)
 					checkEOF(tif1, row, s)
-				if (TIFFReadScanline(tif2, buf2, row, s) < 0)
+				if (NDPIReadScanline(tif2, buf2, row, s) < 0)
 					checkEOF(tif2, row, s)
 				if (ContigCompare(s, row, buf1, buf2, size1) < 0)
 					goto bad1;
@@ -230,24 +230,24 @@ tiffcmp(TIFF* tif1, TIFF* tif2)
 		break;
 	case pack(PLANARCONFIG_CONTIG, PLANARCONFIG_CONTIG):
 		for (row = 0; row < imagelength; row++) {
-			if (TIFFReadScanline(tif1, buf1, row, 0) < 0)
+			if (NDPIReadScanline(tif1, buf1, row, 0) < 0)
 				checkEOF(tif1, row, -1)
-			if (TIFFReadScanline(tif2, buf2, row, 0) < 0)
+			if (NDPIReadScanline(tif2, buf2, row, 0) < 0)
 				checkEOF(tif2, row, -1)
 			if (ContigCompare(-1, row, buf1, buf2, size1) < 0)
 				goto bad1;
 		}
 		break;
 	}
-	if (buf1) _TIFFfree(buf1);
-	if (buf2) _TIFFfree(buf2);
+	if (buf1) _NDPIfree(buf1);
+	if (buf2) _NDPIfree(buf2);
 	return (1);
 bad:
 	if (stopondiff)
 		exit(1);
 bad1:
-	if (buf1) _TIFFfree(buf1);
-	if (buf2) _TIFFfree(buf2);
+	if (buf1) _NDPIfree(buf1);
+	if (buf2) _NDPIfree(buf2);
 	return (0);
 }
 
@@ -284,16 +284,16 @@ cmptags(TIFF* tif1, TIFF* tif2)
 	CmpShortField(TIFFTAG_SAMPLEFORMAT,	"SampleFormat");
 	CmpFloatField(TIFFTAG_XRESOLUTION,	"XResolution");
 	CmpFloatField(TIFFTAG_YRESOLUTION,	"YResolution");
-	if( TIFFGetField(tif1, TIFFTAG_COMPRESSION, &compression1) &&
+	if( NDPIGetField(tif1, TIFFTAG_COMPRESSION, &compression1) &&
 		compression1 == COMPRESSION_CCITTFAX3 &&
-		TIFFGetField(tif2, TIFFTAG_COMPRESSION, &compression2) &&
+		NDPIGetField(tif2, TIFFTAG_COMPRESSION, &compression2) &&
 		compression2 == COMPRESSION_CCITTFAX3 )
 	{
 		CmpLongField(TIFFTAG_GROUP3OPTIONS,	"Group3Options");
 	}
-	if( TIFFGetField(tif1, TIFFTAG_COMPRESSION, &compression1) &&
+	if( NDPIGetField(tif1, TIFFTAG_COMPRESSION, &compression1) &&
 		compression1 == COMPRESSION_CCITTFAX4 &&
-		TIFFGetField(tif2, TIFFTAG_COMPRESSION, &compression2) &&
+		NDPIGetField(tif2, TIFFTAG_COMPRESSION, &compression2) &&
 		compression2 == COMPRESSION_CCITTFAX4 )
 	{
 		CmpLongField(TIFFTAG_GROUP4OPTIONS,	"Group4Options");
@@ -536,15 +536,15 @@ static int
 checkTag(TIFF* tif1, TIFF* tif2, int tag, char* name, void* p1, void* p2)
 {
 
-	if (TIFFGetField(tif1, tag, p1)) {
-		if (!TIFFGetField(tif2, tag, p2)) {
+	if (NDPIGetField(tif1, tag, p1)) {
+		if (!NDPIGetField(tif2, tag, p2)) {
 			printf("%s tag appears only in %s\n",
-			    name, TIFFFileName(tif1));
+			    name, NDPIFileName(tif1));
 			return (0);
 		}
 		return (1);
-	} else if (TIFFGetField(tif2, tag, p2)) {
-		printf("%s tag appears only in %s\n", name, TIFFFileName(tif2));
+	} else if (NDPIGetField(tif2, tag, p2)) {
+		printf("%s tag appears only in %s\n", name, NDPIFileName(tif2));
 		return (0);
 	}
 	return (-1);
@@ -571,17 +571,17 @@ CheckShort2Tag(TIFF* tif1, TIFF* tif2, int tag, char* name)
 {
 	uint16_t v11, v12, v21, v22;
 
-	if (TIFFGetField(tif1, tag, &v11, &v12)) {
-		if (!TIFFGetField(tif2, tag, &v21, &v22)) {
+	if (NDPIGetField(tif1, tag, &v11, &v12)) {
+		if (!NDPIGetField(tif2, tag, &v21, &v22)) {
 			printf("%s tag appears only in %s\n",
-			    name, TIFFFileName(tif1));
+			    name, NDPIFileName(tif1));
 			return (0);
 		}
 		if (v11 == v21 && v12 == v22)
 			return (1);
 		printf("%s: <%"PRIu16",%"PRIu16"> <%"PRIu16",%"PRIu16">\n", name, v11, v12, v21, v22);
-	} else if (TIFFGetField(tif2, tag, &v21, &v22))
-		printf("%s tag appears only in %s\n", name, TIFFFileName(tif2));
+	} else if (NDPIGetField(tif2, tag, &v21, &v22))
+		printf("%s tag appears only in %s\n", name, NDPIFileName(tif2));
 	else
 		return (1);
 	return (0);
@@ -593,10 +593,10 @@ CheckShortArrayTag(TIFF* tif1, TIFF* tif2, int tag, char* name)
 	uint16_t n1, *a1;
 	uint16_t n2, *a2;
 
-	if (TIFFGetField(tif1, tag, &n1, &a1)) {
-		if (!TIFFGetField(tif2, tag, &n2, &a2)) {
+	if (NDPIGetField(tif1, tag, &n1, &a1)) {
+		if (!NDPIGetField(tif2, tag, &n2, &a2)) {
 			printf("%s tag appears only in %s\n",
-			    name, TIFFFileName(tif1));
+			    name, NDPIFileName(tif1));
 			return (0);
 		}
 		if (n1 == n2) {
@@ -616,11 +616,11 @@ CheckShortArrayTag(TIFF* tif1, TIFF* tif2, int tag, char* name)
 			printf(">\n");
 		} else
 			printf("%s: %"PRIu16" items in %s, %"PRIu16" items in %s", name,
-			    n1, TIFFFileName(tif1),
-			    n2, TIFFFileName(tif2)
+			    n1, NDPIFileName(tif1),
+			    n2, NDPIFileName(tif2)
 			);
-	} else if (TIFFGetField(tif2, tag, &n2, &a2))
-		printf("%s tag appears only in %s\n", name, TIFFFileName(tif2));
+	} else if (NDPIGetField(tif2, tag, &n2, &a2))
+		printf("%s tag appears only in %s\n", name, NDPIFileName(tif2));
 	else
 		return (1);
 	return (0);

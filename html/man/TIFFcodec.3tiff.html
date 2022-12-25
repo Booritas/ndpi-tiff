@@ -24,8 +24,8 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>TIFFFindCODEC, TIFFRegisterCODEC, TIFFUnRegisterCODEC,
-TIFFIsCODECConfigured &minus; codec-related utility
+<p>NDPIFindCODEC, NDPIRegisterCODEC, NDPIUnRegisterCODEC,
+NDPIIsCODECConfigured &minus; codec-related utility
 routines</p>
 </td>
 </table>
@@ -39,14 +39,14 @@ routines</p>
 <td width="91%">
 <p><b>#include &lt;tiffio.h&gt;</b></p>
 <!-- INDENTATION -->
-<p><b>const TIFFCodec* TIFFFindCODEC(uint16_t</b>
+<p><b>const TIFFCodec* NDPIFindCODEC(uint16_t</b>
 <i>scheme</i><b>);<br>
-TIFFCodec* TIFFRegisterCODEC(uint16_t</b> <i>scheme</i><b>,
+TIFFCodec* NDPIRegisterCODEC(uint16_t</b> <i>scheme</i><b>,
 const char *</b><i>method</i><b>, TIFFInitMethod</b>
 <i>init</i><b>);<br>
-void TIFFUnRegisterCODEC(TIFFCodec
+void NDPIUnRegisterCODEC(TIFFCodec
 *</b><i>codec</i><b>);<br>
-int TIFFIsCODECConfigured(uint16_t</b>
+int NDPIIsCODECConfigured(uint16_t</b>
 <i>scheme</i><b>);</b></p>
 </td>
 </table>
@@ -68,14 +68,14 @@ associated value of the <small>TIFF</small>
 <i>Compression</i> tag; e.g. 5 for <small>LZW</small>
 compression.</p>
 <!-- INDENTATION -->
-<p>The <i>TIFFRegisterCODEC</i> routine can be used to
+<p>The <i>NDPIRegisterCODEC</i> routine can be used to
 augment or override the set of codecs available to an
 application. If the specified <i>scheme</i> already has a
 registered codec then it is <i>overridden</i> and any images
 with data encoded with this compression scheme will be
 decoded using the supplied coded.</p>
 <!-- INDENTATION -->
-<p><i>TIFFIsCODECConfigured</i> returns 1 if the codec is
+<p><i>NDPIIsCODECConfigured</i> returns 1 if the codec is
 configured and working. Otherwise 0 will be returned.</p>
 </td>
 </table>
@@ -88,11 +88,11 @@ configured and working. Otherwise 0 will be returned.</p>
 <td width="8%"></td>
 <td width="91%">
 <p><b>No space to register compression scheme %s</b>.
-<i>TIFFRegisterCODEC</i> was unable to allocate memory for
+<i>NDPIRegisterCODEC</i> was unable to allocate memory for
 the data structures needed to register a codec.</p>
 <!-- INDENTATION -->
 <p><b>Cannot remove compression scheme %s; not
-registered</b>. <i>TIFFUnRegisterCODEC</i> did not locate
+registered</b>. <i>NDPIUnRegisterCODEC</i> did not locate
 the specified codec in the table of registered compression
 schemes.</p>
 </td>

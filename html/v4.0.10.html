@@ -191,19 +191,19 @@ information is located here:
 
   </LI>
 
-  <LI>TIFFPrintDirectory(): fix null pointer dereference on corrupted
+  <LI>NDPIPrintDirectory(): fix null pointer dereference on corrupted
   file. Fixes <A HREF="http://bugzilla.maptools.org/show_bug.cgi?id=2770">Bug
   2770 - NULL Pointer Dereference in tiffinfo.c with crafted TIFF
   image</A>.</LI>
 
-  <LI>_TIFFVGetField(): fix heap out-of-bounds access when requesting
+  <LI>_NDPIVGetField(): fix heap out-of-bounds access when requesting
   TIFFTAG_NUMBEROFINKS on a EXIF
   directory. Fixes <A HREF="http://bugzilla.maptools.org/show_bug.cgi?id=2765">Bug
   2765 - Heap Out-Of-Bounds Memory Access - 68122422</A>. Reported by
   Google Autofuzz project</LI>
 
   <LI>Fix a memory leak in TIFFStreamOpen. TIFFStreamOpen allocates a
-  new tiff{o,i}s_data, but if TIFFClientOpen fails then that struct is
+  new tiff{o,i}s_data, but if NDPIClientOpen fails then that struct is
   leaked.</LI>
 
   <LI><P>Fix for bug 2772. It is possible to craft a TIFF document where
@@ -230,12 +230,12 @@ information is located here:
   strtoul.  All use the same implementation from NetBSD libc.</LI>
 
   <LI>Fix for CVE-2018-7456 "NULL pointer dereference in
-  TIFFPrintDirectory".</LI>
+  NDPIPrintDirectory".</LI>
 
-  <LI>TIFFWriteDirectorySec: avoid
+  <LI>NDPIWriteDirectorySec: avoid
   assertion. Fixes <A HREF="http://bugzilla.maptools.org/show_bug.cgi?id=2795">Bug
   2795 - There is a reachable assertion abort in function
-  TIFFWriteDirectorySec() of libtiff 4.0.9. A crafted input will lead
+  NDPIWriteDirectorySec() of libtiff 4.0.9. A crafted input will lead
   to remote denial of attack. (CVE-2018-10963)</A>.</LI>
 
   <LI>LZWDecodeCompat(): fix potential index-out-of-bounds
@@ -260,7 +260,7 @@ information is located here:
         Fixes <A HREF="http://bugzilla.maptools.org/show_bug.cgi?id=2800">
       Bug 2800 - Regression: Opening a tiff file with v4.0.9 gives an error with LZWDecode</A>.</LI>
 
-  <LI>TIFFSetupStrips(): avoid potential uint32 overflow on 32-bit
+  <LI>NDPISetupStrips(): avoid potential uint32 overflow on 32-bit
   systems with large number of strips.  Probably relates
   to <A HREF="http://bugzilla.maptools.org/show_bug.cgi?id=2788">Bug
   2788 - Heap Buffer Overflow in TIFFWriteScanline of tif_write.c

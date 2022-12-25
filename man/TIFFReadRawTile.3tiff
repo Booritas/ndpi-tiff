@@ -22,15 +22,15 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFReadRawTile 3TIFF "October 15, 1995" "libtiff"
+.TH NDPIReadRawTile 3TIFF "October 15, 1995" "libtiff"
 .SH NAME
-TIFFReadRawTile \- return an undecoded tile of data from an open
+NDPIReadRawTile \- return an undecoded tile of data from an open
 .SM TIFF
 file
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "tsize_t TIFFReadRawTile(TIFF *" tif ", ttile_t " tile ", tdata_t " buf ", tsize_t " size ")"
+.BI "tsize_t NDPIReadRawTile(TIFF *" tif ", ttile_t " tile ", tdata_t " buf ", tsize_t " size ")"
 .SH DESCRIPTION
 Read the contents of the specified tile into the (user supplied) data buffer.
 Note that the value of
@@ -38,26 +38,26 @@ Note that the value of
 is a ``raw tile number.'' That is, the caller must take into account whether
 or not the data is organized in separate planes (\c
 .IR PlanarConfiguration =2).
-.I TIFFComputeTile
+.I NDPIComputeTile
 automatically does this when converting an (x,y,z,sample) coordinate quadruple
 to a tile number. To read a full tile of data the data buffer should typically
 be at least as large as the value returned by
-.IR TIFFTileSize .
+.IR NDPITileSize .
 .SH "RETURN VALUES"
 The actual number of bytes of data that were placed in
 .I buf
 is returned;
-.IR TIFFReadEncodedTile
+.IR NDPIReadEncodedTile
 returns \-1 if an error was encountered.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.BR TIFFError (3TIFF)
+.BR NDPIError (3TIFF)
 routine.
 .SH "SEE ALSO"
-.BR TIFFOpen (3TIFF),
-.BR TIFFReadEncodedTile (3TIFF),
-.BR TIFFReadTile (3TIFF),
-.BR TIFFTileSize (3TIFF),
+.BR NDPIOpen (3TIFF),
+.BR NDPIReadEncodedTile (3TIFF),
+.BR NDPIReadTile (3TIFF),
+.BR NDPITileSize (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

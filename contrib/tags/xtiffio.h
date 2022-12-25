@@ -25,7 +25,7 @@
 
 /* 
  *  XXX Define Printing method flags. These
- *  flags may be passed in to TIFFPrintDirectory() to
+ *  flags may be passed in to NDPIPrintDirectory() to
  *  indicate that those particular field values should
  *  be printed out in full, rather than just an indicator
  *  of whether they are present or not.

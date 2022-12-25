@@ -4,11 +4,11 @@
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
 <meta name="Content-Style" content="text/css">
-<title>TIFFReadEncodedStrip</title>
+<title>NDPIReadEncodedStrip</title>
 </head>
 <body>
 
-<h1 align=center>TIFFReadEncodedStrip</h1>
+<h1 align=center>NDPIReadEncodedStrip</h1>
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
@@ -26,7 +26,7 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><big>TIFFReadEncodedStrip &minus; read and decode a strip
+<p><big>NDPIReadEncodedStrip &minus; read and decode a strip
 of data from an open</big> TIFF <big>file</big></p>
 </td>
 </table>
@@ -40,7 +40,7 @@ of data from an open</big> TIFF <big>file</big></p>
 <td width="91%">
 <p><big><b>#include &lt;tiffio.h&gt;</b></big></p>
 <!-- INDENTATION -->
-<p><big><b>tsize_t TIFFReadEncodedStrip(TIFF
+<p><big><b>tsize_t NDPIReadEncodedStrip(TIFF
 *</b><i>tif</i><b>, tstrip_t</b> <i>strip</i><b>,
 tdata_t</b> <i>buf</i><b>, tsize_t</b>
 <i>size</i><b>)</b></big></p>
@@ -73,7 +73,7 @@ into account whether or not the data are organized in
 separate planes (<i>PlanarConfiguration</i>=2). To read a
 full strip of data the data buffer should typically be at
 least as large as the number returned by
-<b>TIFFStripSize</b>(3TIFF). If the -1 passed in <i>size</i>
+<b>NDPIStripSize</b>(3TIFF). If the -1 passed in <i>size</i>
 parameter, the whole strip will be read. You should be sure
 you have enough space allocated for the buffer.</big></p>
 <!-- INDENTATION -->
@@ -95,7 +95,7 @@ opposite to the native machine byte order,</big></p>
 <td width="8%"></td>
 <td width="91%">
 <p><big>The actual number of bytes of data that were placed
-in <i>buf</i> is returned; <i>TIFFReadEncodedStrip</i>
+in <i>buf</i> is returned; <i>NDPIReadEncodedStrip</i>
 returns &minus;1 if an error was encountered.</big></p>
 </td>
 </table>
@@ -108,7 +108,7 @@ returns &minus;1 if an error was encountered.</big></p>
 <td width="8%"></td>
 <td width="91%">
 <p><big>All error messages are directed to the
-<b>TIFFError</b>(3TIFF) routine.</big></p>
+<b>NDPIError</b>(3TIFF) routine.</big></p>
 </td>
 </table>
 <a name="SEE ALSO"></a>
@@ -119,9 +119,9 @@ returns &minus;1 if an error was encountered.</big></p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><big><b>TIFFOpen</b>(3TIFF),
-<b>TIFFReadRawStrip</b>(3TIFF),
-<b>TIFFReadScanline</b>(3TIFF),
+<p><big><b>NDPIOpen</b>(3TIFF),
+<b>NDPIReadRawStrip</b>(3TIFF),
+<b>NDPIReadScanline</b>(3TIFF),
 <b>libtiff</b>(3TIFF)</big></p>
 <!-- INDENTATION -->
 <p><big>Libtiff library home page:

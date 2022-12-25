@@ -133,18 +133,18 @@ main(argc, argv)
     if (Verbose)
 	fprintf(stderr, "Reading %s...", inf);
 
-    tif = TIFFOpen(inf, "r");
+    tif = NDPIOpen(inf, "r");
 
     if (tif == NULL)
 	error("%s: error opening TIFF file %s", inf);
 
     if (Verbose)
-	TIFFPrintDirectory(tif, stderr, True, False, False);
-    TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &bitspersample);
+	NDPIPrintDirectory(tif, stderr, True, False, False);
+    NDPIGetField(tif, TIFFTAG_BITSPERSAMPLE, &bitspersample);
     if (bitspersample > 8)
 	error("%s: can't handle more than 8-bits per sample\n", NULL);
 
-    TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samplesperpixel);
+    NDPIGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &samplesperpixel);
     switch (samplesperpixel) {
     case 1:
 	if (bitspersample == 1)
@@ -160,8 +160,8 @@ main(argc, argv)
 	error("%s: only handle 1-channel gray scale or 3-channel color\n");
     }
 
-    TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width);
-    TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height);
+    NDPIGetField(tif, TIFFTAG_IMAGEWIDTH, &width);
+    NDPIGetField(tif, TIFFTAG_IMAGELENGTH, &height);
 
     if (Verbose)
 	fprintf(stderr, "%dx%dx%d image, ", width, height, depth);
@@ -175,7 +175,7 @@ main(argc, argv)
 
     numcolors = (1 << bitspersample);
 
-    TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &photometric);
+    NDPIGetField(tif, TIFFTAG_PHOTOMETRIC, &photometric);
     if (numcolors == 2) {
 	if (Verbose)
 	    fprintf(stderr, "monochrome ");
@@ -219,7 +219,7 @@ main(argc, argv)
 	    memset(red, 0, sizeof(red));
 	    memset(green, 0, sizeof(green));
 	    memset(blue, 0, sizeof(blue));
-	    TIFFGetField(tif, TIFFTAG_COLORMAP,
+	    NDPIGetField(tif, TIFFTAG_COLORMAP,
 		&redcolormap, &greencolormap, &bluecolormap);
 	    for (i = 0; i < numcolors; i++) {
 		red[i] = (u_char) CVT(redcolormap[i]);
@@ -241,12 +241,12 @@ main(argc, argv)
 	}
     }
 
-    buf = (u_char *) malloc(TIFFScanlineSize(tif));
+    buf = (u_char *) malloc(NDPIScanlineSize(tif));
     if (buf == NULL)
 	error("%s: can't allocate memory for scanline buffer...\n", NULL);
 
     for (row = 0; row < height; row++) {
-	if (TIFFReadScanline(tif, buf, row, 0) < 0)
+	if (NDPIReadScanline(tif, buf, row, 0) < 0)
 	    error("%s: bad data read on line: %d\n", row);
 	inp = buf;
 	outp = (u_char *) mprd_addr(mpr_d(pix), 0, row);

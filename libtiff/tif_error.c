@@ -30,7 +30,7 @@
 TIFFErrorHandlerExt _TIFFerrorHandlerExt = NULL;
 
 TIFFErrorHandler
-TIFFSetErrorHandler(TIFFErrorHandler handler)
+NDPISetErrorHandler(TIFFErrorHandler handler)
 {
 	TIFFErrorHandler prev = _TIFFerrorHandler;
 	_TIFFerrorHandler = handler;
@@ -38,7 +38,7 @@ TIFFSetErrorHandler(TIFFErrorHandler handler)
 }
 
 TIFFErrorHandlerExt
-TIFFSetErrorHandlerExt(TIFFErrorHandlerExt handler)
+NDPISetErrorHandlerExt(TIFFErrorHandlerExt handler)
 {
 	TIFFErrorHandlerExt prev = _TIFFerrorHandlerExt;
 	_TIFFerrorHandlerExt = handler;
@@ -46,7 +46,7 @@ TIFFSetErrorHandlerExt(TIFFErrorHandlerExt handler)
 }
 
 void
-TIFFError(const char* module, const char* fmt, ...)
+NDPIError(const char* module, const char* fmt, ...)
 {
 	va_list ap;
 	if (_TIFFerrorHandler) {
@@ -62,7 +62,7 @@ TIFFError(const char* module, const char* fmt, ...)
 }
 
 void
-TIFFErrorExt(thandle_t fd, const char* module, const char* fmt, ...)
+NDPIErrorExt(thandle_t fd, const char* module, const char* fmt, ...)
 {
 	va_list ap;
 	if (_TIFFerrorHandler) {

@@ -66,13 +66,13 @@ static const TIFFDisplay display_sRGB = {
 };
 
 /*
- * Check the image to see if TIFFReadRGBAImage can deal with it.
+ * Check the image to see if NDPIReadRGBAImage can deal with it.
  * 1/0 is returned according to whether or not the image can
  * be handled.  If 0 is returned, emsg contains the reason
  * why it is being rejected.
  */
 int
-TIFFRGBAImageOK(TIFF* tif, char emsg[1024])
+NDPIRGBAImageOK(TIFF* tif, char emsg[1024])
 {
 	TIFFDirectory* td = &tif->tif_dir;
 	uint16_t photometric;
@@ -99,7 +99,7 @@ TIFFRGBAImageOK(TIFF* tif, char emsg[1024])
                 return (0);
         }
 	colorchannels = td->td_samplesperpixel - td->td_extrasamples;
-	if (!TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &photometric)) {
+	if (!NDPIGetField(tif, TIFFTAG_PHOTOMETRIC, &photometric)) {
 		switch (colorchannels) {
 			case 1:
 				photometric = PHOTOMETRIC_MINISBLACK;
@@ -151,7 +151,7 @@ TIFFRGBAImageOK(TIFF* tif, char emsg[1024])
 		case PHOTOMETRIC_SEPARATED:
 			{
 				uint16_t inkset;
-				TIFFGetFieldDefaulted(tif, TIFFTAG_INKSET, &inkset);
+				NDPIGetFieldDefaulted(tif, TIFFTAG_INKSET, &inkset);
 				if (inkset != INKSET_CMYK) {
 					sprintf(emsg,
 					    "Sorry, can not handle separated image with %s=%d",
@@ -212,41 +212,41 @@ TIFFRGBAImageOK(TIFF* tif, char emsg[1024])
 }
 
 void
-TIFFRGBAImageEnd(TIFFRGBAImage* img)
+NDPIRGBAImageEnd(TIFFRGBAImage* img)
 {
 	if (img->Map) {
-		_TIFFfree(img->Map);
+		_NDPIfree(img->Map);
 		img->Map = NULL;
 	}
 	if (img->BWmap) {
-		_TIFFfree(img->BWmap);
+		_NDPIfree(img->BWmap);
 		img->BWmap = NULL;
 	}
 	if (img->PALmap) {
-		_TIFFfree(img->PALmap);
+		_NDPIfree(img->PALmap);
 		img->PALmap = NULL;
 	}
 	if (img->ycbcr) {
-		_TIFFfree(img->ycbcr);
+		_NDPIfree(img->ycbcr);
 		img->ycbcr = NULL;
 	}
 	if (img->cielab) {
-		_TIFFfree(img->cielab);
+		_NDPIfree(img->cielab);
 		img->cielab = NULL;
 	}
 	if (img->UaToAa) {
-		_TIFFfree(img->UaToAa);
+		_NDPIfree(img->UaToAa);
 		img->UaToAa = NULL;
 	}
 	if (img->Bitdepth16To8) {
-		_TIFFfree(img->Bitdepth16To8);
+		_NDPIfree(img->Bitdepth16To8);
 		img->Bitdepth16To8 = NULL;
 	}
 
 	if( img->redcmap ) {
-		_TIFFfree( img->redcmap );
-		_TIFFfree( img->greencmap );
-		_TIFFfree( img->bluecmap );
+		_NDPIfree( img->redcmap );
+		_NDPIfree( img->greencmap );
+		_NDPIfree( img->bluecmap );
                 img->redcmap = img->greencmap = img->bluecmap = NULL;
 	}
 }
@@ -255,7 +255,7 @@ static int
 isCCITTCompression(TIFF* tif)
 {
     uint16_t compress;
-    TIFFGetField(tif, TIFFTAG_COMPRESSION, &compress);
+    NDPIGetField(tif, TIFFTAG_COMPRESSION, &compress);
     return (compress == COMPRESSION_CCITTFAX3 ||
 	    compress == COMPRESSION_CCITTFAX4 ||
 	    compress == COMPRESSION_CCITTRLE ||
@@ -263,7 +263,7 @@ isCCITTCompression(TIFF* tif)
 }
 
 int
-TIFFRGBAImageBegin(TIFFRGBAImage* img, TIFF* tif, int stop, char emsg[1024])
+NDPIRGBAImageBegin(TIFFRGBAImage* img, TIFF* tif, int stop, char emsg[1024])
 {
 	uint16_t* sampleinfo;
 	uint16_t extrasamples;
@@ -273,7 +273,7 @@ TIFFRGBAImageBegin(TIFFRGBAImage* img, TIFF* tif, int stop, char emsg[1024])
 	uint16_t *red_orig, *green_orig, *blue_orig;
 	int n_color;
 	
-	if( !TIFFRGBAImageOK(tif, emsg) )
+	if( !NDPIRGBAImageOK(tif, emsg) )
 		return 0;
 
 	/* Initialize to normal values */
@@ -293,7 +293,7 @@ TIFFRGBAImageBegin(TIFFRGBAImage* img, TIFF* tif, int stop, char emsg[1024])
 
 	img->tif = tif;
 	img->stoponerr = stop;
-	TIFFGetFieldDefaulted(tif, TIFFTAG_BITSPERSAMPLE, &img->bitspersample);
+	NDPIGetFieldDefaulted(tif, TIFFTAG_BITSPERSAMPLE, &img->bitspersample);
 	switch (img->bitspersample) {
 		case 1:
 		case 2:
@@ -307,8 +307,8 @@ TIFFRGBAImageBegin(TIFFRGBAImage* img, TIFF* tif, int stop, char emsg[1024])
 			goto fail_return;
 	}
 	img->alpha = 0;
-	TIFFGetFieldDefaulted(tif, TIFFTAG_SAMPLESPERPIXEL, &img->samplesperpixel);
-	TIFFGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES,
+	NDPIGetFieldDefaulted(tif, TIFFTAG_SAMPLESPERPIXEL, &img->samplesperpixel);
+	NDPIGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES,
 	    &extrasamples, &sampleinfo);
 	if (extrasamples >= 1)
 	{
@@ -325,7 +325,7 @@ TIFFRGBAImageBegin(TIFFRGBAImage* img, TIFF* tif, int stop, char emsg[1024])
 	}
 
 #ifdef DEFAULT_EXTRASAMPLE_AS_ALPHA
-	if( !TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &img->photometric))
+	if( !NDPIGetField(tif, TIFFTAG_PHOTOMETRIC, &img->photometric))
 		img->photometric = PHOTOMETRIC_MINISWHITE;
 
 	if( extrasamples == 0
@@ -338,9 +338,9 @@ TIFFRGBAImageBegin(TIFFRGBAImage* img, TIFF* tif, int stop, char emsg[1024])
 #endif
 
 	colorchannels = img->samplesperpixel - extrasamples;
-	TIFFGetFieldDefaulted(tif, TIFFTAG_COMPRESSION, &compress);
-	TIFFGetFieldDefaulted(tif, TIFFTAG_PLANARCONFIG, &planarconfig);
-	if (!TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &img->photometric)) {
+	NDPIGetFieldDefaulted(tif, TIFFTAG_COMPRESSION, &compress);
+	NDPIGetFieldDefaulted(tif, TIFFTAG_PLANARCONFIG, &planarconfig);
+	if (!NDPIGetField(tif, TIFFTAG_PHOTOMETRIC, &img->photometric)) {
 		switch (colorchannels) {
 			case 1:
 				if (isCCITTCompression(tif))
@@ -358,7 +358,7 @@ TIFFRGBAImageBegin(TIFFRGBAImage* img, TIFF* tif, int stop, char emsg[1024])
 	}
 	switch (img->photometric) {
 		case PHOTOMETRIC_PALETTE:
-			if (!TIFFGetField(tif, TIFFTAG_COLORMAP,
+			if (!NDPIGetField(tif, TIFFTAG_COLORMAP,
 			    &red_orig, &green_orig, &blue_orig)) {
 				sprintf(emsg, "Missing required \"Colormap\" tag");
                                 goto fail_return;
@@ -366,17 +366,17 @@ TIFFRGBAImageBegin(TIFFRGBAImage* img, TIFF* tif, int stop, char emsg[1024])
 
 			/* copy the colormaps so we can modify them */
 			n_color = (1U << img->bitspersample);
-			img->redcmap = (uint16_t *) _TIFFmalloc(sizeof(uint16_t) * n_color);
-			img->greencmap = (uint16_t *) _TIFFmalloc(sizeof(uint16_t) * n_color);
-			img->bluecmap = (uint16_t *) _TIFFmalloc(sizeof(uint16_t) * n_color);
+			img->redcmap = (uint16_t *) _NDPImalloc(sizeof(uint16_t) * n_color);
+			img->greencmap = (uint16_t *) _NDPImalloc(sizeof(uint16_t) * n_color);
+			img->bluecmap = (uint16_t *) _NDPImalloc(sizeof(uint16_t) * n_color);
 			if( !img->redcmap || !img->greencmap || !img->bluecmap ) {
 				sprintf(emsg, "Out of memory for colormap copy");
                                 goto fail_return;
 			}
 
-			_TIFFmemcpy( img->redcmap, red_orig, n_color * 2 );
-			_TIFFmemcpy( img->greencmap, green_orig, n_color * 2 );
-			_TIFFmemcpy( img->bluecmap, blue_orig, n_color * 2 );
+			_NDPImemcpy( img->redcmap, red_orig, n_color * 2 );
+			_NDPImemcpy( img->greencmap, green_orig, n_color * 2 );
+			_NDPImemcpy( img->bluecmap, blue_orig, n_color * 2 );
 
 			/* fall through... */
 		case PHOTOMETRIC_MINISWHITE:
@@ -405,7 +405,7 @@ TIFFRGBAImageBegin(TIFFRGBAImage* img, TIFF* tif, int stop, char emsg[1024])
 						 * and YCbCr handling, remove use of TIFFTAG_JPEGCOLORMODE in
 						 * favor of tif_getimage.c native handling
 						 */
-						TIFFSetField(tif, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
+						NDPISetField(tif, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
 						img->photometric = PHOTOMETRIC_RGB;
 						break;
 					default:
@@ -429,7 +429,7 @@ TIFFRGBAImageBegin(TIFFRGBAImage* img, TIFF* tif, int stop, char emsg[1024])
 		case PHOTOMETRIC_SEPARATED:
 			{
 				uint16_t inkset;
-				TIFFGetFieldDefaulted(tif, TIFFTAG_INKSET, &inkset);
+				NDPIGetFieldDefaulted(tif, TIFFTAG_INKSET, &inkset);
 				if (inkset != INKSET_CMYK) {
 					sprintf(emsg, "Sorry, can not handle separated image with %s=%"PRIu16,
 					    "InkSet", inkset);
@@ -448,7 +448,7 @@ TIFFRGBAImageBegin(TIFFRGBAImage* img, TIFF* tif, int stop, char emsg[1024])
 				    "Compression", COMPRESSION_SGILOG);
                                 goto fail_return;
 			}
-			TIFFSetField(tif, TIFFTAG_SGILOGDATAFMT, SGILOGDATAFMT_8BIT);
+			NDPISetField(tif, TIFFTAG_SGILOGDATAFMT, SGILOGDATAFMT_8BIT);
 			img->photometric = PHOTOMETRIC_MINISBLACK;	/* little white lie */
 			img->bitspersample = 8;
 			break;
@@ -463,7 +463,7 @@ TIFFRGBAImageBegin(TIFFRGBAImage* img, TIFF* tif, int stop, char emsg[1024])
 				    "Planarconfiguration", planarconfig);
 				return (0);
 			}
-			TIFFSetField(tif, TIFFTAG_SGILOGDATAFMT, SGILOGDATAFMT_8BIT);
+			NDPISetField(tif, TIFFTAG_SGILOGDATAFMT, SGILOGDATAFMT_8BIT);
 			img->photometric = PHOTOMETRIC_RGB;		/* little white lie */
 			img->bitspersample = 8;
 			break;
@@ -474,9 +474,9 @@ TIFFRGBAImageBegin(TIFFRGBAImage* img, TIFF* tif, int stop, char emsg[1024])
 			    photoTag, img->photometric);
                         goto fail_return;
 	}
-	TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &img->width);
-	TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &img->height);
-	TIFFGetFieldDefaulted(tif, TIFFTAG_ORIENTATION, &img->orientation);
+	NDPIGetField(tif, TIFFTAG_IMAGEWIDTH, &img->width);
+	NDPIGetField(tif, TIFFTAG_IMAGELENGTH, &img->height);
+	NDPIGetFieldDefaulted(tif, TIFFTAG_ORIENTATION, &img->orientation);
 	img->isContig =
 	    !(planarconfig == PLANARCONFIG_SEPARATE && img->samplesperpixel > 1);
 	if (img->isContig) {
@@ -493,19 +493,19 @@ TIFFRGBAImageBegin(TIFFRGBAImage* img, TIFF* tif, int stop, char emsg[1024])
 	return 1;
 
   fail_return:
-        TIFFRGBAImageEnd( img );
+        NDPIRGBAImageEnd( img );
         return 0;
 }
 
 int
-TIFFRGBAImageGet(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
+NDPIRGBAImageGet(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 {
     if (img->get == NULL) {
-		TIFFErrorExt(img->tif->tif_clientdata, TIFFFileName(img->tif), "No \"get\" routine setup");
+		NDPIErrorExt(img->tif->tif_clientdata, NDPIFileName(img->tif), "No \"get\" routine setup");
 		return (0);
 	}
 	if (img->put.any == NULL) {
-		TIFFErrorExt(img->tif->tif_clientdata, TIFFFileName(img->tif),
+		NDPIErrorExt(img->tif->tif_clientdata, NDPIFileName(img->tif),
 		"No \"put\" routine setupl; probably can not handle image format");
 		return (0);
     }
@@ -517,7 +517,7 @@ TIFFRGBAImageGet(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
  * specified orientation.
  */
 int
-TIFFReadRGBAImageOriented(TIFF* tif,
+NDPIReadRGBAImageOriented(TIFF* tif,
                           uint32_t rwidth, uint32_t rheight, uint32_t* raster,
                           int orientation, int stop)
 {
@@ -525,14 +525,14 @@ TIFFReadRGBAImageOriented(TIFF* tif,
     TIFFRGBAImage img;
     int ok;
 
-	if (TIFFRGBAImageOK(tif, emsg) && TIFFRGBAImageBegin(&img, tif, stop, emsg)) {
+	if (NDPIRGBAImageOK(tif, emsg) && NDPIRGBAImageBegin(&img, tif, stop, emsg)) {
 		img.req_orientation = (uint16_t)orientation;
 		/* XXX verify rwidth and rheight against width and height */
-		ok = TIFFRGBAImageGet(&img, raster+(rheight-img.height)*rwidth,
+		ok = NDPIRGBAImageGet(&img, raster+(rheight-img.height)*rwidth,
 			rwidth, img.height);
-		TIFFRGBAImageEnd(&img);
+		NDPIRGBAImageEnd(&img);
 	} else {
-		TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "%s", emsg);
+		NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "%s", emsg);
 		ok = 0;
     }
     return (ok);
@@ -543,10 +543,10 @@ TIFFReadRGBAImageOriented(TIFF* tif,
  * origin for raster by default.
  */
 int
-TIFFReadRGBAImage(TIFF* tif,
+NDPIReadRGBAImage(TIFF* tif,
                   uint32_t rwidth, uint32_t rheight, uint32_t* raster, int stop)
 {
-	return TIFFReadRGBAImageOriented(tif, rwidth, rheight, raster,
+	return NDPIReadRGBAImageOriented(tif, rwidth, rheight, raster,
 					 ORIENTATION_BOTLEFT, stop);
 }
 
@@ -635,19 +635,19 @@ gtTileContig(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
     uint32_t leftmost_tw;
     tmsize_t bufsize;
 
-    bufsize = TIFFTileSize(tif);
+    bufsize = NDPITileSize(tif);
     if (bufsize == 0) {
-        TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "%s", "No space for tile buffer");
+        NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "%s", "No space for tile buffer");
         return (0);
     }
 
-    TIFFGetField(tif, TIFFTAG_TILEWIDTH, &tw);
-    TIFFGetField(tif, TIFFTAG_TILELENGTH, &th);
+    NDPIGetField(tif, TIFFTAG_TILEWIDTH, &tw);
+    NDPIGetField(tif, TIFFTAG_TILELENGTH, &th);
 
     flip = setorientation(img);
     if (flip & FLIP_VERTICALLY) {
         if ((tw + w) > INT_MAX) {
-            TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "%s", "unsupported tile size (too wide)");
+            NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "%s", "unsupported tile size (too wide)");
             return (0);
         }
         y = h - 1;
@@ -655,7 +655,7 @@ gtTileContig(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
     }
     else {
         if (tw > (INT_MAX + w)) {
-            TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "%s", "unsupported tile size (too wide)");
+            NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "%s", "unsupported tile size (too wide)");
             return (0);
         }
         y = 0;
@@ -679,14 +679,14 @@ gtTileContig(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 	col = img->col_offset;
 	while (tocol < w)
         {
-	    if (_TIFFReadTileAndAllocBuffer(tif, (void**) &buf, bufsize, col,
+	    if (_NDPIReadTileAndAllocBuffer(tif, (void**) &buf, bufsize, col,
 			     row+img->row_offset, 0, 0)==(tmsize_t)(-1) &&
                 (buf == NULL || img->stoponerr))
             {
                 ret = 0;
                 break;
             }
-            pos = ((row+img->row_offset) % th) * TIFFTileRowSize(tif) + \
+            pos = ((row+img->row_offset) % th) * NDPITileRowSize(tif) + \
 		   ((tmsize_t) fromskew * img->samplesperpixel);
 	    if (tocol + this_tw > w) 
 	    {
@@ -710,7 +710,7 @@ gtTileContig(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 
         y += ((flip & FLIP_VERTICALLY) ? -(int32_t) nrow : (int32_t) nrow);
     }
-    _TIFFfree(buf);
+    _NDPIfree(buf);
 
     if (flip & FLIP_HORIZONTALLY) {
 	    uint32_t line;
@@ -763,19 +763,19 @@ gtTileSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 	int32_t leftmost_fromskew;
 	uint32_t leftmost_tw;
 
-	tilesize = TIFFTileSize(tif);  
-	bufsize = _TIFFMultiplySSize(tif, alpha?4:3,tilesize, "gtTileSeparate");
+	tilesize = NDPITileSize(tif);  
+	bufsize = _NDPIMultiplySSize(tif, alpha?4:3,tilesize, "gtTileSeparate");
 	if (bufsize == 0) {
 		return (0);
 	}
 
-	TIFFGetField(tif, TIFFTAG_TILEWIDTH, &tw);
-	TIFFGetField(tif, TIFFTAG_TILELENGTH, &th);
+	NDPIGetField(tif, TIFFTAG_TILEWIDTH, &tw);
+	NDPIGetField(tif, TIFFTAG_TILELENGTH, &th);
 
 	flip = setorientation(img);
 	if (flip & FLIP_VERTICALLY) {
 		if ((tw + w) > INT_MAX) {
-            TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "%s", "unsupported tile size (too wide)");
+            NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "%s", "unsupported tile size (too wide)");
             return (0);
         }
 		y = h - 1;
@@ -783,7 +783,7 @@ gtTileSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 	}
 	else {
 		if (tw > (INT_MAX + w)) {
-            TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "%s", "unsupported tile size (too wide)");
+            NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "%s", "unsupported tile size (too wide)");
             return (0);
         }
 		y = 0;
@@ -822,7 +822,7 @@ gtTileSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 		{
                         if( buf == NULL )
                         {
-                            if (_TIFFReadTileAndAllocBuffer(
+                            if (_NDPIReadTileAndAllocBuffer(
                                     tif, (void**) &buf, bufsize, col,
                                     row+img->row_offset,0,0)==(tmsize_t)(-1)
                                 && (buf == NULL || img->stoponerr))
@@ -843,14 +843,14 @@ gtTileSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
                                 pa = (alpha?(p2+tilesize):NULL);
                             }
                         }
-			else if (TIFFReadTile(tif, p0, col,  
+			else if (NDPIReadTile(tif, p0, col,  
 			    row+img->row_offset,0,0)==(tmsize_t)(-1) && img->stoponerr)
 			{
 				ret = 0;
 				break;
 			}
 			if (colorchannels > 1 
-                            && TIFFReadTile(tif, p1, col,  
+                            && NDPIReadTile(tif, p1, col,  
                                             row+img->row_offset,0,1) == (tmsize_t)(-1) 
                             && img->stoponerr)
 			{
@@ -858,7 +858,7 @@ gtTileSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 				break;
 			}
 			if (colorchannels > 1 
-                            && TIFFReadTile(tif, p2, col,  
+                            && NDPIReadTile(tif, p2, col,  
                                             row+img->row_offset,0,2) == (tmsize_t)(-1) 
                             && img->stoponerr)
 			{
@@ -866,7 +866,7 @@ gtTileSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 				break;
 			}
 			if (alpha
-                            && TIFFReadTile(tif,pa,col,  
+                            && NDPIReadTile(tif,pa,col,  
                                             row+img->row_offset,0,colorchannels) == (tmsize_t)(-1) 
                             && img->stoponerr)
                         {
@@ -874,7 +874,7 @@ gtTileSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
                             break;
 			}
 
-			pos = ((row+img->row_offset) % th) * TIFFTileRowSize(tif) + \
+			pos = ((row+img->row_offset) % th) * NDPITileRowSize(tif) + \
 			   ((tmsize_t) fromskew * img->samplesperpixel);
 			if (tocol + this_tw > w) 
 			{
@@ -917,7 +917,7 @@ gtTileSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 		}
 	}
 
-	_TIFFfree(buf);
+	_NDPIfree(buf);
 	return (ret);
 }
 
@@ -943,18 +943,18 @@ gtStripContig(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 	int ret = 1, flip;
         tmsize_t maxstripsize;
 
-	TIFFGetFieldDefaulted(tif, TIFFTAG_YCBCRSUBSAMPLING, &subsamplinghor, &subsamplingver);
+	NDPIGetFieldDefaulted(tif, TIFFTAG_YCBCRSUBSAMPLING, &subsamplinghor, &subsamplingver);
 	if( subsamplingver == 0 ) {
-		TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "Invalid vertical YCbCr subsampling");
+		NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "Invalid vertical YCbCr subsampling");
 		return (0);
 	}
 	
-	maxstripsize = TIFFStripSize(tif);
+	maxstripsize = NDPIStripSize(tif);
 
 	flip = setorientation(img);
 	if (flip & FLIP_VERTICALLY) {
 		if ( w > INT_MAX ) {
-        	TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "Width overflow");
+        	NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "Width overflow");
 			return (0);
 		}
 		y = h - 1;
@@ -964,9 +964,9 @@ gtStripContig(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 		toskew = -(int32_t)(w - w);
 	}
 
-	TIFFGetFieldDefaulted(tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
+	NDPIGetFieldDefaulted(tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
 
-	scanline = TIFFScanlineSize(tif);
+	scanline = NDPIScanlineSize(tif);
 	fromskew = (w < imagewidth ? imagewidth - w : 0);
 	for (row = 0; row < h; row += nrow)
 	{
@@ -979,11 +979,11 @@ gtStripContig(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 		temp = (row + img->row_offset)%rowsperstrip + nrowsub;
 		if( scanline > 0 && temp > (size_t)(TIFF_TMSIZE_T_MAX / scanline) )
 		{
-			TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "Integer overflow in gtStripContig");
+			NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "Integer overflow in gtStripContig");
 			return 0;
 		}
-		if (_TIFFReadEncodedStripAndAllocBuffer(tif,
-		    TIFFComputeStrip(tif,row+img->row_offset, 0),
+		if (_NDPIReadEncodedStripAndAllocBuffer(tif,
+		    NDPIComputeStrip(tif,row+img->row_offset, 0),
 		    (void**)(&buf),
                     maxstripsize,
 		    temp * scanline)==(tmsize_t)(-1)
@@ -1016,7 +1016,7 @@ gtStripContig(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 		}
 	}
 
-	_TIFFfree(buf);
+	_NDPIfree(buf);
 	return (ret);
 }
 
@@ -1045,8 +1045,8 @@ gtStripSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 	int ret = 1, flip;
         uint16_t colorchannels;
 
-	stripsize = TIFFStripSize(tif);  
-	bufsize = _TIFFMultiplySSize(tif,alpha?4:3,stripsize, "gtStripSeparate");
+	stripsize = NDPIStripSize(tif);  
+	bufsize = _NDPIMultiplySSize(tif,alpha?4:3,stripsize, "gtStripSeparate");
 	if (bufsize == 0) {
 		return (0);
 	}
@@ -1054,7 +1054,7 @@ gtStripSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 	flip = setorientation(img);
 	if (flip & FLIP_VERTICALLY) {
 		if ( w > INT_MAX ) {
-        	TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "Width overflow");
+        	NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "Width overflow");
 			return (0);
 		}
 		y = h - 1;
@@ -1078,8 +1078,8 @@ gtStripSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
             break;
         }
 
-	TIFFGetFieldDefaulted(tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
-	scanline = TIFFScanlineSize(tif);  
+	NDPIGetFieldDefaulted(tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
+	scanline = NDPIScanlineSize(tif);  
 	fromskew = (w < imagewidth ? imagewidth - w : 0);
 	for (row = 0; row < h; row += nrow)
 	{
@@ -1090,13 +1090,13 @@ gtStripSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
                 temp = (row + img->row_offset)%rowsperstrip + nrow;
                 if( scanline > 0 && temp > (size_t)(TIFF_TMSIZE_T_MAX / scanline) )
                 {
-                        TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "Integer overflow in gtStripSeparate");
+                        NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "Integer overflow in gtStripSeparate");
                         return 0;
                 }
                 if( buf == NULL )
                 {
-                    if (_TIFFReadEncodedStripAndAllocBuffer(
-                            tif, TIFFComputeStrip(tif, offset_row, 0),
+                    if (_NDPIReadEncodedStripAndAllocBuffer(
+                            tif, NDPIComputeStrip(tif, offset_row, 0),
                             (void**) &buf, bufsize,
                             temp * scanline)==(tmsize_t)(-1)
                         && (buf == NULL || img->stoponerr))
@@ -1117,7 +1117,7 @@ gtStripSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
                         pa = (alpha?(p2+stripsize):NULL);
                     }
                 }
-		else if (TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, offset_row, 0),
+		else if (NDPIReadEncodedStrip(tif, NDPIComputeStrip(tif, offset_row, 0),
 		    p0, temp * scanline)==(tmsize_t)(-1)
 		    && img->stoponerr)
 		{
@@ -1125,7 +1125,7 @@ gtStripSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 			break;
 		}
 		if (colorchannels > 1 
-                    && TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, offset_row, 1),
+                    && NDPIReadEncodedStrip(tif, NDPIComputeStrip(tif, offset_row, 1),
                                             p1, temp * scanline) == (tmsize_t)(-1)
 		    && img->stoponerr)
 		{
@@ -1133,7 +1133,7 @@ gtStripSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 			break;
 		}
 		if (colorchannels > 1 
-                    && TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, offset_row, 2),
+                    && NDPIReadEncodedStrip(tif, NDPIComputeStrip(tif, offset_row, 2),
                                             p2, temp * scanline) == (tmsize_t)(-1)
 		    && img->stoponerr)
 		{
@@ -1142,7 +1142,7 @@ gtStripSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 		}
 		if (alpha)
 		{
-			if (TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, offset_row, colorchannels),
+			if (NDPIReadEncodedStrip(tif, NDPIComputeStrip(tif, offset_row, colorchannels),
 			    pa, temp * scanline)==(tmsize_t)(-1)
 			    && img->stoponerr)
 			{
@@ -1175,7 +1175,7 @@ gtStripSeparate(TIFFRGBAImage* img, uint32_t* raster, uint32_t w, uint32_t h)
 		}
 	}
 
-	_TIFFfree(buf);
+	_NDPIfree(buf);
 	return (ret);
 }
 
@@ -1792,12 +1792,12 @@ DECLAREContigPutFunc(putcontig8bitCIELab)
 	fromskew *= 3;
 	for( ; h > 0; --h) {
 		for (x = w; x > 0; --x) {
-			TIFFCIELabToXYZ(img->cielab,
+			NDPICIELabToXYZ(img->cielab,
 					(unsigned char)pp[0],
 					(signed char)pp[1],
 					(signed char)pp[2],
 					&X, &Y, &Z);
-			TIFFXYZToRGB(img->cielab, X, Y, Z, &r, &g, &b);
+			NDPIXYZToRGB(img->cielab, X, Y, Z, &r, &g, &b);
 			*cp++ = PACK(r, g, b);
 			pp += 3;
 		}
@@ -1812,7 +1812,7 @@ DECLAREContigPutFunc(putcontig8bitCIELab)
 
 #define	YCbCrtoRGB(dst, Y) {						\
 	uint32_t r, g, b;							\
-	TIFFYCbCrtoRGB(img->ycbcr, (Y), Cb, Cr, &r, &g, &b);		\
+	NDPIYCbCrtoRGB(img->ycbcr, (Y), Cb, Cr, &r, &g, &b);		\
 	dst = PACK(r, g, b);						\
 }
 
@@ -2291,7 +2291,7 @@ DECLARESepPutFunc(putseparate8bitYCbCr11tile)
 		x = w;
 		do {
 			uint32_t dr, dg, db;
-			TIFFYCbCrtoRGB(img->ycbcr,*r++,*g++,*b++,&dr,&dg,&db);
+			NDPIYCbCrtoRGB(img->ycbcr,*r++,*g++,*b++,&dr,&dg,&db);
 			*cp++ = PACK(dr,dg,db);
 		} while (--x);
 		SKEW(r, g, b, fromskew);
@@ -2313,21 +2313,21 @@ initYCbCrConversion(TIFFRGBAImage* img)
 	float *luma, *refBlackWhite;
 
 	if (img->ycbcr == NULL) {
-		img->ycbcr = (TIFFYCbCrToRGB*) _TIFFmalloc(
+		img->ycbcr = (TIFFYCbCrToRGB*) _NDPImalloc(
 		    TIFFroundup_32(sizeof (TIFFYCbCrToRGB), sizeof (long))  
 		    + 4*256*sizeof (TIFFRGBValue)
 		    + 2*256*sizeof (int)
 		    + 3*256*sizeof (int32_t)
 		    );
 		if (img->ycbcr == NULL) {
-			TIFFErrorExt(img->tif->tif_clientdata, module,
+			NDPIErrorExt(img->tif->tif_clientdata, module,
 			    "No space for YCbCr->RGB conversion state");
 			return (0);
 		}
 	}
 
-	TIFFGetFieldDefaulted(img->tif, TIFFTAG_YCBCRCOEFFICIENTS, &luma);
-	TIFFGetFieldDefaulted(img->tif, TIFFTAG_REFERENCEBLACKWHITE,
+	NDPIGetFieldDefaulted(img->tif, TIFFTAG_YCBCRCOEFFICIENTS, &luma);
+	NDPIGetFieldDefaulted(img->tif, TIFFTAG_REFERENCEBLACKWHITE,
 	    &refBlackWhite);
 
         /* Do some validation to avoid later issues. Detect NaN for now */
@@ -2337,7 +2337,7 @@ initYCbCrConversion(TIFFRGBAImage* img)
             luma[1] == 0.0 ||
             luma[2] != luma[2] )
         {
-            TIFFErrorExt(img->tif->tif_clientdata, module,
+            NDPIErrorExt(img->tif->tif_clientdata, module,
                 "Invalid values for YCbCrCoefficients tag");
             return (0);
         }
@@ -2349,12 +2349,12 @@ initYCbCrConversion(TIFFRGBAImage* img)
             !isInRefBlackWhiteRange(refBlackWhite[4]) ||
             !isInRefBlackWhiteRange(refBlackWhite[5]) )
         {
-            TIFFErrorExt(img->tif->tif_clientdata, module,
+            NDPIErrorExt(img->tif->tif_clientdata, module,
                 "Invalid values for ReferenceBlackWhite tag");
             return (0);
         }
 
-	if (TIFFYCbCrToRGBInit(img->ycbcr, luma, refBlackWhite) < 0)
+	if (NDPIYCbCrToRGBInit(img->ycbcr, luma, refBlackWhite) < 0)
 		return(0);
 	return (1);
 }
@@ -2367,18 +2367,18 @@ initCIELabConversion(TIFFRGBAImage* img)
 	float   *whitePoint;
 	float   refWhite[3];
 
-	TIFFGetFieldDefaulted(img->tif, TIFFTAG_WHITEPOINT, &whitePoint);
+	NDPIGetFieldDefaulted(img->tif, TIFFTAG_WHITEPOINT, &whitePoint);
 	if (whitePoint[1] == 0.0f ) {
-		TIFFErrorExt(img->tif->tif_clientdata, module,
+		NDPIErrorExt(img->tif->tif_clientdata, module,
 		    "Invalid value for WhitePoint tag.");
 		return NULL;
         }
 
 	if (!img->cielab) {
 		img->cielab = (TIFFCIELabToRGB *)
-			_TIFFmalloc(sizeof(TIFFCIELabToRGB));
+			_NDPImalloc(sizeof(TIFFCIELabToRGB));
 		if (!img->cielab) {
-			TIFFErrorExt(img->tif->tif_clientdata, module,
+			NDPIErrorExt(img->tif->tif_clientdata, module,
 			    "No space for CIE L*a*b*->RGB conversion state.");
 			return NULL;
 		}
@@ -2388,10 +2388,10 @@ initCIELabConversion(TIFFRGBAImage* img)
 	refWhite[0] = whitePoint[0] / whitePoint[1] * refWhite[1];
 	refWhite[2] = (1.0F - whitePoint[0] - whitePoint[1])
 		      / whitePoint[1] * refWhite[1];
-	if (TIFFCIELabToRGBInit(img->cielab, &display_sRGB, refWhite) < 0) {
-		TIFFErrorExt(img->tif->tif_clientdata, module,
+	if (NDPICIELabToRGBInit(img->cielab, &display_sRGB, refWhite) < 0) {
+		NDPIErrorExt(img->tif->tif_clientdata, module,
 		    "Failed to initialize CIE L*a*b*->RGB conversion state.");
-		_TIFFfree(img->cielab);
+		_NDPIfree(img->cielab);
 		return NULL;
 	}
 
@@ -2417,10 +2417,10 @@ makebwmap(TIFFRGBAImage* img)
     if( nsamples == 0 )
         nsamples = 1;
 
-    img->BWmap = (uint32_t**) _TIFFmalloc(
+    img->BWmap = (uint32_t**) _NDPImalloc(
 	256*sizeof (uint32_t *) + (256 * nsamples * sizeof(uint32_t)));
     if (img->BWmap == NULL) {
-		TIFFErrorExt(img->tif->tif_clientdata, TIFFFileName(img->tif), "No space for B&W mapping table");
+		NDPIErrorExt(img->tif->tif_clientdata, NDPIFileName(img->tif), "No space for B&W mapping table");
 		return (0);
     }
     p = (uint32_t*)(img->BWmap + 256);
@@ -2475,9 +2475,9 @@ setupMap(TIFFRGBAImage* img)
     if( img->bitspersample == 16 )
         range = (int32_t) 255;
 
-    img->Map = (TIFFRGBValue*) _TIFFmalloc((range+1) * sizeof (TIFFRGBValue));
+    img->Map = (TIFFRGBValue*) _NDPImalloc((range+1) * sizeof (TIFFRGBValue));
     if (img->Map == NULL) {
-		TIFFErrorExt(img->tif->tif_clientdata, TIFFFileName(img->tif),
+		NDPIErrorExt(img->tif->tif_clientdata, NDPIFileName(img->tif),
 			"No space for photometric conversion table");
 		return (0);
     }
@@ -2498,7 +2498,7 @@ setupMap(TIFFRGBAImage* img)
 	if (!makebwmap(img))
 	    return (0);
 	/* no longer need Map, free it */
-	_TIFFfree(img->Map);
+	_NDPIfree(img->Map);
 	img->Map = NULL;
     }
     return (1);
@@ -2553,10 +2553,10 @@ makecmap(TIFFRGBAImage* img)
     uint32_t *p;
     int i;
 
-    img->PALmap = (uint32_t**) _TIFFmalloc(
+    img->PALmap = (uint32_t**) _NDPImalloc(
 	256*sizeof (uint32_t *) + (256 * nsamples * sizeof(uint32_t)));
     if (img->PALmap == NULL) {
-		TIFFErrorExt(img->tif->tif_clientdata, TIFFFileName(img->tif), "No space for Palette mapping table");
+		NDPIErrorExt(img->tif->tif_clientdata, NDPIFileName(img->tif), "No space for Palette mapping table");
 		return (0);
 	}
     p = (uint32_t*)(img->PALmap + 256);
@@ -2621,7 +2621,7 @@ buildMap(TIFFRGBAImage* img)
 	if (checkcmap(img) == 16)
 	    cvtcmap(img);
 	else
-	    TIFFWarningExt(img->tif->tif_clientdata, TIFFFileName(img->tif), "Assuming 8-bit colormap");
+	    NDPIWarningExt(img->tif->tif_clientdata, NDPIFileName(img->tif), "Assuming 8-bit colormap");
 	/*
 	 * Use mapping table and colormap to construct
 	 * unpacking tables for samples < 8 bits.
@@ -2639,7 +2639,7 @@ buildMap(TIFFRGBAImage* img)
 static int
 PickContigCase(TIFFRGBAImage* img)
 {
-	img->get = TIFFIsTiled(img->tif) ? gtTileContig : gtStripContig;
+	img->get = NDPIIsTiled(img->tif) ? gtTileContig : gtStripContig;
 	img->put.contig = NULL;
 	switch (img->photometric) {
 		case PHOTOMETRIC_RGB:
@@ -2748,7 +2748,7 @@ PickContigCase(TIFFRGBAImage* img)
 					 */
 					uint16_t SubsamplingHor;
 					uint16_t SubsamplingVer;
-					TIFFGetFieldDefaulted(img->tif, TIFFTAG_YCBCRSUBSAMPLING, &SubsamplingHor, &SubsamplingVer);
+					NDPIGetFieldDefaulted(img->tif, TIFFTAG_YCBCRSUBSAMPLING, &SubsamplingHor, &SubsamplingVer);
 					switch ((SubsamplingHor<<4)|SubsamplingVer) {
 						case 0x44:
 							img->put.contig = putcontig8bitYCbCr44tile;
@@ -2794,7 +2794,7 @@ PickContigCase(TIFFRGBAImage* img)
 static int
 PickSeparateCase(TIFFRGBAImage* img)
 {
-	img->get = TIFFIsTiled(img->tif) ? gtTileSeparate : gtStripSeparate;
+	img->get = NDPIIsTiled(img->tif) ? gtTileSeparate : gtStripSeparate;
 	img->put.separate = NULL;
 	switch (img->photometric) {
 	case PHOTOMETRIC_MINISWHITE:
@@ -2846,7 +2846,7 @@ PickSeparateCase(TIFFRGBAImage* img)
 			if (initYCbCrConversion(img)!=0)
 			{
 				uint16_t hs, vs;
-				TIFFGetFieldDefaulted(img->tif, TIFFTAG_YCBCRSUBSAMPLING, &hs, &vs);
+				NDPIGetFieldDefaulted(img->tif, TIFFTAG_YCBCRSUBSAMPLING, &hs, &vs);
 				switch ((hs<<4)|vs) {
 				case 0x11:
 					img->put.separate = putseparate8bitYCbCr11tile;
@@ -2867,10 +2867,10 @@ BuildMapUaToAa(TIFFRGBAImage* img)
 	uint8_t* m;
 	uint16_t na,nv;
 	assert(img->UaToAa==NULL);
-	img->UaToAa=_TIFFmalloc(65536);
+	img->UaToAa=_NDPImalloc(65536);
 	if (img->UaToAa==NULL)
 	{
-		TIFFErrorExt(img->tif->tif_clientdata,module,"Out of memory");
+		NDPIErrorExt(img->tif->tif_clientdata,module,"Out of memory");
 		return(0);
 	}
 	m=img->UaToAa;
@@ -2889,10 +2889,10 @@ BuildMapBitdepth16To8(TIFFRGBAImage* img)
 	uint8_t* m;
 	uint32_t n;
 	assert(img->Bitdepth16To8==NULL);
-	img->Bitdepth16To8=_TIFFmalloc(65536);
+	img->Bitdepth16To8=_NDPImalloc(65536);
 	if (img->Bitdepth16To8==NULL)
 	{
-		TIFFErrorExt(img->tif->tif_clientdata,module,"Out of memory");
+		NDPIErrorExt(img->tif->tif_clientdata,module,"Out of memory");
 		return(0);
 	}
 	m=img->Bitdepth16To8;
@@ -2911,14 +2911,14 @@ BuildMapBitdepth16To8(TIFFRGBAImage* img)
 
 
 int
-TIFFReadRGBAStrip(TIFF* tif, uint32_t row, uint32_t * raster )
+NDPIReadRGBAStrip(TIFF* tif, uint32_t row, uint32_t * raster )
 
 {
-    return TIFFReadRGBAStripExt(tif, row, raster, 0 );
+    return NDPIReadRGBAStripExt(tif, row, raster, 0 );
 }
 
 int
-TIFFReadRGBAStripExt(TIFF* tif, uint32_t row, uint32_t * raster, int stop_on_error)
+NDPIReadRGBAStripExt(TIFF* tif, uint32_t row, uint32_t * raster, int stop_on_error)
 
 {
     char 	emsg[1024] = "";
@@ -2926,22 +2926,22 @@ TIFFReadRGBAStripExt(TIFF* tif, uint32_t row, uint32_t * raster, int stop_on_err
     int 	ok;
     uint32_t	rowsperstrip, rows_to_read;
 
-    if( TIFFIsTiled( tif ) )
+    if( NDPIIsTiled( tif ) )
     {
-		TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif),
-                  "Can't use TIFFReadRGBAStrip() with tiled file.");
+		NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif),
+                  "Can't use NDPIReadRGBAStrip() with tiled file.");
 	return (0);
     }
     
-    TIFFGetFieldDefaulted(tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
+    NDPIGetFieldDefaulted(tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
     if( (row % rowsperstrip) != 0 )
     {
-		TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif),
-				"Row passed to TIFFReadRGBAStrip() must be first in a strip.");
+		NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif),
+				"Row passed to NDPIReadRGBAStrip() must be first in a strip.");
 		return (0);
     }
 
-    if (TIFFRGBAImageOK(tif, emsg) && TIFFRGBAImageBegin(&img, tif, stop_on_error, emsg)) {
+    if (NDPIRGBAImageOK(tif, emsg) && NDPIRGBAImageBegin(&img, tif, stop_on_error, emsg)) {
 
         img.row_offset = row;
         img.col_offset = 0;
@@ -2951,11 +2951,11 @@ TIFFReadRGBAStripExt(TIFF* tif, uint32_t row, uint32_t * raster, int stop_on_err
         else
             rows_to_read = rowsperstrip;
         
-	ok = TIFFRGBAImageGet(&img, raster, img.width, rows_to_read );
+	ok = NDPIRGBAImageGet(&img, raster, img.width, rows_to_read );
         
-	TIFFRGBAImageEnd(&img);
+	NDPIRGBAImageEnd(&img);
     } else {
-		TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "%s", emsg);
+		NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "%s", emsg);
 		ok = 0;
     }
     
@@ -2969,15 +2969,15 @@ TIFFReadRGBAStripExt(TIFF* tif, uint32_t row, uint32_t * raster, int stop_on_err
  */
 
 int
-TIFFReadRGBATile(TIFF* tif, uint32_t col, uint32_t row, uint32_t * raster)
+NDPIReadRGBATile(TIFF* tif, uint32_t col, uint32_t row, uint32_t * raster)
 
 {
-    return TIFFReadRGBATileExt(tif, col, row, raster, 0 );
+    return NDPIReadRGBATileExt(tif, col, row, raster, 0 );
 }
 
 
 int
-TIFFReadRGBATileExt(TIFF* tif, uint32_t col, uint32_t row, uint32_t * raster, int stop_on_error )
+NDPIReadRGBATileExt(TIFF* tif, uint32_t col, uint32_t row, uint32_t * raster, int stop_on_error )
 {
     char 	emsg[1024] = "";
     TIFFRGBAImage img;
@@ -2991,19 +2991,19 @@ TIFFReadRGBATileExt(TIFF* tif, uint32_t col, uint32_t row, uint32_t * raster, in
      * tile boundary.
      */
     
-    if( !TIFFIsTiled( tif ) )
+    if( !NDPIIsTiled( tif ) )
     {
-		TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif),
-				  "Can't use TIFFReadRGBATile() with striped file.");
+		NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif),
+				  "Can't use NDPIReadRGBATile() with striped file.");
 		return (0);
     }
     
-    TIFFGetFieldDefaulted(tif, TIFFTAG_TILEWIDTH, &tile_xsize);
-    TIFFGetFieldDefaulted(tif, TIFFTAG_TILELENGTH, &tile_ysize);
+    NDPIGetFieldDefaulted(tif, TIFFTAG_TILEWIDTH, &tile_xsize);
+    NDPIGetFieldDefaulted(tif, TIFFTAG_TILELENGTH, &tile_ysize);
     if( (col % tile_xsize) != 0 || (row % tile_ysize) != 0 )
     {
-		TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif),
-                  "Row/col passed to TIFFReadRGBATile() must be top"
+		NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif),
+                  "Row/col passed to NDPIReadRGBATile() must be top"
                   "left corner of a tile.");
 	return (0);
     }
@@ -3012,14 +3012,14 @@ TIFFReadRGBATileExt(TIFF* tif, uint32_t col, uint32_t row, uint32_t * raster, in
      * Setup the RGBA reader.
      */
     
-    if (!TIFFRGBAImageOK(tif, emsg) 
-	|| !TIFFRGBAImageBegin(&img, tif, stop_on_error, emsg)) {
-	    TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "%s", emsg);
+    if (!NDPIRGBAImageOK(tif, emsg) 
+	|| !NDPIRGBAImageBegin(&img, tif, stop_on_error, emsg)) {
+	    NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "%s", emsg);
 	    return( 0 );
     }
 
     /*
-     * The TIFFRGBAImageGet() function doesn't allow us to get off the
+     * The NDPIRGBAImageGet() function doesn't allow us to get off the
      * edge of the image, even to fill an otherwise valid tile.  So we
      * figure out how much we can read, and fix up the tile buffer to
      * a full tile configuration afterwards.
@@ -3042,9 +3042,9 @@ TIFFReadRGBATileExt(TIFF* tif, uint32_t col, uint32_t row, uint32_t * raster, in
     img.row_offset = row;
     img.col_offset = col;
 
-    ok = TIFFRGBAImageGet(&img, raster, read_xsize, read_ysize );
+    ok = NDPIRGBAImageGet(&img, raster, read_xsize, read_ysize );
         
-    TIFFRGBAImageEnd(&img);
+    NDPIRGBAImageEnd(&img);
 
     /*
      * If our read was incomplete we will need to fix up the tile by
@@ -3061,12 +3061,12 @@ TIFFReadRGBATileExt(TIFF* tif, uint32_t col, uint32_t row, uint32_t * raster, in
         memmove( raster + (tile_ysize - i_row - 1) * tile_xsize,
                  raster + (read_ysize - i_row - 1) * read_xsize,
                  read_xsize * sizeof(uint32_t) );
-        _TIFFmemset( raster + (tile_ysize - i_row - 1) * tile_xsize+read_xsize,
+        _NDPImemset( raster + (tile_ysize - i_row - 1) * tile_xsize+read_xsize,
                      0, sizeof(uint32_t) * (tile_xsize - read_xsize) );
     }
 
     for( i_row = read_ysize; i_row < tile_ysize; i_row++ ) {
-        _TIFFmemset( raster + (tile_ysize - i_row - 1) * tile_xsize,
+        _NDPImemset( raster + (tile_ysize - i_row - 1) * tile_xsize,
                      0, sizeof(uint32_t) * tile_xsize );
     }
 

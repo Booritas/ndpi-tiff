@@ -624,7 +624,7 @@ static void* limitMalloc(tmsize_t s)
             (uint64_t)s, (uint64_t)maxMalloc);
     fprintf(stderr, "                  use -k option to change limit.\n"); return NULL;
   }
-  return _TIFFmalloc(s);
+  return _NDPImalloc(s);
 }
 
 
@@ -795,14 +795,14 @@ static int readContigTilesIntoBuffer (TIFF* in, uint8_t* buf,
   uint32_t dst_rowsize, shift_width;
   uint32_t bytes_per_sample, bytes_per_pixel;
   uint32_t trailing_bits, prev_trailing_bits;
-  uint32_t tile_rowsize  = TIFFTileRowSize(in);
+  uint32_t tile_rowsize  = NDPITileRowSize(in);
   uint32_t src_offset, dst_offset;
   uint32_t row_offset, col_offset;
   uint8_t *bufp = (uint8_t*) buf;
   unsigned char *src = NULL;
   unsigned char *dst = NULL;
   tsize_t tbytes = 0, tile_buffsize = 0;
-  tsize_t tilesize = TIFFTileSize(in);
+  tsize_t tilesize = NDPITileSize(in);
   unsigned char *tilebuf = NULL;
 
   bytes_per_sample = (bps + 7) / 8; 
@@ -821,21 +821,21 @@ static int readContigTilesIntoBuffer (TIFF* in, uint8_t* buf,
   tile_buffsize = tilesize;
   if (tilesize == 0 || tile_rowsize == 0)
   {
-     TIFFError("readContigTilesIntoBuffer", "Tile size or tile rowsize is zero");
+     NDPIError("readContigTilesIntoBuffer", "Tile size or tile rowsize is zero");
      exit(EXIT_FAILURE);
   }
 
   if (tilesize < (tsize_t)(tl * tile_rowsize))
     {
 #ifdef DEBUG2
-    TIFFError("readContigTilesIntoBuffer",
+    NDPIError("readContigTilesIntoBuffer",
 	      "Tilesize %"PRId64" is too small, using alternate calculation %"PRIu64,
               tilesize, tl * tile_rowsize);
 #endif
     tile_buffsize = tl * tile_rowsize;
     if (tl != (tile_buffsize / tile_rowsize))
     {
-    	TIFFError("readContigTilesIntoBuffer", "Integer overflow when calculating buffer size.");
+    	NDPIError("readContigTilesIntoBuffer", "Integer overflow when calculating buffer size.");
         exit(EXIT_FAILURE);
     }
     }
@@ -843,7 +843,7 @@ static int readContigTilesIntoBuffer (TIFF* in, uint8_t* buf,
   /* Add 3 padding bytes for extractContigSamplesShifted32bits */
   if( (size_t) tile_buffsize > 0xFFFFFFFFU - 3U )
   {
-      TIFFError("readContigTilesIntoBuffer", "Integer overflow when calculating buffer size.");
+      NDPIError("readContigTilesIntoBuffer", "Integer overflow when calculating buffer size.");
       exit(EXIT_FAILURE);
   }
   tilebuf = limitMalloc(tile_buffsize + 3);
@@ -859,14 +859,14 @@ static int readContigTilesIntoBuffer (TIFF* in, uint8_t* buf,
     nrow = (row + tl > imagelength) ? imagelength - row : tl;
     for (col = 0; col < imagewidth; col += tw)
       {
-      tbytes = TIFFReadTile(in, tilebuf, col, row, 0, 0);
+      tbytes = NDPIReadTile(in, tilebuf, col, row, 0, 0);
       if (tbytes < tilesize  && !ignore)
         {
-	TIFFError(TIFFFileName(in),
+	NDPIError(NDPIFileName(in),
 		  "Error, can't read tile at row %"PRIu32" col %"PRIu32", Read %"TIFF_SSIZE_FORMAT" bytes of %"TIFF_SSIZE_FORMAT,
 		  col, row, tbytes, tilesize);
 		  status = 0;
-                  _TIFFfree(tilebuf);
+                  _NDPIfree(tilebuf);
 		  return status;
 	}
       
@@ -890,7 +890,7 @@ static int readContigTilesIntoBuffer (TIFF* in, uint8_t* buf,
 	for (trow = 0; trow < nrow; trow++)
           {
 	  src_offset = trow * tile_rowsize;
-	  _TIFFmemcpy (bufp, tilebuf + src_offset, (ncol * spp * bps) / 8);
+	  _NDPImemcpy (bufp, tilebuf + src_offset, (ncol * spp * bps) / 8);
           bufp += (imagewidth * bps * spp) / 8;
 	  }
         }
@@ -912,9 +912,9 @@ static int readContigTilesIntoBuffer (TIFF* in, uint8_t* buf,
             case 0: if (extractContigSamplesBytes (src, dst, ncol, sample,
                                                    spp, bps, count, 0, ncol))
                       {
-		      TIFFError("readContigTilesIntoBuffer",
+		      NDPIError("readContigTilesIntoBuffer",
                                 "Unable to extract row %"PRIu32" from tile %"PRIu32,
-				row, TIFFCurrentTile(in));
+				row, NDPICurrentTile(in));
 		      return 1;
 		      }
 		    break;
@@ -926,9 +926,9 @@ static int readContigTilesIntoBuffer (TIFF* in, uint8_t* buf,
                                                             0, ncol,
                                                             prev_trailing_bits))
                         {
-		        TIFFError("readContigTilesIntoBuffer",
+		        NDPIError("readContigTilesIntoBuffer",
                                   "Unable to extract row %"PRIu32" from tile %"PRIu32,
-				  row, TIFFCurrentTile(in));
+				  row, NDPICurrentTile(in));
 		        return 1;
 		        }
 		      break;
@@ -940,9 +940,9 @@ static int readContigTilesIntoBuffer (TIFF* in, uint8_t* buf,
                                                              0, ncol,
                                                              prev_trailing_bits))
                         {
-		        TIFFError("readContigTilesIntoBuffer",
+		        NDPIError("readContigTilesIntoBuffer",
                                   "Unable to extract row %"PRIu32" from tile %"PRIu32,
-			  	  row, TIFFCurrentTile(in));
+			  	  row, NDPICurrentTile(in));
 		        return 1;
 		        }
 	            break;
@@ -952,9 +952,9 @@ static int readContigTilesIntoBuffer (TIFF* in, uint8_t* buf,
                                                            0, ncol,
                                                            prev_trailing_bits))
                       {
-		      TIFFError("readContigTilesIntoBuffer",
+		      NDPIError("readContigTilesIntoBuffer",
                                 "Unable to extract row %"PRIu32" from tile %"PRIu32,
-		  	        row, TIFFCurrentTile(in));
+		  	        row, NDPICurrentTile(in));
 		      return 1;
 		      }
 		    break;
@@ -966,13 +966,13 @@ static int readContigTilesIntoBuffer (TIFF* in, uint8_t* buf,
                                                            0, ncol,
                                                            prev_trailing_bits))
                       {
-		      TIFFError("readContigTilesIntoBuffer",
+		      NDPIError("readContigTilesIntoBuffer",
                                 "Unable to extract row %"PRIu32" from tile %"PRIu32,
-			        row, TIFFCurrentTile(in));
+			        row, NDPICurrentTile(in));
 		      return 1;
 		      }
 		    break;
-            default: TIFFError("readContigTilesIntoBuffer", "Unsupported bit depth %"PRIu16, bps);
+            default: NDPIError("readContigTilesIntoBuffer", "Unsupported bit depth %"PRIu16, bps);
 		     return 1;
 	    }
           }
@@ -983,7 +983,7 @@ static int readContigTilesIntoBuffer (TIFF* in, uint8_t* buf,
       }
     }
 
-  _TIFFfree(tilebuf);
+  _NDPIfree(tilebuf);
   return status;
   }
 
@@ -998,7 +998,7 @@ static int  readSeparateTilesIntoBuffer (TIFF* in, uint8_t *obuf,
   uint32_t  row, col;     /* Current row and col of image */
   uint32_t  nrow, ncol;   /* Number of rows and cols in current tile */
   uint32_t  row_offset, col_offset; /* Output buffer offsets */
-  tsize_t tbytes = 0, tilesize = TIFFTileSize(in);
+  tsize_t tbytes = 0, tilesize = NDPITileSize(in);
   tsample_t s;
   uint8_t*  bufp = (uint8_t*)obuf;
   unsigned char *srcbuffs[MAX_SAMPLES];
@@ -1012,10 +1012,10 @@ static int  readSeparateTilesIntoBuffer (TIFF* in, uint8_t *obuf,
     tbuff = (unsigned char *)limitMalloc(tilesize + 8);
     if (!tbuff)
       {
-      TIFFError ("readSeparateTilesIntoBuffer", 
+      NDPIError ("readSeparateTilesIntoBuffer", 
                  "Unable to allocate tile read buffer for sample %d", sample);
       for (i = 0; i < sample; i++)
-        _TIFFfree (srcbuffs[i]);
+        _NDPIfree (srcbuffs[i]);
       return 0;
       }
     srcbuffs[sample] = tbuff;
@@ -1030,10 +1030,10 @@ static int  readSeparateTilesIntoBuffer (TIFF* in, uint8_t *obuf,
       {
       for (s = 0; s < spp && s < MAX_SAMPLES; s++)
         {  /* Read each plane of a tile set into srcbuffs[s] */
-	tbytes = TIFFReadTile(in, srcbuffs[s], col, row, 0, s);
+	tbytes = NDPIReadTile(in, srcbuffs[s], col, row, 0, s);
         if (tbytes < 0  && !ignore)
           {
-	  TIFFError(TIFFFileName(in),
+	  NDPIError(NDPIFileName(in),
                  "Error, can't read tile for row %"PRIu32" col %"PRIu32", "
 		 "sample %"PRIu16,
 		 col, row, s);
@@ -1042,7 +1042,7 @@ static int  readSeparateTilesIntoBuffer (TIFF* in, uint8_t *obuf,
             {
             tbuff = srcbuffs[sample];
             if (tbuff != NULL)
-              _TIFFfree(tbuff);
+              _NDPIfree(tbuff);
             }
           return status;
 	  }
@@ -1115,7 +1115,7 @@ static int  readSeparateTilesIntoBuffer (TIFF* in, uint8_t *obuf,
                     break;
 		    }
 	          break;
-          default: TIFFError ("readSeparateTilesIntoBuffer", "Unsupported bit depth: %"PRIu16, bps);
+          default: NDPIError ("readSeparateTilesIntoBuffer", "Unsupported bit depth: %"PRIu16, bps);
                   status = 0;
                   break;
           }
@@ -1127,7 +1127,7 @@ static int  readSeparateTilesIntoBuffer (TIFF* in, uint8_t *obuf,
     {
     tbuff = srcbuffs[sample];
     if (tbuff != NULL)
-      _TIFFfree(tbuff);
+      _NDPIfree(tbuff);
     }
  
   return status;
@@ -1139,15 +1139,15 @@ static int writeBufferToContigStrips(TIFF* out, uint8_t* buf, uint32_t imageleng
   tstrip_t strip = 0;
   tsize_t stripsize;
 
-  TIFFGetFieldDefaulted(out, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
+  NDPIGetFieldDefaulted(out, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
   for (row = 0; row < imagelength; row += rowsperstrip)
     {
     nrows = (row + rowsperstrip > imagelength) ?
 	     imagelength - row : rowsperstrip;
-    stripsize = TIFFVStripSize(out, nrows);
+    stripsize = NDPIVStripSize(out, nrows);
     if (TIFFWriteEncodedStrip(out, strip++, buf, stripsize) < 0)
       {
-      TIFFError(TIFFFileName(out), "Error, can't write strip %"PRIu32, strip - 1);
+      NDPIError(NDPIFileName(out), "Error, can't write strip %"PRIu32, strip - 1);
       return 1;
       }
     buf += stripsize;
@@ -1175,19 +1175,19 @@ writeBufferToSeparateStrips (TIFF* out, uint8_t* buf,
   uint32_t   bytes_per_sample;
   tsample_t s;
   tstrip_t strip = 0;
-  tsize_t  stripsize = TIFFStripSize(out);
-  tsize_t  rowstripsize,  scanlinesize = TIFFScanlineSize(out);
+  tsize_t  stripsize = NDPIStripSize(out);
+  tsize_t  rowstripsize,  scanlinesize = NDPIScanlineSize(out);
   tsize_t  total_bytes = 0;
   tdata_t  obuf;
 
-  (void) TIFFGetFieldDefaulted(out, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
-  (void) TIFFGetFieldDefaulted(out, TIFFTAG_BITSPERSAMPLE, &bps);
+  (void) NDPIGetFieldDefaulted(out, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
+  (void) NDPIGetFieldDefaulted(out, TIFFTAG_BITSPERSAMPLE, &bps);
   bytes_per_sample = (bps + 7) / 8;
   if( width == 0 ||
       (uint32_t)bps * (uint32_t)spp > UINT32_MAX / width ||
       bps * spp * width > UINT32_MAX - 7U )
   {
-      TIFFError(TIFFFileName(out),
+      NDPIError(NDPIFileName(out),
             "Error, uint32_t overflow when computing (bps * spp * width) + 7");
       return 1;
   }
@@ -1196,7 +1196,7 @@ writeBufferToSeparateStrips (TIFF* out, uint8_t* buf,
       rowsperstrip > UINT32_MAX / bytes_per_sample ||
       rowsperstrip * bytes_per_sample > UINT32_MAX / (width + 1) )
   {
-      TIFFError(TIFFFileName(out),
+      NDPIError(NDPIFileName(out),
                 "Error, uint32_t overflow when computing rowsperstrip * "
                 "bytes_per_sample * (width + 1)");
       return 1;
@@ -1213,13 +1213,13 @@ writeBufferToSeparateStrips (TIFF* out, uint8_t* buf,
       {
       nrows = (row + rowsperstrip > length) ? length - row : rowsperstrip;
 
-      stripsize = TIFFVStripSize(out, nrows);
+      stripsize = NDPIVStripSize(out, nrows);
       src = buf + (row * rowsize);
       total_bytes += stripsize;
       memset (obuf, '\0', rowstripsize);
       if (extractContigSamplesToBuffer(obuf, src, nrows, width, s, spp, bps, dump))
         {
-        _TIFFfree(obuf);
+        _NDPIfree(obuf);
         return 1;
 	}
       if ((dump->outfile != NULL) && (dump->level == 1))
@@ -1232,14 +1232,14 @@ writeBufferToSeparateStrips (TIFF* out, uint8_t* buf,
 
       if (TIFFWriteEncodedStrip(out, strip++, obuf, stripsize) < 0)
         {
-	TIFFError(TIFFFileName(out), "Error, can't write strip %"PRIu32, strip - 1);
-	_TIFFfree(obuf);
+	NDPIError(NDPIFileName(out), "Error, can't write strip %"PRIu32, strip - 1);
+	_NDPIfree(obuf);
 	return 1;
 	}
       }
     }      
 
-  _TIFFfree(obuf);
+  _NDPIfree(obuf);
   return 0;
 }
 
@@ -1254,20 +1254,20 @@ static int writeBufferToContigTiles (TIFF* out, uint8_t* buf, uint32_t imageleng
   uint32_t tl, tw;
   uint32_t row, col, nrow, ncol;
   uint32_t src_rowsize, col_offset;
-  uint32_t tile_rowsize  = TIFFTileRowSize(out);
+  uint32_t tile_rowsize  = NDPITileRowSize(out);
   uint8_t* bufp = (uint8_t*) buf;
   tsize_t tile_buffsize = 0;
-  tsize_t tilesize = TIFFTileSize(out);
+  tsize_t tilesize = NDPITileSize(out);
   unsigned char *tilebuf = NULL;
 
-  if( !TIFFGetField(out, TIFFTAG_TILELENGTH, &tl) ||
-      !TIFFGetField(out, TIFFTAG_TILEWIDTH, &tw) ||
-      !TIFFGetField(out, TIFFTAG_BITSPERSAMPLE, &bps) )
+  if( !NDPIGetField(out, TIFFTAG_TILELENGTH, &tl) ||
+      !NDPIGetField(out, TIFFTAG_TILEWIDTH, &tw) ||
+      !NDPIGetField(out, TIFFTAG_BITSPERSAMPLE, &bps) )
       return 1;
 
   if (tilesize == 0 || tile_rowsize == 0 || tl == 0 || tw == 0)
   {
-    TIFFError("writeBufferToContigTiles", "Tile size, tile row size, tile width, or tile length is zero");
+    NDPIError("writeBufferToContigTiles", "Tile size, tile row size, tile width, or tile length is zero");
     exit(EXIT_FAILURE);
   }
   
@@ -1275,14 +1275,14 @@ static int writeBufferToContigTiles (TIFF* out, uint8_t* buf, uint32_t imageleng
   if (tilesize < (tsize_t)(tl * tile_rowsize))
     {
 #ifdef DEBUG2
-    TIFFError("writeBufferToContigTiles",
+    NDPIError("writeBufferToContigTiles",
 	      "Tilesize %"PRId64" is too small, using alternate calculation %"PRIu32,
               tilesize, tl * tile_rowsize);
 #endif
     tile_buffsize = tl * tile_rowsize;
     if (tl != tile_buffsize / tile_rowsize)
     {
-	TIFFError("writeBufferToContigTiles", "Integer overflow when calculating buffer size");
+	NDPIError("writeBufferToContigTiles", "Integer overflow when calculating buffer size");
 	exit(EXIT_FAILURE);
     }
     }
@@ -1291,7 +1291,7 @@ static int writeBufferToContigTiles (TIFF* out, uint8_t* buf, uint32_t imageleng
       (uint32_t)bps * (uint32_t)spp > UINT32_MAX / imagewidth ||
       bps * spp * imagewidth > UINT32_MAX - 7U )
   {
-      TIFFError(TIFFFileName(out),
+      NDPIError(NDPIFileName(out),
             "Error, uint32_t overflow when computing (imagewidth * bps * spp) + 7");
       return 1;
   }
@@ -1316,24 +1316,24 @@ static int writeBufferToContigTiles (TIFF* out, uint8_t* buf, uint32_t imageleng
       if (extractContigSamplesToTileBuffer(tilebuf, bufp, nrow, ncol, imagewidth,
 					   tw, 0, spp, spp, bps, dump) > 0)
         {
-	TIFFError("writeBufferToContigTiles", 
+	NDPIError("writeBufferToContigTiles", 
                   "Unable to extract data to tile for row %"PRIu32", col %"PRIu32,
                   row, col);
-	_TIFFfree(tilebuf);
+	_NDPIfree(tilebuf);
 	return 1;
         }
 
       if (TIFFWriteTile(out, tilebuf, col, row, 0, 0) < 0)
         {
-	TIFFError("writeBufferToContigTiles",
+	NDPIError("writeBufferToContigTiles",
 	          "Cannot write tile at %"PRIu32" %"PRIu32,
 	          col, row);
-	 _TIFFfree(tilebuf);
+	 _NDPIfree(tilebuf);
 	return 1;
 	}
       }
     }
-  _TIFFfree(tilebuf);
+  _NDPIfree(tilebuf);
 
   return 0;
   } /* end writeBufferToContigTiles */
@@ -1345,7 +1345,7 @@ static int writeBufferToSeparateTiles (TIFF* out, uint8_t* buf, uint32_t imagele
                                        uint32_t imagewidth, tsample_t spp,
                                        struct dump_opts * dump)
   {
-  tdata_t obuf = limitMalloc(TIFFTileSize(out));
+  tdata_t obuf = limitMalloc(NDPITileSize(out));
   uint32_t tl, tw;
   uint32_t row, col, nrow, ncol;
   uint32_t src_rowsize, col_offset;
@@ -1356,11 +1356,11 @@ static int writeBufferToSeparateTiles (TIFF* out, uint8_t* buf, uint32_t imagele
   if (obuf == NULL)
     return 1;
 
-  if( !TIFFGetField(out, TIFFTAG_TILELENGTH, &tl) ||
-      !TIFFGetField(out, TIFFTAG_TILEWIDTH, &tw) ||
-      !TIFFGetField(out, TIFFTAG_BITSPERSAMPLE, &bps) )
+  if( !NDPIGetField(out, TIFFTAG_TILELENGTH, &tl) ||
+      !NDPIGetField(out, TIFFTAG_TILEWIDTH, &tw) ||
+      !NDPIGetField(out, TIFFTAG_BITSPERSAMPLE, &bps) )
   {
-      _TIFFfree(obuf);
+      _NDPIfree(obuf);
       return 1;
   }
 
@@ -1368,9 +1368,9 @@ static int writeBufferToSeparateTiles (TIFF* out, uint8_t* buf, uint32_t imagele
       (uint32_t)bps * (uint32_t)spp > UINT32_MAX / imagewidth ||
       bps * spp * imagewidth > UINT32_MAX - 7 )
   {
-      TIFFError(TIFFFileName(out),
+      NDPIError(NDPIFileName(out),
             "Error, uint32_t overflow when computing (imagewidth * bps * spp) + 7");
-      _TIFFfree(obuf);
+      _NDPIfree(obuf);
       return 1;
   }
   src_rowsize = ((imagewidth * spp * bps) + 7U) / 8;
@@ -1394,25 +1394,25 @@ static int writeBufferToSeparateTiles (TIFF* out, uint8_t* buf, uint32_t imagele
 	if (extractContigSamplesToTileBuffer(obuf, bufp, nrow, ncol, imagewidth,
 					     tw, s, 1, spp, bps, dump) > 0)
           {
-	  TIFFError("writeBufferToSeparateTiles", 
+	  NDPIError("writeBufferToSeparateTiles", 
                     "Unable to extract data to tile for row %"PRIu32", col %"PRIu32" sample %"PRIu16,
                     row, col, s);
-	  _TIFFfree(obuf);
+	  _NDPIfree(obuf);
 	  return 1;
           }
 
 	if (TIFFWriteTile(out, obuf, col, row, 0, s) < 0)
           {
-	   TIFFError("writeBufferToseparateTiles",
+	   NDPIError("writeBufferToseparateTiles",
 	             "Cannot write tile at %"PRIu32" %"PRIu32" sample %"PRIu16,
 	             col, row, s);
-	   _TIFFfree(obuf);
+	   _NDPIfree(obuf);
 	   return 1;
 	  }
 	}
       }
     }
-  _TIFFfree(obuf);
+  _NDPIfree(obuf);
 
   return 0;
   } /* end writeBufferToSeparateTiles */
@@ -1508,13 +1508,13 @@ usage(int code)
 }
 
 #define	CopyField(tag, v) \
-    if (TIFFGetField(in, tag, &v)) TIFFSetField(out, tag, v)
+    if (NDPIGetField(in, tag, &v)) NDPISetField(out, tag, v)
 #define	CopyField2(tag, v1, v2) \
-    if (TIFFGetField(in, tag, &v1, &v2)) TIFFSetField(out, tag, v1, v2)
+    if (NDPIGetField(in, tag, &v1, &v2)) NDPISetField(out, tag, v1, v2)
 #define	CopyField3(tag, v1, v2, v3) \
-    if (TIFFGetField(in, tag, &v1, &v2, &v3)) TIFFSetField(out, tag, v1, v2, v3)
+    if (NDPIGetField(in, tag, &v1, &v2, &v3)) NDPISetField(out, tag, v1, v2, v3)
 #define	CopyField4(tag, v1, v2, v3, v4) \
-    if (TIFFGetField(in, tag, &v1, &v2, &v3, &v4)) TIFFSetField(out, tag, v1, v2, v3, v4)
+    if (NDPIGetField(in, tag, &v1, &v2, &v3, &v4)) NDPISetField(out, tag, v1, v2, v3, v4)
 
 static void
 cpTag(TIFF* in, TIFF* out, uint16_t tag, uint16_t count, TIFFDataType type)
@@ -1565,7 +1565,7 @@ cpTag(TIFF* in, TIFF* out, uint16_t tag, uint16_t count, TIFFDataType type)
 		}
 		break;
           default:
-                TIFFError(TIFFFileName(in),
+                NDPIError(NDPIFileName(in),
                           "Data type %"PRIu16" is not supported, tag %d skipped",
                           tag, type);
 	}
@@ -1643,16 +1643,16 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
 		break;
       case 'c':	if (!processCompressOptions(optarg)) /* compression scheme */
 		  {
-		  TIFFError ("Unknown compression option", "%s", optarg);
-                  TIFFError ("For valid options type", "tiffcrop -h");
+		  NDPIError ("Unknown compression option", "%s", optarg);
+                  NDPIError ("For valid options type", "tiffcrop -h");
                   exit (EXIT_FAILURE);
                   }
 		break;
       case 'd':	start = strtoul(optarg, NULL, 0); /* initial IFD offset */
 	        if (start == 0)
                   {
-		  TIFFError ("","Directory offset must be greater than zero");
-		  TIFFError ("For valid options type", "tiffcrop -h");
+		  NDPIError ("","Directory offset must be greater than zero");
+		  NDPIError ("For valid options type", "tiffcrop -h");
                   exit (EXIT_FAILURE);
 		  }
 	        *dirnum = start - 1;
@@ -1674,8 +1674,8 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
 		  case 's': crop_data->exp_mode = FILE_PER_SELECTION;
  		            crop_data->img_mode = SEPARATED_IMAGES;
 		            break; /* Sections */
-		  default:  TIFFError ("Unknown export mode","%s", optarg);
-                            TIFFError ("For valid options type", "tiffcrop -h");
+		  default:  NDPIError ("Unknown export mode","%s", optarg);
+                            NDPIError ("For valid options type", "tiffcrop -h");
                             exit (EXIT_FAILURE);
                   }
 	        break;
@@ -1685,8 +1685,8 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
 		  *deffillorder = FILLORDER_MSB2LSB;
 		else
 		  {
-		  TIFFError ("Unknown fill order", "%s", optarg);
-                  TIFFError ("For valid options type", "tiffcrop -h");
+		  NDPIError ("Unknown fill order", "%s", optarg);
+                  NDPIError ("For valid options type", "tiffcrop -h");
                   exit (EXIT_FAILURE);
                   }
 		break;
@@ -1706,8 +1706,8 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
 		  *defconfig = PLANARCONFIG_CONTIG;
 		else
 		  {
-		  TIFFError ("Unknown planar configuration", "%s", optarg);
-                  TIFFError ("For valid options type", "tiffcrop -h");
+		  NDPIError ("Unknown planar configuration", "%s", optarg);
+                  NDPIError ("For valid options type", "tiffcrop -h");
                   exit (EXIT_FAILURE);
                   }
 		break;
@@ -1743,16 +1743,16 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
 			       &crop_data->corners[i].X1, &crop_data->corners[i].Y1,
 			       &crop_data->corners[i].X2, &crop_data->corners[i].Y2) != 4)
                       {
-                      TIFFError ("Unable to parse coordinates for region", "%u %s", i, optarg);
-		      TIFFError ("For valid options type", "tiffcrop -h");
+                      NDPIError ("Unable to parse coordinates for region", "%u %s", i, optarg);
+		      NDPIError ("For valid options type", "tiffcrop -h");
                       exit (EXIT_FAILURE);
 		      }
                     }
                 /*  check for remaining elements over MAX_REGIONS */
                 if ((opt_ptr != NULL) && (i >= MAX_REGIONS))
                   {
-		  TIFFError ("Region list exceeds limit of", "%d regions %s", MAX_REGIONS, optarg);
-		  TIFFError ("For valid options type", "tiffcrop -h");
+		  NDPIError ("Region list exceeds limit of", "%d regions %s", MAX_REGIONS, optarg);
+		  NDPIError ("For valid options type", "tiffcrop -h");
                   exit (EXIT_FAILURE);;
                   }
 		break;
@@ -1773,8 +1773,8 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
 		    opt_offset = strpbrk(opt_ptr, ":=");
                     if (opt_offset == NULL)
                       {
-                      TIFFError("Invalid dump option", "%s", optarg);
-                      TIFFError ("For valid options type", "tiffcrop -h");
+                      NDPIError("Invalid dump option", "%s", optarg);
+                      NDPIError ("For valid options type", "tiffcrop -h");
                       exit (EXIT_FAILURE);
 		      }
                       
@@ -1805,8 +1805,8 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
                           }
                         else
                           {
-                          TIFFError("parse_command_opts", "Unknown dump format %s", opt_offset + 1);
-                          TIFFError ("For valid options type", "tiffcrop -h");
+                          NDPIError("parse_command_opts", "Unknown dump format %s", opt_offset + 1);
+                          NDPIError ("For valid options type", "tiffcrop -h");
                           exit (EXIT_FAILURE);
 		          }
 			}
@@ -1834,11 +1834,11 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
 	        if ((strlen(dump->infilename)) || (strlen(dump->outfilename)))
                   {
 		  if (dump->level == 1)
-                    TIFFError("","Defaulting to dump level 1, no data.");
+                    NDPIError("","Defaulting to dump level 1, no data.");
 	          if (dump->format == DUMP_NONE)
                     {
-		    TIFFError("", "You must specify a dump format for dump files");
-		    TIFFError ("For valid options type", "tiffcrop -h");
+		    NDPIError("", "You must specify a dump format for dump files");
+		    NDPIError ("For valid options type", "tiffcrop -h");
 		    exit (EXIT_FAILURE);
 		    }
                   }
@@ -1866,8 +1866,8 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
                             break;
                   case 'r': crop_data->edge_ref = EDGE_RIGHT;
                             break;
-		  default:  TIFFError ("Edge reference must be top, bottom, left, or right", "%s", optarg);
-			    TIFFError ("For valid options type", "tiffcrop -h");
+		  default:  NDPIError ("Edge reference must be top, bottom, left, or right", "%s", optarg);
+			    NDPIError ("For valid options type", "tiffcrop -h");
                             exit (EXIT_FAILURE);
 		  }
 		break;
@@ -1881,8 +1881,8 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
                              break;
                   case  'b': crop_data->mirror = MIRROR_BOTH;
                              break;
-		  default:   TIFFError ("Flip mode must be horiz, vert, or both", "%s", optarg);
-			     TIFFError ("For valid options type", "tiffcrop -h");
+		  default:   NDPIError ("Flip mode must be horiz, vert, or both", "%s", optarg);
+			     NDPIError ("For valid options type", "tiffcrop -h");
                              exit (EXIT_FAILURE);
 		  }
 		break;
@@ -1914,8 +1914,8 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
                   continue;
                   }
 
-		TIFFError("Missing or unknown option for inverting PHOTOMETRIC_INTERPRETATION", "%s", optarg);
-		TIFFError ("For valid options type", "tiffcrop -h");
+		NDPIError("Missing or unknown option for inverting PHOTOMETRIC_INTERPRETATION", "%s", optarg);
+		NDPIError ("For valid options type", "tiffcrop -h");
                 exit (EXIT_FAILURE);
 		break;
       case 'J': /* horizontal margin for sectioned output pages */
@@ -1987,8 +1987,8 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
                              break;
 		  case  'l': page->orient = ORIENTATION_LANDSCAPE;
                              break;
-		  default:  TIFFError ("Orientation must be portrait, landscape, or auto.", "%s", optarg);
-			    TIFFError ("For valid options type", "tiffcrop -h");
+		  default:  NDPIError ("Orientation must be portrait, landscape, or auto.", "%s", optarg);
+			    NDPIError ("For valid options type", "tiffcrop -h");
                             exit (EXIT_FAILURE);
 		  }
 		break;
@@ -2003,19 +2003,19 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
                   {
 		  if (!strcmp(optarg, "list"))
                     {
-		    TIFFError("", "Name            Width   Length (in inches)");
+		    NDPIError("", "Name            Width   Length (in inches)");
                     for (i = 0; i < MAX_PAPERNAMES - 1; i++)
-                      TIFFError ("", "%-15.15s %5.2f   %5.2f", 
+                      NDPIError ("", "%-15.15s %5.2f   %5.2f", 
 			       PaperTable[i].name, PaperTable[i].width, 
                                PaperTable[i].length);
 		    exit (EXIT_FAILURE);
                     }
      
-		  TIFFError ("Invalid paper size", "%s", optarg);
-                  TIFFError ("", "Select one of:");
-		  TIFFError("", "Name            Width   Length (in inches)");
+		  NDPIError ("Invalid paper size", "%s", optarg);
+                  NDPIError ("", "Select one of:");
+		  NDPIError("", "Name            Width   Length (in inches)");
                   for (i = 0; i < MAX_PAPERNAMES - 1; i++)
-                    TIFFError ("", "%-15.15s %5.2f   %5.2f", 
+                    NDPIError ("", "%-15.15s %5.2f   %5.2f", 
 			       PaperTable[i].name, PaperTable[i].width, 
                                PaperTable[i].length);
 		  exit (EXIT_FAILURE);
@@ -2035,8 +2035,8 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
                              break;
                   case  270: crop_data->rotation = (uint16_t)270;
                              break;
-		  default:   TIFFError ("Rotation must be 90, 180, or 270 degrees clockwise", "%s", optarg);
-			     TIFFError ("For valid options type", "tiffcrop -h");
+		  default:   NDPIError ("Rotation must be 90, 180, or 270 degrees clockwise", "%s", optarg);
+			     NDPIError ("For valid options type", "tiffcrop -h");
                              exit (EXIT_FAILURE);
 		  }
 		break;
@@ -2055,7 +2055,7 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
 		  }
                 if ((page->cols * page->rows) > MAX_SECTIONS)
                   {
-		  TIFFError ("Limit for subdivisions, ie rows x columns, exceeded", "%d", MAX_SECTIONS);
+		  NDPIError ("Limit for subdivisions, ie rows x columns, exceeded", "%d", MAX_SECTIONS);
 		  exit (EXIT_FAILURE);
                   }
                 page->mode |= PAGE_MODE_ROWSCOLS;
@@ -2078,8 +2078,8 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
 		  }
 		else
                   {
-		  TIFFError ("Illegal unit of measure","%s", optarg);
-		  TIFFError ("For valid options type", "tiffcrop -h");
+		  NDPIError ("Illegal unit of measure","%s", optarg);
+		  NDPIError ("For valid options type", "tiffcrop -h");
                   exit (EXIT_FAILURE);
 		  }
 		break;
@@ -2104,7 +2104,7 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
 		    crop_data->zones++;
 		    opt_offset = strchr(opt_ptr, ':');
 		    if (!opt_offset) {
-			TIFFError("Wrong parameter syntax for -Z", "tiffcrop -h");
+			NDPIError("Wrong parameter syntax for -Z", "tiffcrop -h");
 			exit(EXIT_FAILURE);
 		    }
                     *opt_offset = '\0';
@@ -2114,11 +2114,11 @@ void  process_command_opts (int argc, char *argv[], char *mp, char *mode, uint32
                 /*  check for remaining elements over MAX_REGIONS */
                 if ((opt_ptr != NULL) && (i >= MAX_REGIONS))
                   {
-		  TIFFError("Zone list exceeds region limit", "%d",  MAX_REGIONS);
+		  NDPIError("Zone list exceeds region limit", "%d",  MAX_REGIONS);
 		  exit (EXIT_FAILURE);
                   }
 		break;
-    case '?':	TIFFError ("For valid options type", "tiffcrop -h");
+    case '?':	NDPIError ("For valid options type", "tiffcrop -h");
                 exit (EXIT_FAILURE);
 		/*NOTREACHED*/
       }
@@ -2142,7 +2142,7 @@ update_output_file (TIFF **tiffout, char *mode, int autoindex,
   if (autoindex && (*tiffout != NULL))
     {
     /* Close any export file that was previously opened */
-    TIFFClose (*tiffout);
+    NDPIClose (*tiffout);
     *tiffout = NULL;
     }
 
@@ -2171,7 +2171,7 @@ update_output_file (TIFF **tiffout, char *mode, int autoindex,
       /* MAX_EXPORT_PAGES limited to 6 digits to prevent string overflow of pathname */
       if (findex > MAX_EXPORT_PAGES)
         {
-        TIFFError("update_output_file", "Maximum of %d pages per file exceeded", MAX_EXPORT_PAGES);
+        NDPIError("update_output_file", "Maximum of %d pages per file exceeded", MAX_EXPORT_PAGES);
         return 1;
         }
 
@@ -2180,10 +2180,10 @@ update_output_file (TIFF **tiffout, char *mode, int autoindex,
       }
     exportname[sizeof(exportname) - 1] = '\0';
 
-    *tiffout = TIFFOpen(exportname, mode);
+    *tiffout = NDPIOpen(exportname, mode);
     if (*tiffout == NULL)
       {
-      TIFFError("update_output_file", "Unable to open output file %s", exportname);
+      NDPIError("update_output_file", "Unable to open output file %s", exportname);
       return 1;
       }
     *page = 0;
@@ -2260,17 +2260,17 @@ main(int argc, char* argv[])
   /* Read multiple input files and write to output file(s) */
   while (optind < argc - 1)
     {
-    in = TIFFOpen (argv[optind], "r");
+    in = NDPIOpen (argv[optind], "r");
     if (in == NULL)
       return (-3);
 
     /* If only one input file is specified, we can use directory count */
-    total_images = TIFFNumberOfDirectories(in);
+    total_images = NDPINumberOfDirectories(in);
     if (total_images > TIFF_DIR_MAX)
       {
-      TIFFError (TIFFFileName(in), "File contains too many directories");
+      NDPIError (NDPIFileName(in), "File contains too many directories");
       if (out != NULL)
-        (void) TIFFClose(out);
+        (void) NDPIClose(out);
       return (1);
       }
     if (image_count == 0)
@@ -2298,19 +2298,19 @@ main(int argc, char* argv[])
 
     if (dirnum > (total_images))
       {
-      TIFFError (TIFFFileName(in), 
+      NDPIError (NDPIFileName(in), 
       "Invalid image number %"PRIu32", File contains only %"PRIu32" images",
 		 dirnum + 1u, total_images);
       if (out != NULL)
-        (void) TIFFClose(out);
+        (void) NDPIClose(out);
       return (1);
       }
 
-    if (dirnum != 0 && !TIFFSetDirectory(in, (tdir_t)dirnum))
+    if (dirnum != 0 && !NDPISetDirectory(in, (tdir_t)dirnum))
       {
-      TIFFError(TIFFFileName(in),"Error, setting subdirectory at %"PRIu32, dirnum);
+      NDPIError(NDPIFileName(in),"Error, setting subdirectory at %"PRIu32, dirnum);
       if (out != NULL)
-        (void) TIFFClose(out);
+        (void) NDPIClose(out);
       return (1);
       }
 
@@ -2343,11 +2343,11 @@ main(int argc, char* argv[])
                   (dump.format == DUMP_TEXT) ? "txt" : "raw");
           if ((dump.infile = fopen(temp_filename, dump.mode)) == NULL)
             {
-	    TIFFError ("Unable to open dump file for writing", "%s", temp_filename);
+	    NDPIError ("Unable to open dump file for writing", "%s", temp_filename);
 	    exit (EXIT_FAILURE);
             }
           dump_info(dump.infile, dump.format, "Reading image","%u from %s",
-                    dump_images, TIFFFileName(in));
+                    dump_images, NDPIFileName(in));
           } 
         length = strlen(dump.outfilename);
         if (length > 0)
@@ -2362,20 +2362,20 @@ main(int argc, char* argv[])
                   (dump.format == DUMP_TEXT) ? "txt" : "raw");
           if ((dump.outfile = fopen(temp_filename, dump.mode)) == NULL)
             {
-	      TIFFError ("Unable to open dump file for writing", "%s", temp_filename);
+	      NDPIError ("Unable to open dump file for writing", "%s", temp_filename);
 	    exit (EXIT_FAILURE);
             }
           dump_info(dump.outfile, dump.format, "Writing image","%u from %s",
-                    dump_images, TIFFFileName(in));
+                    dump_images, NDPIFileName(in));
           } 
         }
 
       if (dump.debug)
-         TIFFError("main", "Reading image %4d of %4d total pages.", dirnum + 1, total_pages);
+         NDPIError("main", "Reading image %4d of %4d total pages.", dirnum + 1, total_pages);
 
       if (loadImage(in, &image, &dump, &read_buff))
         {
-        TIFFError("main", "Unable to load source image");
+        NDPIError("main", "Unable to load source image");
         exit (EXIT_FAILURE);
         }
 
@@ -2384,12 +2384,12 @@ main(int argc, char* argv[])
       if (image.adjustments != 0)
         {
 	if (correct_orientation(&image, &read_buff))
-	    TIFFError("main", "Unable to correct image orientation");
+	    NDPIError("main", "Unable to correct image orientation");
         }
 
       if (getCropOffsets(&image, &crop, &dump))
         {
-        TIFFError("main", "Unable to define crop regions");
+        NDPIError("main", "Unable to define crop regions");
         exit (EXIT_FAILURE);
 	}
 
@@ -2397,7 +2397,7 @@ main(int argc, char* argv[])
         {
         if (processCropSelections(&image, &crop, &read_buff, seg_buffs))
           {
-          TIFFError("main", "Unable to process image selections");
+          NDPIError("main", "Unable to process image selections");
           exit (EXIT_FAILURE);
 	  }
 	}
@@ -2405,7 +2405,7 @@ main(int argc, char* argv[])
         {
         if (createCroppedImage(&image, &crop, &read_buff, &crop_buff))
           {
-          TIFFError("main", "Unable to create output image");
+          NDPIError("main", "Unable to create output image");
           exit (EXIT_FAILURE);
 	  }
 	}
@@ -2424,7 +2424,7 @@ main(int argc, char* argv[])
           if (writeCroppedImage(in, out, &image, &dump,crop.combined_width, 
                                 crop.combined_length, crop_buff, next_page, total_pages))
             {
-             TIFFError("main", "Unable to write new image");
+             NDPIError("main", "Unable to write new image");
              exit (EXIT_FAILURE);
 	    }
           }
@@ -2441,7 +2441,7 @@ main(int argc, char* argv[])
         /* Break input image into pages or rows and columns */
         if (computeOutputPixelOffsets(&crop, &image, &page, sections, &dump))
           {
-          TIFFError("main", "Unable to compute output section data");
+          NDPIError("main", "Unable to compute output section data");
           exit (EXIT_FAILURE);
 	  }
         /* If there are multiple files on the command line, the final one is assumed 
@@ -2452,7 +2452,7 @@ main(int argc, char* argv[])
 
 	if (writeImageSections(in, out, &image, &page, sections, &dump, sect_src, &sect_buff))
           {
-          TIFFError("main", "Unable to write image sections");
+          NDPIError("main", "Unable to write image sections");
           exit (EXIT_FAILURE);
 	  }
         }
@@ -2467,28 +2467,28 @@ main(int argc, char* argv[])
         }
 
       if (dirnum == MAX_IMAGES - 1)
-        dirnum = TIFFNumberOfDirectories(in) - 1;
+        dirnum = NDPINumberOfDirectories(in) - 1;
 
-      if (!TIFFSetDirectory(in, (tdir_t)dirnum))
+      if (!NDPISetDirectory(in, (tdir_t)dirnum))
         end_of_input = TRUE;
       }
-    TIFFClose(in);
+    NDPIClose(in);
     optind++;
     }
 
   /* If we did not use the read buffer as the crop buffer */
   if (read_buff)
-    _TIFFfree(read_buff);
+    _NDPIfree(read_buff);
 
   if (crop_buff)
-    _TIFFfree(crop_buff);
+    _NDPIfree(crop_buff);
 
   if (sect_buff)
-    _TIFFfree(sect_buff);
+    _NDPIfree(sect_buff);
 
    /* Clean up any segment buffers used for zones or regions */
   for (seg = 0; seg < crop.selections; seg++)
-    _TIFFfree (seg_buffs[seg].buffer);
+    _NDPIfree (seg_buffs[seg].buffer);
 
   if (dump.format != DUMP_NONE)
     {
@@ -2497,12 +2497,12 @@ main(int argc, char* argv[])
 
     if (dump.outfile != NULL)
       {
-      dump_info (dump.outfile, dump.format, "", "Completed run for %s", TIFFFileName(out));
+      dump_info (dump.outfile, dump.format, "", "Completed run for %s", NDPIFileName(out));
       fclose (dump.outfile);
       }
     }
 
-  TIFFClose(out);
+  NDPIClose(out);
 
   return (0);
   } /* end main */
@@ -2518,7 +2518,7 @@ static int dump_data (FILE *dumpfile, int format, char *dump_tag, unsigned char 
 
   if (dumpfile == NULL)
     {
-    TIFFError ("", "Invalid FILE pointer for dump file");
+    NDPIError ("", "Invalid FILE pointer for dump file");
     return (1);
     }
 
@@ -2541,7 +2541,7 @@ static int dump_data (FILE *dumpfile, int format, char *dump_tag, unsigned char 
     {
     if ((fwrite (data, 1, count, dumpfile)) != count)
       {
-      TIFFError ("", "Unable to write binary data to dump file");
+      NDPIError ("", "Unable to write binary data to dump file");
       return (1);
       }
     }
@@ -2557,7 +2557,7 @@ static int dump_byte (FILE *dumpfile, int format, char *dump_tag, unsigned char 
 
   if (dumpfile == NULL)
     {
-    TIFFError ("", "Invalid FILE pointer for dump file");
+    NDPIError ("", "Invalid FILE pointer for dump file");
     return (1);
     }
 
@@ -2576,7 +2576,7 @@ static int dump_byte (FILE *dumpfile, int format, char *dump_tag, unsigned char 
     {
     if ((fwrite (&data, 1, 1, dumpfile)) != 1)
       {
-      TIFFError ("", "Unable to write binary data to dump file");
+      NDPIError ("", "Unable to write binary data to dump file");
       return (1);
       }
     }
@@ -2592,7 +2592,7 @@ static int dump_short (FILE *dumpfile, int format, char *dump_tag, uint16_t data
 
   if (dumpfile == NULL)
     {
-    TIFFError ("", "Invalid FILE pointer for dump file");
+    NDPIError ("", "Invalid FILE pointer for dump file");
     return (1);
     }
 
@@ -2613,7 +2613,7 @@ static int dump_short (FILE *dumpfile, int format, char *dump_tag, uint16_t data
     {
     if ((fwrite (&data, 2, 1, dumpfile)) != 2)
       {
-      TIFFError ("", "Unable to write binary data to dump file");
+      NDPIError ("", "Unable to write binary data to dump file");
       return (1);
       }
     }
@@ -2629,7 +2629,7 @@ static int dump_long (FILE *dumpfile, int format, char *dump_tag, uint32_t data)
 
   if (dumpfile == NULL)
     {
-    TIFFError ("", "Invalid FILE pointer for dump file");
+    NDPIError ("", "Invalid FILE pointer for dump file");
     return (1);
     }
 
@@ -2650,7 +2650,7 @@ static int dump_long (FILE *dumpfile, int format, char *dump_tag, uint32_t data)
     {
     if ((fwrite (&data, 4, 1, dumpfile)) != 4)
       {
-      TIFFError ("", "Unable to write binary data to dump file");
+      NDPIError ("", "Unable to write binary data to dump file");
       return (1);
       }
     }
@@ -2665,7 +2665,7 @@ static int dump_wide (FILE *dumpfile, int format, char *dump_tag, uint64_t data)
 
   if (dumpfile == NULL)
     {
-    TIFFError ("", "Invalid FILE pointer for dump file");
+    NDPIError ("", "Invalid FILE pointer for dump file");
     return (1);
     }
 
@@ -2686,7 +2686,7 @@ static int dump_wide (FILE *dumpfile, int format, char *dump_tag, uint64_t data)
     {
     if ((fwrite (&data, 8, 1, dumpfile)) != 8)
       {
-      TIFFError ("", "Unable to write binary data to dump file");
+      NDPIError ("", "Unable to write binary data to dump file");
       return (1);
       }
     }
@@ -2716,7 +2716,7 @@ static int dump_buffer (FILE* dumpfile, int format, uint32_t rows, uint32_t widt
 
   if (dumpfile == NULL)
     {
-    TIFFError ("", "Invalid FILE pointer for dump file");
+    NDPIError ("", "Invalid FILE pointer for dump file");
     return (1);
     }
 
@@ -2755,19 +2755,19 @@ extractContigSamplesBytes (uint8_t *in, uint8_t *out, uint32_t cols,
 
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("extractContigSamplesBytes","Invalid input or output buffer");
+    NDPIError("extractContigSamplesBytes","Invalid input or output buffer");
     return (1);
     }
 
   if ((start > end) || (start > cols))
     {
-    TIFFError ("extractContigSamplesBytes", 
+    NDPIError ("extractContigSamplesBytes", 
                "Invalid start column value %"PRIu32" ignored", start);
     start = 0;
     }
   if ((end == 0) || (end > cols))
     {
-    TIFFError ("extractContigSamplesBytes", 
+    NDPIError ("extractContigSamplesBytes", 
                "Invalid end column value %"PRIu32" ignored", end);
     end = cols;
     }
@@ -2779,7 +2779,7 @@ extractContigSamplesBytes (uint8_t *in, uint8_t *out, uint32_t cols,
   if (count == spp)
     {
     src = in + (start * spp * bytes_per_sample);
-    _TIFFmemcpy (dst, src, dst_rowsize);
+    _NDPImemcpy (dst, src, dst_rowsize);
     }
   else
     {
@@ -2822,19 +2822,19 @@ extractContigSamples8bits (uint8_t *in, uint8_t *out, uint32_t cols,
 
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("extractContigSamples8bits","Invalid input or output buffer");
+    NDPIError("extractContigSamples8bits","Invalid input or output buffer");
     return (1);
     }
 
   if ((start > end) || (start > cols))
     {
-    TIFFError ("extractContigSamples8bits", 
+    NDPIError ("extractContigSamples8bits", 
                "Invalid start column value %"PRIu32" ignored", start);
     start = 0;
     }
   if ((end == 0) || (end > cols))
     {
-    TIFFError ("extractContigSamples8bits", 
+    NDPIError ("extractContigSamples8bits", 
                "Invalid end column value %"PRIu32" ignored", end);
     end = cols;
     }
@@ -2900,19 +2900,19 @@ extractContigSamples16bits (uint8_t *in, uint8_t *out, uint32_t cols,
 
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("extractContigSamples16bits","Invalid input or output buffer");
+    NDPIError("extractContigSamples16bits","Invalid input or output buffer");
     return (1);
     }
 
   if ((start > end) || (start > cols))
     {
-    TIFFError ("extractContigSamples16bits", 
+    NDPIError ("extractContigSamples16bits", 
                "Invalid start column value %"PRIu32" ignored", start);
     start = 0;
     }
   if ((end == 0) || (end > cols))
     {
-    TIFFError ("extractContigSamples16bits", 
+    NDPIError ("extractContigSamples16bits", 
                "Invalid end column value %"PRIu32" ignored", end);
     end = cols;
     }
@@ -2989,19 +2989,19 @@ extractContigSamples24bits (uint8_t *in, uint8_t *out, uint32_t cols,
 
   if ((in == NULL) || (out == NULL))
     {
-    TIFFError("extractContigSamples24bits","Invalid input or output buffer");
+    NDPIError("extractContigSamples24bits","Invalid input or output buffer");
     return (1);
     }
 
   if ((start > end) || (start > cols))
     {
-    TIFFError ("extractContigSamples24bits", 
+    NDPIError ("extractContigSamples24bits", 
                "Invalid start column value %"PRIu32" ignored", start);
     start = 0;
     }
   if ((end == 0) || (end > cols))
     {
-    TIFFError ("extractContigSamples24bits", 
+    NDPIError ("extractContigSamples24bits", 
                "Invalid end column value %"PRIu32" ignored", end);
     end = cols;
     }
@@ -3099,20 +3099,20 @@ extractContigSamples32bits (uint8_t *in, uint8_t *out, uint32_t cols,
 
   if ((in == NULL) || (out == NULL))
     {
-    TIFFError("extractContigSamples32bits","Invalid input or output buffer");
+    NDPIError("extractContigSamples32bits","Invalid input or output buffer");
     return (1);
     }
 
 
   if ((start > end) || (start > cols))
     {
-    TIFFError ("extractContigSamples32bits", 
+    NDPIError ("extractContigSamples32bits", 
                "Invalid start column value %"PRIu32" ignored", start);
     start = 0;
     }
   if ((end == 0) || (end > cols))
     {
-    TIFFError ("extractContigSamples32bits", 
+    NDPIError ("extractContigSamples32bits", 
                "Invalid end column value %"PRIu32" ignored", end);
     end = cols;
     }
@@ -3203,19 +3203,19 @@ extractContigSamplesShifted8bits (uint8_t *in, uint8_t *out, uint32_t cols,
 
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("extractContigSamplesShifted8bits","Invalid input or output buffer");
+    NDPIError("extractContigSamplesShifted8bits","Invalid input or output buffer");
     return (1);
     }
 
   if ((start > end) || (start > cols))
     {
-    TIFFError ("extractContigSamplesShifted8bits", 
+    NDPIError ("extractContigSamplesShifted8bits", 
                "Invalid start column value %"PRIu32" ignored", start);
     start = 0;
     }
   if ((end == 0) || (end > cols))
     {
-    TIFFError ("extractContigSamplesShifted8bits", 
+    NDPIError ("extractContigSamplesShifted8bits", 
                "Invalid end column value %"PRIu32" ignored", end);
     end = cols;
     }
@@ -3284,19 +3284,19 @@ extractContigSamplesShifted16bits (uint8_t *in, uint8_t *out, uint32_t cols,
   
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("extractContigSamplesShifted16bits","Invalid input or output buffer");
+    NDPIError("extractContigSamplesShifted16bits","Invalid input or output buffer");
     return (1);
     }
 
   if ((start > end) || (start > cols))
     {
-    TIFFError ("extractContigSamplesShifted16bits", 
+    NDPIError ("extractContigSamplesShifted16bits", 
                "Invalid start column value %"PRIu32" ignored", start);
     start = 0;
     }
   if ((end == 0) || (end > cols))
     {
-    TIFFError ("extractContigSamplesShifted16bits", 
+    NDPIError ("extractContigSamplesShifted16bits", 
                "Invalid end column value %"PRIu32" ignored", end);
     end = cols;
     }
@@ -3374,19 +3374,19 @@ extractContigSamplesShifted24bits (uint8_t *in, uint8_t *out, uint32_t cols,
 
   if ((in == NULL) || (out == NULL))
     {
-    TIFFError("extractContigSamplesShifted24bits","Invalid input or output buffer");
+    NDPIError("extractContigSamplesShifted24bits","Invalid input or output buffer");
     return (1);
     }
 
   if ((start > end) || (start > cols))
     {
-    TIFFError ("extractContigSamplesShifted24bits", 
+    NDPIError ("extractContigSamplesShifted24bits", 
                "Invalid start column value %"PRIu32" ignored", start);
     start = 0;
     }
   if ((end == 0) || (end > cols))
     {
-    TIFFError ("extractContigSamplesShifted24bits", 
+    NDPIError ("extractContigSamplesShifted24bits", 
                "Invalid end column value %"PRIu32" ignored", end);
     end = cols;
     }
@@ -3473,20 +3473,20 @@ extractContigSamplesShifted32bits (uint8_t *in, uint8_t *out, uint32_t cols,
 
   if ((in == NULL) || (out == NULL))
     {
-    TIFFError("extractContigSamplesShifted32bits","Invalid input or output buffer");
+    NDPIError("extractContigSamplesShifted32bits","Invalid input or output buffer");
     return (1);
     }
 
 
   if ((start > end) || (start > cols))
     {
-    TIFFError ("extractContigSamplesShifted32bits", 
+    NDPIError ("extractContigSamplesShifted32bits", 
                "Invalid start column value %"PRIu32" ignored", start);
     start = 0;
     }
   if ((end == 0) || (end > cols))
     {
-    TIFFError ("extractContigSamplesShifted32bits", 
+    NDPIError ("extractContigSamplesShifted32bits", 
                "Invalid end column value %"PRIu32" ignored", end);
     end = cols;
     }
@@ -3630,7 +3630,7 @@ extractContigSamplesToBuffer(uint8_t *out, uint8_t *in, uint32_t rows, uint32_t 
                                               spp, bps,  count, first_col, cols))
 	         return (1);
 	      break;
-      default: TIFFError ("extractContigSamplesToBuffer", "Unsupported bit depth: %"PRIu16, bps);
+      default: NDPIError ("extractContigSamplesToBuffer", "Unsupported bit depth: %"PRIu16, bps);
 	       return (1);
       }
     if ((dump->outfile != NULL) && (dump->level == 4))
@@ -3707,7 +3707,7 @@ extractContigSamplesToTileBuffer(uint8_t *out, uint8_t *in, uint32_t rows, uint3
                                               spp, bps,  count, 0, cols))
 	         return (1);
 	      break;
-      default: TIFFError ("extractContigSamplesToTileBuffer", "Unsupported bit depth: %"PRIu16, bps);
+      default: NDPIError ("extractContigSamplesToTileBuffer", "Unsupported bit depth: %"PRIu16, bps);
 	       return (1);
       }
     if ((dump->outfile != NULL) && (dump->level == 4))
@@ -3721,26 +3721,26 @@ static int readContigStripsIntoBuffer (TIFF* in, uint8_t* buf)
 {
         uint8_t* bufp = buf;
         int32_t  bytes_read = 0;
-        uint32_t strip, nstrips   = TIFFNumberOfStrips(in);
-        uint32_t stripsize = TIFFStripSize(in);
+        uint32_t strip, nstrips   = NDPINumberOfStrips(in);
+        uint32_t stripsize = NDPIStripSize(in);
         uint32_t rows = 0;
-        uint32_t rps = TIFFGetFieldDefaulted(in, TIFFTAG_ROWSPERSTRIP, &rps);
-        tsize_t scanline_size = TIFFScanlineSize(in);
+        uint32_t rps = NDPIGetFieldDefaulted(in, TIFFTAG_ROWSPERSTRIP, &rps);
+        tsize_t scanline_size = NDPIScanlineSize(in);
 
         if (scanline_size == 0) {
-                TIFFError("", "TIFF scanline size is zero!");    
+                NDPIError("", "TIFF scanline size is zero!");    
                 return 0;
         }
 
         for (strip = 0; strip < nstrips; strip++) {
-                bytes_read = TIFFReadEncodedStrip (in, strip, bufp, -1);
+                bytes_read = NDPIReadEncodedStrip (in, strip, bufp, -1);
                 rows = bytes_read / scanline_size;
                 if ((strip < (nstrips - 1)) && (bytes_read != (int32_t)stripsize))
-                        TIFFError("", "Strip %"PRIu32": read %"PRId32" bytes, strip size %"PRIu32,
+                        NDPIError("", "Strip %"PRIu32": read %"PRId32" bytes, strip size %"PRIu32,
                                   strip + 1, bytes_read, stripsize);
 
                 if (bytes_read < 0 && !ignore) {
-                        TIFFError("", "Error reading strip %"PRIu32" after %"PRIu32" rows",
+                        NDPIError("", "Error reading strip %"PRIu32" after %"PRIu32" rows",
                                   strip, rows);
                         return 0;
                 }
@@ -3765,7 +3765,7 @@ combineSeparateSamplesBytes (unsigned char *srcbuffs[], unsigned char *out,
   dst = out;
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("combineSeparateSamplesBytes","Invalid buffer address");
+    NDPIError("combineSeparateSamplesBytes","Invalid buffer address");
     return (1);
     }
 
@@ -3827,7 +3827,7 @@ combineSeparateSamples8bits (uint8_t *in[], uint8_t *out, uint32_t cols,
 
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("combineSeparateSamples8bits","Invalid input or output buffer");
+    NDPIError("combineSeparateSamples8bits","Invalid input or output buffer");
     return (1);
     }
 
@@ -3927,7 +3927,7 @@ combineSeparateSamples16bits (uint8_t *in[], uint8_t *out, uint32_t cols,
 
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("combineSeparateSamples16bits","Invalid input or output buffer");
+    NDPIError("combineSeparateSamples16bits","Invalid input or output buffer");
     return (1);
     }
 
@@ -4037,7 +4037,7 @@ combineSeparateSamples24bits (uint8_t *in[], uint8_t *out, uint32_t cols,
 
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("combineSeparateSamples24bits","Invalid input or output buffer");
+    NDPIError("combineSeparateSamples24bits","Invalid input or output buffer");
     return (1);
     }
 
@@ -4162,7 +4162,7 @@ combineSeparateSamples32bits (uint8_t *in[], uint8_t *out, uint32_t cols,
 
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("combineSeparateSamples32bits","Invalid input or output buffer");
+    NDPIError("combineSeparateSamples32bits","Invalid input or output buffer");
     return (1);
     }
 
@@ -4289,7 +4289,7 @@ combineSeparateTileSamplesBytes (unsigned char *srcbuffs[], unsigned char *out,
   dst = out;
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("combineSeparateTileSamplesBytes","Invalid buffer address");
+    NDPIError("combineSeparateTileSamplesBytes","Invalid buffer address");
     return (1);
     }
 
@@ -4309,7 +4309,7 @@ combineSeparateTileSamplesBytes (unsigned char *srcbuffs[], unsigned char *out,
     dst = out + (row * dst_rowsize);
     src_offset = row * src_rowsize;
 #ifdef DEVELMODE
-    TIFFError("","Tile row %4d, Src offset %6d   Dst offset %6d", 
+    NDPIError("","Tile row %4d, Src offset %6d   Dst offset %6d", 
               row, src_offset, dst - out);
 #endif
     for (col = 0; col < cols; col++)
@@ -4353,7 +4353,7 @@ combineSeparateTileSamples8bits (uint8_t *in[], uint8_t *out, uint32_t cols,
 
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("combineSeparateTileSamples8bits","Invalid input or output buffer");
+    NDPIError("combineSeparateTileSamples8bits","Invalid input or output buffer");
     return (1);
     }
 
@@ -4453,7 +4453,7 @@ combineSeparateTileSamples16bits (uint8_t *in[], uint8_t *out, uint32_t cols,
 
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("combineSeparateTileSamples16bits","Invalid input or output buffer");
+    NDPIError("combineSeparateTileSamples16bits","Invalid input or output buffer");
     return (1);
     }
 
@@ -4562,7 +4562,7 @@ combineSeparateTileSamples24bits (uint8_t *in[], uint8_t *out, uint32_t cols,
 
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("combineSeparateTileSamples24bits","Invalid input or output buffer");
+    NDPIError("combineSeparateTileSamples24bits","Invalid input or output buffer");
     return (1);
     }
 
@@ -4687,7 +4687,7 @@ combineSeparateTileSamples32bits (uint8_t *in[], uint8_t *out, uint32_t cols,
 
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("combineSeparateTileSamples32bits","Invalid input or output buffer");
+    NDPIError("combineSeparateTileSamples32bits","Invalid input or output buffer");
     return (1);
     }
 
@@ -4813,22 +4813,22 @@ static int readSeparateStripsIntoBuffer (TIFF *in, uint8_t *obuf, uint32_t lengt
   uint32_t rows_this_strip = 0;
   tsample_t s;
   tstrip_t  strip;
-  tsize_t scanlinesize = TIFFScanlineSize(in);
-  tsize_t stripsize    = TIFFStripSize(in);
+  tsize_t scanlinesize = NDPIScanlineSize(in);
+  tsize_t stripsize    = NDPIStripSize(in);
   unsigned char *srcbuffs[MAX_SAMPLES];
   unsigned char *buff = NULL;
   unsigned char *dst = NULL;
 
   if (obuf == NULL)
     {
-    TIFFError("readSeparateStripsIntoBuffer","Invalid buffer argument");
+    NDPIError("readSeparateStripsIntoBuffer","Invalid buffer argument");
     return (0);
     }
 
   memset (srcbuffs, '\0', sizeof(srcbuffs));
-  TIFFGetFieldDefaulted(in, TIFFTAG_BITSPERSAMPLE, &bps);
-  TIFFGetFieldDefaulted(in, TIFFTAG_PLANARCONFIG, &planar);
-  TIFFGetFieldDefaulted(in, TIFFTAG_ROWSPERSTRIP, &rps);
+  NDPIGetFieldDefaulted(in, TIFFTAG_BITSPERSAMPLE, &bps);
+  NDPIGetFieldDefaulted(in, TIFFTAG_PLANARCONFIG, &planar);
+  NDPIGetFieldDefaulted(in, TIFFTAG_ROWSPERSTRIP, &rps);
   if (rps > length)
     rps = length;
 
@@ -4858,13 +4858,13 @@ static int readSeparateStripsIntoBuffer (TIFF *in, uint8_t *obuf, uint32_t lengt
    * Multiple scanlines and possibly strips of the same plane must be 
    * written before data for any other plane.
    */
-  nstrips = TIFFNumberOfStrips(in);
+  nstrips = NDPINumberOfStrips(in);
   strips_per_sample = nstrips /spp;
 
   /* Add 3 padding bytes for combineSeparateSamples32bits */
   if( (size_t) stripsize > 0xFFFFFFFFU - 3U )
   {
-      TIFFError("readSeparateStripsIntoBuffer", "Integer overflow when calculating buffer size.");
+      NDPIError("readSeparateStripsIntoBuffer", "Integer overflow when calculating buffer size.");
       exit(EXIT_FAILURE);
   }
 
@@ -4874,10 +4874,10 @@ static int readSeparateStripsIntoBuffer (TIFF *in, uint8_t *obuf, uint32_t lengt
     buff = limitMalloc(stripsize + 3);
     if (!buff)
       {
-      TIFFError ("readSeparateStripsIntoBuffer", 
+      NDPIError ("readSeparateStripsIntoBuffer", 
                  "Unable to allocate strip read buffer for sample %"PRIu16, s);
       for (i = 0; i < s; i++)
-        _TIFFfree (srcbuffs[i]);
+        _NDPIfree (srcbuffs[i]);
       return 0;
       }
     buff[stripsize] = 0;
@@ -4893,18 +4893,18 @@ static int readSeparateStripsIntoBuffer (TIFF *in, uint8_t *obuf, uint32_t lengt
       {
       buff = srcbuffs[s];
       strip = (s * strips_per_sample) + j; 
-      bytes_read = TIFFReadEncodedStrip (in, strip, buff, stripsize);
+      bytes_read = NDPIReadEncodedStrip (in, strip, buff, stripsize);
       rows_this_strip = bytes_read / src_rowsize;
       if (bytes_read < 0 && !ignore)
         {
-        TIFFError(TIFFFileName(in),
+        NDPIError(NDPIFileName(in),
 	          "Error, can't read strip %"PRIu32" for sample %"PRIu32,
          	   strip, s + 1u);
         result = 0;
         break;
         }
 #ifdef DEVELMODE
-      TIFFError("", "Strip %2"PRIu32", read %5"PRId32" bytes for %4"PRIu32" scanlines, shift width %d",
+      NDPIError("", "Strip %2"PRIu32", read %5"PRId32" bytes for %4"PRIu32" scanlines, shift width %d",
 		strip, bytes_read, rows_this_strip, shift_width);
 #endif
       }
@@ -4962,7 +4962,7 @@ static int readSeparateStripsIntoBuffer (TIFF *in, uint8_t *obuf, uint32_t lengt
                   break;
 		  }
 	        break;
-        default: TIFFError ("readSeparateStripsIntoBuffer", "Unsupported bit depth: %"PRIu16, bps);
+        default: NDPIError ("readSeparateStripsIntoBuffer", "Unsupported bit depth: %"PRIu16, bps);
                   result = 0;
                   break;
         }
@@ -4984,7 +4984,7 @@ static int readSeparateStripsIntoBuffer (TIFF *in, uint8_t *obuf, uint32_t lengt
     {
     buff = srcbuffs[s];
     if (buff != NULL)
-      _TIFFfree(buff);
+      _NDPIfree(buff);
     }
 
   return (result);
@@ -5151,8 +5151,8 @@ computeInputPixelOffsets(struct crop_mask *crop, struct image_data *image,
 	((crop->crop_mode & CROP_REGIONS) || (crop->crop_mode & CROP_MARGINS) ||
  	 (crop->crop_mode & CROP_LENGTH)  || (crop->crop_mode & CROP_WIDTH)))
       {
-      TIFFError("computeInputPixelOffsets", "Cannot compute margins or fixed size sections without image resolution");
-      TIFFError("computeInputPixelOffsets", "Specify units in pixels and try again");
+      NDPIError("computeInputPixelOffsets", "Cannot compute margins or fixed size sections without image resolution");
+      NDPIError("computeInputPixelOffsets", "Specify units in pixels and try again");
       return (-1);
       }
     xres = image->xres;
@@ -5270,14 +5270,14 @@ computeInputPixelOffsets(struct crop_mask *crop, struct image_data *image,
 
     if ((lmargin + rmargin) > image->width)
       {
-      TIFFError("computeInputPixelOffsets", "Combined left and right margins exceed image width");
+      NDPIError("computeInputPixelOffsets", "Combined left and right margins exceed image width");
       lmargin = (uint32_t) 0;
       rmargin = (uint32_t) 0;
       return (-1);
       }
     if ((tmargin + bmargin) > image->length)
       {
-      TIFFError("computeInputPixelOffsets", "Combined top and bottom margins exceed image length"); 
+      NDPIError("computeInputPixelOffsets", "Combined top and bottom margins exceed image length"); 
       tmargin = (uint32_t) 0;
       bmargin = (uint32_t) 0;
       return (-1);
@@ -5378,7 +5378,7 @@ computeInputPixelOffsets(struct crop_mask *crop, struct image_data *image,
 
   if (crop_width <= 0)
     {
-    TIFFError("computeInputPixelOffsets", 
+    NDPIError("computeInputPixelOffsets", 
                "Invalid left/right margins and /or image crop width requested");
     return (-1);
     }
@@ -5387,7 +5387,7 @@ computeInputPixelOffsets(struct crop_mask *crop, struct image_data *image,
 
   if (crop_length <= 0)
     {
-    TIFFError("computeInputPixelOffsets", 
+    NDPIError("computeInputPixelOffsets", 
               "Invalid top/bottom margins and /or image crop length requested");
     return (-1);
     }
@@ -5435,7 +5435,7 @@ getCropOffsets(struct image_data *image, struct crop_mask *crop, struct dump_opt
     {
     if (computeInputPixelOffsets(crop, image, &offsets))
       {
-      TIFFError ("getCropOffsets", "Unable to compute crop margins");
+      NDPIError ("getCropOffsets", "Unable to compute crop margins");
       return (-1);
       }
     need_buff = TRUE;
@@ -5678,7 +5678,7 @@ computeOutputPixelOffsets (struct crop_mask *crop, struct image_data *image,
 
   if ((page->hres < 1.0) || (page->vres < 1.0))
     {
-    TIFFError("computeOutputPixelOffsets",
+    NDPIError("computeOutputPixelOffsets",
     "Invalid horizontal or vertical resolution specified or read from input image");
     return (1);
     }
@@ -5698,11 +5698,11 @@ computeOutputPixelOffsets (struct crop_mask *crop, struct image_data *image,
 
   if (dump->debug)
     {
-    TIFFError("", "Page size: %s, Vres: %3.2f, Hres: %3.2f, "
+    NDPIError("", "Page size: %s, Vres: %3.2f, Hres: %3.2f, "
                    "Hmargin: %3.2f, Vmargin: %3.2f",
 	     page->name, page->vres, page->hres,
              page->hmargin, page->vmargin);
-    TIFFError("", "Res_unit: %"PRIu16", Scale: %3.2f, Page width: %3.2f, length: %3.2f",
+    NDPIError("", "Res_unit: %"PRIu16", Scale: %3.2f, Page width: %3.2f, length: %3.2f",
            page->res_unit, scale, pwidth, plength);
     }
 
@@ -5722,14 +5722,14 @@ computeOutputPixelOffsets (struct crop_mask *crop, struct image_data *image,
 
     if ((hmargin * 2.0) > (pwidth * page->hres))
       {
-      TIFFError("computeOutputPixelOffsets", 
+      NDPIError("computeOutputPixelOffsets", 
                 "Combined left and right margins exceed page width");
       hmargin = (uint32_t) 0;
       return (-1);
       }
     if ((vmargin * 2.0) > (plength * page->vres))
       {
-      TIFFError("computeOutputPixelOffsets", 
+      NDPIError("computeOutputPixelOffsets", 
                 "Combined top and bottom margins exceed page length"); 
       vmargin = (uint32_t) 0;
       return (-1);
@@ -5745,7 +5745,7 @@ computeOutputPixelOffsets (struct crop_mask *crop, struct image_data *image,
     {
     /* Maybe someday but not for now */
     if (page->mode & PAGE_MODE_MARGINS)
-      TIFFError("computeOutputPixelOffsets", 
+      NDPIError("computeOutputPixelOffsets", 
       "Output margins cannot be specified with rows and columns"); 
 
     owidth  = TIFFhowmany(iwidth, page->cols);
@@ -5828,7 +5828,7 @@ computeOutputPixelOffsets (struct crop_mask *crop, struct image_data *image,
 
   if ((page->rows * page->cols) > MAX_SECTIONS)
    {
-   TIFFError("computeOutputPixelOffsets",
+   NDPIError("computeOutputPixelOffsets",
 	     "Rows and Columns exceed maximum sections\nIncrease resolution or reduce sections");
    return (-1);
    }
@@ -5878,21 +5878,21 @@ loadImage(TIFF* in, struct image_data *image, struct dump_opts *dump, unsigned c
   int      readunit = 0;
   static   uint32_t  prev_readsize = 0;
 
-  TIFFGetFieldDefaulted(in, TIFFTAG_BITSPERSAMPLE, &bps);
-  TIFFGetFieldDefaulted(in, TIFFTAG_SAMPLESPERPIXEL, &spp);
-  TIFFGetFieldDefaulted(in, TIFFTAG_PLANARCONFIG, &planar);
-  TIFFGetFieldDefaulted(in, TIFFTAG_ORIENTATION, &orientation);
-  if (! TIFFGetFieldDefaulted(in, TIFFTAG_PHOTOMETRIC, &input_photometric))
-    TIFFError("loadImage","Image lacks Photometric interpretation tag");
-  if (! TIFFGetField(in, TIFFTAG_IMAGEWIDTH,  &width))
-    TIFFError("loadimage","Image lacks image width tag");
-  if(! TIFFGetField(in, TIFFTAG_IMAGELENGTH, &length))
-    TIFFError("loadimage","Image lacks image length tag");
-  TIFFGetFieldDefaulted(in, TIFFTAG_XRESOLUTION, &xres);
-  TIFFGetFieldDefaulted(in, TIFFTAG_YRESOLUTION, &yres);
-  if (!TIFFGetFieldDefaulted(in, TIFFTAG_RESOLUTIONUNIT, &res_unit))
+  NDPIGetFieldDefaulted(in, TIFFTAG_BITSPERSAMPLE, &bps);
+  NDPIGetFieldDefaulted(in, TIFFTAG_SAMPLESPERPIXEL, &spp);
+  NDPIGetFieldDefaulted(in, TIFFTAG_PLANARCONFIG, &planar);
+  NDPIGetFieldDefaulted(in, TIFFTAG_ORIENTATION, &orientation);
+  if (! NDPIGetFieldDefaulted(in, TIFFTAG_PHOTOMETRIC, &input_photometric))
+    NDPIError("loadImage","Image lacks Photometric interpretation tag");
+  if (! NDPIGetField(in, TIFFTAG_IMAGEWIDTH,  &width))
+    NDPIError("loadimage","Image lacks image width tag");
+  if(! NDPIGetField(in, TIFFTAG_IMAGELENGTH, &length))
+    NDPIError("loadimage","Image lacks image length tag");
+  NDPIGetFieldDefaulted(in, TIFFTAG_XRESOLUTION, &xres);
+  NDPIGetFieldDefaulted(in, TIFFTAG_YRESOLUTION, &yres);
+  if (!NDPIGetFieldDefaulted(in, TIFFTAG_RESOLUTIONUNIT, &res_unit))
     res_unit = RESUNIT_INCH;
-  if (!TIFFGetField(in, TIFFTAG_COMPRESSION, &input_compression))
+  if (!NDPIGetField(in, TIFFTAG_COMPRESSION, &input_compression))
     input_compression = COMPRESSION_NONE;
 
 #ifdef DEBUG2
@@ -5961,10 +5961,10 @@ loadImage(TIFF* in, struct image_data *image, struct dump_opts *dump, unsigned c
 	 strcpy (compressionid, "None/unknown");
          break;         
     }
-  TIFFError("loadImage", "Input compression %s", compressionid);
+  NDPIError("loadImage", "Input compression %s", compressionid);
 #endif
 
-  scanlinesize = TIFFScanlineSize(in);
+  scanlinesize = NDPIScanlineSize(in);
   image->bps = bps;
   image->spp = spp;
   image->planar = planar;
@@ -6020,7 +6020,7 @@ loadImage(TIFF* in, struct image_data *image, struct dump_opts *dump, unsigned c
          strcpy (photometricid, "Unknown");
          break;
     }
-  TIFFError("loadImage", "Input photometric interpretation %s", photometricid);
+  NDPIError("loadImage", "Input photometric interpretation %s", photometricid);
 
 #endif
   image->orientation = orientation;
@@ -6058,29 +6058,29 @@ loadImage(TIFF* in, struct image_data *image, struct dump_opts *dump, unsigned c
 
   if ((bps == 0) || (spp == 0))
     {
-    TIFFError("loadImage", "Invalid samples per pixel (%"PRIu16") or bits per sample (%"PRIu16")",
+    NDPIError("loadImage", "Invalid samples per pixel (%"PRIu16") or bits per sample (%"PRIu16")",
 	       spp, bps);
     return (-1);
     }
 
-  if (TIFFIsTiled(in))
+  if (NDPIIsTiled(in))
     {
     readunit = TILE;
-    tlsize = TIFFTileSize(in);
-    ntiles = TIFFNumberOfTiles(in);
-    TIFFGetField(in, TIFFTAG_TILEWIDTH, &tw);
-    TIFFGetField(in, TIFFTAG_TILELENGTH, &tl);
+    tlsize = NDPITileSize(in);
+    ntiles = NDPINumberOfTiles(in);
+    NDPIGetField(in, TIFFTAG_TILEWIDTH, &tw);
+    NDPIGetField(in, TIFFTAG_TILELENGTH, &tl);
 
-    tile_rowsize  = TIFFTileRowSize(in);      
+    tile_rowsize  = NDPITileRowSize(in);      
     if (ntiles == 0 || tlsize == 0 || tile_rowsize == 0)
     {
-	TIFFError("loadImage", "File appears to be tiled, but the number of tiles, tile size, or tile rowsize is zero.");
+	NDPIError("loadImage", "File appears to be tiled, but the number of tiles, tile size, or tile rowsize is zero.");
 	exit(EXIT_FAILURE);
     }
     buffsize = tlsize * ntiles;
     if (tlsize != (buffsize / ntiles))
     {
-	TIFFError("loadImage", "Integer overflow when calculating buffer size");
+	NDPIError("loadImage", "Integer overflow when calculating buffer size");
 	exit(EXIT_FAILURE);
     }
 
@@ -6089,12 +6089,12 @@ loadImage(TIFF* in, struct image_data *image, struct dump_opts *dump, unsigned c
       buffsize = ntiles * tl * tile_rowsize;
       if (ntiles != (buffsize / tl / tile_rowsize))
       {
-	TIFFError("loadImage", "Integer overflow when calculating buffer size");
+	NDPIError("loadImage", "Integer overflow when calculating buffer size");
 	exit(EXIT_FAILURE);
       }
       
 #ifdef DEBUG2
-      TIFFError("loadImage",
+      NDPIError("loadImage",
 	        "Tilesize %"PRIu32" is too small, using ntiles * tilelength * tilerowsize %"PRIu32,
                 tlsize, buffsize);
 #endif
@@ -6109,32 +6109,32 @@ loadImage(TIFF* in, struct image_data *image, struct dump_opts *dump, unsigned c
     {
     uint32_t buffsize_check;
     readunit = STRIP;
-    TIFFGetFieldDefaulted(in, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
-    stsize = TIFFStripSize(in);
-    nstrips = TIFFNumberOfStrips(in);
+    NDPIGetFieldDefaulted(in, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
+    stsize = NDPIStripSize(in);
+    nstrips = NDPINumberOfStrips(in);
     if (nstrips == 0 || stsize == 0)
     {
-	TIFFError("loadImage", "File appears to be striped, but the number of stipes or stripe size is zero.");
+	NDPIError("loadImage", "File appears to be striped, but the number of stipes or stripe size is zero.");
 	exit(EXIT_FAILURE);
     }
 
     buffsize = stsize * nstrips;
     if (stsize != (buffsize / nstrips))
     {
-	TIFFError("loadImage", "Integer overflow when calculating buffer size");
+	NDPIError("loadImage", "Integer overflow when calculating buffer size");
 	exit(EXIT_FAILURE);
     }
     buffsize_check = ((length * width * spp * bps) + 7);
     if (length != ((buffsize_check - 7) / width / spp / bps))
     {
-	TIFFError("loadImage", "Integer overflow detected.");
+	NDPIError("loadImage", "Integer overflow detected.");
 	exit(EXIT_FAILURE);
     }
     if (buffsize < (uint32_t) (((length * width * spp * bps) + 7) / 8))
       {
       buffsize =  ((length * width * spp * bps) + 7) / 8;
 #ifdef DEBUG2
-      TIFFError("loadImage",
+      NDPIError("loadImage",
 	        "Stripsize %"PRIu32" is too small, using imagelength * width * spp * bps / 8 = %"PRIu32,
                 stsize, (unsigned long)buffsize);
 #endif
@@ -6149,18 +6149,18 @@ loadImage(TIFF* in, struct image_data *image, struct dump_opts *dump, unsigned c
   if (input_compression == COMPRESSION_JPEG)
     {  /* Force conversion to RGB */
     jpegcolormode = JPEGCOLORMODE_RGB;
-    TIFFSetField(in, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
+    NDPISetField(in, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
     }
   /* The clause up to the read statement is taken from Tom Lane's tiffcp patch */
   else 
     {   /* Otherwise, can't handle subsampled input */
     if (input_photometric == PHOTOMETRIC_YCBCR)
       {
-      TIFFGetFieldDefaulted(in, TIFFTAG_YCBCRSUBSAMPLING,
+      NDPIGetFieldDefaulted(in, TIFFTAG_YCBCRSUBSAMPLING,
  		           &subsampling_horiz, &subsampling_vert);
       if (subsampling_horiz != 1 || subsampling_vert != 1)
         {
-	TIFFError("loadImage", 
+	NDPIError("loadImage", 
 		"Can't copy/convert subsampled image with subsampling %"PRIu16" horiz %"PRIu16" vert",
                 subsampling_horiz, subsampling_vert);
         return (-1);
@@ -6175,7 +6175,7 @@ loadImage(TIFF* in, struct image_data *image, struct dump_opts *dump, unsigned c
   {
     if( buffsize > 0xFFFFFFFFU - 3 )
     {
-        TIFFError("loadImage", "Unable to allocate/reallocate read buffer");
+        NDPIError("loadImage", "Unable to allocate/reallocate read buffer");
         return (-1);
     }
     read_buff = (unsigned char *)limitMalloc(buffsize+3);
@@ -6186,10 +6186,10 @@ loadImage(TIFF* in, struct image_data *image, struct dump_opts *dump, unsigned c
     {
       if( buffsize > 0xFFFFFFFFU - 3 )
       {
-          TIFFError("loadImage", "Unable to allocate/reallocate read buffer");
+          NDPIError("loadImage", "Unable to allocate/reallocate read buffer");
           return (-1);
       }
-      new_buff = _TIFFrealloc(read_buff, buffsize+3);
+      new_buff = _NDPIrealloc(read_buff, buffsize+3);
       if (!new_buff)
         {
 	free (read_buff);
@@ -6201,7 +6201,7 @@ loadImage(TIFF* in, struct image_data *image, struct dump_opts *dump, unsigned c
     }
   if (!read_buff)
     {
-    TIFFError("loadImage", "Unable to allocate/reallocate read buffer");
+    NDPIError("loadImage", "Unable to allocate/reallocate read buffer");
     return (-1);
     }
 
@@ -6222,7 +6222,7 @@ loadImage(TIFF* in, struct image_data *image, struct dump_opts *dump, unsigned c
            {
 	     if (!(readContigStripsIntoBuffer(in, read_buff)))
 	     {
-	     TIFFError("loadImage", "Unable to read contiguous strips into buffer");
+	     NDPIError("loadImage", "Unable to read contiguous strips into buffer");
 	     return (-1);
              }
            }
@@ -6230,7 +6230,7 @@ loadImage(TIFF* in, struct image_data *image, struct dump_opts *dump, unsigned c
            {
 	   if (!(readSeparateStripsIntoBuffer(in, read_buff, length, width, spp, dump)))
 	     {
-	     TIFFError("loadImage", "Unable to read separate strips into buffer");
+	     NDPIError("loadImage", "Unable to read separate strips into buffer");
 	     return (-1);
              }
            }
@@ -6241,7 +6241,7 @@ loadImage(TIFF* in, struct image_data *image, struct dump_opts *dump, unsigned c
            {
 	   if (!(readContigTilesIntoBuffer(in, read_buff, length, width, tw, tl, spp, bps)))
 	     {
-	     TIFFError("loadImage", "Unable to read contiguous tiles into buffer");
+	     NDPIError("loadImage", "Unable to read contiguous tiles into buffer");
 	     return (-1);
              }
            }
@@ -6249,12 +6249,12 @@ loadImage(TIFF* in, struct image_data *image, struct dump_opts *dump, unsigned c
            {
 	   if (!(readSeparateTilesIntoBuffer(in, read_buff, length, width, tw, tl, spp, bps)))
 	     {
-	     TIFFError("loadImage", "Unable to read separate tiles into buffer");
+	     NDPIError("loadImage", "Unable to read separate tiles into buffer");
 	     return (-1);
              }
            }
          break;
-    default: TIFFError("loadImage", "Unsupported image file format");
+    default: NDPIError("loadImage", "Unsupported image file format");
           return (-1);
           break;
     }
@@ -6281,7 +6281,7 @@ static int  correct_orientation(struct image_data *image, unsigned char **work_b
   work_buff = *work_buff_ptr;
   if ((image == NULL) || (work_buff == NULL))
     {
-    TIFFError ("correct_orientatin", "Invalid image or buffer pointer");
+    NDPIError ("correct_orientatin", "Invalid image or buffer pointer");
     return (-1);
     }
 
@@ -6291,7 +6291,7 @@ static int  correct_orientation(struct image_data *image, unsigned char **work_b
     if (mirrorImage(image->spp, image->bps, mirror, 
         image->width, image->length, work_buff))
       {
-      TIFFError ("correct_orientation", "Unable to mirror image");
+      NDPIError ("correct_orientation", "Unable to mirror image");
       return (-1);
       }
     }
@@ -6308,14 +6308,14 @@ static int  correct_orientation(struct image_data *image, unsigned char **work_b
       rotation = (uint16_t) 270;
     else
       {
-      TIFFError ("correct_orientation", "Invalid rotation value: %"PRIu16,
+      NDPIError ("correct_orientation", "Invalid rotation value: %"PRIu16,
                  (uint16_t) (image->adjustments & ROTATE_ANY));
       return (-1);
       }
  
     if (rotateImage(rotation, image, &image->width, &image->length, work_buff_ptr))
       {
-      TIFFError ("correct_orientation", "Unable to rotate image");
+      NDPIError ("correct_orientation", "Unable to rotate image");
       return (-1);
       }
     image->orientation = ORIENTATION_TOPLEFT;
@@ -6393,7 +6393,7 @@ extractCompositeRegions(struct image_data *image,  struct crop_mask *crop,
       case EDGE_BOTTOM:
 	   if ((i > 0) && (crop_width != crop->regionlist[i - 1].width))
              {
-	     TIFFError ("extractCompositeRegions", 
+	     NDPIError ("extractCompositeRegions", 
                           "Only equal width regions can be combined for -E top or bottom");
 	     return (1);
              }
@@ -6413,7 +6413,7 @@ extractCompositeRegions(struct image_data *image,  struct crop_mask *crop,
                                                       spp, bps, count, first_col,
                                                       last_col + 1))
                          {
-		         TIFFError("extractCompositeRegions",
+		         NDPIError("extractCompositeRegions",
                                    "Unable to extract row %"PRIu32, row);
 		         return (1);
 		         }
@@ -6425,7 +6425,7 @@ extractCompositeRegions(struct image_data *image,  struct crop_mask *crop,
                                                                first_col, last_col + 1,
                                                                prev_trailing_bits))
                            {
-		           TIFFError("extractCompositeRegions",
+		           NDPIError("extractCompositeRegions",
                                      "Unable to extract row %"PRIu32, row);
 		           return (1);
 		           }
@@ -6437,7 +6437,7 @@ extractCompositeRegions(struct image_data *image,  struct crop_mask *crop,
                                                                 first_col, last_col + 1,
                                                                 prev_trailing_bits))
                            {
-		           TIFFError("extractCompositeRegions",
+		           NDPIError("extractCompositeRegions",
                                      "Unable to extract row %"PRIu32, row);
 		           return (1);
 		           }
@@ -6447,7 +6447,7 @@ extractCompositeRegions(struct image_data *image,  struct crop_mask *crop,
                                                                first_col, last_col + 1,
                                                                prev_trailing_bits))
                           {
-		          TIFFError("extractCompositeRegions",
+		          NDPIError("extractCompositeRegions",
                                     "Unable to extract row %"PRIu32, row);
 		          return (1);
 		          }
@@ -6459,12 +6459,12 @@ extractCompositeRegions(struct image_data *image,  struct crop_mask *crop,
                                                                first_col, last_col + 1,
                                                                prev_trailing_bits))
                           {
-		          TIFFError("extractCompositeRegions",
+		          NDPIError("extractCompositeRegions",
                                     "Unable to extract row %"PRIu32, row);
 		          return (1);
 		          }
 		        break;
-               default: TIFFError("extractCompositeRegions", "Unsupported bit depth %"PRIu16, bps);
+               default: NDPIError("extractCompositeRegions", "Unsupported bit depth %"PRIu16, bps);
 		        return (1);
 	       }
              }
@@ -6474,7 +6474,7 @@ extractCompositeRegions(struct image_data *image,  struct crop_mask *crop,
       case EDGE_RIGHT:
 	   if ((i > 0) && (crop_length != crop->regionlist[i - 1].length))
              {
-	     TIFFError ("extractCompositeRegions", 
+	     NDPIError ("extractCompositeRegions", 
                           "Only equal length regions can be combined for -E left or right");
 	     return (1);
              }
@@ -6495,7 +6495,7 @@ extractCompositeRegions(struct image_data *image,  struct crop_mask *crop,
                                                       sample, spp, bps, count,
                                                       first_col, last_col + 1))
                          {
-		         TIFFError("extractCompositeRegions",
+		         NDPIError("extractCompositeRegions",
                                    "Unable to extract row %"PRIu32, row);
 		         return (1);
 		         }
@@ -6507,7 +6507,7 @@ extractCompositeRegions(struct image_data *image,  struct crop_mask *crop,
                                                                first_col, last_col + 1,
                                                                prev_trailing_bits))
                            {
-		           TIFFError("extractCompositeRegions",
+		           NDPIError("extractCompositeRegions",
                                      "Unable to extract row %"PRIu32, row);
 		           return (1);
 		           }
@@ -6519,7 +6519,7 @@ extractCompositeRegions(struct image_data *image,  struct crop_mask *crop,
                                                                 first_col, last_col + 1,
                                                                 prev_trailing_bits))
                            {
-		           TIFFError("extractCompositeRegions",
+		           NDPIError("extractCompositeRegions",
                                      "Unable to extract row %"PRIu32, row);
 		           return (1);
 		           }
@@ -6529,7 +6529,7 @@ extractCompositeRegions(struct image_data *image,  struct crop_mask *crop,
                                                                first_col, last_col + 1,
                                                                prev_trailing_bits))
                           {
-		          TIFFError("extractCompositeRegions",
+		          NDPIError("extractCompositeRegions",
                                     "Unable to extract row %"PRIu32, row);
 		          return (1);
 		          }
@@ -6541,12 +6541,12 @@ extractCompositeRegions(struct image_data *image,  struct crop_mask *crop,
                                                                first_col, last_col + 1,
                                                                prev_trailing_bits))
                           {
-		          TIFFError("extractCompositeRegions",
+		          NDPIError("extractCompositeRegions",
                                     "Unable to extract row %"PRIu32, row);
 		          return (1);
 		          }
 		        break;
-               default: TIFFError("extractCompositeRegions", "Unsupported bit depth %"PRIu16, bps);
+               default: NDPIError("extractCompositeRegions", "Unsupported bit depth %"PRIu16, bps);
 		        return (1);
 	       }
 	     }
@@ -6558,7 +6558,7 @@ extractCompositeRegions(struct image_data *image,  struct crop_mask *crop,
       }
     }
   if (crop->combined_width != composite_width)
-    TIFFError("combineSeparateRegions","Combined width does not match composite width");
+    NDPIError("combineSeparateRegions","Combined width does not match composite width");
       
   return (0);
   }  /* end extractCompositeRegions */
@@ -6638,7 +6638,7 @@ extractSeparateRegion(struct image_data *image,  struct crop_mask *crop,
                                              spp, bps, count, first_col,
                                              last_col + 1))
                 {
-	        TIFFError("extractSeparateRegion",
+	        NDPIError("extractSeparateRegion",
                           "Unable to extract row %"PRIu32, row);
 	        return (1);
 	        }
@@ -6650,7 +6650,7 @@ extractSeparateRegion(struct image_data *image,  struct crop_mask *crop,
                                                       first_col, last_col + 1,
                                                       prev_trailing_bits))
                   {
-		  TIFFError("extractSeparateRegion",
+		  NDPIError("extractSeparateRegion",
                             "Unable to extract row %"PRIu32, row);
 		  return (1);
 		  }
@@ -6662,7 +6662,7 @@ extractSeparateRegion(struct image_data *image,  struct crop_mask *crop,
                                                        first_col, last_col + 1,
                                                        prev_trailing_bits))
                   {
-		  TIFFError("extractSeparateRegion",
+		  NDPIError("extractSeparateRegion",
                             "Unable to extract row %"PRIu32, row);
 		  return (1);
 		  }
@@ -6672,7 +6672,7 @@ extractSeparateRegion(struct image_data *image,  struct crop_mask *crop,
                                                      first_col, last_col + 1,
                                                      prev_trailing_bits))
                 {
-		TIFFError("extractSeparateRegion",
+		NDPIError("extractSeparateRegion",
                           "Unable to extract row %"PRIu32, row);
 		return (1);
 		}
@@ -6684,12 +6684,12 @@ extractSeparateRegion(struct image_data *image,  struct crop_mask *crop,
                                                      first_col, last_col + 1,
                                                      prev_trailing_bits))
                 {
-		TIFFError("extractSeparateRegion",
+		NDPIError("extractSeparateRegion",
                           "Unable to extract row %"PRIu32, row);
 		return (1);
 		}
 	      break;
-      default: TIFFError("extractSeparateRegion", "Unsupported bit depth %"PRIu16, bps);
+      default: NDPIError("extractSeparateRegion", "Unsupported bit depth %"PRIu16, bps);
 	       return (1);
       }
     }
@@ -6745,7 +6745,7 @@ extractImageSection(struct image_data *image, struct pageseg *section,
     {
     if ((bitarray = (char *)malloc(img_width)) == NULL)
       {
-      TIFFError ("", "DEBUG: Unable to allocate debugging bitarray");
+      NDPIError ("", "DEBUG: Unable to allocate debugging bitarray");
       return (-1);
       }
     }
@@ -6766,11 +6766,11 @@ extractImageSection(struct image_data *image, struct pageseg *section,
   trailing_bits = (sect_width * bps) % 8;
 
 #ifdef DEVELMODE
-    TIFFError ("", "First row: %"PRIu32", last row: %"PRIu32", First col: %"PRIu32", last col: %"PRIu32"\n",
+    NDPIError ("", "First row: %"PRIu32", last row: %"PRIu32", First col: %"PRIu32", last col: %"PRIu32"\n",
            first_row, last_row, first_col, last_col);
-    TIFFError ("", "Image width: %"PRIu32", Image length: %"PRIu32", bps: %"PRIu16", spp: %"PRIu16"\n",
+    NDPIError ("", "Image width: %"PRIu32", Image length: %"PRIu32", bps: %"PRIu16", spp: %"PRIu16"\n",
 	   img_width, img_length, bps, spp);
-    TIFFError ("", "Sect  width: %"PRIu32",  Sect length: %"PRIu32", full bytes: %"PRIu32" trailing bits %"PRIu32"\n", 
+    NDPIError ("", "Sect  width: %"PRIu32",  Sect length: %"PRIu32", full bytes: %"PRIu32" trailing bits %"PRIu32"\n", 
            sect_width, sect_length, full_bytes, trailing_bits);
 #endif
 
@@ -6784,9 +6784,9 @@ extractImageSection(struct image_data *image, struct pageseg *section,
       src_offset = row_offset + col_offset;
 
 #ifdef DEVELMODE
-        TIFFError ("", "Src offset: %8"PRIu32", Dst offset: %8"PRIu32, src_offset, dst_offset); 
+        NDPIError ("", "Src offset: %8"PRIu32", Dst offset: %8"PRIu32, src_offset, dst_offset); 
 #endif
-      _TIFFmemcpy (sect_buff + dst_offset, src_buff + src_offset, full_bytes);
+      _NDPImemcpy (sect_buff + dst_offset, src_buff + src_offset, full_bytes);
       dst_offset += full_bytes;
       }        
     }
@@ -6815,17 +6815,17 @@ extractImageSection(struct image_data *image, struct pageseg *section,
         sprintf(&bitarray[j], (bitset) ? "1" : "0");
         }
       bitarray[18] = '\0';
-      TIFFError ("", "Row: %3d Offset1: %"PRIu32",  Shift1: %"PRIu32",    Offset2: %"PRIu32",  Shift2:  %"PRIu32"\n", 
+      NDPIError ("", "Row: %3d Offset1: %"PRIu32",  Shift1: %"PRIu32",    Offset2: %"PRIu32",  Shift2:  %"PRIu32"\n", 
                  row, offset1, shift1, offset2, shift2); 
 #endif
 
       bytebuff1 = bytebuff2 = 0;
       if (shift1 == 0) /* the region is byte and sample aligned */
         {
-	_TIFFmemcpy (sect_buff + dst_offset, src_buff + offset1, full_bytes);
+	_NDPImemcpy (sect_buff + dst_offset, src_buff + offset1, full_bytes);
 
 #ifdef DEVELMODE
-	TIFFError ("", "        Aligned data src offset1: %8"PRIu32", Dst offset: %8"PRIu32"\n", offset1, dst_offset);
+	NDPIError ("", "        Aligned data src offset1: %8"PRIu32", Dst offset: %8"PRIu32"\n", offset1, dst_offset);
 	sprintf(&bitarray[18], "\n");
 	sprintf(&bitarray[19], "\t");
         for (j = 20, k = 7; j < 28; j++, k--)
@@ -6843,7 +6843,7 @@ extractImageSection(struct image_data *image, struct pageseg *section,
 	  bytebuff2 = src_buff[offset2] & ((unsigned char)255 << (7 - shift2));
           sect_buff[dst_offset] = bytebuff2;
 #ifdef DEVELMODE
-	  TIFFError ("", "        Trailing bits src offset:  %8"PRIu32", Dst offset: %8"PRIu32"\n",
+	  NDPIError ("", "        Trailing bits src offset:  %8"PRIu32", Dst offset: %8"PRIu32"\n",
                               offset2, dst_offset); 
           for (j = 30, k = 7; j < 38; j++, k--)
             {
@@ -6851,7 +6851,7 @@ extractImageSection(struct image_data *image, struct pageseg *section,
             sprintf(&bitarray[j], (bitset) ? "1" : "0");
             }
           bitarray[38] = '\0';
-          TIFFError ("", "\tFirst and last bytes before and after masking:\n\t%s\n\n", bitarray);
+          NDPIError ("", "\tFirst and last bytes before and after masking:\n\t%s\n\n", bitarray);
 #endif
           dst_offset++;
           }
@@ -6859,7 +6859,7 @@ extractImageSection(struct image_data *image, struct pageseg *section,
       else   /* each destination byte will have to be built from two source bytes*/
         {
 #ifdef DEVELMODE
-	  TIFFError ("", "        Unalligned data src offset: %8"PRIu32", Dst offset: %8"PRIu32"\n", offset1 , dst_offset);
+	  NDPIError ("", "        Unalligned data src offset: %8"PRIu32", Dst offset: %8"PRIu32"\n", offset1 , dst_offset);
 #endif
         for (j = 0; j <= full_bytes; j++) 
           {
@@ -6883,7 +6883,7 @@ extractImageSection(struct image_data *image, struct pageseg *section,
         if (trailing_bits != 0)
           {
 #ifdef DEVELMODE
-	    TIFFError ("", "        Trailing bits   src offset: %8"PRIu32", Dst offset: %8"PRIu32"\n", offset1 + full_bytes, dst_offset);
+	    NDPIError ("", "        Trailing bits   src offset: %8"PRIu32", Dst offset: %8"PRIu32"\n", offset1 + full_bytes, dst_offset);
 #endif
 	  if (shift2 > shift1)
             {
@@ -6891,7 +6891,7 @@ extractImageSection(struct image_data *image, struct pageseg *section,
             bytebuff2 = bytebuff1 & ((unsigned char)255 << shift1);
             sect_buff[dst_offset] = bytebuff2;
 #ifdef DEVELMODE
-	    TIFFError ("", "        Shift2 > Shift1\n"); 
+	    NDPIError ("", "        Shift2 > Shift1\n"); 
 #endif
             }
           else
@@ -6901,12 +6901,12 @@ extractImageSection(struct image_data *image, struct pageseg *section,
               bytebuff2 = ((unsigned char)255 << (shift1 - shift2 - 1));
 	      sect_buff[dst_offset] &= bytebuff2;
 #ifdef DEVELMODE
-	      TIFFError ("", "        Shift2 < Shift1\n"); 
+	      NDPIError ("", "        Shift2 < Shift1\n"); 
 #endif
               }
 #ifdef DEVELMODE
             else
-	      TIFFError ("", "        Shift2 == Shift1\n"); 
+	      NDPIError ("", "        Shift2 == Shift1\n"); 
 #endif
             }
 	  }
@@ -6919,7 +6919,7 @@ extractImageSection(struct image_data *image, struct pageseg *section,
             sprintf(&bitarray[j], (bitset) ? "1" : "0");
             }
           bitarray[38] = '\0';
-          TIFFError ("", "\tFirst and last bytes before and after masking:\n\t%s\n\n", bitarray);
+          NDPIError ("", "\tFirst and last bytes before and after masking:\n\t%s\n\n", bitarray);
 #endif
         dst_offset++;
         }
@@ -6953,7 +6953,7 @@ writeSelections(TIFF *in, TIFF **out, struct crop_mask *crop,
                                crop->combined_length,
                                crop_buff, *page, total_pages))
             {
-             TIFFError("writeRegions", "Unable to write new image");
+             NDPIError("writeRegions", "Unable to write new image");
              return (-1);
              }
 	 break;
@@ -6970,7 +6970,7 @@ writeSelections(TIFF *in, TIFF **out, struct crop_mask *crop,
                                  crop->regionlist[i].length, 
                                  crop_buff, *page, page_count))
              {
-             TIFFError("writeRegions", "Unable to write new image");
+             NDPIError("writeRegions", "Unable to write new image");
              return (-1);
              }
 	   }
@@ -6986,7 +6986,7 @@ writeSelections(TIFF *in, TIFF **out, struct crop_mask *crop,
                                crop->combined_length, 
                                crop_buff, *page, total_pages))
            {
-           TIFFError("writeRegions", "Unable to write new image");
+           NDPIError("writeRegions", "Unable to write new image");
            return (-1);
            }
          break;
@@ -7005,7 +7005,7 @@ writeSelections(TIFF *in, TIFF **out, struct crop_mask *crop,
                                  crop->regionlist[i].length, 
                                  crop_buff, *page, page_count))
              {
-             TIFFError("writeRegions", "Unable to write new image");
+             NDPIError("writeRegions", "Unable to write new image");
              return (-1);
              }
            }
@@ -7025,7 +7025,7 @@ writeSelections(TIFF *in, TIFF **out, struct crop_mask *crop,
                                  crop->regionlist[i].length, 
                                  crop_buff, *page, page_count))
              {
-             TIFFError("writeRegions", "Unable to write new image");
+             NDPIError("writeRegions", "Unable to write new image");
              return (-1);
              }
            }
@@ -7052,7 +7052,7 @@ writeImageSections(TIFF *in, TIFF *out, struct image_data *image,
   k = page->cols * page->rows;
   if ((k < 1) || (k > MAX_SECTIONS))
    {
-   TIFFError("writeImageSections",
+   NDPIError("writeImageSections",
 	     "%"PRIu32" Rows and Columns exceed maximum sections\nIncrease resolution or reduce sections", k);
    return (-1);
    }
@@ -7066,21 +7066,21 @@ writeImageSections(TIFF *in, TIFF *out, struct image_data *image,
     /* allocate a buffer if we don't have one already */
     if (createImageSection(sectsize, sect_buff_ptr))
       {
-      TIFFError("writeImageSections", "Unable to allocate section buffer");
+      NDPIError("writeImageSections", "Unable to allocate section buffer");
       exit(EXIT_FAILURE);
       }
     sect_buff = *sect_buff_ptr;
 
     if (extractImageSection (image, &sections[i], src_buff, sect_buff))
       {
-      TIFFError("writeImageSections", "Unable to extract image sections");
+      NDPIError("writeImageSections", "Unable to extract image sections");
       exit(EXIT_FAILURE);
       }
 
   /* call the write routine here instead of outside the loop */
     if (writeSingleSection(in, out, image, dump, width, length, hres, vres, sect_buff))
       {
-      TIFFError("writeImageSections", "Unable to write image section");
+      NDPIError("writeImageSections", "Unable to write image section");
       exit(EXIT_FAILURE);
       }
     }
@@ -7106,20 +7106,20 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
   const struct cpTag* p;
 
   /*  Calling this seems to reset the compression mode on the TIFF *in file.
-  TIFFGetField(in, TIFFTAG_JPEGCOLORMODE, &input_jpeg_colormode);
+  NDPIGetField(in, TIFFTAG_JPEGCOLORMODE, &input_jpeg_colormode);
   */
   input_compression = image->compression;
   input_photometric = image->photometric;
 
   spp = image->spp;
   bps = image->bps;
-  TIFFSetField(out, TIFFTAG_IMAGEWIDTH, width);
-  TIFFSetField(out, TIFFTAG_IMAGELENGTH, length);
-  TIFFSetField(out, TIFFTAG_BITSPERSAMPLE, bps);
-  TIFFSetField(out, TIFFTAG_SAMPLESPERPIXEL, spp);
+  NDPISetField(out, TIFFTAG_IMAGEWIDTH, width);
+  NDPISetField(out, TIFFTAG_IMAGELENGTH, length);
+  NDPISetField(out, TIFFTAG_BITSPERSAMPLE, bps);
+  NDPISetField(out, TIFFTAG_SAMPLESPERPIXEL, spp);
 
 #ifdef DEBUG2
-  TIFFError("writeSingleSection", "Input compression: %s",
+  NDPIError("writeSingleSection", "Input compression: %s",
 	    (input_compression == COMPRESSION_OJPEG) ? "Old Jpeg" :
 	    ((input_compression == COMPRESSION_JPEG) ?  "New Jpeg" : "Non Jpeg"));
 #endif
@@ -7129,14 +7129,14 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
    * of the parameters instead of as a global. If no user
    * option specified it will still be (uint16_t) -1. */
   if (compression != (uint16_t)-1)
-    TIFFSetField(out, TIFFTAG_COMPRESSION, compression);
+    NDPISetField(out, TIFFTAG_COMPRESSION, compression);
   else
     { /* OJPEG is no longer supported for writing so upgrade to JPEG */
     if (input_compression == COMPRESSION_OJPEG)
       {
       compression = COMPRESSION_JPEG;
       jpegcolormode = JPEGCOLORMODE_RAW;
-      TIFFSetField(out, TIFFTAG_COMPRESSION, COMPRESSION_JPEG);
+      NDPISetField(out, TIFFTAG_COMPRESSION, COMPRESSION_JPEG);
       }
     else /* Use the compression from the input file */
       CopyField(TIFFTAG_COMPRESSION, compression);
@@ -7147,7 +7147,7 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
     if ((input_photometric == PHOTOMETRIC_PALETTE) ||  /* color map indexed */
         (input_photometric == PHOTOMETRIC_MASK))       /* holdout mask */
       {
-      TIFFError ("writeSingleSection",
+      NDPIError ("writeSingleSection",
                  "JPEG compression cannot be used with %s image data",
 		 (input_photometric == PHOTOMETRIC_PALETTE) ?
                  "palette" : "mask");
@@ -7155,21 +7155,21 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
       }
     if ((input_photometric == PHOTOMETRIC_RGB) &&
 	(jpegcolormode == JPEGCOLORMODE_RGB))
-      TIFFSetField(out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_YCBCR);
+      NDPISetField(out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_YCBCR);
     else
-	TIFFSetField(out, TIFFTAG_PHOTOMETRIC, input_photometric);
+	NDPISetField(out, TIFFTAG_PHOTOMETRIC, input_photometric);
     }
   else
     {
     if (compression == COMPRESSION_SGILOG || compression == COMPRESSION_SGILOG24)
-      TIFFSetField(out, TIFFTAG_PHOTOMETRIC, spp == 1 ?
+      NDPISetField(out, TIFFTAG_PHOTOMETRIC, spp == 1 ?
 			PHOTOMETRIC_LOGL : PHOTOMETRIC_LOGLUV);
     else
-      TIFFSetField(out, TIFFTAG_PHOTOMETRIC, image->photometric);
+      NDPISetField(out, TIFFTAG_PHOTOMETRIC, image->photometric);
     }
 
 #ifdef DEBUG2
-  TIFFError("writeSingleSection", "Input photometric: %s",
+  NDPIError("writeSingleSection", "Input photometric: %s",
 	    (input_photometric == PHOTOMETRIC_RGB) ? "RGB" :
 	    ((input_photometric == PHOTOMETRIC_YCBCR) ?  "YCbCr" : "Not RGB or YCbCr"));
 #endif
@@ -7179,13 +7179,13 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
       ((compression != COMPRESSION_SGILOG) && 
        (compression != COMPRESSION_SGILOG24)))
     {
-    TIFFError("writeSingleSection",
+    NDPIError("writeSingleSection",
               "LogL and LogLuv source data require SGI_LOG or SGI_LOG24 compression");
     return (-1);
     }
 
   if (fillorder != 0)
-    TIFFSetField(out, TIFFTAG_FILLORDER, fillorder);
+    NDPISetField(out, TIFFTAG_FILLORDER, fillorder);
   else
     CopyTag(TIFFTAG_FILLORDER, 1, TIFF_SHORT);
 
@@ -7196,7 +7196,7 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
    * image->orientation if any transforms are performed, 
    * as per EXIF standard.
    */
-  TIFFSetField(out, TIFFTAG_ORIENTATION, image->orientation);
+  NDPISetField(out, TIFFTAG_ORIENTATION, image->orientation);
 
   /*
    * Choose tiles/strip for the output image according to
@@ -7204,7 +7204,7 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
    * structure of the input image.
    */
   if (outtiled == -1)
-    outtiled = TIFFIsTiled(in);
+    outtiled = NDPIIsTiled(in);
   if (outtiled) {
     /*
      * Setup output file's tile width&height.  If either
@@ -7213,15 +7213,15 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
      * library default.
      */
     if (tilewidth == (uint32_t) 0)
-      TIFFGetField(in, TIFFTAG_TILEWIDTH, &tilewidth);
+      NDPIGetField(in, TIFFTAG_TILEWIDTH, &tilewidth);
     if (tilelength == (uint32_t) 0)
-      TIFFGetField(in, TIFFTAG_TILELENGTH, &tilelength);
+      NDPIGetField(in, TIFFTAG_TILELENGTH, &tilelength);
 
     if (tilewidth == 0 || tilelength == 0)
-      TIFFDefaultTileSize(out, &tilewidth, &tilelength);
-    TIFFDefaultTileSize(out, &tilewidth, &tilelength);
-    TIFFSetField(out, TIFFTAG_TILEWIDTH, tilewidth);
-    TIFFSetField(out, TIFFTAG_TILELENGTH, tilelength);
+      NDPIDefaultTileSize(out, &tilewidth, &tilelength);
+    NDPIDefaultTileSize(out, &tilewidth, &tilelength);
+    NDPISetField(out, TIFFTAG_TILEWIDTH, tilewidth);
+    NDPISetField(out, TIFFTAG_TILELENGTH, tilelength);
     } else {
        /*
 	* RowsPerStrip is left unspecified: use either the
@@ -7230,8 +7230,8 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
 	*/
 	if (rowsperstrip == (uint32_t) 0)
           {
-	  if (!TIFFGetField(in, TIFFTAG_ROWSPERSTRIP, &rowsperstrip))
-	    rowsperstrip = TIFFDefaultStripSize(out, rowsperstrip);
+	  if (!NDPIGetField(in, TIFFTAG_ROWSPERSTRIP, &rowsperstrip))
+	    rowsperstrip = NDPIDefaultStripSize(out, rowsperstrip);
           if (compression != COMPRESSION_JPEG)
             {
   	    if (rowsperstrip > length)
@@ -7241,12 +7241,12 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
 	else 
           if (rowsperstrip == (uint32_t) -1)
 	    rowsperstrip = length;
-	TIFFSetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
+	NDPISetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
 	}
 
-  TIFFGetFieldDefaulted(in, TIFFTAG_PLANARCONFIG, &input_planar);
+  NDPIGetFieldDefaulted(in, TIFFTAG_PLANARCONFIG, &input_planar);
   if (config != (uint16_t) -1)
-    TIFFSetField(out, TIFFTAG_PLANARCONFIG, config);
+    NDPISetField(out, TIFFTAG_PLANARCONFIG, config);
   else
     CopyField(TIFFTAG_PLANARCONFIG, config);
   if (spp <= 4)
@@ -7261,12 +7261,12 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
     case COMPRESSION_JPEG:
          if (((bps % 8) == 0) || ((bps % 12) == 0))
 	   {
-           TIFFSetField(out, TIFFTAG_JPEGQUALITY, quality);
-	   TIFFSetField(out, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
+           NDPISetField(out, TIFFTAG_JPEGQUALITY, quality);
+	   NDPISetField(out, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
            }
          else
            {
-	   TIFFError("writeSingleSection",
+	   NDPIError("writeSingleSection",
                      "JPEG compression requires 8 or 12 bits per sample");
            return (-1);
            }
@@ -7275,7 +7275,7 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
    case COMPRESSION_ADOBE_DEFLATE:
    case COMPRESSION_DEFLATE:
 	if (predictor != (uint16_t)-1)
-          TIFFSetField(out, TIFFTAG_PREDICTOR, predictor);
+          NDPISetField(out, TIFFTAG_PREDICTOR, predictor);
 	else
 	  CopyField(TIFFTAG_PREDICTOR, predictor);
 	break;
@@ -7283,7 +7283,7 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
    case COMPRESSION_CCITTFAX4:
 	if (compression == COMPRESSION_CCITTFAX3) {
           if (g3opts != (uint32_t) -1)
-	    TIFFSetField(out, TIFFTAG_GROUP3OPTIONS, g3opts);
+	    NDPISetField(out, TIFFTAG_GROUP3OPTIONS, g3opts);
 	  else
 	    CopyField(TIFFTAG_GROUP3OPTIONS, g3opts);
 	} else {
@@ -7299,14 +7299,14 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
    }
    { uint32_t len32;
      void** data;
-     if (TIFFGetField(in, TIFFTAG_ICCPROFILE, &len32, &data))
-       TIFFSetField(out, TIFFTAG_ICCPROFILE, len32, data);
+     if (NDPIGetField(in, TIFFTAG_ICCPROFILE, &len32, &data))
+       NDPISetField(out, TIFFTAG_ICCPROFILE, len32, data);
    }
    { uint16_t ninks;
      const char* inknames;
-     if (TIFFGetField(in, TIFFTAG_NUMBEROFINKS, &ninks)) {
-       TIFFSetField(out, TIFFTAG_NUMBEROFINKS, ninks);
-       if (TIFFGetField(in, TIFFTAG_INKNAMES, &inknames)) {
+     if (NDPIGetField(in, TIFFTAG_NUMBEROFINKS, &ninks)) {
+       NDPISetField(out, TIFFTAG_NUMBEROFINKS, ninks);
+       if (NDPIGetField(in, TIFFTAG_INKNAMES, &inknames)) {
 	 int inknameslen = strlen(inknames) + 1;
 	 const char* cp = inknames;
 	 while (ninks > 1) {
@@ -7317,17 +7317,17 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
 	   }
 	   ninks--;
          }
-	 TIFFSetField(out, TIFFTAG_INKNAMES, inknameslen, inknames);
+	 NDPISetField(out, TIFFTAG_INKNAMES, inknameslen, inknames);
        }
      }
    }
    {
    unsigned short pg0, pg1;
-   if (TIFFGetField(in, TIFFTAG_PAGENUMBER, &pg0, &pg1)) {
+   if (NDPIGetField(in, TIFFTAG_PAGENUMBER, &pg0, &pg1)) {
      if (pageNum < 0) /* only one input file */
-	TIFFSetField(out, TIFFTAG_PAGENUMBER, pg0, pg1);
+	NDPISetField(out, TIFFTAG_PAGENUMBER, pg0, pg1);
      else 
-	TIFFSetField(out, TIFFTAG_PAGENUMBER, pageNum++, 0);
+	NDPISetField(out, TIFFTAG_PAGENUMBER, pageNum++, 0);
      }
    }
 
@@ -7335,8 +7335,8 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
 		CopyTag(p->tag, p->count, p->type);
 
   /* Update these since they are overwritten from input res by loop above */
-  TIFFSetField(out, TIFFTAG_XRESOLUTION, (float)hres);
-  TIFFSetField(out, TIFFTAG_YRESOLUTION, (float)vres);
+  NDPISetField(out, TIFFTAG_XRESOLUTION, (float)hres);
+  NDPISetField(out, TIFFTAG_YRESOLUTION, (float)vres);
 
   /* Compute the tile or strip dimensions and write to disk */
   if (outtiled)
@@ -7354,9 +7354,9 @@ writeSingleSection(TIFF *in, TIFF *out, struct image_data *image,
       writeBufferToSeparateStrips(out, sect_buff, length, width, spp, dump);
     }
 
-  if (!TIFFWriteDirectory(out))
+  if (!NDPIWriteDirectory(out))
     {
-    TIFFClose(out);
+    NDPIClose(out);
     return (-1);
     }
 
@@ -7378,28 +7378,28 @@ createImageSection(uint32_t sectsize, unsigned char **sect_buff_ptr)
     {
     sect_buff = (unsigned char *)limitMalloc(sectsize);
     *sect_buff_ptr = sect_buff;
-    _TIFFmemset(sect_buff, 0, sectsize);
+    _NDPImemset(sect_buff, 0, sectsize);
     }
   else
     {
     if (prev_sectsize < sectsize)
       {
-      new_buff = _TIFFrealloc(sect_buff, sectsize);
+      new_buff = _NDPIrealloc(sect_buff, sectsize);
       if (!new_buff)
         {
-          _TIFFfree (sect_buff);
+          _NDPIfree (sect_buff);
         sect_buff = (unsigned char *)limitMalloc(sectsize);
         }
       else
         sect_buff = new_buff;
 
-      _TIFFmemset(sect_buff, 0, sectsize);
+      _NDPImemset(sect_buff, 0, sectsize);
       }
     }
 
   if (!sect_buff)
     {
-    TIFFError("createImageSection", "Unable to allocate/reallocate section buffer");
+    NDPIError("createImageSection", "Unable to allocate/reallocate section buffer");
     return (-1);
     }
   prev_sectsize = sectsize;
@@ -7435,10 +7435,10 @@ processCropSelections(struct image_data *image, struct crop_mask *crop,
       prev_cropsize = seg_buffs[0].size;
       if (prev_cropsize < cropsize)
         {
-        next_buff = _TIFFrealloc(crop_buff, cropsize);
+        next_buff = _NDPIrealloc(crop_buff, cropsize);
         if (! next_buff)
           {
-          _TIFFfree (crop_buff);
+          _NDPIfree (crop_buff);
           crop_buff = (unsigned char *)limitMalloc(cropsize);
           }
         else
@@ -7448,11 +7448,11 @@ processCropSelections(struct image_data *image, struct crop_mask *crop,
 
     if (!crop_buff)
       {
-      TIFFError("processCropSelections", "Unable to allocate/reallocate crop buffer");
+      NDPIError("processCropSelections", "Unable to allocate/reallocate crop buffer");
       return (-1);
       }
  
-    _TIFFmemset(crop_buff, 0, cropsize);
+    _NDPImemset(crop_buff, 0, cropsize);
     seg_buffs[0].buffer = crop_buff;
     seg_buffs[0].size = cropsize;
 
@@ -7474,7 +7474,7 @@ processCropSelections(struct image_data *image, struct crop_mask *crop,
              if (invertImage(image->photometric, image->spp, image->bps, 
                              crop->combined_width, crop->combined_length, crop_buff))
                {
-               TIFFError("processCropSelections", 
+               NDPIError("processCropSelections", 
                          "Failed to invert colorspace for composite regions");
                return (-1);
                }
@@ -7503,7 +7503,7 @@ processCropSelections(struct image_data *image, struct crop_mask *crop,
       if (mirrorImage(image->spp, image->bps, crop->mirror, 
                       crop->combined_width, crop->combined_length, crop_buff))
         {
-        TIFFError("processCropSelections", "Failed to mirror composite regions %s", 
+        NDPIError("processCropSelections", "Failed to mirror composite regions %s", 
 	         (crop->rotation == MIRROR_HORIZ) ? "horizontally" : "vertically");
         return (-1);
         }
@@ -7514,7 +7514,7 @@ processCropSelections(struct image_data *image, struct crop_mask *crop,
       if (rotateImage(crop->rotation, image, &crop->combined_width, 
                       &crop->combined_length, &crop_buff))
         {
-        TIFFError("processCropSelections", 
+        NDPIError("processCropSelections", 
                   "Failed to rotate composite regions by %"PRIu32" degrees", crop->rotation);
         return (-1);
         }
@@ -7537,10 +7537,10 @@ processCropSelections(struct image_data *image, struct crop_mask *crop,
         prev_cropsize = seg_buffs[0].size;
         if (prev_cropsize < cropsize)
           {
-          next_buff = _TIFFrealloc(crop_buff, cropsize);
+          next_buff = _NDPIrealloc(crop_buff, cropsize);
           if (! next_buff)
             {
-            _TIFFfree (crop_buff);
+            _NDPIfree (crop_buff);
             crop_buff = (unsigned char *)limitMalloc(cropsize);
             }
           else
@@ -7550,17 +7550,17 @@ processCropSelections(struct image_data *image, struct crop_mask *crop,
 
       if (!crop_buff)
         {
-        TIFFError("processCropSelections", "Unable to allocate/reallocate crop buffer");
+        NDPIError("processCropSelections", "Unable to allocate/reallocate crop buffer");
         return (-1);
         }
  
-      _TIFFmemset(crop_buff, 0, cropsize);
+      _NDPImemset(crop_buff, 0, cropsize);
       seg_buffs[i].buffer = crop_buff;
       seg_buffs[i].size = cropsize;
 
       if (extractSeparateRegion(image, crop, read_buff, crop_buff, i))
         {
-	TIFFError("processCropSelections", "Unable to extract cropped region %d from image", i);
+	NDPIError("processCropSelections", "Unable to extract cropped region %d from image", i);
         return (-1);
         }
     
@@ -7581,7 +7581,7 @@ processCropSelections(struct image_data *image, struct crop_mask *crop,
                if (invertImage(image->photometric, image->spp, image->bps, 
                                width, length, crop_buff))
                  {
-                 TIFFError("processCropSelections", 
+                 NDPIError("processCropSelections", 
                            "Failed to invert colorspace for region");
                  return (-1);
                  }
@@ -7609,7 +7609,7 @@ processCropSelections(struct image_data *image, struct crop_mask *crop,
         if (mirrorImage(image->spp, image->bps, crop->mirror, 
                         width, length, crop_buff))
           {
-          TIFFError("processCropSelections", "Failed to mirror crop region %s", 
+          NDPIError("processCropSelections", "Failed to mirror crop region %s", 
 	           (crop->rotation == MIRROR_HORIZ) ? "horizontally" : "vertically");
           return (-1);
           }
@@ -7620,7 +7620,7 @@ processCropSelections(struct image_data *image, struct crop_mask *crop,
 	if (rotateImage(crop->rotation, image, &crop->regionlist[i].width, 
 			&crop->regionlist[i].length, &crop_buff))
           {
-          TIFFError("processCropSelections", 
+          NDPIError("processCropSelections", 
                     "Failed to rotate crop region by %"PRIu16" degrees", crop->rotation);
           return (-1);
           }
@@ -7669,14 +7669,14 @@ createCroppedImage(struct image_data *image, struct crop_mask *crop,
     {
     crop_buff = (unsigned char *)limitMalloc(cropsize);
     *crop_buff_ptr = crop_buff;
-    _TIFFmemset(crop_buff, 0, cropsize);
+    _NDPImemset(crop_buff, 0, cropsize);
     prev_cropsize = cropsize;
     }
   else
     {
     if (prev_cropsize < cropsize)
       {
-      new_buff = _TIFFrealloc(crop_buff, cropsize);
+      new_buff = _NDPIrealloc(crop_buff, cropsize);
       if (!new_buff)
         {
 	free (crop_buff);
@@ -7684,13 +7684,13 @@ createCroppedImage(struct image_data *image, struct crop_mask *crop,
         }
       else
         crop_buff = new_buff;
-      _TIFFmemset(crop_buff, 0, cropsize);
+      _NDPImemset(crop_buff, 0, cropsize);
       }
     }
 
   if (!crop_buff)
     {
-    TIFFError("createCroppedImage", "Unable to allocate/reallocate crop buffer");
+    NDPIError("createCroppedImage", "Unable to allocate/reallocate crop buffer");
     return (-1);
     }
   *crop_buff_ptr = crop_buff;
@@ -7709,7 +7709,7 @@ createCroppedImage(struct image_data *image, struct crop_mask *crop,
            if (invertImage(image->photometric, image->spp, image->bps, 
                            crop->combined_width, crop->combined_length, crop_buff))
              {
-             TIFFError("createCroppedImage", 
+             NDPIError("createCroppedImage", 
                        "Failed to invert colorspace for image or cropped selection");
              return (-1);
              }
@@ -7737,7 +7737,7 @@ createCroppedImage(struct image_data *image, struct crop_mask *crop,
     if (mirrorImage(image->spp, image->bps, crop->mirror, 
                     crop->combined_width, crop->combined_length, crop_buff))
       {
-      TIFFError("createCroppedImage", "Failed to mirror image or cropped selection %s", 
+      NDPIError("createCroppedImage", "Failed to mirror image or cropped selection %s", 
 	       (crop->rotation == MIRROR_HORIZ) ? "horizontally" : "vertically");
       return (-1);
       }
@@ -7748,7 +7748,7 @@ createCroppedImage(struct image_data *image, struct crop_mask *crop,
     if (rotateImage(crop->rotation, image, &crop->combined_width, 
                     &crop->combined_length, crop_buff_ptr))
       {
-      TIFFError("createCroppedImage", 
+      NDPIError("createCroppedImage", 
                 "Failed to rotate image or cropped selection by %"PRIu16" degrees", crop->rotation);
       return (-1);
       }
@@ -7787,26 +7787,26 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
   spp = image->spp;
   bps = image->bps;
 
-  TIFFSetField(out, TIFFTAG_IMAGEWIDTH, width);
-  TIFFSetField(out, TIFFTAG_IMAGELENGTH, length);
-  TIFFSetField(out, TIFFTAG_BITSPERSAMPLE, bps);
-  TIFFSetField(out, TIFFTAG_SAMPLESPERPIXEL, spp);
+  NDPISetField(out, TIFFTAG_IMAGEWIDTH, width);
+  NDPISetField(out, TIFFTAG_IMAGELENGTH, length);
+  NDPISetField(out, TIFFTAG_BITSPERSAMPLE, bps);
+  NDPISetField(out, TIFFTAG_SAMPLESPERPIXEL, spp);
 
 #ifdef DEBUG2
-  TIFFError("writeCroppedImage", "Input compression: %s",
+  NDPIError("writeCroppedImage", "Input compression: %s",
 	    (input_compression == COMPRESSION_OJPEG) ? "Old Jpeg" :
 	    ((input_compression == COMPRESSION_JPEG) ?  "New Jpeg" : "Non Jpeg"));
 #endif
 
   if (compression != (uint16_t)-1)
-    TIFFSetField(out, TIFFTAG_COMPRESSION, compression);
+    NDPISetField(out, TIFFTAG_COMPRESSION, compression);
   else
     {
     if (input_compression == COMPRESSION_OJPEG)
       {
       compression = COMPRESSION_JPEG;
       jpegcolormode = JPEGCOLORMODE_RAW;
-      TIFFSetField(out, TIFFTAG_COMPRESSION, COMPRESSION_JPEG);
+      NDPISetField(out, TIFFTAG_COMPRESSION, COMPRESSION_JPEG);
       }
     else
       CopyField(TIFFTAG_COMPRESSION, compression);
@@ -7817,7 +7817,7 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
     if ((input_photometric == PHOTOMETRIC_PALETTE) ||  /* color map indexed */
         (input_photometric == PHOTOMETRIC_MASK))       /* $holdout mask */
       {
-      TIFFError ("writeCroppedImage",
+      NDPIError ("writeCroppedImage",
                  "JPEG compression cannot be used with %s image data",
       	        (input_photometric == PHOTOMETRIC_PALETTE) ?
                  "palette" : "mask");
@@ -7825,15 +7825,15 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
       }
     if ((input_photometric == PHOTOMETRIC_RGB) &&
 	(jpegcolormode == JPEGCOLORMODE_RGB))
-      TIFFSetField(out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_YCBCR);
+      NDPISetField(out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_YCBCR);
     else
-	TIFFSetField(out, TIFFTAG_PHOTOMETRIC, input_photometric);
+	NDPISetField(out, TIFFTAG_PHOTOMETRIC, input_photometric);
     }
   else
     {
     if (compression == COMPRESSION_SGILOG || compression == COMPRESSION_SGILOG24)
       {
-      TIFFSetField(out, TIFFTAG_PHOTOMETRIC, spp == 1 ?
+      NDPISetField(out, TIFFTAG_PHOTOMETRIC, spp == 1 ?
 			PHOTOMETRIC_LOGL : PHOTOMETRIC_LOGLUV);
       }
     else
@@ -7841,11 +7841,11 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
       if (input_compression == COMPRESSION_SGILOG ||
           input_compression == COMPRESSION_SGILOG24)
         {
-        TIFFSetField(out, TIFFTAG_PHOTOMETRIC, spp == 1 ?
+        NDPISetField(out, TIFFTAG_PHOTOMETRIC, spp == 1 ?
 			  PHOTOMETRIC_LOGL : PHOTOMETRIC_LOGLUV);
         }
       else
-        TIFFSetField(out, TIFFTAG_PHOTOMETRIC, image->photometric);
+        NDPISetField(out, TIFFTAG_PHOTOMETRIC, image->photometric);
       }
     }
 
@@ -7854,13 +7854,13 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
       ((compression != COMPRESSION_SGILOG) && 
        (compression != COMPRESSION_SGILOG24)))
     {
-    TIFFError("writeCroppedImage",
+    NDPIError("writeCroppedImage",
               "LogL and LogLuv source data require SGI_LOG or SGI_LOG24 compression");
     return (-1);
     }
 
   if (fillorder != 0)
-    TIFFSetField(out, TIFFTAG_FILLORDER, fillorder);
+    NDPISetField(out, TIFFTAG_FILLORDER, fillorder);
   else
     CopyTag(TIFFTAG_FILLORDER, 1, TIFF_SHORT);
 
@@ -7871,7 +7871,7 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
    * image->orientation if any transforms are performed, 
    * as per EXIF standard. 
    */
-  TIFFSetField(out, TIFFTAG_ORIENTATION, image->orientation);
+  NDPISetField(out, TIFFTAG_ORIENTATION, image->orientation);
 	
   /*
    * Choose tiles/strip for the output image according to
@@ -7879,7 +7879,7 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
    * structure of the input image.
    */
   if (outtiled == -1)
-    outtiled = TIFFIsTiled(in);
+    outtiled = NDPIIsTiled(in);
   if (outtiled) {
     /*
      * Setup output file's tile width&height.  If either
@@ -7888,14 +7888,14 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
      * library default.
      */
     if (tilewidth == (uint32_t) 0)
-      TIFFGetField(in, TIFFTAG_TILEWIDTH, &tilewidth);
+      NDPIGetField(in, TIFFTAG_TILEWIDTH, &tilewidth);
     if (tilelength == (uint32_t) 0)
-      TIFFGetField(in, TIFFTAG_TILELENGTH, &tilelength);
+      NDPIGetField(in, TIFFTAG_TILELENGTH, &tilelength);
 
     if (tilewidth == 0 || tilelength == 0)
-      TIFFDefaultTileSize(out, &tilewidth, &tilelength);
-    TIFFSetField(out, TIFFTAG_TILEWIDTH, tilewidth);
-    TIFFSetField(out, TIFFTAG_TILELENGTH, tilelength);
+      NDPIDefaultTileSize(out, &tilewidth, &tilelength);
+    NDPISetField(out, TIFFTAG_TILEWIDTH, tilewidth);
+    NDPISetField(out, TIFFTAG_TILELENGTH, tilelength);
     } else {
        /*
 	* RowsPerStrip is left unspecified: use either the
@@ -7904,8 +7904,8 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
 	*/
 	if (rowsperstrip == (uint32_t) 0)
           {
-	  if (!TIFFGetField(in, TIFFTAG_ROWSPERSTRIP, &rowsperstrip))
-	    rowsperstrip = TIFFDefaultStripSize(out, rowsperstrip);
+	  if (!NDPIGetField(in, TIFFTAG_ROWSPERSTRIP, &rowsperstrip))
+	    rowsperstrip = NDPIDefaultStripSize(out, rowsperstrip);
           if (compression != COMPRESSION_JPEG)
             {
   	    if (rowsperstrip > length)
@@ -7915,12 +7915,12 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
 	else 
           if (rowsperstrip == (uint32_t) -1)
 	    rowsperstrip = length;
-	TIFFSetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
+	NDPISetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
 	}
 
-  TIFFGetFieldDefaulted(in, TIFFTAG_PLANARCONFIG, &input_planar);
+  NDPIGetFieldDefaulted(in, TIFFTAG_PLANARCONFIG, &input_planar);
   if (config != (uint16_t) -1)
-    TIFFSetField(out, TIFFTAG_PLANARCONFIG, config);
+    NDPISetField(out, TIFFTAG_PLANARCONFIG, config);
   else
     CopyField(TIFFTAG_PLANARCONFIG, config);
   if (spp <= 4)
@@ -7932,12 +7932,12 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
     case COMPRESSION_JPEG:
          if (((bps % 8) == 0) || ((bps % 12) == 0))
 	   {
-           TIFFSetField(out, TIFFTAG_JPEGQUALITY, quality);
-	   TIFFSetField(out, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
+           NDPISetField(out, TIFFTAG_JPEGQUALITY, quality);
+	   NDPISetField(out, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
            }
          else
            {
-	   TIFFError("writeCroppedImage",
+	   NDPIError("writeCroppedImage",
                      "JPEG compression requires 8 or 12 bits per sample");
            return (-1);
            }
@@ -7946,7 +7946,7 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
    case COMPRESSION_ADOBE_DEFLATE:
    case COMPRESSION_DEFLATE:
 	if (predictor != (uint16_t)-1)
-          TIFFSetField(out, TIFFTAG_PREDICTOR, predictor);
+          NDPISetField(out, TIFFTAG_PREDICTOR, predictor);
 	else
 	  CopyField(TIFFTAG_PREDICTOR, predictor);
 	break;
@@ -7954,13 +7954,13 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
    case COMPRESSION_CCITTFAX4:
         if (bps != 1)
           {
-	  TIFFError("writeCroppedImage",
+	  NDPIError("writeCroppedImage",
             "Group 3/4 compression is not usable with bps > 1");
           return (-1);
 	  }
 	if (compression == COMPRESSION_CCITTFAX3) {
           if (g3opts != (uint32_t) -1)
-	    TIFFSetField(out, TIFFTAG_GROUP3OPTIONS, g3opts);
+	    NDPISetField(out, TIFFTAG_GROUP3OPTIONS, g3opts);
 	  else
 	    CopyField(TIFFTAG_GROUP3OPTIONS, g3opts);
 	} else {
@@ -7979,14 +7979,14 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
    }
    { uint32_t len32;
      void** data;
-     if (TIFFGetField(in, TIFFTAG_ICCPROFILE, &len32, &data))
-       TIFFSetField(out, TIFFTAG_ICCPROFILE, len32, data);
+     if (NDPIGetField(in, TIFFTAG_ICCPROFILE, &len32, &data))
+       NDPISetField(out, TIFFTAG_ICCPROFILE, len32, data);
    }
    { uint16_t ninks;
      const char* inknames;
-     if (TIFFGetField(in, TIFFTAG_NUMBEROFINKS, &ninks)) {
-       TIFFSetField(out, TIFFTAG_NUMBEROFINKS, ninks);
-       if (TIFFGetField(in, TIFFTAG_INKNAMES, &inknames)) {
+     if (NDPIGetField(in, TIFFTAG_NUMBEROFINKS, &ninks)) {
+       NDPISetField(out, TIFFTAG_NUMBEROFINKS, ninks);
+       if (NDPIGetField(in, TIFFTAG_INKNAMES, &inknames)) {
 	 int inknameslen = strlen(inknames) + 1;
 	 const char* cp = inknames;
 	 while (ninks > 1) {
@@ -7997,14 +7997,14 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
 	   }
 	   ninks--;
          }
-	 TIFFSetField(out, TIFFTAG_INKNAMES, inknameslen, inknames);
+	 NDPISetField(out, TIFFTAG_INKNAMES, inknameslen, inknames);
        }
      }
    }
    {
    unsigned short pg0, pg1;
-   if (TIFFGetField(in, TIFFTAG_PAGENUMBER, &pg0, &pg1)) {
-     TIFFSetField(out, TIFFTAG_PAGENUMBER, pagenum, total_pages);
+   if (NDPIGetField(in, TIFFTAG_PAGENUMBER, &pg0, &pg1)) {
+     NDPISetField(out, TIFFTAG_PAGENUMBER, pagenum, total_pages);
      }
    }
 
@@ -8017,12 +8017,12 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
     if (config == PLANARCONFIG_CONTIG)
       {
       if (writeBufferToContigTiles (out, crop_buff, length, width, spp, dump))
-        TIFFError("","Unable to write contiguous tile data for page %d", pagenum);
+        NDPIError("","Unable to write contiguous tile data for page %d", pagenum);
       }
     else
       {
       if (writeBufferToSeparateTiles (out, crop_buff, length, width, spp, dump))
-        TIFFError("","Unable to write separate tile data for page %d", pagenum);
+        NDPIError("","Unable to write separate tile data for page %d", pagenum);
       }
     }
   else
@@ -8030,18 +8030,18 @@ writeCroppedImage(TIFF *in, TIFF *out, struct image_data *image,
     if (config == PLANARCONFIG_CONTIG)
       {
       if (writeBufferToContigStrips (out, crop_buff, length))
-        TIFFError("","Unable to write contiguous strip data for page %d", pagenum);
+        NDPIError("","Unable to write contiguous strip data for page %d", pagenum);
       }
     else
       {
       if (writeBufferToSeparateStrips(out, crop_buff, length, width, spp, dump))
-        TIFFError("","Unable to write separate strip data for page %d", pagenum);
+        NDPIError("","Unable to write separate strip data for page %d", pagenum);
       }
     }
 
-  if (!TIFFWriteDirectory(out))
+  if (!NDPIWriteDirectory(out))
     {
-    TIFFError("","Failed to write IFD for page number %d", pagenum);
+    NDPIError("","Failed to write IFD for page number %d", pagenum);
     return (-1);
     }
 
@@ -8062,7 +8062,7 @@ rotateContigSamples8bits(uint16_t rotation, uint16_t spp, uint16_t bps, uint32_t
 
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("rotateContigSamples8bits","Invalid src or destination buffer");
+    NDPIError("rotateContigSamples8bits","Invalid src or destination buffer");
     return (1);
     }
 
@@ -8093,7 +8093,7 @@ rotateContigSamples8bits(uint16_t rotation, uint16_t spp, uint16_t bps, uint32_t
                   break;
         case 270: next = src + src_byte + (row * rowsize);
 	          break;
-	default:  TIFFError("rotateContigSamples8bits", "Invalid rotation %"PRIu16, rotation);
+	default:  NDPIError("rotateContigSamples8bits", "Invalid rotation %"PRIu16, rotation);
                   return (1);
         }
       matchbits = maskbits << (8 - src_bit - bps); 
@@ -8139,7 +8139,7 @@ rotateContigSamples16bits(uint16_t rotation, uint16_t spp, uint16_t bps, uint32_
 
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("rotateContigSamples16bits","Invalid src or destination buffer");
+    NDPIError("rotateContigSamples16bits","Invalid src or destination buffer");
     return (1);
     }
 
@@ -8169,7 +8169,7 @@ rotateContigSamples16bits(uint16_t rotation, uint16_t spp, uint16_t bps, uint32_
                   break;
         case 270: next = src + src_byte + (row * rowsize);
 	          break;
-	default:  TIFFError("rotateContigSamples8bits", "Invalid rotation %"PRIu16, rotation);
+	default:  NDPIError("rotateContigSamples8bits", "Invalid rotation %"PRIu16, rotation);
                   return (1);
         }
       matchbits = maskbits << (16 - src_bit - bps); 
@@ -8223,7 +8223,7 @@ rotateContigSamples24bits(uint16_t rotation, uint16_t spp, uint16_t bps, uint32_
 
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("rotateContigSamples24bits","Invalid src or destination buffer");
+    NDPIError("rotateContigSamples24bits","Invalid src or destination buffer");
     return (1);
     }
 
@@ -8253,7 +8253,7 @@ rotateContigSamples24bits(uint16_t rotation, uint16_t spp, uint16_t bps, uint32_
                   break;
         case 270: next = src + src_byte + (row * rowsize);
 	          break;
-	default:  TIFFError("rotateContigSamples8bits", "Invalid rotation %"PRIu16, rotation);
+	default:  NDPIError("rotateContigSamples8bits", "Invalid rotation %"PRIu16, rotation);
                   return (1);
         }
       matchbits = maskbits << (32 - src_bit - bps); 
@@ -8316,7 +8316,7 @@ rotateContigSamples32bits(uint16_t rotation, uint16_t spp, uint16_t bps, uint32_
 
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("rotateContigSamples24bits","Invalid src or destination buffer");
+    NDPIError("rotateContigSamples24bits","Invalid src or destination buffer");
     return (1);
     }
 
@@ -8353,7 +8353,7 @@ rotateContigSamples32bits(uint16_t rotation, uint16_t spp, uint16_t bps, uint32_
                   break;
         case 270: next = src + src_byte + (row * rowsize);
 	          break;
-	default:  TIFFError("rotateContigSamples8bits", "Invalid rotation %"PRIu16, rotation);
+	default:  NDPIError("rotateContigSamples8bits", "Invalid rotation %"PRIu16, rotation);
                   return (1);
         }
       matchbits = maskbits << (64 - src_bit - bps); 
@@ -8449,16 +8449,16 @@ rotateImage(uint16_t rotation, struct image_data *image, uint32_t *img_width,
     case 90:
     case 180:
     case 270: break;
-    default:  TIFFError("rotateImage", "Invalid rotation angle %"PRIu16, rotation);
+    default:  NDPIError("rotateImage", "Invalid rotation angle %"PRIu16, rotation);
               return (-1);
     }
 
   if (!(rbuff = (unsigned char *)limitMalloc(buffsize)))
     {
-    TIFFError("rotateImage", "Unable to allocate rotation buffer of %1u bytes", buffsize);
+    NDPIError("rotateImage", "Unable to allocate rotation buffer of %1u bytes", buffsize);
     return (-1);
     }
-  _TIFFmemset(rbuff, '\0', buffsize);
+  _NDPImemset(rbuff, '\0', buffsize);
 
   ibuff = *ibuff_ptr;
   switch (rotation)
@@ -8494,20 +8494,20 @@ rotateImage(uint16_t rotation, struct image_data *image, uint32_t *img_width,
 			      {
                               if (reverseSamples8bits(spp, bps, width, src, dst))
                                 {
-		                _TIFFfree(rbuff);
+		                _NDPIfree(rbuff);
                                 return (-1);
                                 }
                               break;
                               }
                             if (reverseSamples16bits(spp, bps, width, src, dst))
                               {
-		              _TIFFfree(rbuff);
+		              _NDPIfree(rbuff);
                               return (-1);
                               }
                              break;
                     case 2: if (reverseSamples24bits(spp, bps, width, src, dst))
                               {
-		              _TIFFfree(rbuff);
+		              _NDPIfree(rbuff);
                               return (-1);
                               }
                              break;
@@ -8515,17 +8515,17 @@ rotateImage(uint16_t rotation, struct image_data *image, uint32_t *img_width,
                     case 4: 
                     case 5: if (reverseSamples32bits(spp, bps, width, src, dst))
                               {
-		              _TIFFfree(rbuff);
+		              _NDPIfree(rbuff);
                               return (-1);
                               }
                              break;
-                    default: TIFFError("rotateImage","Unsupported bit depth %"PRIu16, bps);
-		             _TIFFfree(rbuff);
+                    default: NDPIError("rotateImage","Unsupported bit depth %"PRIu16, bps);
+		             _NDPIfree(rbuff);
                              return (-1);      
                     }
 		  }
 		}
-              _TIFFfree(ibuff);
+              _NDPIfree(ibuff);
               *(ibuff_ptr) = rbuff;
               break;
 
@@ -8560,7 +8560,7 @@ rotateImage(uint16_t rotation, struct image_data *image, uint32_t *img_width,
                               if (rotateContigSamples8bits(rotation, spp, bps, width, 
 				   	                 length, col, src, dst))
                                 {
-		                _TIFFfree(rbuff);
+		                _NDPIfree(rbuff);
                                 return (-1);
                                 }
                               break;
@@ -8568,14 +8568,14 @@ rotateImage(uint16_t rotation, struct image_data *image, uint32_t *img_width,
                             if (rotateContigSamples16bits(rotation, spp, bps, width, 
 				   	                 length, col, src, dst))
                               {
-	                      _TIFFfree(rbuff);
+	                      _NDPIfree(rbuff);
                               return (-1);
 		              }
 		            break;
                     case 2: if (rotateContigSamples24bits(rotation, spp, bps, width, 
 					                  length, col, src, dst))
                               {
-		              _TIFFfree(rbuff);
+		              _NDPIfree(rbuff);
                               return (-1);
                               }
                              break;
@@ -8584,17 +8584,17 @@ rotateImage(uint16_t rotation, struct image_data *image, uint32_t *img_width,
                     case 5: if (rotateContigSamples32bits(rotation, spp, bps, width, 
 					                  length, col, src, dst))
                               {
-		              _TIFFfree(rbuff);
+		              _NDPIfree(rbuff);
                               return (-1);
                               }
                              break;
-                    default: TIFFError("rotateImage","Unsupported bit depth %"PRIu16, bps);
-		             _TIFFfree(rbuff);
+                    default: NDPIError("rotateImage","Unsupported bit depth %"PRIu16, bps);
+		             _NDPIfree(rbuff);
                              return (-1);      
 		    }
 		  }
 		}
-              _TIFFfree(ibuff);
+              _NDPIfree(ibuff);
               *(ibuff_ptr) = rbuff;
 
               *img_width = length;
@@ -8637,7 +8637,7 @@ rotateImage(uint16_t rotation, struct image_data *image, uint32_t *img_width,
                               if (rotateContigSamples8bits(rotation, spp, bps, width, 
 				   	                 length, col, src, dst))
                                 {
-		                _TIFFfree(rbuff);
+		                _NDPIfree(rbuff);
                                 return (-1);
                                 }
                               break;
@@ -8645,14 +8645,14 @@ rotateImage(uint16_t rotation, struct image_data *image, uint32_t *img_width,
                             if (rotateContigSamples16bits(rotation, spp, bps, width, 
 				   	                 length, col, src, dst))
                               {
-	                      _TIFFfree(rbuff);
+	                      _NDPIfree(rbuff);
                               return (-1);
 		              }
 		            break;
                     case 2: if (rotateContigSamples24bits(rotation, spp, bps, width, 
 					                  length, col, src, dst))
                               {
-		              _TIFFfree(rbuff);
+		              _NDPIfree(rbuff);
                               return (-1);
                               }
                              break;
@@ -8661,17 +8661,17 @@ rotateImage(uint16_t rotation, struct image_data *image, uint32_t *img_width,
                     case 5: if (rotateContigSamples32bits(rotation, spp, bps, width, 
 					                  length, col, src, dst))
                               {
-		              _TIFFfree(rbuff);
+		              _NDPIfree(rbuff);
                               return (-1);
                               }
                              break;
-                    default: TIFFError("rotateImage","Unsupported bit depth %"PRIu16, bps);
-		             _TIFFfree(rbuff);
+                    default: NDPIError("rotateImage","Unsupported bit depth %"PRIu16, bps);
+		             _NDPIfree(rbuff);
                              return (-1);      
 		    }
 		  }
 		}
-              _TIFFfree(ibuff);
+              _NDPIfree(ibuff);
               *(ibuff_ptr) = rbuff;
 
               *img_width = length;
@@ -8705,7 +8705,7 @@ reverseSamples8bits (uint16_t spp, uint16_t bps, uint32_t width,
 
   if ((ibuff == NULL) || (obuff == NULL))
     {
-    TIFFError("reverseSamples8bits","Invalid image or work buffer");
+    NDPIError("reverseSamples8bits","Invalid image or work buffer");
     return (1);
     }
 
@@ -8771,7 +8771,7 @@ reverseSamples16bits (uint16_t spp, uint16_t bps, uint32_t width,
 
   if ((ibuff == NULL) || (obuff == NULL))
     {
-    TIFFError("reverseSample16bits","Invalid image or work buffer");
+    NDPIError("reverseSample16bits","Invalid image or work buffer");
     return (1);
     }
 
@@ -8846,7 +8846,7 @@ reverseSamples24bits (uint16_t spp, uint16_t bps, uint32_t width,
 
   if ((ibuff == NULL) || (obuff == NULL))
     {
-    TIFFError("reverseSamples24bits","Invalid image or work buffer");
+    NDPIError("reverseSamples24bits","Invalid image or work buffer");
     return (1);
     }
 
@@ -8932,7 +8932,7 @@ reverseSamples32bits (uint16_t spp, uint16_t bps, uint32_t width,
 
   if ((ibuff == NULL) || (obuff == NULL))
     {
-    TIFFError("reverseSamples32bits","Invalid image or work buffer");
+    NDPIError("reverseSamples32bits","Invalid image or work buffer");
     return (1);
     }
 
@@ -9024,14 +9024,14 @@ reverseSamplesBytes (uint16_t spp, uint16_t bps, uint32_t width,
   
   if ((src == NULL) || (dst == NULL))
     {
-    TIFFError("reverseSamplesBytes","Invalid input or output buffer");
+    NDPIError("reverseSamplesBytes","Invalid input or output buffer");
     return (1);
     }
 
   bytes_per_pixel  = ((bps * spp) + 7) / 8;
   if( bytes_per_pixel > sizeof(swapbuff) )
   {
-    TIFFError("reverseSamplesBytes","bytes_per_pixel too large");
+    NDPIError("reverseSamplesBytes","bytes_per_pixel too large");
     return (1);
   }
   switch (bps / 8)
@@ -9042,9 +9042,9 @@ reverseSamplesBytes (uint16_t spp, uint16_t bps, uint32_t width,
      case 2: for (col = 0; col < (width / 2); col++)
                {
 	       col_offset = col * bytes_per_pixel;                     
-	       _TIFFmemcpy (swapbuff, src + col_offset, bytes_per_pixel);
-	       _TIFFmemcpy (src + col_offset, dst - col_offset - bytes_per_pixel, bytes_per_pixel);
-	       _TIFFmemcpy (dst - col_offset - bytes_per_pixel, swapbuff, bytes_per_pixel);
+	       _NDPImemcpy (swapbuff, src + col_offset, bytes_per_pixel);
+	       _NDPImemcpy (src + col_offset, dst - col_offset - bytes_per_pixel, bytes_per_pixel);
+	       _NDPImemcpy (dst - col_offset - bytes_per_pixel, swapbuff, bytes_per_pixel);
                }
 	     break;
      case 1: /* Use byte copy only for single byte per sample data */
@@ -9059,7 +9059,7 @@ reverseSamplesBytes (uint16_t spp, uint16_t bps, uint32_t width,
 		dst -= spp;
                 }
 	     break;
-     default: TIFFError("reverseSamplesBytes","Unsupported bit depth %"PRIu16, bps);
+     default: NDPIError("reverseSamplesBytes","Unsupported bit depth %"PRIu16, bps);
        return (1);
      }
   return (0);
@@ -9086,21 +9086,21 @@ mirrorImage(uint16_t spp, uint16_t bps, uint16_t mirror, uint32_t width, uint32_
              line_buff = (unsigned char *)limitMalloc(rowsize);
              if (line_buff == NULL)
                {
-	       TIFFError ("mirrorImage", "Unable to allocate mirror line buffer of %1u bytes", rowsize);
+	       NDPIError ("mirrorImage", "Unable to allocate mirror line buffer of %1u bytes", rowsize);
                return (-1);
                }
 
              dst = ibuff + (rowsize * (length - 1));
              for (row = 0; row < length / 2; row++)
                {
-	      _TIFFmemcpy(line_buff, src, rowsize);
-	      _TIFFmemcpy(src, dst,  rowsize);
-	      _TIFFmemcpy(dst, line_buff, rowsize);
+	      _NDPImemcpy(line_buff, src, rowsize);
+	      _NDPImemcpy(src, dst,  rowsize);
+	      _NDPImemcpy(dst, line_buff, rowsize);
                src += (rowsize);
                dst -= (rowsize);                                 
                }
              if (line_buff)
-               _TIFFfree(line_buff);
+               _NDPIfree(line_buff);
              if (mirror == MIRROR_VERT)
                break;
              /* Fall through */
@@ -9122,7 +9122,7 @@ mirrorImage(uint16_t spp, uint16_t bps, uint16_t mirror, uint32_t width, uint32_
                 { /* non 8 bit per sample  data */
                 if (!(line_buff = (unsigned char *)limitMalloc(rowsize + 1)))
                   {
-                  TIFFError("mirrorImage", "Unable to allocate mirror line buffer");
+                  NDPIError("mirrorImage", "Unable to allocate mirror line buffer");
                   return (-1);
                   }
                 bytes_per_sample = (bps + 7) / 8;
@@ -9136,43 +9136,43 @@ mirrorImage(uint16_t spp, uint16_t bps, uint16_t mirror, uint32_t width, uint32_
                   {
 		  row_offset = row * rowsize;
                   src = ibuff + row_offset;
-                  _TIFFmemset (line_buff, '\0', rowsize);
+                  _NDPImemset (line_buff, '\0', rowsize);
                   switch (shift_width)
                     {
                     case 1: if (reverseSamples16bits(spp, bps, width, src, line_buff))
                               {
-		              _TIFFfree(line_buff);
+		              _NDPIfree(line_buff);
                               return (-1);
                               }
-                             _TIFFmemcpy (src, line_buff, rowsize);
+                             _NDPImemcpy (src, line_buff, rowsize);
                              break;
                     case 2: if (reverseSamples24bits(spp, bps, width, src, line_buff))
                               {
-		              _TIFFfree(line_buff);
+		              _NDPIfree(line_buff);
                               return (-1);
                               }
-                             _TIFFmemcpy (src, line_buff, rowsize);
+                             _NDPImemcpy (src, line_buff, rowsize);
                              break;
                     case 3: 
                     case 4: 
                     case 5: if (reverseSamples32bits(spp, bps, width, src, line_buff))
                               {
-		              _TIFFfree(line_buff);
+		              _NDPIfree(line_buff);
                               return (-1);
                               }
-                             _TIFFmemcpy (src, line_buff, rowsize);
+                             _NDPImemcpy (src, line_buff, rowsize);
                              break;
-                    default: TIFFError("mirrorImage","Unsupported bit depth %"PRIu16, bps);
-		             _TIFFfree(line_buff);
+                    default: NDPIError("mirrorImage","Unsupported bit depth %"PRIu16, bps);
+		             _NDPIfree(line_buff);
                              return (-1);      
                     }
 		  }
                 if (line_buff)
-                  _TIFFfree(line_buff);
+                  _NDPIfree(line_buff);
 		}
              break;
 
-    default: TIFFError ("mirrorImage", "Invalid mirror axis %"PRIu16, mirror);
+    default: NDPIError ("mirrorImage", "Invalid mirror axis %"PRIu16, mirror);
              return (-1);
              break;
     }
@@ -9191,20 +9191,20 @@ invertImage(uint16_t photometric, uint16_t spp, uint16_t bps, uint32_t width, ui
 
   if (spp != 1)
     {
-    TIFFError("invertImage", "Image inversion not supported for more than one sample per pixel");
+    NDPIError("invertImage", "Image inversion not supported for more than one sample per pixel");
     return (-1);
     }
 
   if (photometric !=  PHOTOMETRIC_MINISWHITE && photometric !=  PHOTOMETRIC_MINISBLACK)
     {
-    TIFFError("invertImage", "Only black and white and grayscale images can be inverted");
+    NDPIError("invertImage", "Only black and white and grayscale images can be inverted");
     return (-1);
     }
 
   src = work_buff;
   if (src == NULL)
     {
-    TIFFError ("invertImage", "Invalid crop buffer passed to invertImage");
+    NDPIError ("invertImage", "Invalid crop buffer passed to invertImage");
     return (-1);
     }
 
@@ -9236,7 +9236,7 @@ invertImage(uint16_t photometric, uint16_t spp, uint16_t bps, uint32_t width, ui
                 src++;
                 }
             break;
-    default: TIFFError("invertImage", "Unsupported bit depth %"PRIu16, bps);
+    default: NDPIError("invertImage", "Unsupported bit depth %"PRIu16, bps);
       return (-1);
     }
 

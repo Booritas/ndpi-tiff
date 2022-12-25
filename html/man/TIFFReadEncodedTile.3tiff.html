@@ -4,11 +4,11 @@
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
 <meta name="Content-Style" content="text/css">
-<title>TIFFReadEncodedTile</title>
+<title>NDPIReadEncodedTile</title>
 </head>
 <body>
 
-<h1 align=center>TIFFReadEncodedTile</h1>
+<h1 align=center>NDPIReadEncodedTile</h1>
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
@@ -26,7 +26,7 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>TIFFReadEncodedTile &minus; read and decode a tile of
+<p>NDPIReadEncodedTile &minus; read and decode a tile of
 data from an open <small>TIFF</small> file</p>
 </td>
 </table>
@@ -40,7 +40,7 @@ data from an open <small>TIFF</small> file</p>
 <td width="91%">
 <p><b>#include &lt;tiffio.h&gt;</b></p>
 <!-- INDENTATION -->
-<p><b>int TIFFReadEncodedTile(TIFF *</b><i>tif</i><b>,
+<p><b>int NDPIReadEncodedTile(TIFF *</b><i>tif</i><b>,
 ttile_t</b> <i>tile</i><b>, tdata_t</b> <i>buf</i><b>,
 tsize_t</b> <i>size</i><b>)</b></p>
 </td>
@@ -70,11 +70,11 @@ supplied) data buffer.</p>
 number.&rsquo;&rsquo; That is, the caller must take into
 account whether or not the data are organized in separate
 planes (<i>PlanarConfiguration</i>=2).
-<i>TIFFComputeTile</i> automatically does this when
+<i>NDPIComputeTile</i> automatically does this when
 converting an (x,y,z,sample) coordinate quadruple to a tile
 number. To read a full tile of data the data buffer should
 be at least as large as the value returned by
-<i>TIFFTileSize</i>.</p>
+<i>NDPITileSize</i>.</p>
 <!-- INDENTATION -->
 <p>The library attempts to hide bit- and byte-ordering
 differences between the image and the native machine by
@@ -94,7 +94,7 @@ opposite to the native machine byte order,</p>
 <td width="8%"></td>
 <td width="91%">
 <p>The actual number of bytes of data that were placed in
-<i>buf</i> is returned; <i>TIFFReadEncodedTile</i> returns
+<i>buf</i> is returned; <i>NDPIReadEncodedTile</i> returns
 &minus;1 if an error was encountered.</p>
 </td>
 </table>
@@ -107,7 +107,7 @@ opposite to the native machine byte order,</p>
 <td width="8%"></td>
 <td width="91%">
 <p>All error messages are directed to the
-<b>TIFFError</b>(3TIFF) routine.</p>
+<b>NDPIError</b>(3TIFF) routine.</p>
 </td>
 </table>
 <a name="SEE ALSO"></a>
@@ -118,8 +118,8 @@ opposite to the native machine byte order,</p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><b>TIFFOpen</b>(3TIFF), <b>TIFFReadRawTile</b>(3TIFF),
-<b>TIFFReadTile</b>(3TIFF), <b>libtiff</b>(3TIFF)</p>
+<p><b>NDPIOpen</b>(3TIFF), <b>NDPIReadRawTile</b>(3TIFF),
+<b>NDPIReadTile</b>(3TIFF), <b>libtiff</b>(3TIFF)</p>
 <!-- INDENTATION -->
 <p>Libtiff library home page:
 <b>http://www.simplesystems.org/libtiff/</b></p>

@@ -41,7 +41,7 @@ static int NotConfigured(TIFF*, int);
 #define TIFFInitThunderScan NotConfigured
 #endif
 #ifndef NEXT_SUPPORT
-#define TIFFInitNeXT NotConfigured
+#define NDPIInitNeXT NotConfigured
 #endif
 #ifndef JPEG_SUPPORT
 #define TIFFInitJPEG NotConfigured
@@ -84,11 +84,11 @@ static int NotConfigured(TIFF*, int);
  * Compression schemes statically built into the library.
  */
 const TIFFCodec _TIFFBuiltinCODECS[] = {
-    { "None",		COMPRESSION_NONE,	TIFFInitDumpMode },
+    { "None",		COMPRESSION_NONE,	NDPIInitDumpMode },
     { "LZW",		COMPRESSION_LZW,	TIFFInitLZW },
     { "PackBits",	COMPRESSION_PACKBITS,	TIFFInitPackBits },
     { "ThunderScan",	COMPRESSION_THUNDERSCAN,TIFFInitThunderScan },
-    { "NeXT",		COMPRESSION_NEXT,	TIFFInitNeXT },
+    { "NeXT",		COMPRESSION_NEXT,	NDPIInitNeXT },
     { "JPEG",		COMPRESSION_JPEG,	TIFFInitJPEG },
     { "Old-style JPEG",	COMPRESSION_OJPEG,	TIFFInitOJPEG },
     { "CCITT RLE",	COMPRESSION_CCITTRLE,	TIFFInitCCITTRLE },
@@ -111,11 +111,11 @@ const TIFFCodec _TIFFBuiltinCODECS[] = {
 static int
 _notConfigured(TIFF* tif)
 {
-	const TIFFCodec* c = TIFFFindCODEC(tif->tif_dir.td_compression);
+	const TIFFCodec* c = NDPIFindCODEC(tif->tif_dir.td_compression);
         char compression_code[20];
         
         sprintf(compression_code, "%"PRIu16, tif->tif_dir.td_compression );
-	TIFFErrorExt(tif->tif_clientdata, tif->tif_name,
+	NDPIErrorExt(tif->tif_clientdata, tif->tif_name,
                      "%s compression support is not configured", 
                      c ? c->name : compression_code );
 	return (0);
@@ -135,7 +135,7 @@ NotConfigured(TIFF* tif, int scheme)
 }
 
 /************************************************************************/
-/*                       TIFFIsCODECConfigured()                        */
+/*                       NDPIIsCODECConfigured()                        */
 /************************************************************************/
 
 /**
@@ -146,9 +146,9 @@ NotConfigured(TIFF* tif, int scheme)
  */
 
 int
-TIFFIsCODECConfigured(uint16_t scheme)
+NDPIIsCODECConfigured(uint16_t scheme)
 {
-	const TIFFCodec* codec = TIFFFindCODEC(scheme);
+	const TIFFCodec* codec = NDPIFindCODEC(scheme);
 
 	if(codec == NULL) {
 		return 0;

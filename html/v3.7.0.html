@@ -82,11 +82,11 @@ The following information is located here:
 
 	<li> libtiff/tif_dir.c: Initialize td_tilewidth and td_tilelength fields
 	of the TIFFDirectory structure with the 0 instead of -1 to avoid
-	confusing integer overflows in TIFFTileRowSize() for striped images.
+	confusing integer overflows in NDPITileRowSize() for striped images.
 
 	<li> libtiff/tif_dir.c: Initialize td_tilewidth and td_tilelength fields
 	of the TIFFDirectory structure with the 0 instead of -1 to avoid
-	confusing integer overflows in TIFFTileRowSize() for striped images.
+	confusing integer overflows in NDPITileRowSize() for striped images.
 
 	<li> libtiff/tif_dirinfo.c: Fix bug with tif_foundfield and reallocation
 	of tif_fieldinfo as per bug
@@ -94,7 +94,7 @@ The following information is located here:
 		http://bugzilla.remotesensing.org/show_bug.cgi?id=630</A>
 
 	<li> libtiff/tif_compress.c: Improved error reporting in
-	TIFFGetConfiguredCODECs() (Dmitry V. Levin).
+	NDPIGetConfiguredCODECs() (Dmitry V. Levin).
 
 </UL>
 

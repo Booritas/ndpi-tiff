@@ -22,25 +22,25 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFGetField 3TIFF "March 29, 2020" "libtiff"
+.TH NDPIGetField 3TIFF "March 29, 2020" "libtiff"
 .SH NAME
-TIFFGetField, TIFFVGetField \- get the value(s) of a tag in an open
+NDPIGetField, NDPIVGetField \- get the value(s) of a tag in an open
 .SM TIFF
 file
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "int TIFFGetField(TIFF *" tif ", ttag_t " tag ", " ... ")"
+.BI "int NDPIGetField(TIFF *" tif ", ttag_t " tag ", " ... ")"
 .sp
 .B "#include <stdarg.h>"
 .sp
-.BI "int TIFFVGetField(TIFF *" tif ", ttag_t " tag ", va_list " ap ")"
+.BI "int NDPIVGetField(TIFF *" tif ", ttag_t " tag ", va_list " ap ")"
 .br
-.BI "int TIFFGetFieldDefaulted(TIFF *" tif ", ttag_t " tag ", " ... ")"
+.BI "int NDPIGetFieldDefaulted(TIFF *" tif ", ttag_t " tag ", " ... ")"
 .br
-.BI "int TIFFVGetFieldDefaulted(TIFF *" tif ", ttag_t " tag ", va_list " ap ")"
+.BI "int NDPIVGetFieldDefaulted(TIFF *" tif ", ttag_t " tag ", va_list " ap ")"
 .SH DESCRIPTION
-.IR TIFFGetField
+.IR NDPIGetField
 returns the value of a tag or pseudo-tag associated with the the current
 directory of the opened
 .SM TIFF
@@ -52,7 +52,7 @@ is a parameter that is used to control the operation of the
 .SM TIFF
 library but whose value is not read or written to the underlying file.) The
 file must have been previously opened with
-.IR TIFFOpen (3TIFF).
+.IR NDPIOpen (3TIFF).
 The tag is identified by
 .IR tag ,
 one of the values defined in the include file
@@ -62,24 +62,24 @@ dependent on the tag being requested. The programming interface uses a
 variable argument list as prescribed by the
 .IR stdarg (3)
 interface. The returned values should only be interpreted if
-.IR TIFFGetField
+.IR NDPIGetField
 returns 1.
 .PP
-.IR TIFFVGetField
+.IR NDPIVGetField
 is functionally equivalent to
-.IR TIFFGetField
+.IR NDPIGetField
 except that it takes a pointer to a variable argument list.
-.I TIFFVGetField
+.I NDPIVGetField
 is useful for layering interfaces on top of the functionality provided by
-.IR TIFFGetField .
+.IR NDPIGetField .
 .PP
-.IR TIFFGetFieldDefaulted
+.IR NDPIGetFieldDefaulted
 and
-.IR TIFFVGetFieldDefaulted
+.IR NDPIVGetFieldDefaulted
 are identical to 
-.IR TIFFGetField
+.IR NDPIGetField
 and
-.IR TIFFVGetField ,
+.IR NDPIVGetField ,
 except that if a tag is not defined in the current directory and it has a
 default value, then the default value is returned.
 .PP
@@ -88,9 +88,9 @@ The tags understood by
 the number of parameter values, and the types for the returned values are
 shown below. The data types are specified as in C and correspond to the types
 used to specify tag values to
-.IR TIFFSetField (3TIFF).
+.IR NDPISetField (3TIFF).
 Remember that
-.IR TIFFGetField
+.IR NDPIGetField
 returns parameter values, so all the listed data types are pointers to storage
 where values should be returned.
 Consult the
@@ -199,9 +199,9 @@ and ASCII string from the tag 36867 you can use the following code:
 uint32_t  count;
 void    *data;
 
-TIFFGetField(tiff, 33424, &count, &data);
+NDPIGetField(tiff, 33424, &count, &data);
 printf("Tag %d: %d, count %d\n", 33424, *(uint32_t *)data, count);
-TIFFGetField(tiff, 36867, &count, &data);
+NDPIGetField(tiff, 36867, &count, &data);
 printf("Tag %d: %s, count %d\n", 36867, (char *)data, count);
 .fi
 .RE
@@ -211,17 +211,17 @@ printf("Tag %d: %s, count %d\n", 36867, (char *)data, count);
 returned.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.BR TIFFError (3TIFF)
+.BR NDPIError (3TIFF)
 routine.
 .PP
 .BR "Unknown field, tag 0x%x" .
 An unknown tag was supplied.
 .SH "SEE ALSO"
-.BR TIFFOpen (3TIFF),
-.BR TIFFSetField (3TIFF),
-.BR TIFFSetDirectory (3TIFF),
-.BR TIFFReadDirectory (3TIFF),
-.BR TIFFWriteDirectory (3TIFF)
+.BR NDPIOpen (3TIFF),
+.BR NDPISetField (3TIFF),
+.BR NDPISetDirectory (3TIFF),
+.BR NDPIReadDirectory (3TIFF),
+.BR NDPIWriteDirectory (3TIFF)
 .BR libtiff (3TIFF),
 .PP
 Libtiff library home page:

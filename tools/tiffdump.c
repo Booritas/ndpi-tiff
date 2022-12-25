@@ -189,13 +189,13 @@ dump(int fd, uint64_t diroff)
 	else
 		swabflag = bigendian;
 	if (swabflag)
-		TIFFSwabShort(&hdr.common.tiff_version);
+		NDPISwabShort(&hdr.common.tiff_version);
 	if (hdr.common.tiff_version==42)
 	{
 		if (read(fd, (char*) &hdr.classic.tiff_diroff, 4) != 4)
 			ReadError("TIFF header");
 		if (swabflag)
-			TIFFSwabLong(&hdr.classic.tiff_diroff);
+			NDPISwabLong(&hdr.classic.tiff_diroff);
 		printf("Magic: %#x <%s-endian> Version: %#x <%s>\n",
 		    hdr.classic.tiff_magic,
 		    hdr.classic.tiff_magic == TIFF_BIGENDIAN ? "big" : "little",
@@ -209,9 +209,9 @@ dump(int fd, uint64_t diroff)
 			ReadError("TIFF header");
 		if (swabflag)
 		{
-			TIFFSwabShort(&hdr.big.tiff_offsetsize);
-			TIFFSwabShort(&hdr.big.tiff_unused);
-			TIFFSwabLong8(&hdr.big.tiff_diroff);
+			NDPISwabShort(&hdr.big.tiff_offsetsize);
+			NDPISwabShort(&hdr.big.tiff_unused);
+			NDPISwabLong8(&hdr.big.tiff_diroff);
 		}
 		printf("Magic: %#x <%s-endian> Version: %#x <%s>\n",
 		    hdr.big.tiff_magic,
@@ -316,7 +316,7 @@ ReadDirectory(int fd, unsigned int ix, uint64_t off)
 			goto done;
 		}
 		if (swabflag)
-			TIFFSwabShort(&dircount);
+			NDPISwabShort(&dircount);
 		direntrysize = 12;
 	} else {
 		uint64_t dircount64 = 0;
@@ -325,7 +325,7 @@ ReadDirectory(int fd, unsigned int ix, uint64_t off)
 			goto done;
 		}
 		if (swabflag)
-			TIFFSwabLong8(&dircount64);
+			NDPISwabLong8(&dircount64);
 		if (dircount64>0xFFFF) {
 			Error("Sanity check on directory count failed");
 			goto done;
@@ -333,7 +333,7 @@ ReadDirectory(int fd, unsigned int ix, uint64_t off)
 		dircount = (uint16_t)dircount64;
 		direntrysize = 20;
 	}
-	dirmem = _TIFFmalloc(TIFFSafeMultiply(tmsize_t,dircount,direntrysize));
+	dirmem = _NDPImalloc(TIFFSafeMultiply(tmsize_t,dircount,direntrysize));
 	if (dirmem == NULL) {
 		Fatal("No space for TIFF directory");
 		goto done;
@@ -352,13 +352,13 @@ ReadDirectory(int fd, unsigned int ix, uint64_t off)
 			if (read(fd, (char*) &nextdiroff32, sizeof (uint32_t)) != sizeof (uint32_t))
 				nextdiroff32 = 0;
 			if (swabflag)
-				TIFFSwabLong(&nextdiroff32);
+				NDPISwabLong(&nextdiroff32);
 			nextdiroff = nextdiroff32;
 		} else {
 			if (read(fd, (char*) &nextdiroff, sizeof (uint64_t)) != sizeof (uint64_t))
 				nextdiroff = 0;
 			if (swabflag)
-				TIFFSwabLong8(&nextdiroff);
+				NDPISwabLong8(&nextdiroff);
 		}
 	}
 	printf("Directory %u: offset %" PRIu64 " (%#" PRIx64 ") next %" PRIu64 " (%#" PRIx64 ")\n",
@@ -377,12 +377,12 @@ ReadDirectory(int fd, unsigned int ix, uint64_t off)
 
 		tag = *(uint16_t*)dp;
 		if (swabflag)
-			TIFFSwabShort(&tag);
+			NDPISwabShort(&tag);
 		dp += sizeof(uint16_t);
 		type = *(uint16_t*)dp;
 		dp += sizeof(uint16_t);
 		if (swabflag)
-			TIFFSwabShort(&type);
+			NDPISwabShort(&type);
 		PrintTag(stdout, tag);
 		putchar(' ');
 		PrintType(stdout, type);
@@ -392,7 +392,7 @@ ReadDirectory(int fd, unsigned int ix, uint64_t off)
 			uint32_t count32;
 			count32 = *(uint32_t*)dp;
 			if (swabflag)
-				TIFFSwabLong(&count32);
+				NDPISwabLong(&count32);
 			dp += sizeof(uint32_t);
 			count = count32;
 		}
@@ -400,7 +400,7 @@ ReadDirectory(int fd, unsigned int ix, uint64_t off)
 		{
 			memcpy(&count, dp, sizeof(uint64_t));
 			if (swabflag)
-				TIFFSwabLong8(&count);
+				NDPISwabLong8(&count);
 			dp += sizeof(uint64_t);
 		}
 		printf("%" PRIu64 "<", count);
@@ -423,7 +423,7 @@ ReadDirectory(int fd, unsigned int ix, uint64_t off)
 				datamem = NULL;
 				dataoffset32 = *(uint32_t*)dp;
 				if (swabflag)
-					TIFFSwabLong(&dataoffset32);
+					NDPISwabLong(&dataoffset32);
 				dataoffset = dataoffset32;
 			}
 			dp += sizeof(uint32_t);
@@ -436,7 +436,7 @@ ReadDirectory(int fd, unsigned int ix, uint64_t off)
 				datamem = NULL;
 				memcpy(&dataoffset, dp, sizeof(uint64_t));
 				if (swabflag)
-					TIFFSwabLong8(&dataoffset);
+					NDPISwabLong8(&dataoffset);
 			}
 			dp += sizeof(uint64_t);
 		}
@@ -454,21 +454,21 @@ ReadDirectory(int fd, unsigned int ix, uint64_t off)
 		}
 		if (!datafits)
 		{
-			datamem = _TIFFmalloc(datasize);
+			datamem = _NDPImalloc(datasize);
 			if (datamem) {
 				if (_TIFF_lseek_f(fd, (_TIFF_off_t)dataoffset, 0) !=
 				    (_TIFF_off_t)dataoffset)
 				{
 					Error(
 				"Seek error accessing tag %u value", tag);
-					_TIFFfree(datamem);
+					_NDPIfree(datamem);
 					datamem = NULL;
 				}
 				else if (read(fd, datamem, (size_t)datasize) != (tmsize_t)datasize)
 				{
 					Error(
 				"Read error accessing tag %u value", tag);
-					_TIFFfree(datamem);
+					_NDPIfree(datamem);
 					datamem = NULL;
 				}
 			} else
@@ -487,17 +487,17 @@ ReadDirectory(int fd, unsigned int ix, uint64_t off)
 						break;
 					case TIFF_SHORT:
 					case TIFF_SSHORT:
-						TIFFSwabArrayOfShort((uint16_t*)datamem, (tmsize_t)count);
+						NDPISwabArrayOfShort((uint16_t*)datamem, (tmsize_t)count);
 						break;
 					case TIFF_LONG:
 					case TIFF_SLONG:
 					case TIFF_FLOAT:
 					case TIFF_IFD:
-						TIFFSwabArrayOfLong((uint32_t*)datamem, (tmsize_t)count);
+						NDPISwabArrayOfLong((uint32_t*)datamem, (tmsize_t)count);
 						break;
 					case TIFF_RATIONAL:
 					case TIFF_SRATIONAL:
-						TIFFSwabArrayOfLong((uint32_t*)datamem, (tmsize_t)count * 2);
+						NDPISwabArrayOfLong((uint32_t*)datamem, (tmsize_t)count * 2);
 						break;
 					case TIFF_DOUBLE:
 					case TIFF_LONG8:
@@ -512,7 +512,7 @@ ReadDirectory(int fd, unsigned int ix, uint64_t off)
 				printf(" ...");
 			if (!datafits)
                                 {
-                                        _TIFFfree(datamem);
+                                        _NDPIfree(datamem);
                                         datamem = NULL;
                                 }
 		}
@@ -520,7 +520,7 @@ ReadDirectory(int fd, unsigned int ix, uint64_t off)
 	}
 done:
 	if (dirmem)
-		_TIFFfree((char *)dirmem);
+		_NDPIfree((char *)dirmem);
 	return (nextdiroff);
 }
 

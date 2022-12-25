@@ -179,10 +179,10 @@ The following information is located here:
 
 	<li> tif_dirread.c: Move IFD fetching code in the separate
 	function TIFFFetchDirectory() avoiding code duplication in
-	TIFFReadDirectory() and TIFFReadCustomDirectory().
+	NDPIReadDirectory() and TIFFReadCustomDirectory().
 
 	<li>tif_readdir.c: Added case in EstimateStripByteCounts() for tiled
-	files.  Modified TIFFReadDirectory() to not invoke
+	files.  Modified NDPIReadDirectory() to not invoke
 	EstimateStripByteCounts() for case where entry 0 and 1 are unequal but
 	one of them is zero.
 	<a href="http://bugzilla.remotesensing.org/show_bug.cgi?id=1204">
@@ -191,7 +191,7 @@ The following information is located here:
 	<li> tif_open.c, tif_dirread.c, tiffiop.h: Move IFD looping
 	checking code in the separate function TIFFCheckDirOffset().
 
-	<li> tif_aux.c: Added _TIFFCheckRealloc() function.
+	<li> tif_aux.c: Added _NDPICheckRealloc() function.
 
 	<li> tif_fax3.c: Fixed problems in fax decoder as per bug
 	<a href="http://bugzilla.remotesensing.org/show_bug.cgi?id=1194">
@@ -245,7 +245,7 @@ The following information is located here:
 	<a href="http://bugzilla.remotesensing.org/show_bug.cgi?id=1560">
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=1560</a>.
 	Now we don't need tiffiop.h in tiff2pdf anymore and will open output
-	PDF file using TIFFClientOpen() machinery as it is implemented
+	PDF file using NDPIClientOpen() machinery as it is implemented
 	by Leon Bottou.
 
 	<li> tiffcrop.c:  New tiffcrop utility contributed
@@ -292,7 +292,7 @@ The following information is located here:
 <UL> 
 
 	<li> contrib/addtiffo/tif_overview.c: Fix problems with odd sized
-	output blocks in TIFF_DownSample_Subsampled() (bug 1542).
+	output blocks in NDPI_DownSample_Subsampled() (bug 1542).
 
 	<li> contrib/dbs/xtiff/xtiff.c: Make xtiff utility compilable.
 	Though it is still far from the state of being working and useful.

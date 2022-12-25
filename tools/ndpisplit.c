@@ -82,11 +82,11 @@ extern int getopt(int, char**, char*);
 #endif
 
 #define	CopyField(tag, v) \
-    if (TIFFGetField(in, tag, &v)) TIFFSetField(out, tag, v)
+    if (NDPIGetField(in, tag, &v)) NDPISetField(out, tag, v)
 #define	CopyField2(tag, v1, v2) \
-    if (TIFFGetField(in, tag, &v1, &v2)) TIFFSetField(out, tag, v1, v2)
+    if (NDPIGetField(in, tag, &v1, &v2)) NDPISetField(out, tag, v1, v2)
 #define	CopyField3(tag, v1, v2, v3) \
-    if (TIFFGetField(in, tag, &v1, &v2, &v3)) TIFFSetField(out, tag, v1, v2, v3)
+    if (NDPIGetField(in, tag, &v1, &v2, &v3)) NDPISetField(out, tag, v1, v2, v3)
 
 #define MIN(a,b) \
     if (b < a) a = b
@@ -180,8 +180,8 @@ main(int argc, char* argv[])
 	uint16_t mosaiccompressionformat = NDPISPLIT_MOSAICCOMPRESSIONFORMAT;
 	int errorcode = 0;
 
-	oerror = TIFFSetErrorHandler(NULL);
-	/*owarning =*/ TIFFSetWarningHandler(NULL);
+	oerror = NDPISetErrorHandler(NULL);
+	/*owarning =*/ NDPISetWarningHandler(NULL);
 
 	while (arg < argc &&
 	    argv[arg][0] == '-') {
@@ -198,7 +198,7 @@ main(int argc, char* argv[])
 		else if (argv[arg][1] == 'K')
 			printcontroldata = 1;
 		else if (argv[arg][1] == 'T' && argv[arg][2] == 'E') {
-			TIFFSetErrorHandler(oerror);
+			NDPISetErrorHandler(oerror);
 		}
 		else if (argv[arg][1] == 's')
 			shouldsubdivideintoscannedzones = 1;
@@ -480,7 +480,7 @@ read_mosaic_JPEG_quality:
 				if (box == NULL)
 					return (-3);
 
-				box->magnificationstoextract = _TIFFmalloc(
+				box->magnificationstoextract = _NDPImalloc(
 				    sizeof(*(box->magnificationstoextract)));
 				if (box->magnificationstoextract == NULL) {
 					fprintf(stderr, "Error: insufficient memory for specifications of boxes to extract.\n");
@@ -617,10 +617,10 @@ read_mosaic_JPEG_quality:
 		shouldsubdivideintoscannedzones= 0;
 
 	if (verbose) {
-		TIFFSetErrorHandler(stderrErrorHandler);
+		NDPISetErrorHandler(stderrErrorHandler);
 	}
 	if (verbose >= 3) {
-		TIFFSetWarningHandler(stderrWarningHandler);
+		NDPISetWarningHandler(stderrWarningHandler);
 	}
 
 	for (; arg < argc ; arg++) {
@@ -686,7 +686,7 @@ processNDPIFile(char * NDPIfilename, int shouldmakepreviewonly,
 	unsigned numberofavailablendpimagnifications = 0,
 	    numberofavailablendpizoffsets = 0;
 
-	in = TIFFOpen(NDPIfilename, "r");
+	in = NDPIOpen(NDPIfilename, "r");
 	if (in == NULL) {
 		fprintf(stderr, "Unable to open file \"%s\", ignoring it.\n",
 			NDPIfilename);
@@ -711,7 +711,7 @@ processNDPIFile(char * NDPIfilename, int shouldmakepreviewonly,
 
 				if (getWidthAndLength(in, &d.width,
 				    &d.length, ndpimagnification)) {
-					(void) TIFFClose(in);
+					(void) NDPIClose(in);
 					return (1);
 				}
 
@@ -729,11 +729,11 @@ processNDPIFile(char * NDPIfilename, int shouldmakepreviewonly,
 					maxmagn_length = d.length;
 				}
 
-				if (! TIFFGetField(in, NDPITAG_ZOFFSET,
+				if (! NDPIGetField(in, NDPITAG_ZOFFSET,
 				    &ndpizoffset)) {
-					TIFFError(TIFFFileName(in),
+					NDPIError(NDPIFileName(in),
 					"Error, z-Offset not found in NDPI file subdirectory");
-					(void) TIFFClose(in);
+					(void) NDPIClose(in);
 					return (1);
 				}
 				if (addToSetOfInt32s(&availablendpizoffsets,
@@ -765,7 +765,7 @@ processNDPIFile(char * NDPIfilename, int shouldmakepreviewonly,
 
 				if (getWidthAndLength(in, &width,
 				    &length, ndpimagnification)) {
-					(void) TIFFClose(in);
+					(void) NDPIClose(in);
 					return (1);
 				}
 				/*macroimagesize = (tmsize_t) width * length;*/
@@ -774,7 +774,7 @@ processNDPIFile(char * NDPIfilename, int shouldmakepreviewonly,
 				/*ndpihasmap = 1;*/
 			}
 
-		} while (TIFFReadDirectory(in));
+		} while (NDPIReadDirectory(in));
 
 		if (rewindToBeginningOfTIFF(in))
 			return (1);
@@ -828,7 +828,7 @@ processNDPIFile(char * NDPIfilename, int shouldmakepreviewonly,
 					&maxmagn_width,
 					&maxmagn_length,
 					ndpimagnification)) {
-					(void) TIFFClose(in);
+					(void) NDPIClose(in);
 					return (1);
 				}
 				maxndpimagnification= ndpimagnification;
@@ -869,7 +869,7 @@ processNDPIFile(char * NDPIfilename, int shouldmakepreviewonly,
 				}
 			}
 
-		} while (TIFFReadDirectory(in));
+		} while (NDPIReadDirectory(in));
 
 		if (rewindToBeginningOfTIFF(in))
 			return (1);
@@ -979,11 +979,11 @@ processNDPIFile(char * NDPIfilename, int shouldmakepreviewonly,
 			    magnificationstoextract))
 				continue;
 
-			if (! TIFFGetField(in, NDPITAG_ZOFFSET,
+			if (! NDPIGetField(in, NDPITAG_ZOFFSET,
 				&ndpizoffset)) {
-				TIFFError(TIFFFileName(in),
+				NDPIError(NDPIFileName(in),
 				"Error, z-Offset not found in NDPI file subdirectory");
-				(void) TIFFClose(in);
+				(void) NDPIClose(in);
 				return (1);
 			}
 
@@ -1031,7 +1031,7 @@ processNDPIFile(char * NDPIfilename, int shouldmakepreviewonly,
 
 				if (getWidthAndLength(in, &width,
 					&length, ndpimagnification)) {
-					(void) TIFFClose(in);
+					(void) NDPIClose(in);
 					return (1);
 				}
 
@@ -1121,7 +1121,7 @@ processNDPIFile(char * NDPIfilename, int shouldmakepreviewonly,
 						printf(
 				"File containing a TIFF scanned image:%s\n",
 						    path);
-					_TIFFfree(path);
+					_NDPIfree(path);
 					if (r)
 						return r;
 				}
@@ -1181,14 +1181,14 @@ processNDPIFile(char * NDPIfilename, int shouldmakepreviewonly,
 						printf(
 				"File containing a TIFF scanned image:%s\n",
 						    path);
-					_TIFFfree(path);
+					_NDPIfree(path);
 					if (r)
 						return r;
 				}
 			}
 		}
-	} while (TIFFReadDirectory(in));
-	(void) TIFFClose(in);
+	} while (NDPIReadDirectory(in));
+	(void) NDPIClose(in);
 	return (0);
 }
 
@@ -1219,10 +1219,10 @@ static int zoffsetShouldNotBeExtracted(int32_t zoffset,
 
 static int rewindToBeginningOfTIFF(TIFF* in)
 {
-	if (! TIFFSetDirectory(in, 0)) {
-		TIFFError(TIFFFileName(in),
+	if (! NDPISetDirectory(in, 0)) {
+		NDPIError(NDPIFileName(in),
 			"Error, impossible to rewind to beginning of NDPI file");
-		(void) TIFFClose(in);
+		(void) NDPIClose(in);
 		return (1);
 	}
 	return 0;
@@ -1234,42 +1234,42 @@ writeOutTIFF(TIFF* in, char* path, int fd, uint32_t xmin, uint32_t ymin,
 	uint16_t mosaiccompressionformat, uint16_t splitimagecompressionformat)
 {
 	TIFF* out= fd < 0 ?
-		TIFFOpen(path, TIFFIsBigEndian(in)?"wb":"wl") :
-		TIFFFdOpen(fd, path, TIFFIsBigEndian(in)?"wb":"wl");
+		NDPIOpen(path, NDPIIsBigEndian(in)?"wb":"wl") :
+		TIFFFdOpen(fd, path, NDPIIsBigEndian(in)?"wb":"wl");
 
 	if (out == NULL)
 		return (-2);
 	if (!cropNDPI2TIFF(in, out, xmin, ymin, width, length,
 	    splitimagecompressionformat) ||
-	    !TIFFWriteDirectory(out))
+	    !NDPIWriteDirectory(out))
 		return (-1);
 
 	if (shouldmakemosaicoffiles) {
 	/* If the output file that has just been written is not tiled,
 	 * there seems to be no easy way to re-read it without closing
 	 * and reopening it: even resetting the current directory fails
-	 * (there is an error "TIFFFillStrip: Data buffer too small to
-	 * hold strip" during TIFFReadScanline).
-	 * Alternatively, one could try to use TIFFFlush, but it seems
+	 * (there is an error "NDPIFillStrip: Data buffer too small to
+	 * hold strip" during NDPIReadScanline).
+	 * Alternatively, one could try to use NDPIFlush, but it seems
 	 * to bump into a bug: after that, e.g., reading the
 	 * bitspersample field yields an extravagant value. */
-/*	if (! TIFFIsTiled(out) || fd >= 0)
+/*	if (! NDPIIsTiled(out) || fd >= 0)
 {
 fprintf(stderr, "$ will flush...\n");
-		TIFFFlush(out);
+		NDPIFlush(out);
 fprintf(stderr, "$ have flushed.\n");
 }*/
-		if (! TIFFIsTiled(out) || fd >= 0) {
+		if (! NDPIIsTiled(out) || fd >= 0) {
 			if (verbose >= 5)
 				fprintf(stderr, " Closing and reopening \"%s\"\n",
-					TIFFFileName(out));
-			TIFFClose(out);
+					NDPIFileName(out));
+			NDPIClose(out);
 
-			out = TIFFOpen(path, TIFFIsBigEndian(in)?"rb":"rl");
+			out = NDPIOpen(path, NDPIIsBigEndian(in)?"rb":"rl");
 			if (out == NULL)
 				return (-3);
-			if (TIFFReadDirectory(out) == 0 &&
-			    TIFFCurrentDirectory(out) != 0)
+			if (NDPIReadDirectory(out) == 0 &&
+			    NDPICurrentDirectory(out) != 0)
 				return (-3);
 		}
 
@@ -1277,7 +1277,7 @@ fprintf(stderr, "$ have flushed.\n");
 				shouldmakemosaicoffiles);
 	}
 
-	TIFFClose(out);
+	NDPIClose(out);
 
 	return 0;
 }
@@ -1299,8 +1299,8 @@ cropNDPI2TIFF(TIFF* in, TIFF* out, uint32_t xmin, uint32_t ymin,
 	if (length > 0) { /* convention: length=0 <=> ignore x/ymin, width, length */
 		if (xmin+width > imagewidth ) width= imagewidth-xmin;
 		if (ymin+length > imagelength) length= imagelength-ymin;
-		TIFFSetField(out, TIFFTAG_IMAGEWIDTH, width);
-		TIFFSetField(out, TIFFTAG_IMAGELENGTH, length);
+		NDPISetField(out, TIFFTAG_IMAGEWIDTH, width);
+		NDPISetField(out, TIFFTAG_IMAGELENGTH, length);
 	} else {
 		xmin = 0;
 		ymin = 0;
@@ -1310,9 +1310,9 @@ cropNDPI2TIFF(TIFF* in, TIFF* out, uint32_t xmin, uint32_t ymin,
 	}
 
 	if (splitimagecompressionformat == (uint16_t) -1)
-		TIFFGetField(in, TIFFTAG_COMPRESSION, &splitimagecompressionformat);
+		NDPIGetField(in, TIFFTAG_COMPRESSION, &splitimagecompressionformat);
 
-	if (TIFFIsTiled(in))
+	if (NDPIIsTiled(in))
 		return (cpTiles(in, out, xmin, ymin, width, length, splitimagecompressionformat));
 	else
 		if (imagewidth >= 65500 || imagelength >= 65500)
@@ -1337,17 +1337,17 @@ tiffMakeMosaic(TIFF* in, uint16_t mosaiccompressionformat,
 	tmsize_t outmemorysize, ouroutmemorysize;
 	unsigned char * outbuf = NULL;
 
-	TIFFGetField(in, TIFFTAG_IMAGEWIDTH, &inimagewidth);
-	TIFFGetField(in, TIFFTAG_IMAGELENGTH, &inimagelength);
-	TIFFGetField(in, TIFFTAG_SAMPLESPERPIXEL, &spp);
-	TIFFGetField(in, TIFFTAG_BITSPERSAMPLE, &bitspersample);
+	NDPIGetField(in, TIFFTAG_IMAGEWIDTH, &inimagewidth);
+	NDPIGetField(in, TIFFTAG_IMAGELENGTH, &inimagelength);
+	NDPIGetField(in, TIFFTAG_SAMPLESPERPIXEL, &spp);
+	NDPIGetField(in, TIFFTAG_BITSPERSAMPLE, &bitspersample);
 	assert( bitspersample % 8 == 0 );
 
 	if (verbose >= 5)
 		fprintf(stderr, " tiffMakeMosaic, infile \"%s\" has "
 			"width=" TIFF_UINT32_FORMAT " length="
 			TIFF_UINT32_FORMAT " spp=%u bitspersample=%u\n",
-			TIFFFileName(in), inimagewidth, inimagelength,
+			NDPIFileName(in), inimagewidth, inimagelength,
 			spp, bitspersample);
 
 	outwidth= requestedpiecewidth ? requestedpiecewidth : inimagewidth;
@@ -1368,10 +1368,10 @@ tiffMakeMosaic(TIFF* in, uint16_t mosaiccompressionformat,
 
 	{
 		uint16_t planarconfig;
-		(void) TIFFGetField(in, TIFFTAG_PLANARCONFIG, &planarconfig);
+		(void) NDPIGetField(in, TIFFTAG_PLANARCONFIG, &planarconfig);
 		if (verbose >= 5)
 			fprintf(stderr, " tiffMakeMosaic, infile \"%s\" : planarconfig=%u (contig would be %u)\n",
-				TIFFFileName(in), planarconfig,
+				NDPIFileName(in), planarconfig,
 				PLANARCONFIG_CONTIG);
 		assert(planarconfig == PLANARCONFIG_CONTIG);
 	}
@@ -1381,7 +1381,7 @@ tiffMakeMosaic(TIFF* in, uint16_t mosaiccompressionformat,
 	      (requestedpiecelength >= JPEG_MAX_DIMENSION) ) ) {
 		fprintf(stderr, "File \"%s\": at least one requested "
 			"piece dimension is too large for JPEG "
-			"files.\n", TIFFFileName(in));
+			"files.\n", NDPIFileName(in));
 		return;
 	}
 
@@ -1413,11 +1413,11 @@ tiffMakeMosaic(TIFF* in, uint16_t mosaiccompressionformat,
 	if (outwidth == 0 || outlength == 0) {
 		if (verbose)
 			fprintf(stderr, "File \"%s\": impossible to find suitable width and length for mosaic pieces. Maybe you requested too small a memory size?\n",
-			TIFFFileName(in));
+			NDPIFileName(in));
 		return;
 	}
 
-	outbuf= _TIFFmalloc(ouroutmemorysize);
+	outbuf= _NDPImalloc(ouroutmemorysize);
 	while (outbuf == NULL) {
 		if (outlength > outwidth && outlength % 2 == 0)
 			outlength /= 2;
@@ -1433,18 +1433,18 @@ tiffMakeMosaic(TIFF* in, uint16_t mosaiccompressionformat,
 		    &outmemorysize, &ouroutmemorysize,
 		    &hnpieces, &vnpieces, &hoverlap, &voverlap);
 
-		outbuf= _TIFFmalloc(ouroutmemorysize);
+		outbuf= _NDPImalloc(ouroutmemorysize);
 	}
 	if (outbuf == NULL) {
 		if (verbose && outmemorysize > mosaicpiecesizelimit)
 			fprintf(stderr, "File \"%s\": unable to find width and length of mosaic pieces that will suit into memory during mosaic creation.\n",
-				TIFFFileName(in));
+				NDPIFileName(in));
 		return;
 	}
 
 	if (verbose) {
 		fprintf(stderr, "Making mosaic from file \"%s\"\n",
-			TIFFFileName(in));
+			NDPIFileName(in));
 		if (verbose >= 3) {
 			fprintf(stderr, " for each piece: maximum "
 				"memory requirement " TIFF_UINT64_FORMAT
@@ -1469,7 +1469,7 @@ tiffMakeMosaic(TIFF* in, uint16_t mosaiccompressionformat,
 		}
 	}
 
-	my_asprintf(&infilename, "%s", TIFFFileName(in));
+	my_asprintf(&infilename, "%s", NDPIFileName(in));
 	{
 		int l = strlen(infilename);
 		if (infilename[l-sizeof(TIFF_SUFFIX)+1] == '.')
@@ -1479,7 +1479,7 @@ tiffMakeMosaic(TIFF* in, uint16_t mosaiccompressionformat,
 	ndigitshpiecenumber= searchNumberOfDigits(hnpieces);
 	ndigitsvpiecenumber= searchNumberOfDigits(vnpieces);
 	/* Loop over x, loop over y in that order, so that, when in is 
-	 * not tiled, TIFFReadScanline calls are done sequentially from 
+	 * not tiled, NDPIReadScanline calls are done sequentially from 
 	 * 0 to H-1 then 0 to H-1 then... Otherwise (0 to h-1 then 0 to 
 	 * h-1 then h to 2*h-1 then... with h<H),, reading fails. */
 	for (x = 0 ; x < inimagewidth ; x += outwidth) {
@@ -1530,12 +1530,12 @@ tiffMakeMosaic(TIFF* in, uint16_t mosaiccompressionformat,
 
 			out = mosaiccompressionformat == COMPRESSION_JPEG_IN_JPEG_FILE ?
 			    fopen(outfilename, "wb") :
-			    (void *) TIFFOpen(outfilename,
-				TIFFIsBigEndian(in)?"wb":"wl");
+			    (void *) NDPIOpen(outfilename,
+				NDPIIsBigEndian(in)?"wb":"wl");
 			if (verbose >= 2)
 				fprintf(stderr, " Writing mosaic tile \"%s\"\n",
 					outfilename);
-			_TIFFfree(outfilename);
+			_NDPIfree(outfilename);
 			if (out == NULL)
 				continue;
 
@@ -1557,10 +1557,10 @@ tiffMakeMosaic(TIFF* in, uint16_t mosaiccompressionformat,
 				if (mosaic_JPEG_quality <= 0) {
 					uint16_t in_compression;
 
-					TIFFGetField(in, TIFFTAG_COMPRESSION, &in_compression);
+					NDPIGetField(in, TIFFTAG_COMPRESSION, &in_compression);
 					if (in_compression == COMPRESSION_JPEG) {
 						int in_jpegquality;
-						TIFFGetField(in,
+						NDPIGetField(in,
 						    TIFFTAG_JPEGQUALITY,
 						    &in_jpegquality);
 						mosaic_JPEG_quality = in_jpegquality;
@@ -1584,9 +1584,9 @@ tiffMakeMosaic(TIFF* in, uint16_t mosaiccompressionformat,
 						xwithleftoverlap, ywithtopoverlap,
 						outwidthwithoverlap,
 						outlengthwithoverlap,
-						TIFFFileName(in));
+						NDPIFileName(in));
 
-				if (TIFFIsTiled(in))
+				if (NDPIIsTiled(in))
 					cpTiles2Strip(in, &cinfo, 1,
 					    xwithleftoverlap, ywithtopoverlap,
 					    outwidthwithoverlap,
@@ -1605,12 +1605,12 @@ tiffMakeMosaic(TIFF* in, uint16_t mosaiccompressionformat,
 				fclose(out);
 				jpeg_destroy_compress(&cinfo);
 			} else {
-				TIFFSetField(out, TIFFTAG_IMAGEWIDTH, outwidthwithoverlap);
-				TIFFSetField(out, TIFFTAG_IMAGELENGTH, outlengthwithoverlap);
-				TIFFSetField(out, TIFFTAG_ROWSPERSTRIP, outlengthwithoverlap);
+				NDPISetField(out, TIFFTAG_IMAGEWIDTH, outwidthwithoverlap);
+				NDPISetField(out, TIFFTAG_IMAGELENGTH, outlengthwithoverlap);
+				NDPISetField(out, TIFFTAG_ROWSPERSTRIP, outlengthwithoverlap);
 				tiffCopyFieldsButDimensions(in, out);
 
-				if (TIFFIsTiled(in))
+				if (NDPIIsTiled(in))
 					cpTiles2Strip(in, out, 0,
 						xwithleftoverlap,
 						ywithtopoverlap,
@@ -1629,13 +1629,13 @@ tiffMakeMosaic(TIFF* in, uint16_t mosaiccompressionformat,
 						&y_of_last_read_scanline,
 						inimagelength);
 
-				TIFFClose(out);
+				NDPIClose(out);
 			}
 		}
 	}
 
-	_TIFFfree(infilename);
-	_TIFFfree(outbuf);
+	_NDPIfree(infilename);
+	_NDPIfree(outbuf);
 }
 
 static void
@@ -1747,52 +1747,52 @@ static int
 cpStripsNoClipping(TIFF* in, TIFF* out, uint32_t xmin, uint32_t ymin,
 	uint32_t width, uint32_t length, uint16_t requestedcompressionformat)
 {
-	tmsize_t bufsize  = TIFFStripSize(in);
+	tmsize_t bufsize  = NDPIStripSize(in);
 	unsigned char *buf;
 	uint16_t compression;
 
-	TIFFGetFieldDefaulted(in, TIFFTAG_COMPRESSION, &compression);
+	NDPIGetFieldDefaulted(in, TIFFTAG_COMPRESSION, &compression);
 	if (requestedcompressionformat == (uint16_t) -1)
 		requestedcompressionformat = compression;
 
 	if (requestedcompressionformat == compression &&
-	    (buf = (unsigned char *)_TIFFmalloc(bufsize))) {
-		tstrip_t s, ns = TIFFNumberOfStrips(in);
+	    (buf = (unsigned char *)_NDPImalloc(bufsize))) {
+		tstrip_t s, ns = NDPINumberOfStrips(in);
 		uint64_t *bytecounts;
 		uint32_t longv;
 		uint16_t compression;
 
 		CopyField(TIFFTAG_ROWSPERSTRIP, longv);
 
-		TIFFGetFieldDefaulted(in, TIFFTAG_COMPRESSION, &compression);
+		NDPIGetFieldDefaulted(in, TIFFTAG_COMPRESSION, &compression);
 		if (compression == COMPRESSION_JPEG) {
 			uint32_t count = 0; /* bug in TIFF's tiffsplit : uint16_t should be uint32_t */
 				/* posted patch on the TIFF mailing list on 2011-10-19 and committed in libtiff CVS on 2011-10-22 */
 			void *table = NULL;
-			if (TIFFGetField(in, TIFFTAG_JPEGTABLES, &count, &table)
+			if (NDPIGetField(in, TIFFTAG_JPEGTABLES, &count, &table)
 			    && count > 0 && table) {
-			    TIFFSetField(out, TIFFTAG_JPEGTABLES, count, table);
+			    NDPISetField(out, TIFFTAG_JPEGTABLES, count, table);
 			}
 		}
 
-		if (!TIFFGetField(in, TIFFTAG_STRIPBYTECOUNTS, &bytecounts)) {
+		if (!NDPIGetField(in, TIFFTAG_STRIPBYTECOUNTS, &bytecounts)) {
 			fprintf(stderr, "ndpisplit: strip byte counts are missing\n");
 			return (0);
 		}
 		for (s = 0; s < ns; s++) {
 			if (bytecounts[s] > (uint64_t)bufsize) {
-				buf = (unsigned char *)_TIFFrealloc(buf, (tmsize_t)bytecounts[s]);
+				buf = (unsigned char *)_NDPIrealloc(buf, (tmsize_t)bytecounts[s]);
 				if (!buf)
 					return (0);
 				bufsize = (tmsize_t)bytecounts[s];
 			}
-			if (TIFFReadRawStrip(in, s, buf, (tmsize_t)bytecounts[s]) < 0 ||
+			if (NDPIReadRawStrip(in, s, buf, (tmsize_t)bytecounts[s]) < 0 ||
 			    TIFFWriteRawStrip(out, s, buf, (tmsize_t)bytecounts[s]) < 0) {
-				_TIFFfree(buf);
+				_NDPIfree(buf);
 				return (0);
 			}
 		}
-		_TIFFfree(buf);
+		_NDPIfree(buf);
 		return (1);
 	} else {
 		/* Not enough memory to read an entire strip, or change
@@ -1812,11 +1812,11 @@ cpStrips(TIFF* in, TIFF* out, uint32_t xmin, uint32_t ymin, uint32_t width, uint
 	 * it is not requested. */
 
 /*	tmsize_t bufsize  = TIFFScanLineSize(in);
-	unsigned char *buf = (unsigned char *)_TIFFmalloc(bufsize);
+	unsigned char *buf = (unsigned char *)_NDPImalloc(bufsize);
 
 
 	if (buf) {
-		_TIFFfree(buf);
+		_NDPIfree(buf);
 		return (1);
 	} else { */
 		return cpStrips2Tiles(in, out, xmin, ymin, width, length, requestedcompressionformat);
@@ -1840,13 +1840,13 @@ cpTiles(TIFF* in, TIFF* out, uint32_t xmin, uint32_t ymin, uint32_t width, uint3
 	(void) width;
 	(void) length;
 
-	tmsize_t bufsize = TIFFTileSize(in);
+	tmsize_t bufsize = NDPITileSize(in);
 
 	{
 		uint16_t incompression;
-		TIFFGetField(in, TIFFTAG_COMPRESSION, &incompression);
+		NDPIGetField(in, TIFFTAG_COMPRESSION, &incompression);
 		if (incompression != requestedcompressionformat) {
-			TIFFError(TIFFFileName(in),
+			NDPIError(NDPIFileName(in),
 				"Error, this version of the program "
 				"can't set the compression format "
 				"of the output as requested");
@@ -1854,7 +1854,7 @@ cpTiles(TIFF* in, TIFF* out, uint32_t xmin, uint32_t ymin, uint32_t width, uint3
 		}
 	}
 
-	unsigned char *buf = (unsigned char *)_TIFFmalloc(bufsize);
+	unsigned char *buf = (unsigned char *)_NDPImalloc(bufsize);
 
 	{
 		uint32_t w, l;
@@ -1863,30 +1863,30 @@ cpTiles(TIFF* in, TIFF* out, uint32_t xmin, uint32_t ymin, uint32_t width, uint3
 	}
 
 	if (buf) {
-		ttile_t t, nt = TIFFNumberOfTiles(in);
+		ttile_t t, nt = NDPINumberOfTiles(in);
 		uint64_t *bytecounts;
 
-		if (!TIFFGetField(in, TIFFTAG_TILEBYTECOUNTS, &bytecounts)) {
+		if (!NDPIGetField(in, TIFFTAG_TILEBYTECOUNTS, &bytecounts)) {
 			fprintf(stderr, "ndpisplit: tile byte counts are missing\n");
 			return (0);
 		}
 		for (t = 0; t < nt; t++) {
 			if (bytecounts[t] > (uint64_t) bufsize) {
-				buf = (unsigned char *)_TIFFrealloc(buf, (tmsize_t)bytecounts[t]);
+				buf = (unsigned char *)_NDPIrealloc(buf, (tmsize_t)bytecounts[t]);
 				if (!buf)
 					return (0);
 				bufsize = (tmsize_t)bytecounts[t];
 			}
-			if (TIFFReadRawTile(in, t, buf, (tmsize_t)bytecounts[t]) < 0 ||
+			if (NDPIReadRawTile(in, t, buf, (tmsize_t)bytecounts[t]) < 0 ||
 			    TIFFWriteRawTile(out, t, buf, (tmsize_t)bytecounts[t]) < 0) {
-				_TIFFfree(buf);
+				_NDPIfree(buf);
 				return (0);
 			}
 		}
-		_TIFFfree(buf);
+		_NDPIfree(buf);
 		return (1);
 	} else {
-		TIFFError(TIFFFileName(in),
+		NDPIError(NDPIFileName(in),
 			"Error, can't allocate memory buffer of size "
 			"%"TIFF_SSIZE_FORMAT " to read tiles",
 			bufsize);
@@ -1897,22 +1897,22 @@ cpTiles(TIFF* in, TIFF* out, uint32_t xmin, uint32_t ymin, uint32_t width, uint3
 static int readContigStripsIntoBuffer(TIFF* in, uint8_t* buf,
 	uint32_t firstrow, uint32_t lengthtoread, tmsize_t bufsize)
 {
-	tmsize_t scanlinesize = TIFFRasterScanlineSize(in);
+	tmsize_t scanlinesize = NDPIRasterScanlineSize(in);
 	uint8_t* bufp = buf;
 	uint32_t row;
 
 	if (lengthtoread * scanlinesize > bufsize) {
-		/* stderr rather than TIFFError since there may be
+		/* stderr rather than NDPIError since there may be
 		 * many such messages */
 		fprintf(stderr,
 			"%s: Error in calculating dimensions --- resulting image may be corrupted.\nConsider sending the input NDPI file to the author of ndpisplit for improvement.\n",
-			TIFFFileName(in));
+			NDPIFileName(in));
 		lengthtoread = bufsize / scanlinesize;
 	}
 
 	for (row = firstrow; row < firstrow + lengthtoread; row++) {
-		if (TIFFReadScanline(in, (tdata_t) bufp, row, 0) < 0) {
-			TIFFError(TIFFFileName(in),
+		if (NDPIReadScanline(in, (tdata_t) bufp, row, 0) < 0) {
+			NDPIError(NDPIFileName(in),
 			    "Error, can't read scanline " TIFF_UINT32_FORMAT,
 			    row);
 			return 0;
@@ -1941,29 +1941,29 @@ writeBufferToContigTiles(TIFF* out, uint8_t* buf,
 	uint32_t lengthtowrite, uint32_t firstcol,
 	uint32_t widthtowrite, uint16_t bytesperpixel)
 {
-	tmsize_t tilew = TIFFTileRowSize(out); /* in bytes */
+	tmsize_t tilew = NDPITileRowSize(out); /* in bytes */
 	int iskew = inimagerowsizeinbytes - tilew; /* in bytes */
-	tmsize_t tilesize = TIFFTileSize(out); /* in bytes */
+	tmsize_t tilesize = NDPITileSize(out); /* in bytes */
 	tdata_t obuf;
 	uint8_t* bufp = (uint8_t*) buf;
 	uint32_t tl, tw;
 	uint32_t row;
 
 	if (widthtowrite * bytesperpixel > inimagerowsizeinbytes) {
-		/* stderr rather than TIFFError since there may be
+		/* stderr rather than NDPIError since there may be
 		 * many such messages, one per tile */
 		fprintf(stderr,
 			"%s: Error in calculating dimensions --- resulting image may be corrupted.\nConsider sending the input NDPI file to the author of ndpisplit for improvement.\n",
-			TIFFFileName(out));
+			NDPIFileName(out));
 		widthtowrite = inimagerowsizeinbytes / bytesperpixel;
 	}
 
-	obuf = _TIFFmalloc(tilesize);
+	obuf = _NDPImalloc(tilesize);
 	if (obuf == NULL)
 		return 0;
-	_TIFFmemset(obuf, 0, tilesize);
-	(void) TIFFGetField(out, TIFFTAG_TILELENGTH, &tl);
-	(void) TIFFGetField(out, TIFFTAG_TILEWIDTH, &tw);
+	_NDPImemset(obuf, 0, tilesize);
+	(void) NDPIGetField(out, TIFFTAG_TILELENGTH, &tl);
+	(void) NDPIGetField(out, TIFFTAG_TILEWIDTH, &tw);
 	for (row = firstrow; row < firstrow+lengthtowrite; row += tl) {
 		uint32_t nrow = (row+tl > firstrow+lengthtowrite) ?
 			firstrow+lengthtowrite-row : tl;
@@ -1986,18 +1986,18 @@ writeBufferToContigTiles(TIFF* out, uint8_t* buf,
 				cpBufToBuf(obuf, bufp + colb, nrow, tilew,
 				    0, iskew);
 			if (TIFFWriteTile(out, obuf, col, row, 0, 0) < 0) {
-				TIFFError(TIFFFileName(out),
+				NDPIError(NDPIFileName(out),
 				    "Error, can't write tile at "
 				    TIFF_UINT32_FORMAT " " TIFF_UINT32_FORMAT,
 				    col, row);
-				_TIFFfree(obuf);
+				_NDPIfree(obuf);
 				return 0;
 			}
 			colb += tilew;
 		}
 		bufp += nrow * inimagerowsizeinbytes;
 	}
-	_TIFFfree(obuf);
+	_NDPIfree(obuf);
 	return 1;
 }
 
@@ -2011,45 +2011,45 @@ cpStrips2Tiles(TIFF* in, TIFF* out, uint32_t xmin, uint32_t ymin,
 	tmsize_t inimagerowsizeinbytes, bufsize;
 	unsigned char *buf;
 
-	TIFFDefaultTileSize(out, &tilewidth, &tilelength);
+	NDPIDefaultTileSize(out, &tilewidth, &tilelength);
 		/* NDPI images are acquired through 128 pixel-wide 
 		 columns, thus try to align the tiles' limits on the 
 		 columns -- this is useful at least for the highest 
 		 resolution images */
 	tilewidth = 128;
-	TIFFSetField(out, TIFFTAG_TILEWIDTH, tilewidth);
-	TIFFSetField(out, TIFFTAG_TILELENGTH, tilelength);
+	NDPISetField(out, TIFFTAG_TILEWIDTH, tilewidth);
+	NDPISetField(out, TIFFTAG_TILELENGTH, tilelength);
 
-	TIFFGetField(in, TIFFTAG_SAMPLESPERPIXEL, &spp);
-	TIFFGetField(in, TIFFTAG_BITSPERSAMPLE, &bitspersample);
+	NDPIGetField(in, TIFFTAG_SAMPLESPERPIXEL, &spp);
+	NDPIGetField(in, TIFFTAG_BITSPERSAMPLE, &bitspersample);
 	assert( bitspersample % 8 == 0 );
 	bytesperpixel = (bitspersample/8) * spp;
 
-	TIFFGetField(in, TIFFTAG_IMAGELENGTH, &inimagelength);
+	NDPIGetField(in, TIFFTAG_IMAGELENGTH, &inimagelength);
 	if (inimagelength == (uint32_t) -1) {
-		TIFFError(TIFFFileName(in),
+		NDPIError(NDPIFileName(in),
 				"Error, can't read reasonable image length and/or width");
 		return (0);
 	}
 
 	if (requestedcompression == (uint16_t) -1)
-		TIFFGetField(out, TIFFTAG_COMPRESSION, &requestedcompression);
+		NDPIGetField(out, TIFFTAG_COMPRESSION, &requestedcompression);
 	else
-		TIFFSetField(out, TIFFTAG_COMPRESSION, requestedcompression);
-	TIFFSetField(in, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
+		NDPISetField(out, TIFFTAG_COMPRESSION, requestedcompression);
+	NDPISetField(in, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
 	if (requestedcompression == COMPRESSION_JPEG) {
 		/* like in tiffcp.c -- otherwise the reserved size for
 		 the tiles is too small and the program segfaults */
-		TIFFSetField(out, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
+		NDPISetField(out, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
 	}
 
-	inimagerowsizeinbytes= TIFFRasterScanlineSize(in);
+	inimagerowsizeinbytes= NDPIRasterScanlineSize(in);
 	bufferlength = tilelength;
 	bufsize = inimagerowsizeinbytes * bufferlength;
 
-	buf = (unsigned char *)_TIFFmalloc(bufsize);
+	buf = (unsigned char *)_NDPImalloc(bufsize);
 	if (!buf) {
-		TIFFError(TIFFFileName(in),
+		NDPIError(NDPIFileName(in),
 				"Error, can't allocate space for image buffer");
 		return (0);
 	} else {
@@ -2063,8 +2063,8 @@ cpStrips2Tiles(TIFF* in, TIFF* out, uint32_t xmin, uint32_t ymin,
 			    (ymin-row) % bufferlength == 0)
 				fprintf(stderr, "  cpStrips2Tiles remaining lines: " TIFF_UINT32_FORMAT " \r",
 					length + ymin-row);
-			if (TIFFReadScanline(in, (tdata_t) buf, row, 0) < 0) {
-				TIFFError(TIFFFileName(in),
+			if (NDPIReadScanline(in, (tdata_t) buf, row, 0) < 0) {
+				NDPIError(NDPIFileName(in),
 				    "Error, can't read scanline " 
 				    TIFF_UINT32_FORMAT,
 				    row);
@@ -2107,7 +2107,7 @@ cpStrips2Tiles(TIFF* in, TIFF* out, uint32_t xmin, uint32_t ymin,
 		}
 		if (verbose >= 2)
 			fprintf(stderr, "  cpStrips2Tiles completed.        \n");
-		_TIFFfree(buf);
+		_NDPIfree(buf);
 		return (success);
 	}
 	return (0);
@@ -2125,7 +2125,7 @@ cpTiles2Strip(TIFF* in, void * ambiguous_out,
 	uint16_t in_compression, in_photometric;
 	uint16_t spp, bitspersample, bytesperpixel;
 	uint32_t intilewidth = (uint32_t) -1, intilelength = (uint32_t) -1;
-	tmsize_t intilewidthinbytes = TIFFTileRowSize(in);
+	tmsize_t intilewidthinbytes = NDPITileRowSize(in);
 	uint32_t y;
 	tmsize_t outscanlinesizeinbytes;
 	unsigned char * inbuf, * bufp= outbuf;
@@ -2139,10 +2139,10 @@ cpTiles2Strip(TIFF* in, void * ambiguous_out,
 		TIFFout = (TIFF*) ambiguous_out;
 	}
 
-	TIFFGetField(in, TIFFTAG_TILEWIDTH, &intilewidth);
-	TIFFGetField(in, TIFFTAG_TILELENGTH, &intilelength);
-	TIFFGetField(in, TIFFTAG_SAMPLESPERPIXEL, &spp);
-	TIFFGetField(in, TIFFTAG_BITSPERSAMPLE, &bitspersample);
+	NDPIGetField(in, TIFFTAG_TILEWIDTH, &intilewidth);
+	NDPIGetField(in, TIFFTAG_TILELENGTH, &intilelength);
+	NDPIGetField(in, TIFFTAG_SAMPLESPERPIXEL, &spp);
+	NDPIGetField(in, TIFFTAG_BITSPERSAMPLE, &bitspersample);
 	if (output_to_jpeg_rather_than_tiff) {
 		assert( bitspersample == 8 );
 		assert( spp == 3 );
@@ -2150,8 +2150,8 @@ cpTiles2Strip(TIFF* in, void * ambiguous_out,
 		assert( bitspersample % 8 == 0 );
 	bytesperpixel = (bitspersample/8) * spp;
 
-	TIFFGetField(in, TIFFTAG_COMPRESSION, &in_compression);
-	TIFFGetFieldDefaulted(in, TIFFTAG_PHOTOMETRIC, &in_photometric);
+	NDPIGetField(in, TIFFTAG_COMPRESSION, &in_compression);
+	NDPIGetFieldDefaulted(in, TIFFTAG_PHOTOMETRIC, &in_photometric);
 	if (in_compression == COMPRESSION_JPEG) {
 		/* "in" is a file we have just written. If it was not 
 		 * closed and reopen, then it is tiled and we have
@@ -2164,12 +2164,12 @@ cpTiles2Strip(TIFF* in, void * ambiguous_out,
 		 * `Cannot modify tag "" while writing'. */
 
 		int in_jpegcolormode;
-		TIFFGetField(in, TIFFTAG_JPEGCOLORMODE, &in_jpegcolormode);
+		NDPIGetField(in, TIFFTAG_JPEGCOLORMODE, &in_jpegcolormode);
 
 		if (in_jpegcolormode != JPEGCOLORMODE_RGB)
 		/* like in tiffcp.c -- otherwise the reserved size for
 		 * the tiles is too small and the program segfaults */
-			TIFFSetField(in, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
+			NDPISetField(in, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
 	}
 
 	if (output_to_jpeg_rather_than_tiff) {
@@ -2178,23 +2178,23 @@ cpTiles2Strip(TIFF* in, void * ambiguous_out,
 
 		switch (compressionformat) {
 		case COMPRESSION_LZW:
-			TIFFSetField(TIFFout, TIFFTAG_COMPRESSION,
+			NDPISetField(TIFFout, TIFFTAG_COMPRESSION,
 				COMPRESSION_LZW);
-			TIFFSetField(TIFFout, TIFFTAG_PHOTOMETRIC,
+			NDPISetField(TIFFout, TIFFTAG_PHOTOMETRIC,
 				PHOTOMETRIC_RGB);
 			break;
 		case COMPRESSION_JPEG:
-			TIFFSetField(TIFFout, TIFFTAG_COMPRESSION,
+			NDPISetField(TIFFout, TIFFTAG_COMPRESSION,
 				COMPRESSION_JPEG);
-			TIFFSetField(TIFFout, TIFFTAG_PHOTOMETRIC,
+			NDPISetField(TIFFout, TIFFTAG_PHOTOMETRIC,
 				in_photometric);
-			TIFFSetField(TIFFout, TIFFTAG_JPEGCOLORMODE,
+			NDPISetField(TIFFout, TIFFTAG_JPEGCOLORMODE,
 				JPEGCOLORMODE_RGB);
 			break;
 		case COMPRESSION_NONE:
-			TIFFSetField(TIFFout, TIFFTAG_COMPRESSION,
+			NDPISetField(TIFFout, TIFFTAG_COMPRESSION,
 				COMPRESSION_NONE);
-			TIFFSetField(TIFFout, TIFFTAG_PHOTOMETRIC,
+			NDPISetField(TIFFout, TIFFTAG_PHOTOMETRIC,
 				PHOTOMETRIC_RGB);
 			break;
 		default:
@@ -2204,26 +2204,26 @@ cpTiles2Strip(TIFF* in, void * ambiguous_out,
 
 		/* To be done *after* setting compression -- otherwise,
 		 * ScanlineSize may be wrong */
-		outscanlinesizeinbytes= TIFFRasterScanlineSize(TIFFout);
+		outscanlinesizeinbytes= NDPIRasterScanlineSize(TIFFout);
 
 /*{
 uint16_t out_compression= -1, out_photometric= -1;
 
-TIFFGetField(TIFFout, TIFFTAG_COMPRESSION, &out_compression);
-TIFFGetField(TIFFout, TIFFTAG_PHOTOMETRIC, &out_photometric);
+NDPIGetField(TIFFout, TIFFTAG_COMPRESSION, &out_compression);
+NDPIGetField(TIFFout, TIFFTAG_PHOTOMETRIC, &out_photometric);
 fprintf(stderr, "Infile had compression %u and photometric %u ; outfile will have compression %u and photometric %u\n",
 	in_compression, in_photometric, out_compression, out_photometric);
 }
 
 fprintf(stderr, "Outfile \"%s\": compression set scanlinesize=%lld or %lld\n", 
-TIFFFileName(TIFFout), outscanlinesizeinbytes, TIFFScanlineSize(TIFFout));*/
+NDPIFileName(TIFFout), outscanlinesizeinbytes, NDPIScanlineSize(TIFFout));*/
 
 	}
 
-	inbufsize= TIFFTileSize(in);
-	inbuf = (unsigned char *)_TIFFmalloc(inbufsize);
+	inbufsize= NDPITileSize(in);
+	inbuf = (unsigned char *)_NDPImalloc(inbufsize);
 	if (!inbuf) {
-		TIFFError(TIFFFileName(in),
+		NDPIError(NDPIFileName(in),
 				"Error, can't allocate space for image buffer");
 		return (0);
 	}
@@ -2258,9 +2258,9 @@ TIFFFileName(TIFFout), outscanlinesizeinbytes, TIFFScanlineSize(TIFFout));*/
 			widthtocopyinbytes = (xmaxplusone - xmintocopyintile) *
 				bytesperpixel;
 
-			if (TIFFReadTile(in, inbuf, xminoftile, 
+			if (NDPIReadTile(in, inbuf, xminoftile, 
 			    yminoftile, 0, 0) < 0) {
-				TIFFError(TIFFFileName(in),
+				NDPIError(NDPIFileName(in),
 				    "Error, can't read tile at "
 				    TIFF_UINT32_FORMAT " " TIFF_UINT32_FORMAT,
 				    xminoftile, yminoftile);
@@ -2282,10 +2282,10 @@ TIFFFileName(TIFFout), outscanlinesizeinbytes, TIFFScanlineSize(TIFFout));*/
 	if (output_to_jpeg_rather_than_tiff) {
 		JSAMPROW row_pointer;
 		JSAMPROW* row_pointers =
-			_TIFFmalloc(length * sizeof(JSAMPROW));
+			_NDPImalloc(length * sizeof(JSAMPROW));
 
 		if (row_pointers == NULL) {
-			TIFFError(TIFFFileName(in),
+			NDPIError(NDPIFileName(in),
 				"Error, can't allocate space for row_pointers");
 			success = 0;
 			goto done;
@@ -2298,16 +2298,16 @@ TIFFFileName(TIFFout), outscanlinesizeinbytes, TIFFScanlineSize(TIFFout));*/
 		jpeg_write_scanlines(p_cinfo, row_pointers, length);
 	} else {
 		if (TIFFWriteEncodedStrip(TIFFout,
-			TIFFComputeStrip(TIFFout, 0, 0),
-		    outbuf, TIFFStripSize(TIFFout)) < 0) {
-			TIFFError(TIFFFileName(TIFFout),
+			NDPIComputeStrip(TIFFout, 0, 0),
+		    outbuf, NDPIStripSize(TIFFout)) < 0) {
+			NDPIError(NDPIFileName(TIFFout),
 			    "Error, can't write strip");
 			success = 0;
 		}
 	}
 
 	done:
-	_TIFFfree(inbuf);
+	_NDPIfree(inbuf);
 	return success;
 }
 
@@ -2323,7 +2323,7 @@ cpStrips2Strip(TIFF* in, void * ambiguous_out,
 	tmsize_t inbufsize;
 	uint16_t in_compression, in_photometric;
 	uint16_t spp, bitspersample, bytesperpixel;
-	tmsize_t inwidthinbytes = TIFFRasterScanlineSize(in);
+	tmsize_t inwidthinbytes = NDPIRasterScanlineSize(in);
 	uint32_t y;
 	tmsize_t outscanlinesizeinbytes;
 	unsigned char * inbuf, * bufp= outbuf;
@@ -2337,8 +2337,8 @@ cpStrips2Strip(TIFF* in, void * ambiguous_out,
 		TIFFout = (TIFF*) ambiguous_out;
 	}
 
-	TIFFGetField(in, TIFFTAG_SAMPLESPERPIXEL, &spp);
-	TIFFGetField(in, TIFFTAG_BITSPERSAMPLE, &bitspersample);
+	NDPIGetField(in, TIFFTAG_SAMPLESPERPIXEL, &spp);
+	NDPIGetField(in, TIFFTAG_BITSPERSAMPLE, &bitspersample);
 	if (output_to_jpeg_rather_than_tiff) {
 		assert( bitspersample == 8 );
 		assert( spp == 3 );
@@ -2346,8 +2346,8 @@ cpStrips2Strip(TIFF* in, void * ambiguous_out,
 		assert( bitspersample % 8 == 0 );
 	bytesperpixel = (bitspersample/8) * spp;
 
-	TIFFGetField(in, TIFFTAG_COMPRESSION, &in_compression);
-	TIFFGetFieldDefaulted(in, TIFFTAG_PHOTOMETRIC, &in_photometric);
+	NDPIGetField(in, TIFFTAG_COMPRESSION, &in_compression);
+	NDPIGetFieldDefaulted(in, TIFFTAG_PHOTOMETRIC, &in_photometric);
 	if (in_compression == COMPRESSION_JPEG) {
 		/* "in" is a file we have just written. If it was not 
 		 * closed and reopen, then it is tiled and we have
@@ -2359,7 +2359,7 @@ cpStrips2Strip(TIFF* in, void * ambiguous_out,
 
 		/* like in tiffcp.c -- otherwise the reserved size for
 		 * the tiles is too small and the program segfaults */
-		TIFFSetField(in, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
+		NDPISetField(in, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
 	}
 
 	if (output_to_jpeg_rather_than_tiff) {
@@ -2368,23 +2368,23 @@ cpStrips2Strip(TIFF* in, void * ambiguous_out,
 
 		switch (compressionformat) {
 		case COMPRESSION_LZW:
-			TIFFSetField(TIFFout, TIFFTAG_COMPRESSION,
+			NDPISetField(TIFFout, TIFFTAG_COMPRESSION,
 				COMPRESSION_LZW);
-			TIFFSetField(TIFFout, TIFFTAG_PHOTOMETRIC,
+			NDPISetField(TIFFout, TIFFTAG_PHOTOMETRIC,
 				PHOTOMETRIC_RGB);
 			break;
 		case COMPRESSION_JPEG:
-			TIFFSetField(TIFFout, TIFFTAG_COMPRESSION,
+			NDPISetField(TIFFout, TIFFTAG_COMPRESSION,
 				COMPRESSION_JPEG);
-			TIFFSetField(TIFFout, TIFFTAG_PHOTOMETRIC,
+			NDPISetField(TIFFout, TIFFTAG_PHOTOMETRIC,
 				in_photometric);
-			TIFFSetField(TIFFout, TIFFTAG_JPEGCOLORMODE,
+			NDPISetField(TIFFout, TIFFTAG_JPEGCOLORMODE,
 				JPEGCOLORMODE_RGB);
 			break;
 		case COMPRESSION_NONE:
-			TIFFSetField(TIFFout, TIFFTAG_COMPRESSION,
+			NDPISetField(TIFFout, TIFFTAG_COMPRESSION,
 				COMPRESSION_NONE);
-			TIFFSetField(TIFFout, TIFFTAG_PHOTOMETRIC,
+			NDPISetField(TIFFout, TIFFTAG_PHOTOMETRIC,
 				PHOTOMETRIC_RGB);
 			break;
 		default:
@@ -2394,26 +2394,26 @@ cpStrips2Strip(TIFF* in, void * ambiguous_out,
 
 		/* To be done *after* setting compression -- otherwise,
 		 * ScanlineSize may be wrong */
-		outscanlinesizeinbytes= TIFFRasterScanlineSize(TIFFout);
+		outscanlinesizeinbytes= NDPIRasterScanlineSize(TIFFout);
 /*{
 uint16_t out_compression= -1, out_photometric= -1;
 
-TIFFGetField(TIFFout, TIFFTAG_COMPRESSION, &out_compression);
-TIFFGetField(TIFFout, TIFFTAG_PHOTOMETRIC, &out_photometric);
+NDPIGetField(TIFFout, TIFFTAG_COMPRESSION, &out_compression);
+NDPIGetField(TIFFout, TIFFTAG_PHOTOMETRIC, &out_photometric);
 fprintf(stderr, "Infile had compression %u and photometric %u ; outfile will have compression %u and photometric %u\n",
 	in_compression, in_photometric, out_compression, out_photometric);
 }
 
 fprintf(stderr, "Outfile \"%s\": compression set scanlinesize="
   TIFF_UINT64_FORMAT " or " TIFF_UINT64_FORMAT "\n",
-  TIFFFileName(TIFFout), outscanlinesizeinbytes, TIFFScanlineSize(TIFFout));*/
+  NDPIFileName(TIFFout), outscanlinesizeinbytes, NDPIScanlineSize(TIFFout));*/
 
 	}
 
-	inbufsize= TIFFRasterScanlineSize(in);
-	inbuf = (unsigned char *)_TIFFmalloc(inbufsize);
+	inbufsize= NDPIRasterScanlineSize(in);
+	inbuf = (unsigned char *)_NDPImalloc(inbufsize);
 	if (!inbuf) {
-		TIFFError(TIFFFileName(in),
+		NDPIError(NDPIFileName(in),
 				"Error, can't allocate space for image buffer");
 		return (0);
 	}
@@ -2429,8 +2429,8 @@ fprintf(stderr, "Outfile \"%s\": compression set scanlinesize="
 		uint32_t y;
 
 		for (y = *y_of_last_read_scanline + 1 ; y < inimagelength ; y++)
-			if (TIFFReadScanline(in, inbuf, y, 0) < 0) {
-				TIFFError(TIFFFileName(in),
+			if (NDPIReadScanline(in, inbuf, y, 0) < 0) {
+				NDPIError(NDPIFileName(in),
 				    "Error, can't read scanline at "
 				    TIFF_UINT32_FORMAT " for exhausting",
 				    y);
@@ -2440,8 +2440,8 @@ fprintf(stderr, "Outfile \"%s\": compression set scanlinesize="
 				*y_of_last_read_scanline= y;
 
 		for (y = 0 ; y < ymin ; y++)
-			if (TIFFReadScanline(in, inbuf, y, 0) < 0) {
-				TIFFError(TIFFFileName(in),
+			if (NDPIReadScanline(in, inbuf, y, 0) < 0) {
+				NDPIError(NDPIFileName(in),
 				    "Error, can't read scanline at "
 				    TIFF_UINT32_FORMAT " for exhausting",
 				    y);
@@ -2456,8 +2456,8 @@ fprintf(stderr, "Outfile \"%s\": compression set scanlinesize="
 		uint32_t xmintocopyinscanline = xmin;
 		tmsize_t widthtocopyinbytes = outscanlinesizeinbytes;
 
-		if (TIFFReadScanline(in, inbuf, y, 0) < 0) {
-			TIFFError(TIFFFileName(in),
+		if (NDPIReadScanline(in, inbuf, y, 0) < 0) {
+			NDPIError(NDPIFileName(in),
 				"Error, can't read scanline at "
 				TIFF_UINT32_FORMAT " for copying",
 				y);
@@ -2477,10 +2477,10 @@ fprintf(stderr, "Outfile \"%s\": compression set scanlinesize="
 	if (output_to_jpeg_rather_than_tiff) {
 		JSAMPROW row_pointer;
 		JSAMPROW* row_pointers =
-			_TIFFmalloc(length * sizeof(JSAMPROW));
+			_NDPImalloc(length * sizeof(JSAMPROW));
 
 		if (row_pointers == NULL) {
-			TIFFError(TIFFFileName(in),
+			NDPIError(NDPIFileName(in),
 				"Error, can't allocate space for row_pointers");
 			success = 0;
 			goto done;
@@ -2493,16 +2493,16 @@ fprintf(stderr, "Outfile \"%s\": compression set scanlinesize="
 		jpeg_write_scanlines(p_cinfo, row_pointers, length);
 	} else {
 		if (TIFFWriteEncodedStrip(TIFFout,
-			TIFFComputeStrip(TIFFout, 0, 0),
-		    outbuf, TIFFStripSize(TIFFout)) < 0) {
-			TIFFError(TIFFFileName(TIFFout),
+			NDPIComputeStrip(TIFFout, 0, 0),
+		    outbuf, NDPIStripSize(TIFFout)) < 0) {
+			NDPIError(NDPIFileName(TIFFout),
 			    "Error, can't write strip");
 			success = 0;
 		}
 	}
 
 	done:
-	_TIFFfree(inbuf);
+	_NDPIfree(inbuf);
 	return success;
 }
 
@@ -2512,7 +2512,7 @@ getNumberOfBlankLanes(TIFF* in)
 	uint32_t nblanklanes;
 	uint32_t *blanklanes;
 
-	if (! TIFFGetField(in, NDPITAG_BLANKLANES, &nblanklanes, &blanklanes) )
+	if (! NDPIGetField(in, NDPITAG_BLANKLANES, &nblanklanes, &blanklanes) )
 		return 0;
 	/* Now, blank lane numbers are stored in blanklanes[0], blanklanes[1]... */
 
@@ -2531,8 +2531,8 @@ getNDPIMagnification(TIFF* in)
 {
 	float f;
 
-	if (! TIFFGetField(in, NDPITAG_MAGNIFICATION, &f) ) {
-		TIFFError(TIFFFileName(in),
+	if (! NDPIGetField(in, NDPITAG_MAGNIFICATION, &f) ) {
+		NDPIError(NDPIFileName(in),
 			"Error, Magnification not found in NDPI file subdirectory");
 		return(NAN);
 	}
@@ -2543,9 +2543,9 @@ static int
 getWidthAndLength(TIFF* in, uint32_t * width, uint32_t * length,
 		float ndpimagnification)
 {
-	if (! TIFFGetField(in, TIFFTAG_IMAGEWIDTH, width) ||
-	    ! TIFFGetField(in, TIFFTAG_IMAGELENGTH, length)) {
-		TIFFError(TIFFFileName(in),
+	if (! NDPIGetField(in, TIFFTAG_IMAGEWIDTH, width) ||
+	    ! NDPIGetField(in, TIFFTAG_IMAGELENGTH, length)) {
+		NDPIError(NDPIFileName(in),
 			"Error, impossible to find width or length of image at magnification %f",
 			ndpimagnification);
 		return -1;
@@ -2563,23 +2563,23 @@ getScannedZonesFromMap(TIFF* in, ScannedZoneBox ** ppboxes)
 	uint8_t * buf, * p;
 	unsigned int numberscannedzones, n;
 
-	assert(! TIFFIsTiled(in));
+	assert(! NDPIIsTiled(in));
 
-	(void) TIFFGetField(in, TIFFTAG_PLANARCONFIG, &planarconfig);
+	(void) NDPIGetField(in, TIFFTAG_PLANARCONFIG, &planarconfig);
 	assert(planarconfig == PLANARCONFIG_CONTIG);
 
-	(void) TIFFGetField(in, TIFFTAG_BITSPERSAMPLE, &bitspersample);
+	(void) NDPIGetField(in, TIFFTAG_BITSPERSAMPLE, &bitspersample);
 	assert(bitspersample == 8);
 
-	(void) TIFFGetField(in, TIFFTAG_IMAGELENGTH, &imagelength);
-	(void) TIFFGetField(in, TIFFTAG_IMAGEWIDTH, &imagewidth);
-	(void) TIFFGetField(in, TIFFTAG_SAMPLESPERPIXEL, &spp);
+	(void) NDPIGetField(in, TIFFTAG_IMAGELENGTH, &imagelength);
+	(void) NDPIGetField(in, TIFFTAG_IMAGEWIDTH, &imagewidth);
+	(void) NDPIGetField(in, TIFFTAG_SAMPLESPERPIXEL, &spp);
 
-	bufsize = TIFFRasterScanlineSize(in) * (tmsize_t) imagelength;
-	buf  = (unsigned char *)_TIFFmalloc(bufsize);
+	bufsize = NDPIRasterScanlineSize(in) * (tmsize_t) imagelength;
+	buf  = (unsigned char *)_NDPImalloc(bufsize);
 
 	if (!buf) {
-		TIFFError(TIFFFileName(in),
+		NDPIError(NDPIFileName(in),
 			"Error, can't allocate memory buffer of size "
 			"%"TIFF_SSIZE_FORMAT " to read map of scanned "
 			"zones",
@@ -2598,9 +2598,9 @@ getScannedZonesFromMap(TIFF* in, ScannedZoneBox ** ppboxes)
 				numberscannedzones= *p;
 		}
 
-	*ppboxes= _TIFFmalloc(numberscannedzones * sizeof(ScannedZoneBox));
+	*ppboxes= _NDPImalloc(numberscannedzones * sizeof(ScannedZoneBox));
 	if (*ppboxes == NULL) {
-		TIFFError(TIFFFileName(in),
+		NDPIError(NDPIFileName(in),
 			"Error, can't allocate memory buffer to store "
 			"the limits of scanned zones");
 		return 0;
@@ -2639,7 +2639,7 @@ findUnitsAtMagnification(TIFF* in, float ndpimagnification, uint32_t* xunit, uin
 	float m;
 
 	if (ndpimagnification > 40) {
-		TIFFError(TIFFFileName(in),
+		NDPIError(NDPIFileName(in),
 			"Error, can't handle magnification larger than 40");
 		*xunit= 0; *yunit= 0;
 		return;
@@ -2650,7 +2650,7 @@ findUnitsAtMagnification(TIFF* in, float ndpimagnification, uint32_t* xunit, uin
 	for (m = 40 ; m > ndpimagnification ; m /= 2.) {
 		*xunit /= 2; *yunit /= 2;
 		if (m < 1e-6) {
-			TIFFError(TIFFFileName(in),
+			NDPIError(NDPIFileName(in),
 				"Error during the computation of x- and y-units");
 			*xunit= 0; *yunit= 0;
 			return;
@@ -2667,7 +2667,7 @@ extendArrayOf##nameOfTypeS(type ** array, unsigned * numberofelems, const char *
 		*numberofelems = 1; \
 	else \
 		(*numberofelems)++; \
-	*array = _TIFFrealloc(*array, sizeof(type) * (*numberofelems)); \
+	*array = _NDPIrealloc(*array, sizeof(type) * (*numberofelems)); \
 	if (*array == NULL) { \
 		fprintf(stderr, "Error: insufficient memory for %s.\n", \
 			message); \
@@ -2725,7 +2725,7 @@ buildFileNameForExtract(const char * NDPIfilename,
 		*path= NULL;
 		do {
 			if (*path != NULL)
-				_TIFFfree(*path);
+				_NDPIfree(*path);
 			u++;
 			my_asprintf(path,
 				"%s_x%g_z" TIFF_INT32_FORMAT "_%u%s",
@@ -2824,7 +2824,7 @@ my_asprintf(char** ret, const char* format, ...)
 	va_start(ap, format);
 	n= vsnprintf(NULL, 0, format, ap);
 	va_end(ap);
-	p= _TIFFmalloc(n+1);
+	p= _NDPImalloc(n+1);
 	if (p == NULL) {
 		perror("Insufficient memory for a character string ");
 		exit(EXIT_FAILURE);

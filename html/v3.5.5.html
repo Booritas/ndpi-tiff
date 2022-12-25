@@ -73,7 +73,7 @@ The following information is located here:
         conversion for the run arrays.  
 
 	<LI> Set td_sampleformat default to SAMPLEFORMAT_UINT instead of 
-	SAMPLEFORMAT_VOID in TIFFDefaultDirectory() in tif_dir.c.
+	SAMPLEFORMAT_VOID in NDPIDefaultDirectory() in tif_dir.c.
 
         <LI> Added "GetDefaulted" support for TIFFTAG_SAMPLEFORMAT in tif_aux.c.
 
@@ -97,14 +97,14 @@ The following information is located here:
 	      between toff_t and tsize_t.
 
 	<LI> Set tif_rawdatasize to zero when freeing raw data buffer in
-	     TIFFWriteDirectory().
+	     NDPIWriteDirectory().
 
          <LI> Enabled "REWRITE_HACK" in tif_write.c by default.
         
          <LI> Fix bug in tif_write.c when switching between reading one directory
 	      and writing to another. 
 
-         <LI> Made TIFFWriteCheck() public, and added TIFFCreateDirectory()
+         <LI> Made NDPIWriteCheck() public, and added NDPICreateDirectory()
 
          <LI> Added TIFFmemory(3t) functions to libtiff.def.
 

@@ -144,23 +144,23 @@ for details on their operation; on most systems doing ``man function-name''
 will work.
 .sp
 .nf
-.ta \w'TIFFCheckpointDirectory'u+2n
+.ta \w'NDPICheckpointDirectory'u+2n
 \fIName\fP	\fIDescription\fP
 .sp 5p
-TIFFCheckpointDirectory	writes the current state of the directory
-TIFFCheckTile		very x,y,z,sample is within image
-TIFFCIELabToRGBInit	initialize CIE L*a*b* 1976 to RGB conversion state
-TIFFCIELabToXYZ		perform CIE L*a*b* 1976 to CIE XYZ conversion
-TIFFClientOpen		open a file for reading or writing
-TIFFClose		close an open file
-TIFFComputeStrip	return strip containing y,sample
-TIFFComputeTile		return tile containing x,y,z,sample
-TIFFCurrentDirectory	return index of current directory
-TIFFCurrentRow		return index of current scanline
-TIFFCurrentStrip	return index of current strip
-TIFFCurrentTile		return index of current tile
+NDPICheckpointDirectory	writes the current state of the directory
+NDPICheckTile		very x,y,z,sample is within image
+NDPICIELabToRGBInit	initialize CIE L*a*b* 1976 to RGB conversion state
+NDPICIELabToXYZ		perform CIE L*a*b* 1976 to CIE XYZ conversion
+NDPIClientOpen		open a file for reading or writing
+NDPIClose		close an open file
+NDPIComputeStrip	return strip containing y,sample
+NDPIComputeTile		return tile containing x,y,z,sample
+NDPICurrentDirectory	return index of current directory
+NDPICurrentRow		return index of current scanline
+NDPICurrentStrip	return index of current strip
+NDPICurrentTile		return index of current tile
 TIFFDataWidth 		return the size of TIFF data types
-TIFFError		library error handler
+NDPIError		library error handler
 TIFFFdOpen		open a file for reading or writing
 TIFFFieldDataType	get data type from field information
 TIFFFieldName		get field name from field information
@@ -168,81 +168,81 @@ TIFFFieldPassCount	get whether to pass a value count to Get/SetField
 TIFFFieldReadCount	get number of values to be read from field
 TIFFFieldTag		get tag value from field information
 TIFFFieldWithName	get field information given field name
-TIFFFieldWithTag	get field information given tag
+NDPIFieldWithTag	get field information given tag
 TIFFFieldWriteCount	get number of values to be written to field
-TIFFFileName		return name of open file
-TIFFFileno		return open file descriptor
-TIFFFindCODEC		find standard codec for the specific scheme
-TIFFFindField		get field information given tag and data type
-TIFFFlush		flush all pending writes
-TIFFFlushData		flush pending data writes
+NDPIFileName		return name of open file
+NDPIFileno		return open file descriptor
+NDPIFindCODEC		find standard codec for the specific scheme
+NDPIFindField		get field information given tag and data type
+NDPIFlush		flush all pending writes
+NDPIFlushData		flush pending data writes
 TIFFGetBitRevTable	return bit reversal table
-TIFFGetField		return tag value in current directory
-TIFFGetFieldDefaulted	return tag value in current directory
-TIFFGetMode		return open file mode
+NDPIGetField		return tag value in current directory
+NDPIGetFieldDefaulted	return tag value in current directory
+NDPIGetMode		return open file mode
 TIFFGetVersion		return library version string
-TIFFIsCODECConfigured	check, whether we have working codec
-TIFFIsMSB2LSB		return true if image data is being returned
+NDPIIsCODECConfigured	check, whether we have working codec
+NDPIIsMSB2LSB		return true if image data is being returned
 			with bit 0 as the most significant bit 
-TIFFIsTiled		return true if image data is tiled
-TIFFIsByteSwapped	return true if image data is byte-swapped
-TIFFNumberOfStrips	return number of strips in an image
-TIFFNumberOfTiles	return number of tiles in an image
-TIFFOpen		open a file for reading or writing
-TIFFPrintDirectory	print description of the current directory
-TIFFReadBufferSetup	specify i/o buffer for reading
-TIFFReadDirectory	read the next directory
-TIFFReadEncodedStrip	read and decode a strip of data
-TIFFReadEncodedTile	read and decode a tile of data
-TIFFReadRawStrip	read a raw strip of data
-TIFFReadRawTile		read a raw tile of data
-TIFFReadRGBAImage	read an image into a fixed format raster
-TIFFReadScanline	read and decode a row of data
-TIFFReadTile		read and decode a tile of data
-TIFFRegisterCODEC	override standard codec for the specific scheme
-TIFFReverseBits		reverse bits in an array of bytes
-TIFFRGBAImageBegin	setup decoder state for TIFFRGBAImageGet
-TIFFRGBAImageEnd	release TIFFRGBAImage decoder state
-TIFFRGBAImageGet	read and decode an image
-TIFFRGBAImageOK		is image readable by TIFFRGBAImageGet
-TIFFScanlineSize	return size of a scanline
-TIFFSetDirectory	set the current directory
-TIFFSetSubDirectory	set the current directory
-TIFFSetErrorHandler	set error handler function
-TIFFSetField		set a tag's value in the current directory
-TIFFSetWarningHandler	set warning handler function
-TIFFStripSize		returns size of a strip
-TIFFRawStripSize	returns the number of bytes in a raw strip
-TIFFSwabShort		swap bytes of short
-TIFFSwabLong		swap bytes of long
-TIFFSwabArrayOfShort	swap bytes of an array of shorts
-TIFFSwabArrayOfLong	swap bytes of an array of longs
-TIFFTileRowSize		return size of a row in a tile
-TIFFTileSize		return size of a tile
-TIFFUnRegisterCODEC	unregisters the codec
-TIFFVGetField		return tag value in current directory
-TIFFVGetFieldDefaulted	return tag value in current directory
-TIFFVSetField		set a tag's value in the current directory
-TIFFVStripSize		returns the number of bytes in a strip
+NDPIIsTiled		return true if image data is tiled
+NDPIIsByteSwapped	return true if image data is byte-swapped
+NDPINumberOfStrips	return number of strips in an image
+NDPINumberOfTiles	return number of tiles in an image
+NDPIOpen		open a file for reading or writing
+NDPIPrintDirectory	print description of the current directory
+NDPIReadBufferSetup	specify i/o buffer for reading
+NDPIReadDirectory	read the next directory
+NDPIReadEncodedStrip	read and decode a strip of data
+NDPIReadEncodedTile	read and decode a tile of data
+NDPIReadRawStrip	read a raw strip of data
+NDPIReadRawTile		read a raw tile of data
+NDPIReadRGBAImage	read an image into a fixed format raster
+NDPIReadScanline	read and decode a row of data
+NDPIReadTile		read and decode a tile of data
+NDPIRegisterCODEC	override standard codec for the specific scheme
+NDPIReverseBits		reverse bits in an array of bytes
+NDPIRGBAImageBegin	setup decoder state for NDPIRGBAImageGet
+NDPIRGBAImageEnd	release TIFFRGBAImage decoder state
+NDPIRGBAImageGet	read and decode an image
+NDPIRGBAImageOK		is image readable by NDPIRGBAImageGet
+NDPIScanlineSize	return size of a scanline
+NDPISetDirectory	set the current directory
+NDPISetSubDirectory	set the current directory
+NDPISetErrorHandler	set error handler function
+NDPISetField		set a tag's value in the current directory
+NDPISetWarningHandler	set warning handler function
+NDPIStripSize		returns size of a strip
+NDPIRawStripSize	returns the number of bytes in a raw strip
+NDPISwabShort		swap bytes of short
+NDPISwabLong		swap bytes of long
+NDPISwabArrayOfShort	swap bytes of an array of shorts
+NDPISwabArrayOfLong	swap bytes of an array of longs
+NDPITileRowSize		return size of a row in a tile
+NDPITileSize		return size of a tile
+NDPIUnRegisterCODEC	unregisters the codec
+NDPIVGetField		return tag value in current directory
+NDPIVGetFieldDefaulted	return tag value in current directory
+NDPIVSetField		set a tag's value in the current directory
+NDPIVStripSize		returns the number of bytes in a strip
 TIFFWarning		library warning handler
-TIFFWriteDirectory	write the current directory
+NDPIWriteDirectory	write the current directory
 TIFFWriteEncodedStrip	compress and write a strip of data
 TIFFWriteEncodedTile	compress and write a tile of data
 TIFFWriteRawStrip	write a raw strip of data
 TIFFWriteRawTile	write a raw tile of data
 TIFFWriteScanline	write a scanline of data
 TIFFWriteTile		compress and write a tile of data
-TIFFXYZToRGB		perform CIE XYZ to RGB conversion
-TIFFYCbCrToRGBInit	initialize YCbCr to RGB conversion state
-TIFFYCbCrtoRGB		perform YCbCr to RGB conversion
+NDPIXYZToRGB		perform CIE XYZ to RGB conversion
+NDPIYCbCrToRGBInit	initialize YCbCr to RGB conversion state
+NDPIYCbCrtoRGB		perform YCbCr to RGB conversion
 .sp
 Auxiliary functions:
-_TIFFfree		free memory buffer
-_TIFFmalloc		dynamically allocate memory buffer
+_NDPIfree		free memory buffer
+_NDPImalloc		dynamically allocate memory buffer
 _TIFFmemcmp		compare contents of the memory buffers
-_TIFFmemcpy		copy contents of the one buffer to another
-_TIFFmemset		fill memory buffer with a constant byte
-_TIFFrealloc		dynamically reallocate memory buffer
+_NDPImemcpy		copy contents of the one buffer to another
+_NDPImemset		fill memory buffer with a constant byte
+_NDPIrealloc		dynamically reallocate memory buffer
 
 .fi
 .SH "TAG USAGE"
@@ -499,7 +499,7 @@ for returning 8-bit greyscale data
 (valid only when decoding LogL-encoded data).
 .SH DIAGNOSTICS
 All error messages are directed through the
-.IR TIFFError
+.IR NDPIError
 routine.
 By default messages are directed to
 .B stderr

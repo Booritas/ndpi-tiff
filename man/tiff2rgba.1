@@ -42,7 +42,7 @@ interpretation into RGBA, support for alpha blending, and translation
 of many different bit depths into a 32bit RGBA image.
 .P
 Internally this program is implemented using the
-.I TIFFReadRGBAImage()
+.I NDPIReadRGBAImage()
 function, and it suffers any limitations of that image.  This includes
 limited support for > 8 BitsPerSample images, and flaws with some
 esoteric combinations of BitsPerSample, photometric interpretation, 
@@ -93,7 +93,7 @@ Set maximum memory allocation size (in MiB). The default is 256MiB.
 Set to 0 to disable the limit.
 .SH "SEE ALSO"
 .BR tiff2bw (1),
-.BR TIFFReadRGBAImage (3t),
+.BR NDPIReadRGBAImage (3t),
 .BR libtiff (3)
 .PP
 Libtiff library home page:

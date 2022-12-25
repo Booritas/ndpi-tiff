@@ -24,7 +24,7 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>TIFFReadBufferSetup, TIFFWriteBufferSetup &minus; I/O
+<p>NDPIReadBufferSetup, TIFFWriteBufferSetup &minus; I/O
 buffering control routines</p>
 </td>
 </table>
@@ -38,7 +38,7 @@ buffering control routines</p>
 <td width="91%">
 <pre><b>#include &lt;tiffio.h&gt;
 
-int TIFFReadBufferSetup(TIFF *</b><i>tif</i><b>, tdata_t</b> <i>buffer</i><b>, tsize_t</b> <i>size</i><b>);
+int NDPIReadBufferSetup(TIFF *</b><i>tif</i><b>, tdata_t</b> <i>buffer</i><b>, tsize_t</b> <i>size</i><b>);
 int TIFFWriteBufferSetup(TIFF *</b><i>tif</i><b>, tdata_t</b> <i>buffer</i><b>, tsize_t</b> <i>size</i><b>);
 </b></pre>
 </td>
@@ -60,12 +60,12 @@ optimize memory usage and/or eliminate potential copy
 operations that can occur when working with images that have
 data stored without compression.</p>
 <!-- INDENTATION -->
-<p><i>TIFFReadBufferSetup</i> sets up the data buffer used
+<p><i>NDPIReadBufferSetup</i> sets up the data buffer used
 to read raw (encoded) data from a file. If the specified
 pointer is <small>NULL</small> (zero), then a buffer of the
 appropriate size is allocated. Otherwise the caller must
 guarantee that the buffer is large enough to hold any
-individual strip of raw data. <i>TIFFReadBufferSetup</i>
+individual strip of raw data. <i>NDPIReadBufferSetup</i>
 returns a non-zero value if the setup was successful and
 zero otherwise.</p>
 <!-- INDENTATION -->
@@ -89,7 +89,7 @@ zero otherwise.</p>
 <td width="8%"></td>
 <td width="91%">
 <p><b>%s: No space for data buffer at scanline %ld</b>.
-<i>TIFFReadBufferSetup</i> was unable to dynamically
+<i>NDPIReadBufferSetup</i> was unable to dynamically
 allocate space for a data buffer.</p>
 <!-- INDENTATION -->
 <p><b>%s: No space for output buffer</b>.

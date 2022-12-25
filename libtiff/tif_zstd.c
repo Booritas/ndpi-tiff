@@ -109,13 +109,13 @@ ZSTDPreDecode(TIFF* tif, uint16_t s)
 
         sp->dstream = ZSTD_createDStream();
         if( sp->dstream == NULL ) {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "Cannot allocate decompression stream");
             return 0;
         }
         zstd_ret = ZSTD_initDStream(sp->dstream);
         if( ZSTD_isError(zstd_ret) ) {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "Error in ZSTD_initDStream(): %s",
                          ZSTD_getErrorName(zstd_ret));
             return 0;
@@ -149,7 +149,7 @@ ZSTDDecode(TIFF* tif, uint8_t* op, tmsize_t occ, uint16_t s)
                 zstd_ret = ZSTD_decompressStream(sp->dstream, &out_buffer,
                                                  &in_buffer);
                 if( ZSTD_isError(zstd_ret) ) {
-                    TIFFErrorExt(tif->tif_clientdata, module,
+                    NDPIErrorExt(tif->tif_clientdata, module,
                                 "Error in ZSTD_decompressStream(): %s",
                                 ZSTD_getErrorName(zstd_ret));
                     return 0;
@@ -159,7 +159,7 @@ ZSTDDecode(TIFF* tif, uint8_t* op, tmsize_t occ, uint16_t s)
                  out_buffer.pos < out_buffer.size );
 
         if (out_buffer.pos < (size_t)occ) {
-                TIFFErrorExt(tif->tif_clientdata, module,
+                NDPIErrorExt(tif->tif_clientdata, module,
                     "Not enough data at scanline %lu (short %lu bytes)",
                     (unsigned long) tif->tif_row,
                     (unsigned long) (size_t)occ - out_buffer.pos);
@@ -209,14 +209,14 @@ ZSTDPreEncode(TIFF* tif, uint16_t s)
         }
         sp->cstream = ZSTD_createCStream();
         if( sp->cstream == NULL ) {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "Cannot allocate compression stream");
             return 0;
         }
 
         zstd_ret = ZSTD_initCStream(sp->cstream, sp->compression_level);
         if( ZSTD_isError(zstd_ret) ) {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                          "Error in ZSTD_initCStream(): %s",
                          ZSTD_getErrorName(zstd_ret));
             return 0;
@@ -253,14 +253,14 @@ ZSTDEncode(TIFF* tif, uint8_t* bp, tmsize_t cc, uint16_t s)
                 zstd_ret = ZSTD_compressStream(sp->cstream, &sp->out_buffer,
                                                &in_buffer);
                 if( ZSTD_isError(zstd_ret) ) {
-                    TIFFErrorExt(tif->tif_clientdata, module,
+                    NDPIErrorExt(tif->tif_clientdata, module,
                                 "Error in ZSTD_compressStream(): %s",
                                 ZSTD_getErrorName(zstd_ret));
                     return 0;
                 }
                 if( sp->out_buffer.pos == sp->out_buffer.size ) {
                         tif->tif_rawcc = tif->tif_rawdatasize;
-                        if (!TIFFFlushData1(tif))
+                        if (!NDPIFlushData1(tif))
                                 return 0;
                         sp->out_buffer.dst = tif->tif_rawcp;
                         sp->out_buffer.pos = 0;
@@ -283,14 +283,14 @@ ZSTDPostEncode(TIFF* tif)
         do {
                 zstd_ret = ZSTD_endStream(sp->cstream, &sp->out_buffer);
                 if( ZSTD_isError(zstd_ret) ) {
-                    TIFFErrorExt(tif->tif_clientdata, module,
+                    NDPIErrorExt(tif->tif_clientdata, module,
                                 "Error in ZSTD_endStream(): %s",
                                 ZSTD_getErrorName(zstd_ret));
                     return 0;
                 }
                 if( sp->out_buffer.pos > 0 ) {
                         tif->tif_rawcc = sp->out_buffer.pos;
-                        if (!TIFFFlushData1(tif))
+                        if (!NDPIFlushData1(tif))
                                 return 0;
                         sp->out_buffer.dst = tif->tif_rawcp;
                         sp->out_buffer.pos = 0;
@@ -319,10 +319,10 @@ ZSTDCleanup(TIFF* tif)
             ZSTD_freeCStream(sp->cstream);
             sp->cstream = NULL;
         }
-        _TIFFfree(sp);
+        _NDPIfree(sp);
         tif->tif_data = NULL;
 
-        _TIFFSetDefaultCompressionState(tif);
+        _NDPISetDefaultCompressionState(tif);
 }
 
 static int
@@ -337,7 +337,7 @@ ZSTDVSetField(TIFF* tif, uint32_t tag, va_list ap)
                 if( sp->compression_level <= 0 ||
                     sp->compression_level > ZSTD_maxCLevel() )
                 {
-                    TIFFWarningExt(tif->tif_clientdata, module,
+                    NDPIWarningExt(tif->tif_clientdata, module,
                                    "ZSTD_LEVEL should be between 1 and %d",
                                    ZSTD_maxCLevel());
                 }
@@ -381,8 +381,8 @@ TIFFInitZSTD(TIFF* tif, int scheme)
         /*
         * Merge codec-specific tag information.
         */
-        if (!_TIFFMergeFields(tif, ZSTDFields, TIFFArrayCount(ZSTDFields))) {
-                TIFFErrorExt(tif->tif_clientdata, module,
+        if (!_NDPIMergeFields(tif, ZSTDFields, TIFFArrayCount(ZSTDFields))) {
+                NDPIErrorExt(tif->tif_clientdata, module,
                             "Merging ZSTD codec-specific tags failed");
                 return 0;
         }
@@ -390,7 +390,7 @@ TIFFInitZSTD(TIFF* tif, int scheme)
         /*
         * Allocate state block so tag methods have storage to record values.
         */
-        tif->tif_data = (uint8_t*) _TIFFmalloc(sizeof(ZSTDState));
+        tif->tif_data = (uint8_t*) _NDPImalloc(sizeof(ZSTDState));
         if (tif->tif_data == NULL)
                 goto bad;
         sp = LState(tif);
@@ -434,7 +434,7 @@ TIFFInitZSTD(TIFF* tif, int scheme)
         (void) TIFFPredictorInit(tif);
         return 1;
 bad:
-        TIFFErrorExt(tif->tif_clientdata, module,
+        NDPIErrorExt(tif->tif_clientdata, module,
                     "No space for ZSTD state block");
         return 0;
 }

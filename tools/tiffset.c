@@ -74,7 +74,7 @@ GetField(TIFF *tiff, const char *tagname)
     const TIFFField *fip;
 
     if( atoi(tagname) > 0 )
-        fip = TIFFFieldWithTag(tiff, (ttag_t)atoi(tagname));
+        fip = NDPIFieldWithTag(tiff, (ttag_t)atoi(tagname));
     else
         fip = TIFFFieldWithName(tiff, tagname);
 
@@ -95,14 +95,14 @@ main(int argc, char* argv[])
     if (argc < 2)
         usage(EXIT_FAILURE);
 
-    tiff = TIFFOpen(argv[argc-1], "r+");
+    tiff = NDPIOpen(argv[argc-1], "r+");
     if (tiff == NULL)
         return EXIT_FAILURE;
 
     for( arg_index = 1; arg_index < argc-1; arg_index++ ) {
 	if (strcmp(argv[arg_index],"-d") == 0 && arg_index < argc-2) {
 	    arg_index++;
-	    if( TIFFSetDirectory(tiff, atoi(argv[arg_index]) ) != 1 )
+	    if( NDPISetDirectory(tiff, atoi(argv[arg_index]) ) != 1 )
             {
                fprintf( stderr, "Failed to set directory=%s\n", argv[arg_index] );
                return EXIT_FAILURE;
@@ -111,7 +111,7 @@ main(int argc, char* argv[])
 	}
 	if (strcmp(argv[arg_index],"-sd") == 0 && arg_index < argc-2) {
 	    arg_index++;
-	    if( TIFFSetSubDirectory(tiff, atoi(argv[arg_index]) ) != 1 )
+	    if( NDPISetSubDirectory(tiff, atoi(argv[arg_index]) ) != 1 )
             {
                fprintf( stderr, "Failed to set sub directory=%s\n", argv[arg_index] );
                return EXIT_FAILURE;
@@ -146,7 +146,7 @@ main(int argc, char* argv[])
 
             arg_index++;
             if (TIFFFieldDataType(fip) == TIFF_ASCII) {
-                if (TIFFSetField(tiff, TIFFFieldTag(fip), argv[arg_index]) != 1)
+                if (NDPISetField(tiff, TIFFFieldTag(fip), argv[arg_index]) != 1)
                     fprintf( stderr, "Failed to set %s=%s\n",
                              TIFFFieldName(fip), argv[arg_index] );
             } else if (TIFFFieldWriteCount(fip) > 0
@@ -209,7 +209,7 @@ main(int argc, char* argv[])
                                     break;
                         }
 
-                        array = _TIFFmalloc(wc * size);
+                        array = _NDPImalloc(wc * size);
                         if (!array) {
                                 fprintf(stderr, "No space for %s tag\n",
                                         tagname);
@@ -266,54 +266,54 @@ main(int argc, char* argv[])
                         }
                 
                         if (TIFFFieldPassCount(fip)) {
-                                ret = TIFFSetField(tiff, TIFFFieldTag(fip),
+                                ret = NDPISetField(tiff, TIFFFieldTag(fip),
                                                    wc, array);
                         } else if (TIFFFieldTag(fip) == TIFFTAG_PAGENUMBER
 				   || TIFFFieldTag(fip) == TIFFTAG_HALFTONEHINTS
 				   || TIFFFieldTag(fip) == TIFFTAG_YCBCRSUBSAMPLING
 				   || TIFFFieldTag(fip) == TIFFTAG_DOTRANGE) {
        				if (TIFFFieldDataType(fip) == TIFF_BYTE) {
-					ret = TIFFSetField(tiff, TIFFFieldTag(fip),
+					ret = NDPISetField(tiff, TIFFFieldTag(fip),
                                        ((uint8_t *)array)[0], ((uint8_t *)array)[1]);
 				} else if (TIFFFieldDataType(fip) == TIFF_SHORT) {
-					ret = TIFFSetField(tiff, TIFFFieldTag(fip),
+					ret = NDPISetField(tiff, TIFFFieldTag(fip),
                                        ((uint16_t *)array)[0], ((uint16_t *)array)[1]);
 				}
 			} else {
-                                ret = TIFFSetField(tiff, TIFFFieldTag(fip),
+                                ret = NDPISetField(tiff, TIFFFieldTag(fip),
                                                    array);
                         }
 
-                        _TIFFfree(array);
+                        _NDPIfree(array);
                 } else {
                         switch (TIFFFieldDataType(fip)) {
                             case TIFF_BYTE:
                             case TIFF_SHORT:
                             case TIFF_SBYTE:
                             case TIFF_SSHORT:
-                                ret = TIFFSetField(tiff, TIFFFieldTag(fip),
+                                ret = NDPISetField(tiff, TIFFFieldTag(fip),
                                                    atoi(argv[arg_index++]));
                                 break;
                             case TIFF_LONG:
                             case TIFF_SLONG:
                             case TIFF_IFD:
-                                ret = TIFFSetField(tiff, TIFFFieldTag(fip),
+                                ret = NDPISetField(tiff, TIFFFieldTag(fip),
                                                    atol(argv[arg_index++]));
                                 break;
                             case TIFF_LONG8:
                             case TIFF_SLONG8:
                             case TIFF_IFD8:
-                                ret = TIFFSetField(tiff, TIFFFieldTag(fip),
+                                ret = NDPISetField(tiff, TIFFFieldTag(fip),
                                                    strtoll(argv[arg_index++], (char **)NULL, 10));
                                 break;
                             case TIFF_DOUBLE:
-                                ret = TIFFSetField(tiff, TIFFFieldTag(fip),
+                                ret = NDPISetField(tiff, TIFFFieldTag(fip),
                                                    atof(argv[arg_index++]));
                                 break;
                             case TIFF_RATIONAL:
                             case TIFF_SRATIONAL:
                             case TIFF_FLOAT:
-                                ret = TIFFSetField(tiff, TIFFFieldTag(fip),
+                                ret = NDPISetField(tiff, TIFFFieldTag(fip),
                                                    (float)atof(argv[arg_index++]));
                                 break;
                             default:
@@ -365,16 +365,16 @@ main(int argc, char* argv[])
             fclose( fp );
 
             if(TIFFFieldPassCount( fip )) {
-                ret = TIFFSetField(tiff, TIFFFieldTag(fip), (uint16_t)len, text );
+                ret = NDPISetField(tiff, TIFFFieldTag(fip), (uint16_t)len, text );
             } else {
-                ret = TIFFSetField( tiff, TIFFFieldTag(fip), text );
+                ret = NDPISetField( tiff, TIFFFieldTag(fip), text );
             }
             if(!ret) {
                 fprintf(stderr, "Failed to set %s from file %s\n", 
                         TIFFFieldName(fip), argv[arg_index]);
             }
 
-            _TIFFfree( text );
+            _NDPIfree( text );
             arg_index++;
         } else if (strcmp(argv[arg_index],"-h") == 0 || strcmp(argv[arg_index],"--help") == 0) {
             usage(EXIT_SUCCESS);
@@ -385,8 +385,8 @@ main(int argc, char* argv[])
         }
     }
 
-    TIFFRewriteDirectory(tiff);
-    TIFFClose(tiff);
+    NDPIRewriteDirectory(tiff);
+    NDPIClose(tiff);
     return EXIT_SUCCESS;
 }
 

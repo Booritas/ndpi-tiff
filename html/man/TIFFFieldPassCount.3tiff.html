@@ -57,13 +57,13 @@ TIFFFieldPassCount(const TIFFField*</b>
 
 
 <p style="margin-left:11%; margin-top: 1em"><b>TIFFFieldPassCount</b>
-returns true (nonzero) if <b>TIFFGetField</b> and
-<b>TIFFSetField</b> expect a <i>count</i> value to be passed
+returns true (nonzero) if <b>NDPIGetField</b> and
+<b>NDPISetField</b> expect a <i>count</i> value to be passed
 before the actual data pointer.</p>
 
 <p style="margin-left:11%; margin-top: 1em"><i>fip</i> is a
 field information pointer previously returned by
-<b>TIFFFindField</b>, <b>TIFFFieldWithTag</b>, or
+<b>NDPIFindField</b>, <b>NDPIFieldWithTag</b>, or
 <b>TIFFFieldWithName</b>.</p>
 
 <p style="margin-left:11%; margin-top: 1em">When a
@@ -71,8 +71,8 @@ field information pointer previously returned by
 when <b>TIFFFieldReadCount</b> reports
 <b>TIFF_VARIABLE2</b>, and of type <b>uint16_t</b> otherwise.
 (This distinction is critical for use of
-<b>TIFFGetField</b>, but normally not so for use of
-<b>TIFFSetField</b>.)</p>
+<b>NDPIGetField</b>, but normally not so for use of
+<b>NDPISetField</b>.)</p>
 
 <h2>RETURN VALUES
 <a name="RETURN VALUES"></a>

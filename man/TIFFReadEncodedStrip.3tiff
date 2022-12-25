@@ -22,15 +22,15 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFReadEncodedStrip 3TIFF "October 15, 1995" "libtiff"
+.TH NDPIReadEncodedStrip 3TIFF "October 15, 1995" "libtiff"
 .SH NAME
-TIFFReadEncodedStrip \- read and decode a strip of data from an open
+NDPIReadEncodedStrip \- read and decode a strip of data from an open
 .SM TIFF
 file
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "tmsize_t TIFFReadEncodedStrip(TIFF *" tif ", uint32_t " strip ", void *" buf ", tmsize_t " size ")"
+.BI "tmsize_t NDPIReadEncodedStrip(TIFF *" tif ", uint32_t " strip ", void *" buf ", tmsize_t " size ")"
 .SH DESCRIPTION
 Read the specified strip of data and place up to
 .I size
@@ -44,7 +44,7 @@ organized in separate planes (\c
 .IR PlanarConfiguration =2).
 To read a full strip of data the data buffer should typically be at least as
 large as the number returned by
-.BR TIFFStripSize (3TIFF).
+.BR NDPIStripSize (3TIFF).
 If the -1 passed in
 .I size
 parameter, the whole strip will be read. You should be sure you have enough
@@ -61,16 +61,16 @@ to the native machine byte order,
 The actual number of bytes of data that were placed in
 .I buf
 is returned;
-.IR TIFFReadEncodedStrip
+.IR NDPIReadEncodedStrip
 returns \-1 if an error was encountered.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.BR TIFFError (3TIFF)
+.BR NDPIError (3TIFF)
 routine.
 .SH "SEE ALSO"
-.BR TIFFOpen (3TIFF),
-.BR TIFFReadRawStrip (3TIFF),
-.BR TIFFReadScanline (3TIFF),
+.BR NDPIOpen (3TIFF),
+.BR NDPIReadRawStrip (3TIFF),
+.BR NDPIReadScanline (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

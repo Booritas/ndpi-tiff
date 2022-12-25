@@ -38,8 +38,8 @@ header files, such as
 .P
 .I fip
 is a field information pointer previously returned by
-.BR TIFFFindField ,
-.BR TIFFFieldWithTag ,
+.BR NDPIFindField ,
+.BR NDPIFieldWithTag ,
 or
 .BR TIFFFieldWithName .
 .br

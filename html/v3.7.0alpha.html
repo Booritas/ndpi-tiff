@@ -78,7 +78,7 @@ The following information is located here:
 		http://bugzilla.remotesensing.org/show_bug.cgi?id=581</a>.
 
 	<li> libtiff/{tif_open.c, tiffio.h}: New function added:
-	TIFFIsBigEndian(). Function returns nonzero if given was file written
+	NDPIIsBigEndian(). Function returns nonzero if given was file written
 	in big-endian order.
 
 	<li> libtiff/tif_print.c: added (untested) support for printing
@@ -89,7 +89,7 @@ The following information is located here:
 	<a href="http://bugzilla.remotesensing.org/show_bug.cgi?id=565">
 		http://bugzilla.remotesensing.org/show_bug.cgi?id=565</a>.
 
-	<li> libtiff/tif_strip.c: Never return 0 from the TIFFNumberOfStrips().
+	<li> libtiff/tif_strip.c: Never return 0 from the NDPINumberOfStrips().
 
 	<li> libtiff/tif_dirread.c: Workaround for broken TIFF writers which
 	store single SampleFormat value for multisampled images. See
@@ -107,7 +107,7 @@ The following information is located here:
 		http://bugzilla.remotesensing.org/show_bug.cgi?id=532</a>.
 
 	<li> libtiff/tif_open.c: Use dummy mmap/munmap functions in
-	TIFFClientOpen() when the appropriate client functions was not
+	NDPIClientOpen() when the appropriate client functions was not
 	supplied by user.
 
 	<li> libtiff/tif_dirread.c: Fixed problem with handling TIFF_UNDEFINED
@@ -140,7 +140,7 @@ The following information is located here:
 		http://bugzilla.remotesensing.org/show_bug.cgi?id=468</a>.
 
 	<li> libtiff/{libtiff.def, tif_close.c, tiffio.h, tif_open.c}:
-	Separate TIFFCleanup() from the TIFFClose() in order to fix the bug
+	Separate NDPICleanup() from the NDPIClose() in order to fix the bug
 	<a href="http://bugzilla.remotesensing.org/show_bug.cgi?id=468">
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=468</a>.
 
@@ -154,7 +154,7 @@ The following information is located here:
 	<a href="http://bugzilla.remotesensing.org/show_bug.cgi?id=460">
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=460</a>.
 				
-	<li> libtiff/tif_dir.c: Incomplete cleanup in TIFFFreeDirectory(),
+	<li> libtiff/tif_dir.c: Incomplete cleanup in NDPIFreeDirectory(),
 	patch from Gerben Koopmans.
 
 	<li> libtiff/tif_dirread.c: Check field_passcount value before setting
@@ -163,7 +163,7 @@ The following information is located here:
 	<li> libtiff/{tiff.h, tif_fax3.c}:Fixes for AMD 64 platform as
 	suggested by Jeremy C. Reed.			
 
-	<li> libtiff/tif_win32.c: Fixed problem with _TIFFrealloc() when
+	<li> libtiff/tif_win32.c: Fixed problem with _NDPIrealloc() when
 	the NULL pointer passed. Patch supplied by Larry Grill.
 
 </UL>

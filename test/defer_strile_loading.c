@@ -50,30 +50,30 @@ int test(int classictif, int height, int tiled)
 
     (void)ret;
 
-    tif = TIFFOpen(filename, classictif ? "wDO" : "w8DO"); /* O should be ignored in write mode */
+    tif = NDPIOpen(filename, classictif ? "wDO" : "w8DO"); /* O should be ignored in write mode */
     if(!tif)
     {
         fprintf(stderr, "cannot create %s\n", filename);
         return 1;
     }
-    ret = TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
+    ret = NDPISetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, 1);
+    ret = NDPISetField(tif, TIFFTAG_IMAGEWIDTH, 1);
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_IMAGELENGTH, height);
+    ret = NDPISetField(tif, TIFFTAG_IMAGELENGTH, height);
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8);
+    ret = NDPISetField(tif, TIFFTAG_BITSPERSAMPLE, 8);
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1);
+    ret = NDPISetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1);
     assert(ret);
-    ret = TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+    ret = NDPISetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
     assert(ret);
     if( tiled )
     {
         int j;
-        ret = TIFFSetField(tif, TIFFTAG_TILEWIDTH, 16);
+        ret = NDPISetField(tif, TIFFTAG_TILEWIDTH, 16);
         assert( ret );
-        ret = TIFFSetField(tif, TIFFTAG_TILELENGTH, 16);
+        ret = NDPISetField(tif, TIFFTAG_TILELENGTH, 16);
         assert( ret );
         for( j = 0; j < (height+15) / 16; j++ )
         {
@@ -85,7 +85,7 @@ int test(int classictif, int height, int tiled)
     }
     else
     {
-        ret = TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, 1);
+        ret = NDPISetField(tif, TIFFTAG_ROWSPERSTRIP, 1);
         assert(ret);
         for( i = 0; i < height; i++ )
         {
@@ -97,7 +97,7 @@ int test(int classictif, int height, int tiled)
                 i = height -  2;
         }
     }
-    TIFFClose(tif);
+    NDPIClose(tif);
 
     f = fopen(filename, "rb");
     if( !f )
@@ -105,7 +105,7 @@ int test(int classictif, int height, int tiled)
 
     for( i = 0; i < 2; i++ )
     {
-        tif = TIFFOpen(filename, i == 0 ? "rD" : "rO");
+        tif = NDPIOpen(filename, i == 0 ? "rD" : "rO");
         if(!tif)
         {
             fprintf(stderr, "cannot open %s\n", filename);
@@ -124,14 +124,14 @@ int test(int classictif, int height, int tiled)
                 {
                     unsigned char tilebuffer[256];
                     memset(tilebuffer,0, 256);
-                    ret = TIFFReadEncodedTile( tif, j, tilebuffer, 256 );
+                    ret = NDPIReadEncodedTile( tif, j, tilebuffer, 256 );
                     assert(ret == 256);
                     if( tilebuffer[0] != expected_c ||
                         tilebuffer[255] != expected_c )
                     {
                         fprintf(stderr, "unexpected value at tile %d: %d %d\n",
                                 j, tilebuffer[0], tilebuffer[255]);
-                        TIFFClose(tif);
+                        NDPIClose(tif);
                         fclose(f);
                         return 1;
                     }
@@ -159,7 +159,7 @@ int test(int classictif, int height, int tiled)
                     }
 
                     memset(tilebuffer,0, 256);
-                    ret = TIFFReadFromUserBuffer(tif, j,
+                    ret = NDPIReadFromUserBuffer(tif, j,
                                                     inputbuffer, 256,
                                                     tilebuffer, 256 );
                     assert(ret == 1);
@@ -168,7 +168,7 @@ int test(int classictif, int height, int tiled)
                     {
                         fprintf(stderr, "unexpected value at tile %d: %d %d\n",
                                 j, tilebuffer[0], tilebuffer[255]);
-                        TIFFClose(tif);
+                        NDPIClose(tif);
                         fclose(f);
                         return 1;
                     }
@@ -185,13 +185,13 @@ int test(int classictif, int height, int tiled)
                 for( retry = 0; retry < 2; retry++ )
                 {
                     unsigned char c = 0;
-                    ret = TIFFReadEncodedStrip( tif, j, &c, 1 );
+                    ret = NDPIReadEncodedStrip( tif, j, &c, 1 );
                     assert(ret == 1);
                     if( c != expected_c )
                     {
                         fprintf(stderr, "unexpected value at line %d: %d\n",
                                 j, c);
-                        TIFFClose(tif);
+                        NDPIClose(tif);
                         fclose(f);
                         return 1;
                     }
@@ -218,7 +218,7 @@ int test(int classictif, int height, int tiled)
                         (void)nread;
                     }
                     memset(tilebuffer,0, 1);
-                    ret = TIFFReadFromUserBuffer(tif, j,
+                    ret = NDPIReadFromUserBuffer(tif, j,
                                                     inputbuffer, 1,
                                                     tilebuffer, 1 );
                     assert(ret == 1);
@@ -226,7 +226,7 @@ int test(int classictif, int height, int tiled)
                     {
                         fprintf(stderr, "unexpected value at line %d: %d\n",
                                 j, tilebuffer[0]);
-                        TIFFClose(tif);
+                        NDPIClose(tif);
                         fclose(f);
                         return 1;
                     }
@@ -265,11 +265,11 @@ int test(int classictif, int height, int tiled)
         {
             toff_t* offsets = NULL;
             toff_t* bytecounts = NULL;
-            ret = TIFFGetField( tif,
+            ret = NDPIGetField( tif,
                 tiled ? TIFFTAG_TILEOFFSETS : TIFFTAG_STRIPOFFSETS, &offsets );
             assert(ret);
             assert(offsets);
-            ret = TIFFGetField( tif,
+            ret = NDPIGetField( tif,
                 tiled ? TIFFTAG_TILEBYTECOUNTS : TIFFTAG_STRIPBYTECOUNTS, &bytecounts );
             assert(ret);
             assert(bytecounts);
@@ -289,7 +289,7 @@ int test(int classictif, int height, int tiled)
             }
         }
 
-        TIFFClose(tif);
+        NDPIClose(tif);
     }
     fclose(f);
 

@@ -45,7 +45,7 @@
 
 #define	streq(a,b)	(strcmp(a,b) == 0)
 #define	CopyField(tag, v) \
-    if (TIFFGetField(in, tag, &v)) TIFFSetField(out, tag, v)
+    if (NDPIGetField(in, tag, &v)) NDPISetField(out, tag, v)
 
 #ifndef howmany
 #define	howmany(x, y)	(((x)+((y)-1))/(y))
@@ -129,25 +129,25 @@ main(int argc, char* argv[])
 	if (argc - optind < 2)
 		usage(EXIT_FAILURE);
 
-	out = TIFFOpen(argv[argc-1], bigtiff_output?"w8":"w");
+	out = NDPIOpen(argv[argc-1], bigtiff_output?"w8":"w");
 	if (out == NULL)
 		return (EXIT_FAILURE);
 
 	for (; optind < argc-1; optind++) {
-		in = TIFFOpen(argv[optind], "r");
+		in = NDPIOpen(argv[optind], "r");
 		if (in != NULL) {
 			do {
 				if (!tiffcvt(in, out) ||
-				    !TIFFWriteDirectory(out)) {
-					(void) TIFFClose(out);
-					(void) TIFFClose(in);
+				    !NDPIWriteDirectory(out)) {
+					(void) NDPIClose(out);
+					(void) NDPIClose(in);
 					return (1);
 				}
-			} while (TIFFReadDirectory(in));
-			(void) TIFFClose(in);
+			} while (NDPIReadDirectory(in));
+			(void) NDPIClose(in);
 		}
 	}
-	(void) TIFFClose(out);
+	(void) NDPIClose(out);
 	return (EXIT_SUCCESS);
 }
 
@@ -163,17 +163,17 @@ cvt_by_tile( TIFF *in, TIFF *out )
     int	    ok = 1;
     uint32_t  rastersize, wrk_linesize;
 
-    TIFFGetField(in, TIFFTAG_IMAGEWIDTH, &width);
-    TIFFGetField(in, TIFFTAG_IMAGELENGTH, &height);
+    NDPIGetField(in, TIFFTAG_IMAGEWIDTH, &width);
+    NDPIGetField(in, TIFFTAG_IMAGELENGTH, &height);
 
-    if( !TIFFGetField(in, TIFFTAG_TILEWIDTH, &tile_width)
-        || !TIFFGetField(in, TIFFTAG_TILELENGTH, &tile_height) ) {
-        TIFFError(TIFFFileName(in), "Source image not tiled");
+    if( !NDPIGetField(in, TIFFTAG_TILEWIDTH, &tile_width)
+        || !NDPIGetField(in, TIFFTAG_TILELENGTH, &tile_height) ) {
+        NDPIError(NDPIFileName(in), "Source image not tiled");
         return (0);
     }
     
-    TIFFSetField(out, TIFFTAG_TILEWIDTH, tile_width );
-    TIFFSetField(out, TIFFTAG_TILELENGTH, tile_height );
+    NDPISetField(out, TIFFTAG_TILEWIDTH, tile_width );
+    NDPISetField(out, TIFFTAG_TILELENGTH, tile_height );
 
     /*
      * Allocate tile buffer
@@ -181,12 +181,12 @@ cvt_by_tile( TIFF *in, TIFF *out )
     rastersize = tile_width * tile_height * sizeof (uint32_t);
     if (tile_width != (rastersize / tile_height) / sizeof( uint32_t))
     {
-	TIFFError(TIFFFileName(in), "Integer overflow when calculating raster buffer");
+	NDPIError(NDPIFileName(in), "Integer overflow when calculating raster buffer");
 	exit(EXIT_FAILURE);
     }
-    raster = (uint32_t*)_TIFFmalloc(rastersize);
+    raster = (uint32_t*)_NDPImalloc(rastersize);
     if (raster == 0) {
-        TIFFError(TIFFFileName(in), "No space for raster buffer");
+        NDPIError(NDPIFileName(in), "No space for raster buffer");
         return (0);
     }
 
@@ -197,12 +197,12 @@ cvt_by_tile( TIFF *in, TIFF *out )
     wrk_linesize = tile_width * sizeof (uint32_t);
     if (tile_width != wrk_linesize / sizeof (uint32_t))
     {
-        TIFFError(TIFFFileName(in), "Integer overflow when calculating wrk_line buffer");
+        NDPIError(NDPIFileName(in), "Integer overflow when calculating wrk_line buffer");
 	exit(EXIT_FAILURE);
     }
-    wrk_line = (uint32_t*)_TIFFmalloc(wrk_linesize);
+    wrk_line = (uint32_t*)_NDPImalloc(wrk_linesize);
     if (!wrk_line) {
-        TIFFError(TIFFFileName(in), "No space for raster scanline buffer");
+        NDPIError(NDPIFileName(in), "No space for raster scanline buffer");
         ok = 0;
     }
     
@@ -216,7 +216,7 @@ cvt_by_tile( TIFF *in, TIFF *out )
             uint32_t i_row;
 
             /* Read the tile into an RGBA array */
-            if (!TIFFReadRGBATile(in, col, row, raster)) {
+            if (!NDPIReadRGBATile(in, col, row, raster)) {
                 ok = 0;
                 break;
             }
@@ -227,11 +227,11 @@ cvt_by_tile( TIFF *in, TIFF *out )
 	     * we should rearrange it here.
 	     */
 #if HOST_BIGENDIAN
-	    TIFFSwabArrayOfLong(raster, tile_width * tile_height);
+	    NDPISwabArrayOfLong(raster, tile_width * tile_height);
 #endif
 
             /*
-             * For some reason the TIFFReadRGBATile() function chooses the
+             * For some reason the NDPIReadRGBATile() function chooses the
              * lower left corner as the origin.  Vertically mirror scanlines.
              */
             for( i_row = 0; i_row < tile_height / 2; i_row++ )
@@ -241,9 +241,9 @@ cvt_by_tile( TIFF *in, TIFF *out )
                 top_line = raster + tile_width * i_row;
                 bottom_line = raster + tile_width * (tile_height-i_row-1);
 
-                _TIFFmemcpy(wrk_line, top_line, 4*tile_width);
-                _TIFFmemcpy(top_line, bottom_line, 4*tile_width);
-                _TIFFmemcpy(bottom_line, wrk_line, 4*tile_width);
+                _NDPImemcpy(wrk_line, top_line, 4*tile_width);
+                _NDPImemcpy(top_line, bottom_line, 4*tile_width);
+                _NDPImemcpy(bottom_line, wrk_line, 4*tile_width);
             }
 
             /*
@@ -251,7 +251,7 @@ cvt_by_tile( TIFF *in, TIFF *out )
              */
 
             if( TIFFWriteEncodedTile( out,
-                                      TIFFComputeTile( out, col, row, 0, 0),
+                                      NDPIComputeTile( out, col, row, 0, 0),
                                       raster,
                                       4 * tile_width * tile_height ) == -1 )
             {
@@ -261,8 +261,8 @@ cvt_by_tile( TIFF *in, TIFF *out )
         }
     }
 
-    _TIFFfree( raster );
-    _TIFFfree( wrk_line );
+    _NDPIfree( raster );
+    _NDPIfree( wrk_line );
 
     return ok;
 }
@@ -278,15 +278,15 @@ cvt_by_strip( TIFF *in, TIFF *out )
     int	    ok = 1;
     uint32_t  rastersize, wrk_linesize;
 
-    TIFFGetField(in, TIFFTAG_IMAGEWIDTH, &width);
-    TIFFGetField(in, TIFFTAG_IMAGELENGTH, &height);
+    NDPIGetField(in, TIFFTAG_IMAGEWIDTH, &width);
+    NDPIGetField(in, TIFFTAG_IMAGELENGTH, &height);
 
-    if( !TIFFGetField(in, TIFFTAG_ROWSPERSTRIP, &rowsperstrip) ) {
-        TIFFError(TIFFFileName(in), "Source image not in strips");
+    if( !NDPIGetField(in, TIFFTAG_ROWSPERSTRIP, &rowsperstrip) ) {
+        NDPIError(NDPIFileName(in), "Source image not in strips");
         return (0);
     }
     
-    TIFFSetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
+    NDPISetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
 
     /*
      * Allocate strip buffer
@@ -294,12 +294,12 @@ cvt_by_strip( TIFF *in, TIFF *out )
     rastersize = width * rowsperstrip * sizeof (uint32_t);
     if (width != (rastersize / rowsperstrip) / sizeof( uint32_t))
     {
-	TIFFError(TIFFFileName(in), "Integer overflow when calculating raster buffer");
+	NDPIError(NDPIFileName(in), "Integer overflow when calculating raster buffer");
 	exit(EXIT_FAILURE);
     }
-    raster = (uint32_t*)_TIFFmalloc(rastersize);
+    raster = (uint32_t*)_NDPImalloc(rastersize);
     if (raster == 0) {
-        TIFFError(TIFFFileName(in), "No space for raster buffer");
+        NDPIError(NDPIFileName(in), "No space for raster buffer");
         return (0);
     }
 
@@ -310,12 +310,12 @@ cvt_by_strip( TIFF *in, TIFF *out )
     wrk_linesize = width * sizeof (uint32_t);
     if (width != wrk_linesize / sizeof (uint32_t))
     {
-        TIFFError(TIFFFileName(in), "Integer overflow when calculating wrk_line buffer");
+        NDPIError(NDPIFileName(in), "Integer overflow when calculating wrk_line buffer");
 	exit(EXIT_FAILURE);
     }
-    wrk_line = (uint32_t*)_TIFFmalloc(wrk_linesize);
+    wrk_line = (uint32_t*)_NDPImalloc(wrk_linesize);
     if (!wrk_line) {
-        TIFFError(TIFFFileName(in), "No space for raster scanline buffer");
+        NDPIError(NDPIFileName(in), "No space for raster scanline buffer");
         ok = 0;
     }
     
@@ -327,7 +327,7 @@ cvt_by_strip( TIFF *in, TIFF *out )
         int	rows_to_write, i_row;
 
         /* Read the strip into an RGBA array */
-        if (!TIFFReadRGBAStrip(in, row, raster)) {
+        if (!NDPIReadRGBAStrip(in, row, raster)) {
             ok = 0;
             break;
         }
@@ -337,7 +337,7 @@ cvt_by_strip( TIFF *in, TIFF *out )
 	 * we should rearrange it here.
 	 */
 #if HOST_BIGENDIAN
-	TIFFSwabArrayOfLong(raster, width * rowsperstrip);
+	NDPISwabArrayOfLong(raster, width * rowsperstrip);
 #endif
 
         /*
@@ -349,7 +349,7 @@ cvt_by_strip( TIFF *in, TIFF *out )
             rows_to_write = rowsperstrip;
 
         /*
-         * For some reason the TIFFReadRGBAStrip() function chooses the
+         * For some reason the NDPIReadRGBAStrip() function chooses the
          * lower left corner as the origin.  Vertically mirror scanlines.
          */
 
@@ -360,9 +360,9 @@ cvt_by_strip( TIFF *in, TIFF *out )
             top_line = raster + width * i_row;
             bottom_line = raster + width * (rows_to_write-i_row-1);
 
-            _TIFFmemcpy(wrk_line, top_line, 4*width);
-            _TIFFmemcpy(top_line, bottom_line, 4*width);
-            _TIFFmemcpy(bottom_line, wrk_line, 4*width);
+            _NDPImemcpy(wrk_line, top_line, 4*width);
+            _NDPImemcpy(top_line, bottom_line, 4*width);
+            _NDPImemcpy(bottom_line, wrk_line, 4*width);
         }
 
         /*
@@ -377,8 +377,8 @@ cvt_by_strip( TIFF *in, TIFF *out )
         }
     }
 
-    _TIFFfree( raster );
-    _TIFFfree( wrk_line );
+    _NDPIfree( raster );
+    _NDPIfree( wrk_line );
 
     return ok;
 }
@@ -387,7 +387,7 @@ cvt_by_strip( TIFF *in, TIFF *out )
  * cvt_whole_image()
  *
  * read the whole image into one big RGBA buffer and then write out
- * strips from that.  This is using the traditional TIFFReadRGBAImage()
+ * strips from that.  This is using the traditional NDPIReadRGBAImage()
  * API that we trust.
  */
 
@@ -400,38 +400,38 @@ cvt_whole_image( TIFF *in, TIFF *out )
     uint32_t  row;
     size_t pixel_count;
         
-    TIFFGetField(in, TIFFTAG_IMAGEWIDTH, &width);
-    TIFFGetField(in, TIFFTAG_IMAGELENGTH, &height);
+    NDPIGetField(in, TIFFTAG_IMAGEWIDTH, &width);
+    NDPIGetField(in, TIFFTAG_IMAGELENGTH, &height);
     pixel_count = width * height;
 
     /* XXX: Check the integer overflow. */
     if (!width || !height || pixel_count / width != height) {
-        TIFFError(TIFFFileName(in),
+        NDPIError(NDPIFileName(in),
 		  "Malformed input file; can't allocate buffer for raster of %"PRIu32"x%"PRIu32" size",
 		  width, height);
         return 0;
     }
     if (maxMalloc != 0 && (tmsize_t)pixel_count * (tmsize_t)sizeof(uint32_t) > maxMalloc) {
-	TIFFError(TIFFFileName(in),
+	NDPIError(NDPIFileName(in),
 		  "Raster size %"TIFF_SIZE_FORMAT" over memory limit (%" TIFF_SSIZE_FORMAT "), try -b option.",
               pixel_count * sizeof(uint32_t), maxMalloc);
         return 0;
     }
 
-    rowsperstrip = TIFFDefaultStripSize(out, rowsperstrip);
-    TIFFSetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
+    rowsperstrip = NDPIDefaultStripSize(out, rowsperstrip);
+    NDPISetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
 
-    raster = (uint32_t*)_TIFFCheckMalloc(in, pixel_count, sizeof(uint32_t), "raster buffer");
+    raster = (uint32_t*)_NDPICheckMalloc(in, pixel_count, sizeof(uint32_t), "raster buffer");
     if (raster == 0) {
-        TIFFError(TIFFFileName(in), "Failed to allocate buffer (%"TIFF_SIZE_FORMAT" elements of %"TIFF_SIZE_FORMAT" each)",
+        NDPIError(NDPIFileName(in), "Failed to allocate buffer (%"TIFF_SIZE_FORMAT" elements of %"TIFF_SIZE_FORMAT" each)",
 		  pixel_count, sizeof(uint32_t));
         return (0);
     }
 
     /* Read the image in one chunk into an RGBA array */
-    if (!TIFFReadRGBAImageOriented(in, width, height, raster,
+    if (!NDPIReadRGBAImageOriented(in, width, height, raster,
                                    ORIENTATION_TOPLEFT, 0)) {
-        _TIFFfree(raster);
+        _NDPIfree(raster);
         return (0);
     }
 
@@ -440,7 +440,7 @@ cvt_whole_image( TIFF *in, TIFF *out )
      * we should rearrange it here.
      */
 #if HOST_BIGENDIAN
-    TIFFSwabArrayOfLong(raster, width * height);
+    NDPISwabArrayOfLong(raster, width * height);
 #endif
 
     /*
@@ -490,12 +490,12 @@ cvt_whole_image( TIFF *in, TIFF *out )
         if( TIFFWriteEncodedStrip( out, row / rowsperstrip, raster_strip,
                              bytes_per_pixel * rows_to_write * width ) == -1 )
         {
-            _TIFFfree( raster );
+            _NDPIfree( raster );
             return 0;
         }
     }
 
-    _TIFFfree( raster );
+    _NDPIfree( raster );
 
     return 1;
 }
@@ -511,45 +511,45 @@ tiffcvt(TIFF* in, TIFF* out)
 	uint32_t longv;
         uint16_t v[1];
 
-	TIFFGetField(in, TIFFTAG_IMAGEWIDTH, &width);
-	TIFFGetField(in, TIFFTAG_IMAGELENGTH, &height);
+	NDPIGetField(in, TIFFTAG_IMAGEWIDTH, &width);
+	NDPIGetField(in, TIFFTAG_IMAGELENGTH, &height);
 
 	CopyField(TIFFTAG_SUBFILETYPE, longv);
-	TIFFSetField(out, TIFFTAG_IMAGEWIDTH, width);
-	TIFFSetField(out, TIFFTAG_IMAGELENGTH, height);
-	TIFFSetField(out, TIFFTAG_BITSPERSAMPLE, 8);
-	TIFFSetField(out, TIFFTAG_COMPRESSION, compression);
-	TIFFSetField(out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
+	NDPISetField(out, TIFFTAG_IMAGEWIDTH, width);
+	NDPISetField(out, TIFFTAG_IMAGELENGTH, height);
+	NDPISetField(out, TIFFTAG_BITSPERSAMPLE, 8);
+	NDPISetField(out, TIFFTAG_COMPRESSION, compression);
+	NDPISetField(out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
 
 	CopyField(TIFFTAG_FILLORDER, shortv);
-	TIFFSetField(out, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
+	NDPISetField(out, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
 
         if( no_alpha )
-            TIFFSetField(out, TIFFTAG_SAMPLESPERPIXEL, 3);
+            NDPISetField(out, TIFFTAG_SAMPLESPERPIXEL, 3);
         else
-            TIFFSetField(out, TIFFTAG_SAMPLESPERPIXEL, 4);
+            NDPISetField(out, TIFFTAG_SAMPLESPERPIXEL, 4);
 
         if( !no_alpha )
         {
             v[0] = EXTRASAMPLE_ASSOCALPHA;
-            TIFFSetField(out, TIFFTAG_EXTRASAMPLES, 1, v);
+            NDPISetField(out, TIFFTAG_EXTRASAMPLES, 1, v);
         }
 
 	CopyField(TIFFTAG_XRESOLUTION, floatv);
 	CopyField(TIFFTAG_YRESOLUTION, floatv);
 	CopyField(TIFFTAG_RESOLUTIONUNIT, shortv);
-	TIFFSetField(out, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-	TIFFSetField(out, TIFFTAG_SOFTWARE, TIFFGetVersion());
+	NDPISetField(out, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+	NDPISetField(out, TIFFTAG_SOFTWARE, TIFFGetVersion());
 	CopyField(TIFFTAG_DOCUMENTNAME, stringv);
 
-	if (maxMalloc != 0 && TIFFStripSize(in) > maxMalloc)
+	if (maxMalloc != 0 && NDPIStripSize(in) > maxMalloc)
 	{
-		TIFFError(TIFFFileName(in),
+		NDPIError(NDPIFileName(in),
 			  "Strip Size %" TIFF_SSIZE_FORMAT " over memory limit (%" TIFF_SSIZE_FORMAT ")",
-                  TIFFStripSize(in), maxMalloc);
+                  NDPIStripSize(in), maxMalloc);
 		return 0;
 	}
-        if( process_by_block && TIFFIsTiled( in ) )
+        if( process_by_block && NDPIIsTiled( in ) )
             return( cvt_by_tile( in, out ) );
         else if( process_by_block )
             return( cvt_by_strip( in, out ) );

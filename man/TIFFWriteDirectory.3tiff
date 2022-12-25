@@ -22,43 +22,43 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFWriteDirectory 3TIFF "September 26, 2001" "libtiff"
+.TH NDPIWriteDirectory 3TIFF "September 26, 2001" "libtiff"
 .SH NAME
-TIFFWriteDirectory, TIFFRewriteDirectory, TIFFCheckpointDirectory \- write the
+NDPIWriteDirectory, NDPIRewriteDirectory, NDPICheckpointDirectory \- write the
 current directory in an open
 .SM TIFF
 file
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "int TIFFWriteDirectory(TIFF *" tif ")"
+.BI "int NDPIWriteDirectory(TIFF *" tif ")"
 .br
-.BI "int TIFFRewriteDirectory(TIFF *" tif ")"
+.BI "int NDPIRewriteDirectory(TIFF *" tif ")"
 .br
-.BI "int TIFFCheckpointDirectory(TIFF *" tif ")"
+.BI "int NDPICheckpointDirectory(TIFF *" tif ")"
 .SH DESCRIPTION
-.IR TIFFWriteDirectory 
+.IR NDPIWriteDirectory 
 will write the contents of the current directory to the file and setup to
 create a new subfile in the same file. Applications only need to call
-.IR TIFFWriteDirectory
+.IR NDPIWriteDirectory
 when writing multiple subfiles to a single
 .SM TIFF
 file.
-.IR TIFFWriteDirectory
+.IR NDPIWriteDirectory
 is automatically called by
-.IR TIFFClose
+.IR NDPIClose
 and
-.IR TIFFFlush
+.IR NDPIFlush
 to write a modified directory if the file is open for writing.
 .PP
 The 
-.IR TIFFRewriteDirectory
+.IR NDPIRewriteDirectory
 function operates similarly to 
-.IR TIFFWriteDirectory,
+.IR NDPIWriteDirectory,
 but can be called with directories previously read or written that already
 have an established location in the file.  It will rewrite the directory,
 but instead of place it at it's old location (as 
-.IR TIFFWriteDirectory
+.IR NDPIWriteDirectory
 would) it will place them at the end of the file, correcting the pointer from
 the preceding directory or file header to point to it's new location.  This
 is particularly important in cases where the size of the directory and
@@ -66,18 +66,18 @@ pointed to data has grown, so it won't fit in the space available at the
 old location.
 .PP
 The
-.IR TIFFCheckpointDirectory
+.IR NDPICheckpointDirectory
 writes the current state of the tiff directory into the file to make what
 is currently in the file readable.  Unlike
-.IR TIFFWriteDirectory,
-.IR TIFFCheckpointDirectory
+.IR NDPIWriteDirectory,
+.IR NDPICheckpointDirectory
 does not free up the directory data structures in memory, so they can be
 updated (as strips/tiles are written) and written again.  Reading such
 a partial file you will at worst get a tiff read error for the first
 strip/tile encountered that is incomplete, but you will at least get
 all the valid data in the file before that.  When the file is complete,
 just use
-.IR TIFFWriteDirectory
+.IR NDPIWriteDirectory
 as usual to finish it off cleanly.
 .SH "RETURN VALUES"
 1 is returned when the contents are successfully written to the file.
@@ -85,7 +85,7 @@ Otherwise, 0 is returned if an error was encountered when writing
 the directory contents.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.IR TIFFError (3TIFF)
+.IR NDPIError (3TIFF)
 routine.
 .PP
 .BR "Error post-encoding before directory write" .
@@ -127,10 +127,10 @@ a previous directory.
 This can occur when setting up a link to the directory that is being
 written.
 .SH "SEE ALSO"
-.BR TIFFOpen (3TIFF),
-.BR TIFFError (3TIFF),
-.BR TIFFReadDirectory (3TIFF),
-.BR TIFFSetDirectory (3TIFF),
+.BR NDPIOpen (3TIFF),
+.BR NDPIError (3TIFF),
+.BR NDPIReadDirectory (3TIFF),
+.BR NDPISetDirectory (3TIFF),
 .BR libtiff (3TIFF)
 .PP
 Libtiff library home page:

@@ -67,11 +67,11 @@
 
 #define TIFF_DIR_MAX  65534
 
-void TIFFBuildOverviews( TIFF *, int, int *, int, const char *,
+void NDPIBuildOverviews( TIFF *, int, int *, int, const char *,
                          int (*)(double,void*), void * );
 
 /************************************************************************/
-/*                         TIFF_WriteOverview()                         */
+/*                         NDPI_WriteOverview()                         */
 /*                                                                      */
 /*      Create a new directory, without any image data for an overview. */
 /*      Returns offset of newly created overview directory, but the     */
@@ -79,7 +79,7 @@ void TIFFBuildOverviews( TIFF *, int, int *, int, const char *,
 /*      function is called.                                             */
 /************************************************************************/
 
-uint32_t TIFF_WriteOverview( TIFF *hTIFF, uint32_t nXSize, uint32_t nYSize,
+uint32_t NDPI_WriteOverview( TIFF *hTIFF, uint32_t nXSize, uint32_t nYSize,
                              int nBitsPerPixel, int nPlanarConfig, int nSamples,
                              int nBlockXSize, int nBlockYSize,
                              int bTiled, int nCompressFlag, int nPhotometric,
@@ -97,39 +97,39 @@ uint32_t TIFF_WriteOverview( TIFF *hTIFF, uint32_t nXSize, uint32_t nYSize,
 
     (void) bUseSubIFDs;
 
-    nBaseDirOffset = TIFFCurrentDirOffset( hTIFF );
+    nBaseDirOffset = NDPICurrentDirOffset( hTIFF );
 
-    TIFFCreateDirectory( hTIFF );
+    NDPICreateDirectory( hTIFF );
 
 /* -------------------------------------------------------------------- */
 /*      Setup TIFF fields.                                              */
 /* -------------------------------------------------------------------- */
-    TIFFSetField( hTIFF, TIFFTAG_IMAGEWIDTH, nXSize );
-    TIFFSetField( hTIFF, TIFFTAG_IMAGELENGTH, nYSize );
+    NDPISetField( hTIFF, TIFFTAG_IMAGEWIDTH, nXSize );
+    NDPISetField( hTIFF, TIFFTAG_IMAGELENGTH, nYSize );
     if( nSamples == 1 )
-        TIFFSetField( hTIFF, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG );
+        NDPISetField( hTIFF, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG );
     else
-        TIFFSetField( hTIFF, TIFFTAG_PLANARCONFIG, nPlanarConfig );
+        NDPISetField( hTIFF, TIFFTAG_PLANARCONFIG, nPlanarConfig );
 
-    TIFFSetField( hTIFF, TIFFTAG_BITSPERSAMPLE, nBitsPerPixel );
-    TIFFSetField( hTIFF, TIFFTAG_SAMPLESPERPIXEL, nSamples );
-    TIFFSetField( hTIFF, TIFFTAG_COMPRESSION, nCompressFlag );
-    TIFFSetField( hTIFF, TIFFTAG_PHOTOMETRIC, nPhotometric );
-    TIFFSetField( hTIFF, TIFFTAG_SAMPLEFORMAT, nSampleFormat );
+    NDPISetField( hTIFF, TIFFTAG_BITSPERSAMPLE, nBitsPerPixel );
+    NDPISetField( hTIFF, TIFFTAG_SAMPLESPERPIXEL, nSamples );
+    NDPISetField( hTIFF, TIFFTAG_COMPRESSION, nCompressFlag );
+    NDPISetField( hTIFF, TIFFTAG_PHOTOMETRIC, nPhotometric );
+    NDPISetField( hTIFF, TIFFTAG_SAMPLEFORMAT, nSampleFormat );
 
     if( bTiled )
     {
-        TIFFSetField( hTIFF, TIFFTAG_TILEWIDTH, nBlockXSize );
-        TIFFSetField( hTIFF, TIFFTAG_TILELENGTH, nBlockYSize );
+        NDPISetField( hTIFF, TIFFTAG_TILEWIDTH, nBlockXSize );
+        NDPISetField( hTIFF, TIFFTAG_TILELENGTH, nBlockYSize );
     }
     else
-        TIFFSetField( hTIFF, TIFFTAG_ROWSPERSTRIP, nBlockYSize );
+        NDPISetField( hTIFF, TIFFTAG_ROWSPERSTRIP, nBlockYSize );
 
-    TIFFSetField( hTIFF, TIFFTAG_SUBFILETYPE, FILETYPE_REDUCEDIMAGE );
+    NDPISetField( hTIFF, TIFFTAG_SUBFILETYPE, FILETYPE_REDUCEDIMAGE );
 
     if( nPhotometric == PHOTOMETRIC_YCBCR || nPhotometric == PHOTOMETRIC_ITULAB )
     {
-        TIFFSetField( hTIFF, TIFFTAG_YCBCRSUBSAMPLING, nHorSubsampling, nVerSubsampling);
+        NDPISetField( hTIFF, TIFFTAG_YCBCRSUBSAMPLING, nHorSubsampling, nVerSubsampling);
         /* TODO: also write YCbCrPositioning and YCbCrCoefficients tag identical to source IFD */
     }
     /* TODO: add command-line parameter for selecting jpeg compression quality
@@ -140,40 +140,40 @@ uint32_t TIFF_WriteOverview( TIFF *hTIFF, uint32_t nXSize, uint32_t nYSize,
 /* -------------------------------------------------------------------- */
     if( panRed != NULL )
     {
-        TIFFSetField( hTIFF, TIFFTAG_COLORMAP, panRed, panGreen, panBlue );
+        NDPISetField( hTIFF, TIFFTAG_COLORMAP, panRed, panGreen, panBlue );
     }
 
 /* -------------------------------------------------------------------- */
 /*      Write directory, and return byte offset.                        */
 /* -------------------------------------------------------------------- */
-    if( TIFFWriteCheck( hTIFF, bTiled, "TIFFBuildOverviews" ) == 0 )
+    if( NDPIWriteCheck( hTIFF, bTiled, "NDPIBuildOverviews" ) == 0 )
         return 0;
 
-    TIFFWriteDirectory( hTIFF );
-    iNumDir = TIFFNumberOfDirectories(hTIFF);
+    NDPIWriteDirectory( hTIFF );
+    iNumDir = NDPINumberOfDirectories(hTIFF);
     if( iNumDir > TIFF_DIR_MAX )
     {
-        TIFFErrorExt( TIFFClientdata(hTIFF),
-                      "TIFF_WriteOverview",
+        NDPIErrorExt( NDPIClientdata(hTIFF),
+                      "NDPI_WriteOverview",
                       "File `%s' has too many directories.\n",
-                      TIFFFileName(hTIFF) );
+                      NDPIFileName(hTIFF) );
         exit(-1);
     }
-    TIFFSetDirectory( hTIFF, (tdir_t) (iNumDir - 1) );
+    NDPISetDirectory( hTIFF, (tdir_t) (iNumDir - 1) );
 
-    nOffset = TIFFCurrentDirOffset( hTIFF );
+    nOffset = NDPICurrentDirOffset( hTIFF );
 
-    TIFFSetSubDirectory( hTIFF, nBaseDirOffset );
+    NDPISetSubDirectory( hTIFF, nBaseDirOffset );
 
     return nOffset;
 }
 
 /************************************************************************/
-/*                       TIFF_GetSourceSamples()                        */
+/*                       NDPI_GetSourceSamples()                        */
 /************************************************************************/
 
 static void 
-TIFF_GetSourceSamples( double * padfSamples, unsigned char *pabySrc,
+NDPI_GetSourceSamples( double * padfSamples, unsigned char *pabySrc,
                        int nPixelBytes, int nSampleFormat,
                        uint32_t nXSize, uint32_t nYSize,
                        int nPixelOffset, int nLineOffset )
@@ -224,11 +224,11 @@ TIFF_GetSourceSamples( double * padfSamples, unsigned char *pabySrc,
 } 
 
 /************************************************************************/
-/*                           TIFF_SetSample()                           */
+/*                           NDPI_SetSample()                           */
 /************************************************************************/
 
 static void 
-TIFF_SetSample( unsigned char * pabyData, int nPixelBytes, int nSampleFormat, 
+NDPI_SetSample( unsigned char * pabyData, int nPixelBytes, int nSampleFormat, 
                 double dfValue )
 
 {
@@ -263,14 +263,14 @@ TIFF_SetSample( unsigned char * pabyData, int nPixelBytes, int nSampleFormat,
 }
 
 /************************************************************************/
-/*                          TIFF_DownSample()                           */
+/*                          NDPI_DownSample()                           */
 /*                                                                      */
 /*      Down sample a tile of full res data into a window of a tile     */
 /*      of downsampled data.                                            */
 /************************************************************************/
 
 static
-void TIFF_DownSample( unsigned char *pabySrcTile,
+void NDPI_DownSample( unsigned char *pabySrcTile,
                       uint32_t nBlockXSize, uint32_t nBlockYSize,
                       int nPixelSkewBits, int nBitsPerPixel,
                       unsigned char * pabyOTile,
@@ -365,7 +365,7 @@ void TIFF_DownSample( unsigned char *pabySrcTile,
                 nXSize = MIN((uint32_t)nOMult, nBlockXSize - i);
                 nYSize = MIN((uint32_t)nOMult, nBlockYSize - j);
 
-                TIFF_GetSourceSamples( padfSamples, pabySrc,
+                NDPI_GetSourceSamples( padfSamples, pabySrc,
                                        nPixelBytes, nSampleFormat,
                                        nXSize, nYSize,
                                        nPixelGroupBytes,
@@ -377,7 +377,7 @@ void TIFF_DownSample( unsigned char *pabySrcTile,
                     dfTotal += padfSamples[iSample];
                 }
 
-                TIFF_SetSample( pabyDst, nPixelBytes, nSampleFormat, 
+                NDPI_SetSample( pabyDst, nPixelBytes, nSampleFormat, 
                                 dfTotal / (nXSize*nYSize) );
 
                 pabySrc += nOMult * nPixelGroupBytes;
@@ -390,10 +390,10 @@ void TIFF_DownSample( unsigned char *pabySrcTile,
 }
 
 /************************************************************************/
-/*                     TIFF_DownSample_Subsampled()                     */
+/*                     NDPI_DownSample_Subsampled()                     */
 /************************************************************************/
 static
-void TIFF_DownSample_Subsampled( unsigned char *pabySrcTile, int nSample,
+void NDPI_DownSample_Subsampled( unsigned char *pabySrcTile, int nSample,
                                  uint32_t nBlockXSize, uint32_t nBlockYSize,
                                  unsigned char * pabyOTile,
                                  uint32_t nOBlockXSize, uint32_t nOBlockYSize,
@@ -560,13 +560,13 @@ void TIFF_DownSample_Subsampled( unsigned char *pabySrcTile, int nSample,
 }
 
 /************************************************************************/
-/*                      TIFF_ProcessFullResBlock()                      */
+/*                      NDPI_ProcessFullResBlock()                      */
 /*                                                                      */
 /*      Process one block of full res data, downsampling into each      */
 /*      of the overviews.                                               */
 /************************************************************************/
 
-void TIFF_ProcessFullResBlock( TIFF *hTIFF, int nPlanarConfig,
+void NDPI_ProcessFullResBlock( TIFF *hTIFF, int nPlanarConfig,
                                int bSubsampled,
                                int nHorSubsampling, int nVerSubsampling,
                                int nOverviews, int * panOvList,
@@ -589,21 +589,21 @@ void TIFF_ProcessFullResBlock( TIFF *hTIFF, int nPlanarConfig,
          */
         if( nPlanarConfig == PLANARCONFIG_SEPARATE || iSample == 0 )
         {
-            if( TIFFIsTiled(hTIFF) )
+            if( NDPIIsTiled(hTIFF) )
             {
-                TIFFReadEncodedTile( hTIFF,
-                                     TIFFComputeTile(hTIFF, nSXOff, nSYOff,
+                NDPIReadEncodedTile( hTIFF,
+                                     NDPIComputeTile(hTIFF, nSXOff, nSYOff,
                                                      0, (tsample_t)iSample ),
                                      pabySrcTile,
-                                     TIFFTileSize(hTIFF));
+                                     NDPITileSize(hTIFF));
             }
             else
             {
-                TIFFReadEncodedStrip( hTIFF,
-                                      TIFFComputeStrip(hTIFF, nSYOff,
+                NDPIReadEncodedStrip( hTIFF,
+                                      NDPIComputeStrip(hTIFF, nSYOff,
                                                        (tsample_t) iSample),
                                       pabySrcTile,
-                                      TIFFStripSize(hTIFF) );
+                                      NDPIStripSize(hTIFF) );
             }
         }
 
@@ -641,7 +641,7 @@ void TIFF_ProcessFullResBlock( TIFF *hTIFF, int nPlanarConfig,
 #ifdef DBMALLOC
                 malloc_chain_check( 1 );
 #endif
-                TIFF_DownSample_Subsampled( pabySrcTile, iSample,
+                NDPI_DownSample_Subsampled( pabySrcTile, iSample,
                                             nBlockXSize, nBlockYSize,
                                             pabyOTile,
                                             poRBI->nBlockXSize, poRBI->nBlockYSize,
@@ -687,7 +687,7 @@ void TIFF_ProcessFullResBlock( TIFF *hTIFF, int nPlanarConfig,
 #ifdef DBMALLOC
                 malloc_chain_check( 1 );
 #endif
-                TIFF_DownSample( pabySrcTile + nSampleByteOffset,
+                NDPI_DownSample( pabySrcTile + nSampleByteOffset,
                                nBlockXSize, nBlockYSize,
                                nSkewBits, nBitsPerPixel, pabyOTile,
                                poRBI->nBlockXSize, poRBI->nBlockYSize,
@@ -711,7 +711,7 @@ void TIFF_ProcessFullResBlock( TIFF *hTIFF, int nPlanarConfig,
 /*      overviews.                                                      */
 /************************************************************************/
 
-void TIFFBuildOverviews( TIFF *hTIFF, int nOverviews, int * panOvList,
+void NDPIBuildOverviews( TIFF *hTIFF, int nOverviews, int * panOvList,
                          int bUseSubIFDs, const char *pszResampleMethod,
                          int (*pfnProgress)( double, void * ),
                          void * pProgressData )
@@ -734,27 +734,27 @@ void TIFFBuildOverviews( TIFF *hTIFF, int nOverviews, int * panOvList,
 /* -------------------------------------------------------------------- */
 /*      Get the base raster size.                                       */
 /* -------------------------------------------------------------------- */
-    TIFFGetField( hTIFF, TIFFTAG_IMAGEWIDTH, &nXSize );
-    TIFFGetField( hTIFF, TIFFTAG_IMAGELENGTH, &nYSize );
+    NDPIGetField( hTIFF, TIFFTAG_IMAGEWIDTH, &nXSize );
+    NDPIGetField( hTIFF, TIFFTAG_IMAGELENGTH, &nYSize );
 
-    TIFFGetField( hTIFF, TIFFTAG_BITSPERSAMPLE, &nBitsPerPixel );
+    NDPIGetField( hTIFF, TIFFTAG_BITSPERSAMPLE, &nBitsPerPixel );
     /* TODO: nBitsPerPixel seems misnomer and may need renaming to nBitsPerSample */
-    TIFFGetField( hTIFF, TIFFTAG_SAMPLESPERPIXEL, &nSamples );
-    TIFFGetFieldDefaulted( hTIFF, TIFFTAG_PLANARCONFIG, &nPlanarConfig );
+    NDPIGetField( hTIFF, TIFFTAG_SAMPLESPERPIXEL, &nSamples );
+    NDPIGetFieldDefaulted( hTIFF, TIFFTAG_PLANARCONFIG, &nPlanarConfig );
 
-    TIFFGetFieldDefaulted( hTIFF, TIFFTAG_PHOTOMETRIC, &nPhotometric );
-    TIFFGetFieldDefaulted( hTIFF, TIFFTAG_COMPRESSION, &nCompressFlag );
-    TIFFGetFieldDefaulted( hTIFF, TIFFTAG_SAMPLEFORMAT, &nSampleFormat );
+    NDPIGetFieldDefaulted( hTIFF, TIFFTAG_PHOTOMETRIC, &nPhotometric );
+    NDPIGetFieldDefaulted( hTIFF, TIFFTAG_COMPRESSION, &nCompressFlag );
+    NDPIGetFieldDefaulted( hTIFF, TIFFTAG_SAMPLEFORMAT, &nSampleFormat );
 
     if( nPhotometric == PHOTOMETRIC_YCBCR || nPhotometric == PHOTOMETRIC_ITULAB )
     {
         if( nBitsPerPixel != 8 || nSamples != 3 || nPlanarConfig != PLANARCONFIG_CONTIG ||
             nSampleFormat != SAMPLEFORMAT_UINT)
         {
-            /* TODO: use of TIFFError is inconsistent with use of fprintf in addtiffo.c, sort out */
-            TIFFErrorExt( TIFFClientdata(hTIFF), "TIFFBuildOverviews",
+            /* TODO: use of NDPIError is inconsistent with use of fprintf in addtiffo.c, sort out */
+            NDPIErrorExt( NDPIClientdata(hTIFF), "NDPIBuildOverviews",
                           "File `%s' has an unsupported subsampling configuration.\n",
-                          TIFFFileName(hTIFF) );
+                          NDPIFileName(hTIFF) );
             /* If you need support for this particular flavor, please contact either
              * Frank Warmerdam warmerdam@pobox.com
              * Joris Van Damme info@awaresystems.be
@@ -762,18 +762,18 @@ void TIFFBuildOverviews( TIFF *hTIFF, int nOverviews, int * panOvList,
             return;
         }
         bSubsampled = 1;
-        TIFFGetField( hTIFF, TIFFTAG_YCBCRSUBSAMPLING, &nHorSubsampling, &nVerSubsampling );
-        /* TODO: find out if maybe TIFFGetFieldDefaulted is better choice for YCbCrSubsampling tag */
+        NDPIGetField( hTIFF, TIFFTAG_YCBCRSUBSAMPLING, &nHorSubsampling, &nVerSubsampling );
+        /* TODO: find out if maybe NDPIGetFieldDefaulted is better choice for YCbCrSubsampling tag */
     }
     else
     {
         if( nBitsPerPixel < 8 )
         {
-            /* TODO: use of TIFFError is inconsistent with use of fprintf in addtiffo.c, sort out */
-            TIFFErrorExt( TIFFClientdata(hTIFF), "TIFFBuildOverviews",
+            /* TODO: use of NDPIError is inconsistent with use of fprintf in addtiffo.c, sort out */
+            NDPIErrorExt( NDPIClientdata(hTIFF), "NDPIBuildOverviews",
                           "File `%s' has samples of %d bits per sample.  Sample\n"
                           "sizes of less than 8 bits per sample are not supported.\n",
-                          TIFFFileName(hTIFF), nBitsPerPixel );
+                          NDPIFileName(hTIFF), nBitsPerPixel );
             return;
         }
         bSubsampled = 0;
@@ -785,35 +785,35 @@ void TIFFBuildOverviews( TIFF *hTIFF, int nOverviews, int * panOvList,
 /*      Turn off warnings to avoid a lot of repeated warnings while      */
 /*      rereading directories.                                          */
 /* -------------------------------------------------------------------- */
-    pfnWarning = TIFFSetWarningHandler( NULL );
+    pfnWarning = NDPISetWarningHandler( NULL );
 
 /* -------------------------------------------------------------------- */
 /*      Get the base raster block size.                                 */
 /* -------------------------------------------------------------------- */
-    if( TIFFGetField( hTIFF, TIFFTAG_ROWSPERSTRIP, &(nBlockYSize) ) )
+    if( NDPIGetField( hTIFF, TIFFTAG_ROWSPERSTRIP, &(nBlockYSize) ) )
     {
         nBlockXSize = nXSize;
         bTiled = FALSE;
     }
     else
     {
-        TIFFGetField( hTIFF, TIFFTAG_TILEWIDTH, &nBlockXSize );
-        TIFFGetField( hTIFF, TIFFTAG_TILELENGTH, &nBlockYSize );
+        NDPIGetField( hTIFF, TIFFTAG_TILEWIDTH, &nBlockXSize );
+        NDPIGetField( hTIFF, TIFFTAG_TILELENGTH, &nBlockYSize );
         bTiled = TRUE;
     }
 
 /* -------------------------------------------------------------------- */
 /*	Capture the palette if there is one.				*/
 /* -------------------------------------------------------------------- */
-    if( TIFFGetField( hTIFF, TIFFTAG_COLORMAP,
+    if( NDPIGetField( hTIFF, TIFFTAG_COLORMAP,
                       &panRedMap, &panGreenMap, &panBlueMap ) )
     {
         uint16_t		*panRed2, *panGreen2, *panBlue2;
         int             nColorCount = 1 << nBitsPerPixel;
 
-        panRed2 = (uint16_t *) _TIFFmalloc(2 * nColorCount);
-        panGreen2 = (uint16_t *) _TIFFmalloc(2 * nColorCount);
-        panBlue2 = (uint16_t *) _TIFFmalloc(2 * nColorCount);
+        panRed2 = (uint16_t *) _NDPImalloc(2 * nColorCount);
+        panGreen2 = (uint16_t *) _NDPImalloc(2 * nColorCount);
+        panBlue2 = (uint16_t *) _NDPImalloc(2 * nColorCount);
 
         memcpy( panRed2, panRedMap, 2 * nColorCount );
         memcpy( panGreen2, panGreenMap, 2 * nColorCount );
@@ -831,7 +831,7 @@ void TIFFBuildOverviews( TIFF *hTIFF, int nOverviews, int * panOvList,
 /* -------------------------------------------------------------------- */
 /*      Initialize overviews.                                           */
 /* -------------------------------------------------------------------- */
-    papoRawBIs = (TIFFOvrCache **) _TIFFmalloc(nOverviews*sizeof(void*));
+    papoRawBIs = (TIFFOvrCache **) _NDPImalloc(nOverviews*sizeof(void*));
 
     for( i = 0; i < nOverviews; i++ )
     {
@@ -853,7 +853,7 @@ void TIFFBuildOverviews( TIFF *hTIFF, int nOverviews, int * panOvList,
                 nOBlockYSize = nOBlockYSize + 16 - (nOBlockYSize % 16);
         }
 
-        nDirOffset = TIFF_WriteOverview( hTIFF, nOXSize, nOYSize,
+        nDirOffset = NDPI_WriteOverview( hTIFF, nOXSize, nOYSize,
                                          nBitsPerPixel, nPlanarConfig,
                                          nSamples, nOBlockXSize, nOBlockYSize,
                                          bTiled, nCompressFlag, nPhotometric,
@@ -862,23 +862,23 @@ void TIFFBuildOverviews( TIFF *hTIFF, int nOverviews, int * panOvList,
                                          bUseSubIFDs,
                                          nHorSubsampling, nVerSubsampling );
         
-        papoRawBIs[i] = TIFFCreateOvrCache( hTIFF, nDirOffset );
+        papoRawBIs[i] = NDPICreateOvrCache( hTIFF, nDirOffset );
     }
 
     if( panRedMap != NULL )
     {
-        _TIFFfree( panRedMap );
-        _TIFFfree( panGreenMap );
-        _TIFFfree( panBlueMap );
+        _NDPIfree( panRedMap );
+        _NDPIfree( panGreenMap );
+        _NDPIfree( panBlueMap );
     }
     
 /* -------------------------------------------------------------------- */
 /*      Allocate a buffer to hold a source block.                       */
 /* -------------------------------------------------------------------- */
     if( bTiled )
-        pabySrcTile = (unsigned char *) _TIFFmalloc(TIFFTileSize(hTIFF));
+        pabySrcTile = (unsigned char *) _NDPImalloc(NDPITileSize(hTIFF));
     else
-        pabySrcTile = (unsigned char *) _TIFFmalloc(TIFFStripSize(hTIFF));
+        pabySrcTile = (unsigned char *) _NDPImalloc(NDPIStripSize(hTIFF));
     
 /* -------------------------------------------------------------------- */
 /*      Loop over the source raster, applying data to the               */
@@ -892,7 +892,7 @@ void TIFFBuildOverviews( TIFF *hTIFF, int nOverviews, int * panOvList,
              * Read and resample into the various overview images.
              */
             
-            TIFF_ProcessFullResBlock( hTIFF, nPlanarConfig,
+            NDPI_ProcessFullResBlock( hTIFF, nPlanarConfig,
                                       bSubsampled,nHorSubsampling,nVerSubsampling,
                                       nOverviews, panOvList,
                                       nBitsPerPixel, nSamples, papoRawBIs,
@@ -902,20 +902,20 @@ void TIFFBuildOverviews( TIFF *hTIFF, int nOverviews, int * panOvList,
         }
     }
 
-    _TIFFfree( pabySrcTile );
+    _NDPIfree( pabySrcTile );
 
 /* -------------------------------------------------------------------- */
 /*      Cleanup the rawblockedimage files.                              */
 /* -------------------------------------------------------------------- */
     for( i = 0; i < nOverviews; i++ )
     {
-        TIFFDestroyOvrCache( papoRawBIs[i] );
+        NDPIDestroyOvrCache( papoRawBIs[i] );
     }
 
     if( papoRawBIs != NULL )
-        _TIFFfree( papoRawBIs );
+        _NDPIfree( papoRawBIs );
 
-    TIFFSetWarningHandler( pfnWarning );
+    NDPISetWarningHandler( pfnWarning );
 }
 
 

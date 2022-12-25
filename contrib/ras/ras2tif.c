@@ -162,7 +162,7 @@ main(argc, argv)
     if (Verbose)
 	fprintf(stderr, "Writing %s...", outf);
 
-    tif = TIFFOpen(outf, "w");
+    tif = NDPIOpen(outf, "w");
 
     if (tif == NULL)
 	error("%s: error opening TIFF file %s", outf);
@@ -199,26 +199,26 @@ main(argc, argv)
     bpsl = ((depth * width + 15) >> 3) & ~1;
     rowsperstrip = (8 * 1024) / bpsl;
 
-    TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, width);
-    TIFFSetField(tif, TIFFTAG_IMAGELENGTH, height);
-    TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, bitspersample);
-    TIFFSetField(tif, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
-    TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_LZW);
-    TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, photometric);
-    TIFFSetField(tif, TIFFTAG_DOCUMENTNAME, inf);
-    TIFFSetField(tif, TIFFTAG_IMAGEDESCRIPTION, "converted Sun rasterfile");
-    TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, samplesperpixel);
-    TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
-    TIFFSetField(tif, TIFFTAG_STRIPBYTECOUNTS, height / rowsperstrip);
-    TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-    TIFFSetField(tif, TIFFTAG_SOFTWARE, version);
-    TIFFSetField(tif, TIFFTAG_DATETIME, datetime);
+    NDPISetField(tif, TIFFTAG_IMAGEWIDTH, width);
+    NDPISetField(tif, TIFFTAG_IMAGELENGTH, height);
+    NDPISetField(tif, TIFFTAG_BITSPERSAMPLE, bitspersample);
+    NDPISetField(tif, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
+    NDPISetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_LZW);
+    NDPISetField(tif, TIFFTAG_PHOTOMETRIC, photometric);
+    NDPISetField(tif, TIFFTAG_DOCUMENTNAME, inf);
+    NDPISetField(tif, TIFFTAG_IMAGEDESCRIPTION, "converted Sun rasterfile");
+    NDPISetField(tif, TIFFTAG_SAMPLESPERPIXEL, samplesperpixel);
+    NDPISetField(tif, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
+    NDPISetField(tif, TIFFTAG_STRIPBYTECOUNTS, height / rowsperstrip);
+    NDPISetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+    NDPISetField(tif, TIFFTAG_SOFTWARE, version);
+    NDPISetField(tif, TIFFTAG_DATETIME, datetime);
 
     memset(red, 0, sizeof(red));
     memset(green, 0, sizeof(green));
     memset(blue, 0, sizeof(blue));
     if (depth == 8) {
-	TIFFSetField(tif, TIFFTAG_COLORMAP, red, green, blue);
+	NDPISetField(tif, TIFFTAG_COLORMAP, red, green, blue);
 	for (i = 0; i < Colormap.length; i++) {
 	    red[i] = SCALE(Colormap.map[0][i]);
 	    green[i] = SCALE(Colormap.map[1][i]);
@@ -235,8 +235,8 @@ main(argc, argv)
 	    fprintf("failed a scanline write (%d)\n", row);
 	    break;
 	}
-    TIFFFlushData(tif);
-    TIFFClose(tif);
+    NDPIFlushData(tif);
+    NDPIClose(tif);
 
     if (Verbose)
 	fprintf(stderr, "done.\n");

@@ -24,24 +24,24 @@
 .if n .po 0
 .TH TIFFSTRIP 3TIFF "October 15, 1995" "libtiff"
 .SH NAME
-TIFFDefaultStripSize, TIFFStripSize, TIFFVStripSize, TIFFRawStripSize,
-TIFFComputeStrip, TIFFNumberOfStrips \- strip-related utility routines
+NDPIDefaultStripSize, NDPIStripSize, NDPIVStripSize, NDPIRawStripSize,
+NDPIComputeStrip, NDPINumberOfStrips \- strip-related utility routines
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "uint32_t TIFFDefaultStripSize(TIFF *" tif ", uint32_t " estimate ")"
+.BI "uint32_t NDPIDefaultStripSize(TIFF *" tif ", uint32_t " estimate ")"
 .br
-.BI "tmsize_t TIFFStripSize(TIFF *" tif ")"
+.BI "tmsize_t NDPIStripSize(TIFF *" tif ")"
 .br
-.BI "tmsize_t TIFFVStripSize(TIFF *" tif ", uint32_t " nrows ")"
+.BI "tmsize_t NDPIVStripSize(TIFF *" tif ", uint32_t " nrows ")"
 .br
-.BI "tmsize_t TIFFRawStripSize(TIFF *" tif ", uint32_t " strip ")"
+.BI "tmsize_t NDPIRawStripSize(TIFF *" tif ", uint32_t " strip ")"
 .br
-.BI "tstrip_t TIFFComputeStrip(TIFF *" tif ", uint32_t " row ", tsample_t " sample ")"
+.BI "tstrip_t NDPIComputeStrip(TIFF *" tif ", uint32_t " row ", tsample_t " sample ")"
 .br
-.BI "tstrip_t TIFFNumberOfStrips(TIFF *" tif ")"
+.BI "tstrip_t NDPINumberOfStrips(TIFF *" tif ")"
 .SH DESCRIPTION
-.I TIFFDefaultStripSize
+.I NDPIDefaultStripSize
 returns the number of rows for a reasonable-sized strip according to the
 current settings of the
 .IR ImageWidth ,
@@ -54,26 +54,26 @@ size and adjusted according to any compression-specific requirements. The
 value returned by this function is typically used to define the
 .I RowsPerStrip
 tag. In lieu of any unusual requirements
-.I TIFFDefaultStripSize
+.I NDPIDefaultStripSize
 tries to create strips that have approximately
 8 kilobytes of uncompressed data.
 .PP
-.IR TIFFStripSize
+.IR NDPIStripSize
 returns the equivalent size for a strip of data as it would be returned in a
 call to
-.IR TIFFReadEncodedStrip
+.IR NDPIReadEncodedStrip
 or as it would be expected in a call to
 .IR TIFFWriteEncodedStrip .
 .PP
-.I TIFFVStripSize
+.I NDPIVStripSize
 returns the number of bytes in a strip with
 .I nrows
 rows of data.
 .PP
-.I TIFFRawStripSize
+.I NDPIRawStripSize
 returns the number of bytes in a raw strip (i.e. not decoded).
 .PP
-.IR TIFFComputeStrip
+.IR NDPIComputeStrip
 returns the strip that contains the specified coordinates. A valid strip is
 always returned; out-of-range coordinate values are clamped to the bounds of
 the image. The
@@ -83,13 +83,13 @@ parameter is always used in calculating a strip. The
 parameter is used only if data are organized in separate planes (\c
 .IR PlanarConfiguration =2).
 .PP
-.IR TIFFNumberOfStrips
+.IR NDPINumberOfStrips
 returns the number of strips in the image.
 .SH DIAGNOSTICS
 None.
 .SH "SEE ALSO"
-.BR TIFFReadEncodedStrip (3TIFF),
-.BR TIFFReadRawStrip (3TIFF),
+.BR NDPIReadEncodedStrip (3TIFF),
+.BR NDPIReadRawStrip (3TIFF),
 .BR TIFFWriteEncodedStrip (3TIFF),
 .BR TIFFWriteRawStrip (3TIFF),
 .BR libtiff (3TIFF),

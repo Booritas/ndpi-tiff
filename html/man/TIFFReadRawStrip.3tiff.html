@@ -4,11 +4,11 @@
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
 <meta name="Content-Style" content="text/css">
-<title>TIFFReadRawStrip</title>
+<title>NDPIReadRawStrip</title>
 </head>
 <body>
 
-<h1 align=center>TIFFReadRawStrip</h1>
+<h1 align=center>NDPIReadRawStrip</h1>
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
@@ -25,7 +25,7 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>TIFFReadRawStrip &minus; return the undecoded contents of
+<p>NDPIReadRawStrip &minus; return the undecoded contents of
 a strip of data from an open <small>TIFF</small> file</p>
 </td>
 </table>
@@ -39,7 +39,7 @@ a strip of data from an open <small>TIFF</small> file</p>
 <td width="91%">
 <p><b>#include &lt;tiffio.h&gt;</b></p>
 <!-- INDENTATION -->
-<p><b>tsize_t TIFFReadRawStrip(TIFF *</b><i>tif</i><b>,
+<p><b>tsize_t NDPIReadRawStrip(TIFF *</b><i>tif</i><b>,
 tstrip_t</b> <i>strip</i><b>, tdata_t</b> <i>buf</i><b>,
 tsize_t</b> <i>size</i><b>)</b></p>
 </td>
@@ -59,7 +59,7 @@ the caller must take into account whether or not the data is
 organized in separate planes (<i>PlanarConfiguration</i>=2).
 To read a full strip of data the data buffer should
 typically be at least as large as the number returned by
-<i>TIFFStripSize</i>.</p>
+<i>NDPIStripSize</i>.</p>
 </td>
 </table>
 <a name="RETURN VALUES"></a>
@@ -71,7 +71,7 @@ typically be at least as large as the number returned by
 <td width="8%"></td>
 <td width="91%">
 <p>The actual number of bytes of data that were placed in
-<i>buf</i> is returned; <i>TIFFReadEncodedStrip</i> returns
+<i>buf</i> is returned; <i>NDPIReadEncodedStrip</i> returns
 &minus;1 if an error was encountered.</p>
 </td>
 </table>
@@ -84,7 +84,7 @@ typically be at least as large as the number returned by
 <td width="8%"></td>
 <td width="91%">
 <p>All error messages are directed to the
-<b>TIFFError</b>(3TIFF) routine.</p>
+<b>NDPIError</b>(3TIFF) routine.</p>
 </td>
 </table>
 <a name="SEE ALSO"></a>
@@ -95,9 +95,9 @@ typically be at least as large as the number returned by
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><b>TIFFOpen</b>(3TIFF),
-<b>TIFFReadEncodedStrip</b>(3TIFF),
-<b>TIFFReadScanline</b>(3TIFF), <b>TIFFStripSize</b>(3TIFF),
+<p><b>NDPIOpen</b>(3TIFF),
+<b>NDPIReadEncodedStrip</b>(3TIFF),
+<b>NDPIReadScanline</b>(3TIFF), <b>NDPIStripSize</b>(3TIFF),
 <b>libtiff</b>(3TIFF)</p>
 <!-- INDENTATION -->
 <p>Libtiff library home page:

@@ -52,7 +52,7 @@ The following information is located here:
 
 <UL>
 <LI>support was add for ICC: <TT>NumberOfInks</TT>, and <TT>ICCProfile</TT>
-<LI>a memory leak caused by doing <TT>TIFFSetDirectory(0)</TT> was fixed
+<LI>a memory leak caused by doing <TT>NDPISetDirectory(0)</TT> was fixed
 <LI>a bug was fixed whereby certain multi-directory files were not
     properly handled when accessed by mapping the data into memory 
 <LI>the strip chopping support is now always compiled
@@ -73,9 +73,9 @@ The following information is located here:
 <LI>the LZW decoder was changed to use a more conservative scheme when
     bounds checking the hash table array; this avoids pitfalls with
     systems that load objects into memory in unusual locations
-<LI>a bug was fixed in <TT>TIFFPrintDirectory</TT>'s handling of the
+<LI>a bug was fixed in <TT>NDPIPrintDirectory</TT>'s handling of the
     <TT>InkNames</TT> tag
-<LI><TT>TIFFPrintDirectory</TT> now understands <TT>NumberOfInks</TT>
+<LI><TT>NDPIPrintDirectory</TT> now understands <TT>NumberOfInks</TT>
     and ICC-related tags
 <LI>the routines for reading image data now provide more useful information
     when a read error is encountered

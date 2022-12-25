@@ -64,43 +64,43 @@ main(int argc, char **argv)
         (void) argv;
 
 	/* Test whether we can write tags. */
-	tif = TIFFOpen(filename, "w");
+	tif = NDPIOpen(filename, "w");
 	if (!tif) {
 		fprintf (stderr, "Can't create test TIFF file %s.\n", filename);
 		return 1;
 	}
 
-	if (!TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, width)) {
+	if (!NDPISetField(tif, TIFFTAG_IMAGEWIDTH, width)) {
 		fprintf (stderr, "Can't set ImageWidth tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_IMAGELENGTH, length)) {
+	if (!NDPISetField(tif, TIFFTAG_IMAGELENGTH, length)) {
 		fprintf (stderr, "Can't set ImageLength tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8)) {
+	if (!NDPISetField(tif, TIFFTAG_BITSPERSAMPLE, 8)) {
 		fprintf (stderr, "Can't set BitsPerSample tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 3)) {
+	if (!NDPISetField(tif, TIFFTAG_SAMPLESPERPIXEL, 3)) {
 		fprintf (stderr, "Can't set SamplesPerPixel tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, rows_per_strip)) {
+	if (!NDPISetField(tif, TIFFTAG_ROWSPERSTRIP, rows_per_strip)) {
 		fprintf (stderr, "Can't set SamplesPerPixel tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG)) {
+	if (!NDPISetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG)) {
 		fprintf (stderr, "Can't set PlanarConfiguration tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB)) {
+	if (!NDPISetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB)) {
 		fprintf (stderr, "Can't set PhotometricInterpretation tag.\n");
 		goto failure;
 	}
 
 	for (i = 0; i < NTAGS; i++) {
-		if (!TIFFSetField(tif, long_tags[i].tag,
+		if (!NDPISetField(tif, long_tags[i].tag,
 				  long_tags[i].value)) {
 			fprintf(stderr, "Can't set tag %d.\n",
 				(int)long_tags[i].tag);
@@ -114,10 +114,10 @@ main(int argc, char **argv)
 		goto failure;
 	}
 
-	TIFFClose(tif);
+	NDPIClose(tif);
 	
 	/* Ok, now test whether we can read written values. */
-	tif = TIFFOpen(filename, "r");
+	tif = NDPIOpen(filename, "r");
 	if (!tif) {
 		fprintf (stderr, "Can't open test TIFF file %s.\n", filename);
 		return 1;
@@ -138,7 +138,7 @@ main(int argc, char **argv)
 			goto failure;
 	}
 
-	TIFFClose(tif);
+	NDPIClose(tif);
 	
 	/* All tests passed; delete file and exit with success status. */
 	unlink(filename);
@@ -146,7 +146,7 @@ main(int argc, char **argv)
 
 failure:
 	/* Something goes wrong; close file and return unsuccessful status. */
-	TIFFClose(tif);
+	NDPIClose(tif);
 	unlink(filename);
 	return 1;
 }

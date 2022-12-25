@@ -24,9 +24,9 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>TIFFTileSize, TIFFTileRowSize, TIFFVTileSize,
-TIFFDefaultTileSize, TIFFComputeTile, TIFFCheckTile,
-TIFFNumberOfTiles &minus; tile-related utility routines</p>
+<p>NDPITileSize, NDPITileRowSize, NDPIVTileSize,
+NDPIDefaultTileSize, NDPIComputeTile, NDPICheckTile,
+NDPINumberOfTiles &minus; tile-related utility routines</p>
 </td>
 </table>
 <a name="SYNOPSIS"></a>
@@ -39,19 +39,19 @@ TIFFNumberOfTiles &minus; tile-related utility routines</p>
 <td width="91%">
 <p><b>#include &lt;tiffio.h&gt;</b></p>
 <!-- INDENTATION -->
-<p><b>void TIFFDefaultTileSize(TIFF *</b><i>tif</i><b>,
+<p><b>void NDPIDefaultTileSize(TIFF *</b><i>tif</i><b>,
 uint32_t *</b><i>tw</i><b>, uint32_t *</b><i>th</i><b>)<br>
-tsize_t TIFFTileSize(TIFF *</b><i>tif</i><b>)<br>
-tsize_t TIFFTileRowSize(TIFF *</b><i>tif</i><b>)<br>
-tsize_t TIFFVTileSize(TIFF *</b><i>tif</i><b>, uint32_t</b>
+tsize_t NDPITileSize(TIFF *</b><i>tif</i><b>)<br>
+tsize_t NDPITileRowSize(TIFF *</b><i>tif</i><b>)<br>
+tsize_t NDPIVTileSize(TIFF *</b><i>tif</i><b>, uint32_t</b>
 <i>nrows</i><b>)<br>
-ttile_t TIFFComputeTile(TIFF *</b><i>tif</i><b>, uint32_t</b>
+ttile_t NDPIComputeTile(TIFF *</b><i>tif</i><b>, uint32_t</b>
 <i>x</i><b>, uint32_t</b> <i>y</i><b>, uint32_t</b> <i>z</i><b>,
 tsample_t</b> <i>sample</i><b>)<br>
-int TIFFCheckTile(TIFF *</b><i>tif</i><b>, uint32_t</b>
+int NDPICheckTile(TIFF *</b><i>tif</i><b>, uint32_t</b>
 <i>x</i><b>, uint32_t</b> <i>y</i><b>, uint32_t</b> <i>z</i><b>,
 tsample_t</b> <i>sample</i><b>)<br>
-ttile_t TIFFNumberOfTiles(TIFF *</b><i>tif</i><b>)</b></p>
+ttile_t NDPINumberOfTiles(TIFF *</b><i>tif</i><b>)</b></p>
 </td>
 </table>
 <a name="DESCRIPTION"></a>
@@ -62,7 +62,7 @@ ttile_t TIFFNumberOfTiles(TIFF *</b><i>tif</i><b>)</b></p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><i>TIFFDefaultTileSize</i> returns the pixel width and
+<p><i>NDPIDefaultTileSize</i> returns the pixel width and
 height of a reasonable-sized tile; suitable for setting up
 the <i>TileWidth</i> and <i>TileLength</i> tags. If the
 <i>tw</i> and <i>th</i> values passed in are non-zero, then
@@ -71,18 +71,18 @@ requirements. The returned width and height are constrained
 to be a multiple of 16 pixels to conform with the
 <small>TIFF</small> specification.</p>
 <!-- INDENTATION -->
-<p><i>TIFFTileSize</i> returns the equivalent size for a
+<p><i>NDPITileSize</i> returns the equivalent size for a
 tile of data as it would be returned in a call to
-<i>TIFFReadTile</i> or as it would be expected in a call to
+<i>NDPIReadTile</i> or as it would be expected in a call to
 <i>TIFFWriteTile</i>.</p>
 <!-- INDENTATION -->
-<p><i>TIFFVTileSize</i> returns the number of bytes in a
+<p><i>NDPIVTileSize</i> returns the number of bytes in a
 row-aligned tile with <i>nrows</i> of data.</p>
 <!-- INDENTATION -->
-<p><i>TIFFTileRowSize</i> returns the number of bytes of a
+<p><i>NDPITileRowSize</i> returns the number of bytes of a
 row of data in a tile.</p>
 <!-- INDENTATION -->
-<p><i>TIFFComputeTile</i> returns the tile that contains the
+<p><i>NDPIComputeTile</i> returns the tile that contains the
 specified coordinates. A valid tile is always returned;
 out-of-range coordinate values are clamped to the bounds of
 the image. The <i>x</i> and <i>y</i> parameters are always
@@ -92,7 +92,7 @@ if the image is deeper than 1 slice
 used only if data are organized in separate planes
 (<i>PlanarConfiguration</i>=2).</p>
 <!-- INDENTATION -->
-<p><i>TIFFCheckTile</i> returns a non-zero value if the
+<p><i>NDPICheckTile</i> returns a non-zero value if the
 supplied coordinates are within the bounds of the image and
 zero otherwise. The <i>x</i> parameter is checked against
 the value of the <i>ImageWidth</i> tag. The <i>y</i>
@@ -103,7 +103,7 @@ The <i>sample</i> parameter is checked against the value of
 the <i>SamplesPerPixel</i> parameter if the data are
 organized in separate planes.</p>
 <!-- INDENTATION -->
-<p><i>TIFFNumberOfTiles</i> returns the number of tiles in
+<p><i>NDPINumberOfTiles</i> returns the number of tiles in
 the image.</p>
 </td>
 </table>
@@ -126,8 +126,8 @@ the image.</p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><b>TIFFReadEncodedTile</b>(3TIFF),
-<b>TIFFReadRawTile</b>(3TIFF), <b>TIFFReadTile</b>(3TIFF),
+<p><b>NDPIReadEncodedTile</b>(3TIFF),
+<b>NDPIReadRawTile</b>(3TIFF), <b>NDPIReadTile</b>(3TIFF),
 <b>TIFFWriteEncodedTile</b>(3TIFF),
 <b>TIFFWriteRawTile</b>(3TIFF), <b>TIFFWriteTile</b>(3TIFF),
 <b>libtiff</b>(3TIFF)</p>

@@ -24,8 +24,8 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>_TIFFmalloc, _TIFFrealloc, _TIFFfree, _TIFFmemset,
-_TIFFmemcpy, _TIFFmemcmp, &minus; memory management-related
+<p>_NDPImalloc, _NDPIrealloc, _NDPIfree, _NDPImemset,
+_NDPImemcpy, _TIFFmemcmp, &minus; memory management-related
 functions for use with <small>TIFF</small> files</p>
 </td>
 </table>
@@ -39,13 +39,13 @@ functions for use with <small>TIFF</small> files</p>
 <td width="91%">
 <p><b>#include &lt;tiffio.h&gt;</b></p>
 <!-- INDENTATION -->
-<p><b>tdata_t _TIFFmalloc(tsize_t</b> <i>size</i><b>);<br>
-tdata_t _TIFFrealloc(tdata_t</b> <i>buffer</i><b>,
+<p><b>tdata_t _NDPImalloc(tsize_t</b> <i>size</i><b>);<br>
+tdata_t _NDPIrealloc(tdata_t</b> <i>buffer</i><b>,
 tsize_t</b> <i>size</i><b>);<br>
-void _TIFFfree(tdata_t</b> <i>buffer</i><b>);<br>
-void _TIFFmemset(tdata_t</b> <i>s</i><b>, int</b>
+void _NDPIfree(tdata_t</b> <i>buffer</i><b>);<br>
+void _NDPImemset(tdata_t</b> <i>s</i><b>, int</b>
 <i>c</i><b>, tsize_t</b> <i>n</i><b>);<br>
-void _TIFFmemcpy(tdata_t</b> <i>dest</i><b>, const
+void _NDPImemcpy(tdata_t</b> <i>dest</i><b>, const
 tdata_t</b> <i>src</i><b>, tsize_t</b> <i>n</i><b>);<br>
 int _TIFFmemcmp(const tdata_t</b> <i>s1</i><b>, const
 tdata_t</b> <i>s2</i><b>, tsize_t</b> <i>n</i><b>);</b></p>
@@ -64,15 +64,15 @@ that uses <i>libtiff</i>; they hide any memory-management
 related issues, such as dealing with segmented architectures
 found on 16-bit machines.</p>
 <!-- INDENTATION -->
-<p><i>_TIFFmalloc</i> and <i>_TIFFrealloc</i> are used to
+<p><i>_NDPImalloc</i> and <i>_NDPIrealloc</i> are used to
 dynamically allocate and reallocate memory used by
 <i>libtiff</i>; such as memory passed into the I/O routines.
 Memory allocated through these interfaces is released back
-to the system using the <i>_TIFFfree</i> routine.</p>
+to the system using the <i>_NDPIfree</i> routine.</p>
 <!-- INDENTATION -->
 <p>Memory allocated through one of the above interfaces can
-be set to a known value using <i>_TIFFmemset</i>, copied to
-another memory location using <i>_TIFFmemcpy</i>, or
+be set to a known value using <i>_NDPImemset</i>, copied to
+another memory location using <i>_NDPImemcpy</i>, or
 compared for equality using <i>_TIFFmemcmp</i>. These
 routines conform to the equivalent <small>ANSI</small> C
 routines: <i>memset</i>, <i>memcpy</i>, and <i>memcmp</i>,

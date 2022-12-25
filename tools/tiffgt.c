@@ -105,15 +105,15 @@ main(int argc, char* argv[])
         int dirnum = -1;
         uint32_t diroff = 0;
 
-        oerror = TIFFSetErrorHandler(NULL);
-        owarning = TIFFSetWarningHandler(NULL);
+        oerror = NDPISetErrorHandler(NULL);
+        owarning = NDPISetWarningHandler(NULL);
         while ((c = getopt(argc, argv, "d:o:p:eflmsvwh")) != -1)
             switch (c) {
             case 'd':
                 dirnum = atoi(optarg);
                 break;
             case 'e':
-                oerror = TIFFSetErrorHandler(oerror);
+                oerror = NDPISetErrorHandler(oerror);
                 break;
             case 'l':
                 order0 = FILLORDER_LSB2MSB;
@@ -131,7 +131,7 @@ main(int argc, char* argv[])
                 stoponerr = 1;
                 break;
             case 'w':
-                owarning = TIFFSetWarningHandler(owarning);
+                owarning = NDPISetWarningHandler(owarning);
                 break;
             case 'v':
                 verbose = 1;
@@ -162,29 +162,29 @@ main(int argc, char* argv[])
         xmax = xmax - xmax / 10.0;
         ymax = ymax - ymax / 10.0;
 
-        filelist = (char **) _TIFFmalloc(filenum * sizeof(char*));
+        filelist = (char **) _NDPImalloc(filenum * sizeof(char*));
         if (!filelist) {
-                TIFFError(argv[0], "Can not allocate space for the file list.");
+                NDPIError(argv[0], "Can not allocate space for the file list.");
                 return EXIT_FAILURE;
         }
-        _TIFFmemcpy(filelist, argv + optind, filenum * sizeof(char*));
+        _NDPImemcpy(filelist, argv + optind, filenum * sizeof(char*));
         fileindex = -1;
         if (nextImage() < 0) {
-                _TIFFfree(filelist);
+                _NDPIfree(filelist);
                 return EXIT_FAILURE;
         }
         /*
          * Set initial directory if user-specified
          * file was opened successfully.
          */
-        if (dirnum != -1 && !TIFFSetDirectory(tif, dirnum))
-            TIFFError(argv[0], "Error, seeking to directory %d", dirnum);
-        if (diroff != 0 && !TIFFSetSubDirectory(tif, diroff))
-            TIFFError(argv[0], "Error, setting subdirectory at %#x", diroff);
+        if (dirnum != -1 && !NDPISetDirectory(tif, dirnum))
+            NDPIError(argv[0], "Error, seeking to directory %d", dirnum);
+        if (diroff != 0 && !NDPISetSubDirectory(tif, diroff))
+            NDPIError(argv[0], "Error, setting subdirectory at %#x", diroff);
         order = order0;
         photo = photo0;
 	if (initImage() < 0){
-                _TIFFfree(filelist);
+                _NDPIfree(filelist);
                 return EXIT_FAILURE;
         }
         /*
@@ -193,7 +193,7 @@ main(int argc, char* argv[])
          */
         glutInitWindowSize(width, height);
         snprintf(title, TITLE_LENGTH - 1, "%s [%u]", filelist[fileindex],
-                (unsigned int) TIFFCurrentDirectory(tif));
+                (unsigned int) NDPICurrentDirectory(tif));
         glutCreateWindow(title);
         glutDisplayFunc(raster_draw);
         glutReshapeFunc(raster_reshape);
@@ -208,13 +208,13 @@ main(int argc, char* argv[])
 static void 
 cleanup_and_exit(int code)
 {
-        TIFFRGBAImageEnd(&img);
+        NDPIRGBAImageEnd(&img);
         if (filelist != NULL)
-                _TIFFfree(filelist);
+                _NDPIfree(filelist);
         if (raster != NULL)
-                _TIFFfree(raster);
+                _NDPIfree(raster);
         if (tif != NULL)
-                TIFFClose(tif);
+                NDPIClose(tif);
         exit(code);
 }
 
@@ -224,12 +224,12 @@ initImage(void)
         uint32_t w, h;
 
         if (order)
-                TIFFSetField(tif, TIFFTAG_FILLORDER, order);
+                NDPISetField(tif, TIFFTAG_FILLORDER, order);
         if (photo != (uint16_t) -1)
-                TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, photo);
-        if (!TIFFRGBAImageBegin(&img, tif, stoponerr, title)) {
-                TIFFError(filelist[fileindex], "%s", title);
-                TIFFClose(tif);
+                NDPISetField(tif, TIFFTAG_PHOTOMETRIC, photo);
+        if (!NDPIRGBAImageBegin(&img, tif, stoponerr, title)) {
+                NDPIError(filelist[fileindex], "%s", title);
+                NDPIClose(tif);
                 tif = NULL;
                 return -1;
         }
@@ -250,22 +250,22 @@ initImage(void)
 
 	if (w != width || h != height) {
 		uint32_t rastersize =
-			_TIFFMultiply32(tif, img.width, img.height, "allocating raster buffer");
+			_NDPIMultiply32(tif, img.width, img.height, "allocating raster buffer");
 		if (raster != NULL)
-			_TIFFfree(raster), raster = NULL;
-		raster = (uint32_t*) _TIFFCheckMalloc(tif, rastersize, sizeof (uint32_t),
+			_NDPIfree(raster), raster = NULL;
+		raster = (uint32_t*) _NDPICheckMalloc(tif, rastersize, sizeof (uint32_t),
                                               "allocating raster buffer");
 		if (raster == NULL) {
 			width = height = 0;
-			TIFFError(filelist[fileindex], "No space for raster buffer");
+			NDPIError(filelist[fileindex], "No space for raster buffer");
 			cleanup_and_exit(EXIT_FAILURE);
 		}
 		width = w;
 		height = h;
 	}
-	TIFFRGBAImageGet(&img, raster, img.width, img.height);
+	NDPIRGBAImageGet(&img, raster, img.width, img.height);
 #if HOST_BIGENDIAN
-	TIFFSwabArrayOfLong(raster,img.width*img.height);
+	NDPISwabArrayOfLong(raster,img.width*img.height);
 #endif
 	return 0;
 }
@@ -278,8 +278,8 @@ prevImage(void)
         else if (tif)
                 return fileindex;
         if (tif)
-                TIFFClose(tif);
-        tif = TIFFOpen(filelist[fileindex], "r");
+                NDPIClose(tif);
+        tif = NDPIOpen(filelist[fileindex], "r");
         if (tif == NULL)
                 return -1;
         return fileindex;
@@ -293,8 +293,8 @@ nextImage(void)
         else if (tif)
                 return fileindex;
         if (tif)
-                TIFFClose(tif);
-        tif = TIFFOpen(filelist[fileindex], "r");
+                NDPIClose(tif);
+        tif = NDPIOpen(filelist[fileindex], "r");
         if (tif == NULL)
                 return -1;
         return fileindex;
@@ -323,7 +323,7 @@ raster_reshape(int win_w, int win_h)
         glPixelZoom(xratio, yratio);
         glViewport(0, 0, win_w, win_h);
         snprintf(title, 1024, "%s [%u] %d%%", filelist[fileindex],
-                (unsigned int) TIFFCurrentDirectory(tif), ratio);
+                (unsigned int) NDPICurrentDirectory(tif), ratio);
         glutSetWindowTitle(title);
 }
 
@@ -350,11 +350,11 @@ raster_keys(unsigned char key, int x, int y)
                     initImage();
                     break;
                 case 'W':                       /* toggle warnings */
-                    owarning = TIFFSetWarningHandler(owarning);
+                    owarning = NDPISetWarningHandler(owarning);
                     initImage();
                     break;
                 case 'E':                       /* toggle errors */
-                    oerror = TIFFSetErrorHandler(oerror);
+                    oerror = NDPISetErrorHandler(oerror);
                     initImage();
                     break;
                 case 'z':                       /* reset to defaults */
@@ -362,9 +362,9 @@ raster_keys(unsigned char key, int x, int y)
                     order = order0;
                     photo = photo0;
                     if (owarning == NULL)
-                        owarning = TIFFSetWarningHandler(NULL);
+                        owarning = NDPISetWarningHandler(NULL);
                     if (oerror == NULL)
-                        oerror = TIFFSetErrorHandler(NULL);
+                        oerror = NDPISetErrorHandler(NULL);
                     initImage();
                     break;
                 case 'q':                       /* exit */
@@ -381,43 +381,43 @@ raster_special(int key, int x, int y)
         (void) y;
         switch (key) {
                 case GLUT_KEY_PAGE_UP:          /* previous logical image */
-                    if (TIFFCurrentDirectory(tif) > 0) {
-                            if (TIFFSetDirectory(tif,
-                                                 TIFFCurrentDirectory(tif)-1)) {
+                    if (NDPICurrentDirectory(tif) > 0) {
+                            if (NDPISetDirectory(tif,
+                                                 NDPICurrentDirectory(tif)-1)) {
                                     initImage();
                                     setWindowSize();
                         }
                     } else {
-                            TIFFRGBAImageEnd(&img);
+                            NDPIRGBAImageEnd(&img);
                             prevImage();
                             initImage();
                             setWindowSize();
                     }
                 break;
                 case GLUT_KEY_PAGE_DOWN:        /* next logical image */
-                    if (!TIFFLastDirectory(tif)) {
-                            if (TIFFReadDirectory(tif)) {
+                    if (!NDPILastDirectory(tif)) {
+                            if (NDPIReadDirectory(tif)) {
                                     initImage();
                                     setWindowSize();
                             }
                     } else {
-                            TIFFRGBAImageEnd(&img);
+                            NDPIRGBAImageEnd(&img);
                             nextImage();
                             initImage();
                             setWindowSize();
                     }
                 break;
                 case GLUT_KEY_HOME:             /* 1st image in current file */
-                        if (TIFFSetDirectory(tif, 0)) {
-                                TIFFRGBAImageEnd(&img);
+                        if (NDPISetDirectory(tif, 0)) {
+                                NDPIRGBAImageEnd(&img);
                                 initImage();
                                 setWindowSize();
                         }
                 break;
                 case GLUT_KEY_END:              /* last image in current file */
-                        TIFFRGBAImageEnd(&img);
-                        while (!TIFFLastDirectory(tif))
-                                TIFFReadDirectory(tif);
+                        NDPIRGBAImageEnd(&img);
+                        while (!NDPILastDirectory(tif))
+                                NDPIReadDirectory(tif);
                         initImage();
                         setWindowSize();
                 break;

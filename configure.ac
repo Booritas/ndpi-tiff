@@ -1016,7 +1016,7 @@ dnl ---------------------------------------------------------------------------
 
 AC_ARG_ENABLE(defer-strile-load,
 	      AS_HELP_STRING([--enable-defer-strile-load],
-			     [enable deferred strip/tile offset/size loading (also available at runtime with the 'D' flag of TIFFOpen()]),
+			     [enable deferred strip/tile offset/size loading (also available at runtime with the 'D' flag of NDPIOpen()]),
 	      [HAVE_DEFER_STRILE_LOAD=$enableval], [HAVE_DEFER_STRILE_LOAD=no])
 
 if test "$HAVE_DEFER_STRILE_LOAD" = "yes" ; then
@@ -1027,12 +1027,12 @@ fi
 dnl ---------------------------------------------------------------------------
 dnl Check for support of CHUNKY_STRIP_READ_SUPPORT, a mechanism to allowing
 dnl reading large strips (usually one strip files) in chunks when using
-dnl TIFFReadScanline().  This is an experimental feature in libtiff 4.0.
+dnl NDPIReadScanline().  This is an experimental feature in libtiff 4.0.
 dnl ---------------------------------------------------------------------------
 
 AC_ARG_ENABLE(chunky-strip-read,
 	      AS_HELP_STRING([--enable-chunky-strip-read],
-			     [enable reading large strips in chunks for TIFFReadScanline() (experimental)]),
+			     [enable reading large strips in chunks for NDPIReadScanline() (experimental)]),
 	      [HAVE_CHUNKY_STRIP_READ=$enableval], [HAVE_CHUNKY_STRIP_READ=no])
 
 if test "$HAVE_CHUNKY_STRIP_READ" = "yes" ; then

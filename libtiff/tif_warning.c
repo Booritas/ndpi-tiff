@@ -30,7 +30,7 @@
 TIFFErrorHandlerExt _TIFFwarningHandlerExt = NULL;
 
 TIFFErrorHandler
-TIFFSetWarningHandler(TIFFErrorHandler handler)
+NDPISetWarningHandler(TIFFErrorHandler handler)
 {
 	TIFFErrorHandler prev = _TIFFwarningHandler;
 	_TIFFwarningHandler = handler;
@@ -62,7 +62,7 @@ TIFFWarning(const char* module, const char* fmt, ...)
 }
 
 void
-TIFFWarningExt(thandle_t fd, const char* module, const char* fmt, ...)
+NDPIWarningExt(thandle_t fd, const char* module, const char* fmt, ...)
 {
 	va_list ap;
 	if (_TIFFwarningHandler) {

@@ -50,7 +50,7 @@ BigTIFF support changes:
 
 <UL>
 
-	<LI>The options parameter in the TIFFOpen and TIFFClientOpen funcs has
+	<LI>The options parameter in the NDPIOpen and NDPIClientOpen funcs has
 	been extended. When creating new files, you can add option '4' to
 	specify you want to create a ClassicTIFF file, though that is the
 	default and the option is not strictly necessary. (As such, old
@@ -84,8 +84,8 @@ BigTIFF support changes:
 	changed and need to start using toff_t or uint64. This impacts access
 	to tags like the EXIF IFD tag, for example, or the SubIfds tag, or to
 	StripOffsets or TileOffsets, the return type of functions like
-	TIFFCurrentDirOffset, and a parameter type to functions like
-	TIFFSetSubDirectory.
+	NDPICurrentDirOffset, and a parameter type to functions like
+	NDPISetSubDirectory.
 
 	<LI>Although it's rare, some application code does use structures
 	like TIFFHeader or TIFFDirEntry that used to be an exact binary
@@ -99,7 +99,7 @@ BigTIFF support changes:
 	definition, and no longer an exact binary representation of the tag
 	structure of either TIFF version).
 
-	<LI>Sizer functions, like TIFFTileSize or TIFFScanlineSize and the
+	<LI>Sizer functions, like NDPITileSize or NDPIScanlineSize and the
 	like, return a tmsize_t value (tmsize_t is defined as int32 on 32bit
 	machines, and int64 on 64bit machines, and as such it is meant to
 	represent signed memory sizes). This is because we figure 98% of the
@@ -108,8 +108,8 @@ BigTIFF support changes:
 	when LibTiff is running on a 32bit system, is best detected inside the
 	sizer functions and it is best to return a type that makes sense as a
 	memory size. If your calling code is the exception and is interested
-	in actual file size, you best use the newer TIFFTileSize64 or
-	TIFFScanlineSize64 function that returns an uint64 type.
+	in actual file size, you best use the newer NDPITileSize64 or
+	NDPIScanlineSize64 function that returns an uint64 type.
 
 	<LI>These TIFF tags require a 64-bit type as an argument in
 	libtiff 4.0.0:
@@ -127,7 +127,7 @@ BigTIFF support changes:
 Other important backward incompatible changes in the public API:
 
 <UL>
-	<LI> TIFFRewriteField() renamed into _TIFFRewriteField() and moved out
+	<LI> TIFFRewriteField() renamed into _NDPIRewriteField() and moved out
 	from the public interface (from tiffio.h to tiffiop.h). Type of its
 	'count' parameter changed from uint32 to tmsize_t.
 
@@ -136,7 +136,7 @@ Other important backward incompatible changes in the public API:
 	and should not be used in new programs. Use the new tag extension
 	scheme instead.
 
-	<LI> TIFFFieldWithTag() and TIFFFieldWithName() functions now return
+	<LI> NDPIFieldWithTag() and TIFFFieldWithName() functions now return
 	pointer to TIFFField constant object instead of TIFFFieldInfo.
 
 	<LI> TIFFReassignTagToIgnore() function and TIFFIgnoreSense enumeration
@@ -179,7 +179,7 @@ Other important backward incompatible changes in the public API:
 
 	<LI>--enable-chunky-strip-read configure option to enable
 	experimental enable reading large strips in chunks in
-	TIFFReadScanline().
+	NDPIReadScanline().
 
 	<LI>Now always uses WIN32 native I/O functions for Microsoft
 	Windows except for under Cygwin.

@@ -280,8 +280,8 @@ main(int argc, char **argv)
         Usage();
 
     if (appData.verbose == False) {
-        TIFFSetErrorHandler(0);
-        TIFFSetWarningHandler(0);
+        NDPISetErrorHandler(0);
+        NDPISetWarningHandler(0);
     }
 
     fileName = argv[1];
@@ -386,15 +386,15 @@ void
 OpenTIFFFile()
 {
     if (tfFile != NULL)
-        TIFFClose(tfFile);
+        NDPIClose(tfFile);
 
-    if ((tfFile = TIFFOpen(fileName, "r")) == NULL) {
+    if ((tfFile = NDPIOpen(fileName, "r")) == NULL) {
 	fprintf(appData.verbose ? stderr : stdout,
 	    "xtiff: can't open %s as a TIFF file\n", fileName);
         exit(0);
     }
 
-    tfMultiPage = (TIFFLastDirectory(tfFile) ? False : True);
+    tfMultiPage = (NDPILastDirectory(tfFile) ? False : True);
 }
 
 void
@@ -402,22 +402,22 @@ GetTIFFHeader()
 {
     register int i;
 
-    if (!TIFFSetDirectory(tfFile, tfDirectory)) {
+    if (!NDPISetDirectory(tfFile, tfDirectory)) {
         fprintf(stderr, "xtiff: can't seek to directory %d in %s\n",
             tfDirectory, fileName);
         exit(0);
     }
 
-    TIFFGetField(tfFile, TIFFTAG_IMAGEWIDTH, &tfImageWidth);
-    TIFFGetField(tfFile, TIFFTAG_IMAGELENGTH, &tfImageHeight);
+    NDPIGetField(tfFile, TIFFTAG_IMAGEWIDTH, &tfImageWidth);
+    NDPIGetField(tfFile, TIFFTAG_IMAGELENGTH, &tfImageHeight);
 
     /*
      * If the following tags aren't present then use the TIFF defaults.
      */
-    TIFFGetFieldDefaulted(tfFile, TIFFTAG_BITSPERSAMPLE, &tfBitsPerSample);
-    TIFFGetFieldDefaulted(tfFile, TIFFTAG_SAMPLESPERPIXEL, &tfSamplesPerPixel);
-    TIFFGetFieldDefaulted(tfFile, TIFFTAG_PLANARCONFIG, &tfPlanarConfiguration);
-    TIFFGetFieldDefaulted(tfFile, TIFFTAG_GRAYRESPONSEUNIT, &tfGrayResponseUnit);
+    NDPIGetFieldDefaulted(tfFile, TIFFTAG_BITSPERSAMPLE, &tfBitsPerSample);
+    NDPIGetFieldDefaulted(tfFile, TIFFTAG_SAMPLESPERPIXEL, &tfSamplesPerPixel);
+    NDPIGetFieldDefaulted(tfFile, TIFFTAG_PLANARCONFIG, &tfPlanarConfiguration);
+    NDPIGetFieldDefaulted(tfFile, TIFFTAG_GRAYRESPONSEUNIT, &tfGrayResponseUnit);
 
     tfUnitMap = tfGrayResponseUnitMap[tfGrayResponseUnit];
     colormapSize = 1 << tfBitsPerSample;
@@ -432,13 +432,13 @@ GetTIFFHeader()
      * If TIFFTAG_PHOTOMETRIC is not present then assign a reasonable default.
      * The TIFF 5.0 specification doesn't give a default.
      */
-    if (!TIFFGetField(tfFile, TIFFTAG_PHOTOMETRIC,
+    if (!NDPIGetField(tfFile, TIFFTAG_PHOTOMETRIC,
             &tfPhotometricInterpretation)) {
         if (tfSamplesPerPixel != 1)
             tfPhotometricInterpretation = PHOTOMETRIC_RGB;
         else if (tfBitsPerSample == 1)
             tfPhotometricInterpretation = PHOTOMETRIC_MINISBLACK;
-        else if (TIFFGetField(tfFile, TIFFTAG_COLORMAP,
+        else if (NDPIGetField(tfFile, TIFFTAG_COLORMAP,
                 &redMap, &greenMap, &blueMap)) {
             tfPhotometricInterpretation = PHOTOMETRIC_PALETTE;
             redMap = greenMap = blueMap = NULL;
@@ -460,7 +460,7 @@ GetTIFFHeader()
 		= (double) SCALE(i, colormapSize - 1);
         break;
     case PHOTOMETRIC_PALETTE:
-        if (!TIFFGetField(tfFile, TIFFTAG_COLORMAP,
+        if (!NDPIGetField(tfFile, TIFFTAG_COLORMAP,
                 &redMap, &greenMap, &blueMap)) {
             redMap = (uint16_t *) malloc(colormapSize * sizeof(uint16_t));
             greenMap = (uint16_t *) malloc(colormapSize * sizeof(uint16_t));
@@ -739,7 +739,7 @@ GetTIFFImage()
     uint32_t i, j;
     uint16_t s;
 
-    scan_line = (char *) malloc(tfBytesPerRow = TIFFScanlineSize(tfFile));
+    scan_line = (char *) malloc(tfBytesPerRow = NDPIScanlineSize(tfFile));
     MCHECK(scan_line);
 
     if ((tfImageDepth == 32) || (tfImageDepth == 24)) {
@@ -768,7 +768,7 @@ GetTIFFImage()
 
         if (tfPlanarConfiguration == PLANARCONFIG_CONTIG) {
             for (i = 0; i < tfImageHeight; i++) {
-                if (TIFFReadScanline(tfFile, scan_line, i, 0) < 0)
+                if (NDPIReadScanline(tfFile, scan_line, i, 0) < 0)
                     break;
                 for (input_p = scan_line, j = 0; j < tfImageWidth; j++) {
                     *(output_p + red_shift) = *input_p++;
@@ -784,7 +784,7 @@ GetTIFFImage()
                 if (s == 3)             /* skip the fourth channel */
                     continue;
                 for (i = 0; i < tfImageHeight; i++) {
-                    if (TIFFReadScanline(tfFile, scan_line, i, s) < 0)
+                    if (NDPIReadScanline(tfFile, scan_line, i, s) < 0)
                         break;
                     input_p = scan_line;
                     output_p = imageMemory + (i*tfImageWidth*4) + pixel_map[s];
@@ -800,7 +800,7 @@ GetTIFFImage()
             MCHECK(imageMemory);
 
             for (i = 0; i < tfImageHeight; i++, output_p += tfBytesPerRow)
-                if (TIFFReadScanline(tfFile, output_p, i, 0) < 0)
+                if (NDPIReadScanline(tfFile, output_p, i, 0) < 0)
                     break;
         } else if ((xImageDepth == 8) && (tfImageDepth == 4)) {
             output_p = imageMemory = (char *)
@@ -813,7 +813,7 @@ GetTIFFImage()
              * each scanline and padding imageMemory a little at the end.
              */
             for (i = 0; i < tfImageHeight; i++) {
-                if (TIFFReadScanline(tfFile, scan_line, i, 0) < 0)
+                if (NDPIReadScanline(tfFile, scan_line, i, 0) < 0)
                     break;
                 output_p = &imageMemory[i * tfImageWidth];
                 input_p = scan_line;
@@ -828,7 +828,7 @@ GetTIFFImage()
             MCHECK(imageMemory);
 
             for (i = 0; i < tfImageHeight; i++) {
-                if (TIFFReadScanline(tfFile, scan_line, i, 0) < 0)
+                if (NDPIReadScanline(tfFile, scan_line, i, 0) < 0)
                     break;
                 output_p = &imageMemory[i * tfImageWidth];
                 input_p = scan_line;
@@ -845,7 +845,7 @@ GetTIFFImage()
             MCHECK(imageMemory);
 
             for (i = 0; i < tfImageHeight; i++) {
-                if (TIFFReadScanline(tfFile, scan_line, i, 0) < 0)
+                if (NDPIReadScanline(tfFile, scan_line, i, 0) < 0)
                     break;
                 output_p = &imageMemory[i * tfBytesPerRow * 2];
                 input_p = scan_line;
@@ -987,12 +987,12 @@ PageProc(direction)
     switch (direction) {
     case ButtonPreviousPage:
         if (tfDirectory > 0)
-            TIFFSetDirectory(tfFile, --tfDirectory);
+            NDPISetDirectory(tfFile, --tfDirectory);
         else
             return;
         break;
     case ButtonNextPage:
-        if (TIFFReadDirectory(tfFile) == True)
+        if (NDPIReadDirectory(tfFile) == True)
             tfDirectory++;
         else
             return;

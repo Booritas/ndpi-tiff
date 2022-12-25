@@ -181,7 +181,7 @@ main(int argc, char* argv[])
 			fillorder_out = FILLORDER_LSB2MSB;
 			break;
 		case 'o':
-			out = TIFFOpen(optarg, "w");
+			out = NDPIOpen(optarg, "w");
 			if (out == NULL) {
 				fprintf(stderr,
 				    "%s: Can not create or open %s\n",
@@ -224,15 +224,15 @@ main(int argc, char* argv[])
 	if (npages < 1)
 		usage(EXIT_FAILURE);
 
-	rowbuf = _TIFFmalloc(TIFFhowmany8(xsize));
-	refbuf = _TIFFmalloc(TIFFhowmany8(xsize));
+	rowbuf = _NDPImalloc(TIFFhowmany8(xsize));
+	refbuf = _NDPImalloc(TIFFhowmany8(xsize));
 	if (rowbuf == NULL || refbuf == NULL) {
 		fprintf(stderr, "%s: Not enough memory\n", argv[0]);
 		return (EXIT_FAILURE);
 	}
 
 	if (out == NULL) {
-		out = TIFFOpen("fax.tif", "w");
+		out = NDPIOpen("fax.tif", "w");
 		if (out == NULL) {
 			fprintf(stderr, "%s: Can not create fax.tif\n",
 			    argv[0]);
@@ -240,34 +240,34 @@ main(int argc, char* argv[])
 		}
 	}
 		
-	faxTIFF = TIFFClientOpen("(FakeInput)", "w",
-	/* TIFFClientOpen() fails if we don't set existing value here */
-				 TIFFClientdata(out),
-				 TIFFGetReadProc(out), TIFFGetWriteProc(out),
-				 TIFFGetSeekProc(out), TIFFGetCloseProc(out),
-				 TIFFGetSizeProc(out), TIFFGetMapFileProc(out),
-				 TIFFGetUnmapFileProc(out));
+	faxTIFF = NDPIClientOpen("(FakeInput)", "w",
+	/* NDPIClientOpen() fails if we don't set existing value here */
+				 NDPIClientdata(out),
+				 NDPIGetReadProc(out), NDPIGetWriteProc(out),
+				 NDPIGetSeekProc(out), NDPIGetCloseProc(out),
+				 NDPIGetSizeProc(out), NDPIGetMapFileProc(out),
+				 NDPIGetUnmapFileProc(out));
 	if (faxTIFF == NULL) {
 		fprintf(stderr, "%s: Can not create fake input file\n",
 		    argv[0]);
 		return (EXIT_FAILURE);
 	}
-	TIFFSetMode(faxTIFF, O_RDONLY);
-	TIFFSetField(faxTIFF, TIFFTAG_IMAGEWIDTH,	xsize);
-	TIFFSetField(faxTIFF, TIFFTAG_SAMPLESPERPIXEL,	1);
-	TIFFSetField(faxTIFF, TIFFTAG_BITSPERSAMPLE,	1);
-	TIFFSetField(faxTIFF, TIFFTAG_FILLORDER,	fillorder_in);
-	TIFFSetField(faxTIFF, TIFFTAG_PLANARCONFIG,	PLANARCONFIG_CONTIG);
-	TIFFSetField(faxTIFF, TIFFTAG_PHOTOMETRIC,	photometric_in);
-	TIFFSetField(faxTIFF, TIFFTAG_YRESOLUTION,	resY);
-	TIFFSetField(faxTIFF, TIFFTAG_RESOLUTIONUNIT,	RESUNIT_INCH);
+	NDPISetMode(faxTIFF, O_RDONLY);
+	NDPISetField(faxTIFF, TIFFTAG_IMAGEWIDTH,	xsize);
+	NDPISetField(faxTIFF, TIFFTAG_SAMPLESPERPIXEL,	1);
+	NDPISetField(faxTIFF, TIFFTAG_BITSPERSAMPLE,	1);
+	NDPISetField(faxTIFF, TIFFTAG_FILLORDER,	fillorder_in);
+	NDPISetField(faxTIFF, TIFFTAG_PLANARCONFIG,	PLANARCONFIG_CONTIG);
+	NDPISetField(faxTIFF, TIFFTAG_PHOTOMETRIC,	photometric_in);
+	NDPISetField(faxTIFF, TIFFTAG_YRESOLUTION,	resY);
+	NDPISetField(faxTIFF, TIFFTAG_RESOLUTIONUNIT,	RESUNIT_INCH);
 	
 	/* NB: this must be done after directory info is setup */
-	TIFFSetField(faxTIFF, TIFFTAG_COMPRESSION, compression_in);
+	NDPISetField(faxTIFF, TIFFTAG_COMPRESSION, compression_in);
 	if (compression_in == COMPRESSION_CCITTFAX3)
-		TIFFSetField(faxTIFF, TIFFTAG_GROUP3OPTIONS, group3options_in);
+		NDPISetField(faxTIFF, TIFFTAG_GROUP3OPTIONS, group3options_in);
 	else if (compression_in == COMPRESSION_CCITTFAX4)
-		TIFFSetField(faxTIFF, TIFFTAG_GROUP4OPTIONS, group4options_in);
+		NDPISetField(faxTIFF, TIFFTAG_GROUP4OPTIONS, group4options_in);
 	for (pn = 0; optind < argc; pn++, optind++) {
 		in = fopen(argv[optind], "rb");
 		if (in == NULL) {
@@ -280,58 +280,58 @@ main(int argc, char* argv[])
 #else
 		client_data.fd = fileno(in);
 #endif
-		TIFFSetClientdata(faxTIFF, client_data.fh);
-		TIFFSetFileName(faxTIFF, (const char*)argv[optind]);
-		TIFFSetField(out, TIFFTAG_IMAGEWIDTH, xsize);
-		TIFFSetField(out, TIFFTAG_BITSPERSAMPLE, 1);
-		TIFFSetField(out, TIFFTAG_COMPRESSION, compression_out);
-		TIFFSetField(out, TIFFTAG_PHOTOMETRIC, photometric_out);
-		TIFFSetField(out, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
-		TIFFSetField(out, TIFFTAG_SAMPLESPERPIXEL, 1);
+		NDPISetClientdata(faxTIFF, client_data.fh);
+		NDPISetFileName(faxTIFF, (const char*)argv[optind]);
+		NDPISetField(out, TIFFTAG_IMAGEWIDTH, xsize);
+		NDPISetField(out, TIFFTAG_BITSPERSAMPLE, 1);
+		NDPISetField(out, TIFFTAG_COMPRESSION, compression_out);
+		NDPISetField(out, TIFFTAG_PHOTOMETRIC, photometric_out);
+		NDPISetField(out, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
+		NDPISetField(out, TIFFTAG_SAMPLESPERPIXEL, 1);
 		switch (compression_out) {
 			/* g3 */
 			case COMPRESSION_CCITTFAX3:
-			TIFFSetField(out, TIFFTAG_GROUP3OPTIONS,
+			NDPISetField(out, TIFFTAG_GROUP3OPTIONS,
 				     group3options_out);
-			TIFFSetField(out, TIFFTAG_FAXMODE, mode);
+			NDPISetField(out, TIFFTAG_FAXMODE, mode);
 			rowsperstrip =
 				(defrowsperstrip)?defrowsperstrip:(uint32_t)-1L;
 			break;
 
 			/* g4 */
 			case COMPRESSION_CCITTFAX4:
-			TIFFSetField(out, TIFFTAG_GROUP4OPTIONS,
+			NDPISetField(out, TIFFTAG_GROUP4OPTIONS,
 				     group4options_out);
-			TIFFSetField(out, TIFFTAG_FAXMODE, mode);
+			NDPISetField(out, TIFFTAG_FAXMODE, mode);
 			rowsperstrip =
 				(defrowsperstrip)?defrowsperstrip:(uint32_t)-1L;
 			break;
 
 			default:
 			rowsperstrip = (defrowsperstrip) ?
-				defrowsperstrip : TIFFDefaultStripSize(out, 0);
+				defrowsperstrip : NDPIDefaultStripSize(out, 0);
 		}
-		TIFFSetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
-		TIFFSetField(out, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-		TIFFSetField(out, TIFFTAG_FILLORDER, fillorder_out);
-		TIFFSetField(out, TIFFTAG_SOFTWARE, "fax2tiff");
-		TIFFSetField(out, TIFFTAG_XRESOLUTION, 204.0);
+		NDPISetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
+		NDPISetField(out, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+		NDPISetField(out, TIFFTAG_FILLORDER, fillorder_out);
+		NDPISetField(out, TIFFTAG_SOFTWARE, "fax2tiff");
+		NDPISetField(out, TIFFTAG_XRESOLUTION, 204.0);
 		if (!stretch) {
-			TIFFGetField(faxTIFF, TIFFTAG_YRESOLUTION, &resY);
-			TIFFSetField(out, TIFFTAG_YRESOLUTION, resY);
+			NDPIGetField(faxTIFF, TIFFTAG_YRESOLUTION, &resY);
+			NDPISetField(out, TIFFTAG_YRESOLUTION, resY);
 		} else
-			TIFFSetField(out, TIFFTAG_YRESOLUTION, 196.);
-		TIFFSetField(out, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH);
-		TIFFSetField(out, TIFFTAG_PAGENUMBER, pn, npages);
+			NDPISetField(out, TIFFTAG_YRESOLUTION, 196.);
+		NDPISetField(out, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH);
+		NDPISetField(out, TIFFTAG_PAGENUMBER, pn, npages);
 
 		if (!verbose)
-		    whandler = TIFFSetWarningHandler(NULL);
+		    whandler = NDPISetWarningHandler(NULL);
 		rows = copyFaxFile(faxTIFF, out);
 		fclose(in);
 		if (!verbose)
-		    (void) TIFFSetWarningHandler(whandler);
+		    (void) NDPISetWarningHandler(whandler);
 
-		TIFFSetField(out, TIFFTAG_IMAGELENGTH, rows);
+		NDPISetField(out, TIFFTAG_IMAGELENGTH, rows);
 
 		if (verbose) {
 			fprintf(stderr, "%s:\n", argv[optind]);
@@ -342,16 +342,16 @@ main(int argc, char* argv[])
 		}
 		if (compression_out == COMPRESSION_CCITTFAX3 &&
 		    mode == FAXMODE_CLASSF) {
-			TIFFSetField(out, TIFFTAG_BADFAXLINES, badfaxlines);
-			TIFFSetField(out, TIFFTAG_CLEANFAXDATA, badfaxlines ?
+			NDPISetField(out, TIFFTAG_BADFAXLINES, badfaxlines);
+			NDPISetField(out, TIFFTAG_CLEANFAXDATA, badfaxlines ?
 			    CLEANFAXDATA_REGENERATED : CLEANFAXDATA_CLEAN);
-			TIFFSetField(out, TIFFTAG_CONSECUTIVEBADFAXLINES, badfaxrun);
+			NDPISetField(out, TIFFTAG_CONSECUTIVEBADFAXLINES, badfaxrun);
 		}
-		TIFFWriteDirectory(out);
+		NDPIWriteDirectory(out);
 	}
-	TIFFClose(out);
-	_TIFFfree(rowbuf);
-	_TIFFfree(refbuf);
+	NDPIClose(out);
+	_NDPIfree(rowbuf);
+	_NDPIfree(refbuf);
 	return (EXIT_SUCCESS);
 }
 
@@ -365,16 +365,16 @@ copyFaxFile(TIFF* tifin, TIFF* tifout)
 
 	tifin->tif_rawdatasize = (tmsize_t)TIFFGetFileSize(tifin);
 	if (tifin->tif_rawdatasize == 0) {
-		TIFFError(tifin->tif_name, "Empty input file");
+		NDPIError(tifin->tif_name, "Empty input file");
 		return (0);
 	}
-	tifin->tif_rawdata = _TIFFmalloc(tifin->tif_rawdatasize);
+	tifin->tif_rawdata = _NDPImalloc(tifin->tif_rawdatasize);
 	if (tifin->tif_rawdata == NULL) {
-		TIFFError(tifin->tif_name, "Not enough memory");
+		NDPIError(tifin->tif_name, "Not enough memory");
 		return (0);
 	}
 	if (!ReadOK(tifin, tifin->tif_rawdata, tifin->tif_rawdatasize)) {
-		TIFFError(tifin->tif_name, "Read error at scanline 0");
+		NDPIError(tifin->tif_name, "Read error at scanline 0");
 		return (0);
 	}
 	tifin->tif_rawcp = tifin->tif_rawdata;
@@ -386,7 +386,7 @@ copyFaxFile(TIFF* tifin, TIFF* tifout)
 	badfaxlines = 0;
 	badfaxrun = 0;
 
-	_TIFFmemset(refbuf, 0, linesize);
+	_NDPImemset(refbuf, 0, linesize);
 	row = 0;
 	badrun = 0;		/* current run of bad lines */
 	while (tifin->tif_rawcc > 0) {
@@ -396,12 +396,12 @@ copyFaxFile(TIFF* tifin, TIFF* tifout)
 			badfaxlines++;
 			badrun++;
 			/* regenerate line from previous good line */
-			_TIFFmemcpy(rowbuf, refbuf, linesize);
+			_NDPImemcpy(rowbuf, refbuf, linesize);
 		} else {
 			if (badrun > badfaxrun)
 				badfaxrun = badrun;
 			badrun = 0;
-			_TIFFmemcpy(refbuf, rowbuf, linesize);
+			_NDPImemcpy(refbuf, rowbuf, linesize);
 		}
 		tifin->tif_row++;
 
@@ -422,7 +422,7 @@ copyFaxFile(TIFF* tifin, TIFF* tifout)
 	}
 	if (badrun > badfaxrun)
 		badfaxrun = badrun;
-	_TIFFfree(tifin->tif_rawdata);
+	_NDPIfree(tifin->tif_rawdata);
 	return (row);
 }
 

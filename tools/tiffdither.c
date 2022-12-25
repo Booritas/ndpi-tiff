@@ -47,7 +47,7 @@
 #define	strneq(a,b,n)	(strncmp(a,b,n) == 0)
 
 #define	CopyField(tag, v) \
-	if (TIFFGetField(in, tag, &v)) TIFFSetField(out, tag, v)
+	if (NDPIGetField(in, tag, &v)) NDPISetField(out, tag, v)
 
 uint32_t	imagewidth;
 uint32_t	imagelength;
@@ -75,11 +75,11 @@ fsdither(TIFF* in, TIFF* out)
 
 	imax = imagelength - 1;
 	jmax = imagewidth - 1;
-	inputline = (unsigned char *)_TIFFmalloc(TIFFScanlineSize(in));
-	thisline = (short *)_TIFFmalloc(TIFFSafeMultiply(tmsize_t, imagewidth, sizeof (short)));
-	nextline = (short *)_TIFFmalloc(TIFFSafeMultiply(tmsize_t, imagewidth, sizeof (short)));
-	outlinesize = TIFFScanlineSize(out);
-	outline = (unsigned char *) _TIFFmalloc(outlinesize);
+	inputline = (unsigned char *)_NDPImalloc(NDPIScanlineSize(in));
+	thisline = (short *)_NDPImalloc(TIFFSafeMultiply(tmsize_t, imagewidth, sizeof (short)));
+	nextline = (short *)_NDPImalloc(TIFFSafeMultiply(tmsize_t, imagewidth, sizeof (short)));
+	outlinesize = NDPIScanlineSize(out);
+	outline = (unsigned char *) _NDPImalloc(outlinesize);
 	if (! (inputline && thisline && nextline && outline)) {
 	    fprintf(stderr, "Out of memory.\n");
 	    goto skip_on_error;
@@ -88,7 +88,7 @@ fsdither(TIFF* in, TIFF* out)
 	/*
 	 * Get first line
 	 */
-	if (TIFFReadScanline(in, inputline, 0, 0) <= 0)
+	if (NDPIReadScanline(in, inputline, 0, 0) <= 0)
             goto skip_on_error;
 
 	inptr = inputline;
@@ -100,7 +100,7 @@ fsdither(TIFF* in, TIFF* out)
 		thisline = nextline;
 		nextline = tmpptr;
 		lastline = (i == imax);
-		if (TIFFReadScanline(in, inputline, i, 0) <= 0)
+		if (NDPIReadScanline(in, inputline, i, 0) <= 0)
 			goto skip_on_error;
 		inptr = inputline;
 		nextptr = nextline;
@@ -108,7 +108,7 @@ fsdither(TIFF* in, TIFF* out)
 			*nextptr++ = *inptr++;
 		thisptr = thisline;
 		nextptr = nextline;
-		_TIFFmemset(outptr = outline, 0, outlinesize);
+		_NDPImemset(outptr = outline, 0, outlinesize);
 		bit = 0x80;
 		for (j = 0; j < imagewidth; ++j) {
 			register int v;
@@ -146,10 +146,10 @@ fsdither(TIFF* in, TIFF* out)
   skip_on_error:
 	errcode = 1;
   exit_label:
-	_TIFFfree(inputline);
-	_TIFFfree(thisline);
-	_TIFFfree(nextline);
-	_TIFFfree(outline);
+	_NDPIfree(inputline);
+	_NDPIfree(thisline);
+	_NDPIfree(nextline);
+	_NDPIfree(outline);
 	return errcode;
 }
 
@@ -252,56 +252,56 @@ main(int argc, char* argv[])
 		}
 	if (argc - optind < 2)
 		usage(EXIT_FAILURE);
-	in = TIFFOpen(argv[optind], "r");
+	in = NDPIOpen(argv[optind], "r");
 	if (in == NULL)
 		return (EXIT_FAILURE);
-	TIFFGetField(in, TIFFTAG_SAMPLESPERPIXEL, &samplesperpixel);
+	NDPIGetField(in, TIFFTAG_SAMPLESPERPIXEL, &samplesperpixel);
 	if (samplesperpixel != 1) {
 		fprintf(stderr, "%s: Not a b&w image.\n", argv[0]);
 		return (EXIT_FAILURE);
 	}
-	TIFFGetField(in, TIFFTAG_BITSPERSAMPLE, &bitspersample);
+	NDPIGetField(in, TIFFTAG_BITSPERSAMPLE, &bitspersample);
 	if (bitspersample != 8) {
 		fprintf(stderr,
 		    " %s: Sorry, only handle 8-bit samples.\n", argv[0]);
 		return (EXIT_FAILURE);
 	}
-	out = TIFFOpen(argv[optind+1], "w");
+	out = NDPIOpen(argv[optind+1], "w");
 	if (out == NULL)
 		return (EXIT_FAILURE);
 	CopyField(TIFFTAG_IMAGEWIDTH, imagewidth);
-	TIFFGetField(in, TIFFTAG_IMAGELENGTH, &imagelength);
-	TIFFSetField(out, TIFFTAG_IMAGELENGTH, imagelength-1);
-	TIFFSetField(out, TIFFTAG_BITSPERSAMPLE, 1);
-	TIFFSetField(out, TIFFTAG_SAMPLESPERPIXEL, 1);
-	TIFFSetField(out, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-	TIFFSetField(out, TIFFTAG_COMPRESSION, compression);
+	NDPIGetField(in, TIFFTAG_IMAGELENGTH, &imagelength);
+	NDPISetField(out, TIFFTAG_IMAGELENGTH, imagelength-1);
+	NDPISetField(out, TIFFTAG_BITSPERSAMPLE, 1);
+	NDPISetField(out, TIFFTAG_SAMPLESPERPIXEL, 1);
+	NDPISetField(out, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+	NDPISetField(out, TIFFTAG_COMPRESSION, compression);
 	if (fillorder)
-		TIFFSetField(out, TIFFTAG_FILLORDER, fillorder);
+		NDPISetField(out, TIFFTAG_FILLORDER, fillorder);
 	else
 		CopyField(TIFFTAG_FILLORDER, shortv);
 	snprintf(thing, sizeof(thing), "Dithered B&W version of %s", argv[optind]);
-	TIFFSetField(out, TIFFTAG_IMAGEDESCRIPTION, thing);
+	NDPISetField(out, TIFFTAG_IMAGEDESCRIPTION, thing);
 	CopyField(TIFFTAG_PHOTOMETRIC, shortv);
 	CopyField(TIFFTAG_ORIENTATION, shortv);
 	CopyField(TIFFTAG_XRESOLUTION, floatv);
 	CopyField(TIFFTAG_YRESOLUTION, floatv);
 	CopyField(TIFFTAG_RESOLUTIONUNIT, shortv);
-        rowsperstrip = TIFFDefaultStripSize(out, rowsperstrip);
-	TIFFSetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
+        rowsperstrip = NDPIDefaultStripSize(out, rowsperstrip);
+	NDPISetField(out, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
 	switch (compression) {
 	case COMPRESSION_CCITTFAX3:
-		TIFFSetField(out, TIFFTAG_GROUP3OPTIONS, group3options);
+		NDPISetField(out, TIFFTAG_GROUP3OPTIONS, group3options);
 		break;
 	case COMPRESSION_LZW:
 	case COMPRESSION_DEFLATE:
 		if (predictor)
-			TIFFSetField(out, TIFFTAG_PREDICTOR, predictor);
+			NDPISetField(out, TIFFTAG_PREDICTOR, predictor);
 		break;
 	}
 	fsdither(in, out);
-	TIFFClose(in);
-	TIFFClose(out);
+	NDPIClose(in);
+	NDPIClose(out);
 	return (EXIT_SUCCESS);
 }
 

@@ -52,15 +52,15 @@ The following information is located here:
 <LI>the G3/G4 decoder was replaced by a new one that is faster and
    has smaller state tables
 <LI>Niles Ritter's client tag extension hooks were added
-<LI>a new routine <TT>TIFFCurrentDirOffset</TT> was added for
+<LI>a new routine <TT>NDPICurrentDirOffset</TT> was added for
    applications that want to find out the file offset of a TIFF directory
 <LI>the calculation of the number of strips in an image was corrected
    for images with certain esoteric configurations
 <LI>a potential memory leak (very unlikely) was plugged
-<LI>the <TT>TIFFReadRGBAImage</TT> support was completely rewritten
+<LI>the <TT>NDPIReadRGBAImage</TT> support was completely rewritten
    and new, more flexible support was added for reading images into
    a fixed-format raster
-<LI>YCbCr to RGB conversion done in the <TT>TIFFReadRGBAImage</TT> support
+<LI>YCbCr to RGB conversion done in the <TT>NDPIReadRGBAImage</TT> support
    was optimized
 <LI>a bug in JPEG support calculation of strip size was corrected
 <LI>the LZW decoder was changed to initialize the code table to zero

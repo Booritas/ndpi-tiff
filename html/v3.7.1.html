@@ -88,7 +88,7 @@ The following information is located here:
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=687</a>
 
 	<li> tif_dirread.c: Do not forget about TIFF_VARIABLE2 when
-	checking for tag count in TIFFReadDirectory() function. As per bug
+	checking for tag count in NDPIReadDirectory() function. As per bug
 	<a href="http://bugzilla.remotesensing.org/show_bug.cgi?id=713">
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=713</a>
 
@@ -113,7 +113,7 @@ The following information is located here:
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=697</a>
 
 	<li> tif_dir.c, tif_dirread.c: Remove TIFFReassignTagToIgnore()
-	call from the TIFFReadDirectory() function. TIFFReassignTagToIgnore
+	call from the NDPIReadDirectory() function. TIFFReassignTagToIgnore
 	must be removed in the future, as it was never used properly. As per
 	bug <a href="http://bugzilla.remotesensing.org/show_bug.cgi?id=692">
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=692</a>
@@ -144,7 +144,7 @@ The following information is located here:
 	for details). Those who want to use C++ streams should
 	#include <tiffio.hxx>.
 
-	<li> tif_open.c: Removed close() in TIFFClientOpen() if file
+	<li> tif_open.c: Removed close() in NDPIClientOpen() if file
 	is bad. This is the callers responsibility.
 	<a href="http://bugzilla.remotesensing.org/show_bug.cgi?id=651">
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=651</a>

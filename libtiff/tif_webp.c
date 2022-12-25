@@ -78,12 +78,12 @@ int TWebPDatasetWriter(const uint8_t* data, size_t data_size,
   TIFF* tif = (TIFF*)(picture->custom_ptr);
   
   if ( (tif->tif_rawcc + (tmsize_t)data_size) > tif->tif_rawdatasize ) {
-    TIFFErrorExt(tif->tif_clientdata, module,
+    NDPIErrorExt(tif->tif_clientdata, module,
                  "Buffer too small by %"TIFF_SIZE_FORMAT" bytes.",
                  (size_t) (tif->tif_rawcc + data_size - tif->tif_rawdatasize));
     return 0;
   } else {
-    _TIFFmemcpy(tif->tif_rawcp, data, data_size);
+    _NDPImemcpy(tif->tif_rawcp, data, data_size);
     tif->tif_rawcc += data_size;
     tif->tif_rawcp += data_size;
     return 1;    
@@ -106,7 +106,7 @@ TWebPEncode(TIFF* tif, uint8_t* bp, tmsize_t cc, uint16_t s)
   if((uint64_t)sp->buffer_offset +
      (uint64_t)cc > sp->buffer_size )
   {
-      TIFFErrorExt(tif->tif_clientdata, module,
+      NDPIErrorExt(tif->tif_clientdata, module,
                    "Too many bytes to be written");
       return 0;
   }
@@ -132,7 +132,7 @@ TWebPDecode(TIFF* tif, uint8_t* op, tmsize_t occ, uint16_t s)
   
   if (occ % sp->sDecBuffer.u.RGBA.stride)
   {
-    TIFFErrorExt(tif->tif_clientdata, module,
+    NDPIErrorExt(tif->tif_clientdata, module,
                  "Fractional scanlines cannot be read");
     return 0;
   }
@@ -141,13 +141,13 @@ TWebPDecode(TIFF* tif, uint8_t* op, tmsize_t occ, uint16_t s)
 
   if (status != VP8_STATUS_OK && status != VP8_STATUS_SUSPENDED) {
     if (status == VP8_STATUS_INVALID_PARAM) {
-       TIFFErrorExt(tif->tif_clientdata, module,
+       NDPIErrorExt(tif->tif_clientdata, module,
          "Invalid parameter used.");      
     } else if (status == VP8_STATUS_OUT_OF_MEMORY) {
-      TIFFErrorExt(tif->tif_clientdata, module,
+      NDPIErrorExt(tif->tif_clientdata, module,
         "Out of memory.");         
     } else {
-      TIFFErrorExt(tif->tif_clientdata, module,
+      NDPIErrorExt(tif->tif_clientdata, module,
         "Unrecognized error.");   
     }
     return 0;
@@ -169,7 +169,7 @@ TWebPDecode(TIFF* tif, uint8_t* op, tmsize_t occ, uint16_t s)
       sp->last_y += occ / sp->sDecBuffer.u.RGBA.stride;
       return 1;
     } else {
-      TIFFErrorExt(tif->tif_clientdata, module, "Unable to decode WebP data."); 
+      NDPIErrorExt(tif->tif_clientdata, module, "Unable to decode WebP data."); 
       return 0;
     }
   }
@@ -181,7 +181,7 @@ TWebPFixupTags(TIFF* tif)
   (void) tif;
   if (tif->tif_dir.td_planarconfig != PLANARCONFIG_CONTIG) {
     static const char module[] = "TWebPFixupTags";
-    TIFFErrorExt(tif->tif_clientdata, module,
+    NDPIErrorExt(tif->tif_clientdata, module,
       "TIFF WEBP requires data to be stored contiguously in RGB e.g. RGBRGBRGB "
 #if WEBP_ENCODER_ABI_VERSION >= 0x0100
       "or RGBARGBARGBA"
@@ -211,7 +211,7 @@ TWebPSetupDecode(TIFF* tif)
 #endif
   )
   {
-    TIFFErrorExt(tif->tif_clientdata, module,
+    NDPIErrorExt(tif->tif_clientdata, module,
       "WEBP driver doesn't support %d bands. Must be 3 (RGB) "
   #if WEBP_ENCODER_ABI_VERSION >= 0x0100
       "or 4 (RGBA) "
@@ -223,7 +223,7 @@ TWebPSetupDecode(TIFF* tif)
 
   /* check bits per sample and data type */
   if ((nBitsPerSample != 8) && (sampleFormat != 1)) {
-    TIFFErrorExt(tif->tif_clientdata, module,
+    NDPIErrorExt(tif->tif_clientdata, module,
                 "WEBP driver requires 8 bit unsigned data");
     return 0;
   }
@@ -232,7 +232,7 @@ TWebPSetupDecode(TIFF* tif)
   if (sp->state & LSTATE_INIT_ENCODE) {
       WebPPictureFree(&sp->sPicture);
       if (sp->pBuffer != NULL) {
-        _TIFFfree(sp->pBuffer);
+        _NDPIfree(sp->pBuffer);
         sp->pBuffer = NULL;
       }
       sp->buffer_offset = 0;
@@ -268,7 +268,7 @@ TWebPPreDecode(TIFF* tif, uint16_t s)
   }
 
   if( segment_width > 16383 || segment_height > 16383 ) {
-      TIFFErrorExt(tif->tif_clientdata, module,
+      NDPIErrorExt(tif->tif_clientdata, module,
                    "WEBP maximum image dimensions are 16383 x 16383.");
       return 0;
   }
@@ -301,7 +301,7 @@ TWebPPreDecode(TIFF* tif, uint16_t s)
   sp->psDecoder = WebPINewDecoder(&sp->sDecBuffer);
   
   if (sp->psDecoder == NULL) {
-    TIFFErrorExt(tif->tif_clientdata, module,
+    NDPIErrorExt(tif->tif_clientdata, module,
                 "Unable to allocate WebP decoder.");
     return 0;
   }
@@ -328,7 +328,7 @@ TWebPSetupEncode(TIFF* tif)
 #endif
   )
   {
-    TIFFErrorExt(tif->tif_clientdata, module,
+    NDPIErrorExt(tif->tif_clientdata, module,
       "WEBP driver doesn't support %d bands. Must be 3 (RGB) "
 #if WEBP_ENCODER_ABI_VERSION >= 0x0100
       "or 4 (RGBA) "
@@ -340,7 +340,7 @@ TWebPSetupEncode(TIFF* tif)
   
   /* check bits per sample and data type */
   if ((nBitsPerSample != 8) || (sampleFormat != SAMPLEFORMAT_UINT)) {
-    TIFFErrorExt(tif->tif_clientdata, module,
+    NDPIErrorExt(tif->tif_clientdata, module,
                 "WEBP driver requires 8 bit unsigned data");
     return 0;
   }
@@ -356,7 +356,7 @@ TWebPSetupEncode(TIFF* tif)
   sp->state |= LSTATE_INIT_ENCODE;
 
   if (!WebPPictureInit(&sp->sPicture)) {
-    TIFFErrorExt(tif->tif_clientdata, module,
+    NDPIErrorExt(tif->tif_clientdata, module,
         "Error initializing WebP picture.");
     return 0;
   }
@@ -364,7 +364,7 @@ TWebPSetupEncode(TIFF* tif)
   if (!WebPConfigInitInternal(&sp->sEncoderConfig, WEBP_PRESET_DEFAULT,
                               (float)sp->quality_level,
                               WEBP_ENCODER_ABI_VERSION)) {
-    TIFFErrorExt(tif->tif_clientdata, module,
+    NDPIErrorExt(tif->tif_clientdata, module,
       "Error creating WebP encoder configuration.");
     return 0;
   }
@@ -378,7 +378,7 @@ TWebPSetupEncode(TIFF* tif)
   #endif
 
   if (!WebPValidateConfig(&sp->sEncoderConfig)) {
-    TIFFErrorExt(tif->tif_clientdata, module,
+    NDPIErrorExt(tif->tif_clientdata, module,
       "Error with WebP encoder configuration.");
     return 0;
   }
@@ -417,7 +417,7 @@ TWebPPreEncode(TIFF* tif, uint16_t s)
   }
 
   if( segment_width > 16383 || segment_height > 16383 ) {
-      TIFFErrorExt(tif->tif_clientdata, module, 
+      NDPIErrorExt(tif->tif_clientdata, module, 
                    "WEBP maximum image dimensions are 16383 x 16383.");
       return 0;
   }
@@ -427,13 +427,13 @@ TWebPPreEncode(TIFF* tif, uint16_t s)
   sp->buffer_size = segment_width * segment_height * sp->nSamples;
   
   if (sp->pBuffer != NULL) {
-      _TIFFfree(sp->pBuffer);
+      _NDPIfree(sp->pBuffer);
       sp->pBuffer = NULL;    
   }
   
-  sp->pBuffer = _TIFFmalloc(sp->buffer_size);
+  sp->pBuffer = _NDPImalloc(sp->buffer_size);
   if( !sp->pBuffer) {
-      TIFFErrorExt(tif->tif_clientdata, module, "Cannot allocate buffer");
+      NDPIErrorExt(tif->tif_clientdata, module, "Cannot allocate buffer");
       return 0;
   }
   sp->buffer_offset = 0;
@@ -464,7 +464,7 @@ TWebPPostEncode(TIFF* tif)
 #if WEBP_ENCODER_ABI_VERSION >= 0x0100
   if (sp->nSamples == 4) {
       if (!WebPPictureImportRGBA(&sp->sPicture, sp->pBuffer, (int)stride)) {
-          TIFFErrorExt(tif->tif_clientdata, module,
+          NDPIErrorExt(tif->tif_clientdata, module,
                     "WebPPictureImportRGBA() failed" );
           return 0;
       }
@@ -472,7 +472,7 @@ TWebPPostEncode(TIFF* tif)
   else
 #endif
   if (!WebPPictureImportRGB(&sp->sPicture, sp->pBuffer, (int)stride)) {
-      TIFFErrorExt(tif->tif_clientdata, module,
+      NDPIErrorExt(tif->tif_clientdata, module,
                     "WebPPictureImportRGB() failed");
       return 0;
   }
@@ -507,16 +507,16 @@ TWebPPostEncode(TIFF* tif)
         pszErrorMsg = "User interrupted";
         break;
     default:
-        TIFFErrorExt(tif->tif_clientdata, module,
+        NDPIErrorExt(tif->tif_clientdata, module,
                 "WebPEncode returned an unknown error code: %d",
                 sp->sPicture.error_code);
         pszErrorMsg = "Unknown WebP error type.";
         break;
     }
-    TIFFErrorExt(tif->tif_clientdata, module,
+    NDPIErrorExt(tif->tif_clientdata, module,
              "WebPEncode() failed : %s", pszErrorMsg);
 #else
-    TIFFErrorExt(tif->tif_clientdata, module,
+    NDPIErrorExt(tif->tif_clientdata, module,
              "Error in WebPEncode()");
 #endif
     return 0;
@@ -524,9 +524,9 @@ TWebPPostEncode(TIFF* tif)
 
   sp->sPicture.custom_ptr = NULL;
 
-  if (!TIFFFlushData1(tif))
+  if (!NDPIFlushData1(tif))
   {
-    TIFFErrorExt(tif->tif_clientdata, module,
+    NDPIErrorExt(tif->tif_clientdata, module,
       "Error flushing TIFF WebP encoder.");
     return 0;
   }
@@ -556,14 +556,14 @@ TWebPCleanup(TIFF* tif)
   }
   
   if (sp->pBuffer != NULL) {
-      _TIFFfree(sp->pBuffer);
+      _NDPIfree(sp->pBuffer);
       sp->pBuffer = NULL;    
   }
 
-  _TIFFfree(tif->tif_data);
+  _NDPIfree(tif->tif_data);
   tif->tif_data = NULL;
 
-  _TIFFSetDefaultCompressionState(tif);
+  _NDPISetDefaultCompressionState(tif);
 }
 
 static int
@@ -577,7 +577,7 @@ TWebPVSetField(TIFF* tif, uint32_t tag, va_list ap)
     sp->quality_level = (int) va_arg(ap, int);
     if( sp->quality_level <= 0 ||
         sp->quality_level > 100.0f ) {
-      TIFFWarningExt(tif->tif_clientdata, module,
+      NDPIWarningExt(tif->tif_clientdata, module,
                      "WEBP_LEVEL should be between 1 and 100");
     }
     return 1;
@@ -589,7 +589,7 @@ TWebPVSetField(TIFF* tif, uint32_t tag, va_list ap)
     }
     return 1;
     #else
-      TIFFErrorExt(tif->tif_clientdata, module,
+      NDPIErrorExt(tif->tif_clientdata, module,
                   "Need to upgrade WEBP driver, this version doesn't support "
                   "lossless compression.");
       return 0;
@@ -640,8 +640,8 @@ TIFFInitWebP(TIFF* tif, int scheme)
   /*
   * Merge codec-specific tag information.
   */
-  if ( !_TIFFMergeFields(tif, TWebPFields, TIFFArrayCount(TWebPFields)) ) {
-    TIFFErrorExt(tif->tif_clientdata, module,
+  if ( !_NDPIMergeFields(tif, TWebPFields, TIFFArrayCount(TWebPFields)) ) {
+    NDPIErrorExt(tif->tif_clientdata, module,
                 "Merging WebP codec-specific tags failed");
     return 0;
   }
@@ -649,7 +649,7 @@ TIFFInitWebP(TIFF* tif, int scheme)
   /*
   * Allocate state block so tag methods have storage to record values.
   */
-  tif->tif_data = (uint8_t*) _TIFFmalloc(sizeof(WebPState));
+  tif->tif_data = (uint8_t*) _NDPImalloc(sizeof(WebPState));
   if (tif->tif_data == NULL)
     goto bad;
   sp = LState(tif);
@@ -694,7 +694,7 @@ TIFFInitWebP(TIFF* tif, int scheme)
 
   return 1;
 bad:
-  TIFFErrorExt(tif->tif_clientdata, module,
+  NDPIErrorExt(tif->tif_clientdata, module,
   	     "No space for WebP state block");
   return 0;
 }

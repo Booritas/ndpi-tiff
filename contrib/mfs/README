@@ -26,7 +26,7 @@ One thing that libtiff did not do was work on a memory area rather than
 files. In my applications I had already read a TIFF or other format
 file in to memory and did not want to waste I/O writing it out again
 for libtiff's benefit. I therefore constructed a set of functions to
-pass up to TIFFClientOpen to simulate a file in memory. I have attached
+pass up to NDPIClientOpen to simulate a file in memory. I have attached
 my mfs (memory file system) source code for you to use or junk, as you
 see fit. :-)
 

@@ -114,7 +114,7 @@ static	void usage(int);
 static	int processCompressOptions(char*);
 
 #define	CopyField(tag, v) \
-	if (TIFFGetField(in, tag, &v)) TIFFSetField(out, tag, v)
+	if (NDPIGetField(in, tag, &v)) NDPISetField(out, tag, v)
 
 int
 main(int argc, char* argv[])
@@ -163,24 +163,24 @@ main(int argc, char* argv[])
 		}
 	if (argc - optind != 2)
 		usage(EXIT_FAILURE);
-	in = TIFFOpen(argv[optind], "r");
+	in = NDPIOpen(argv[optind], "r");
 	if (in == NULL)
 		return (EXIT_FAILURE);
-	TIFFGetField(in, TIFFTAG_IMAGEWIDTH, &imagewidth);
-	TIFFGetField(in, TIFFTAG_IMAGELENGTH, &imagelength);
-	TIFFGetField(in, TIFFTAG_BITSPERSAMPLE, &bitspersample);
-	TIFFGetField(in, TIFFTAG_SAMPLESPERPIXEL, &samplesperpixel);
+	NDPIGetField(in, TIFFTAG_IMAGEWIDTH, &imagewidth);
+	NDPIGetField(in, TIFFTAG_IMAGELENGTH, &imagelength);
+	NDPIGetField(in, TIFFTAG_BITSPERSAMPLE, &bitspersample);
+	NDPIGetField(in, TIFFTAG_SAMPLESPERPIXEL, &samplesperpixel);
 	if (bitspersample != 8 && bitspersample != 16) {
 		fprintf(stderr, "%s: Image must have at least 8-bits/sample\n",
 		    argv[optind]);
 		return (EXIT_FAILURE);
 	}
-	if (!TIFFGetField(in, TIFFTAG_PHOTOMETRIC, &photometric) ||
+	if (!NDPIGetField(in, TIFFTAG_PHOTOMETRIC, &photometric) ||
 	    photometric != PHOTOMETRIC_RGB || samplesperpixel < 3) {
 		fprintf(stderr, "%s: Image must have RGB data\n", argv[optind]);
 		return (EXIT_FAILURE);
 	}
-	TIFFGetField(in, TIFFTAG_PLANARCONFIG, &config);
+	NDPIGetField(in, TIFFTAG_PLANARCONFIG, &config);
 	if (config != PLANARCONFIG_CONTIG) {
 		fprintf(stderr, "%s: Can only handle contiguous data packing\n",
 		    argv[optind]);
@@ -191,7 +191,7 @@ main(int argc, char* argv[])
 	 * STEP 1:  create empty boxes
 	 */
 	usedboxes = NULL;
-	box_list = freeboxes = (Colorbox *)_TIFFmalloc(num_colors*sizeof (Colorbox));
+	box_list = freeboxes = (Colorbox *)_NDPImalloc(num_colors*sizeof (Colorbox));
 	freeboxes[0].next = &freeboxes[1];
 	freeboxes[0].prev = NULL;
 	for (i = 1; i < num_colors-1; ++i) {
@@ -236,15 +236,15 @@ main(int argc, char* argv[])
 	}
 
 	/* We're done with the boxes now */
-	_TIFFfree(box_list);
+	_NDPIfree(box_list);
 	freeboxes = usedboxes = NULL;
 
 	/*
 	 * STEP 5: scan histogram and map all values to closest color
 	 */
 	/* 5a: create cell list as described in Heckbert[2] */
-	ColorCells = (C_cell **)_TIFFmalloc(C_LEN*C_LEN*C_LEN*sizeof (C_cell*));
-	_TIFFmemset(ColorCells, 0, C_LEN*C_LEN*C_LEN*sizeof (C_cell*));
+	ColorCells = (C_cell **)_NDPImalloc(C_LEN*C_LEN*C_LEN*sizeof (C_cell*));
+	_NDPImemset(ColorCells, 0, C_LEN*C_LEN*C_LEN*sizeof (C_cell*));
 	/* 5b: create mapping from truncated pixel space to color
 	   table entries */
 	map_colortable();
@@ -252,30 +252,30 @@ main(int argc, char* argv[])
 	/*
 	 * STEP 6: scan image, match input values to table entries
 	 */
-	out = TIFFOpen(argv[optind+1], "w");
+	out = NDPIOpen(argv[optind+1], "w");
 	if (out == NULL)
 		return (EXIT_FAILURE);
 
 	CopyField(TIFFTAG_SUBFILETYPE, longv);
 	CopyField(TIFFTAG_IMAGEWIDTH, longv);
-	TIFFSetField(out, TIFFTAG_BITSPERSAMPLE, (short)COLOR_DEPTH);
+	NDPISetField(out, TIFFTAG_BITSPERSAMPLE, (short)COLOR_DEPTH);
 	if (compression != (uint16_t)-1) {
-		TIFFSetField(out, TIFFTAG_COMPRESSION, compression);
+		NDPISetField(out, TIFFTAG_COMPRESSION, compression);
 		switch (compression) {
 		case COMPRESSION_LZW:
 		case COMPRESSION_DEFLATE:
 			if (predictor != 0)
-				TIFFSetField(out, TIFFTAG_PREDICTOR, predictor);
+				NDPISetField(out, TIFFTAG_PREDICTOR, predictor);
 			break;
 		}
 	} else
 		CopyField(TIFFTAG_COMPRESSION, compression);
-	TIFFSetField(out, TIFFTAG_PHOTOMETRIC, (short)PHOTOMETRIC_PALETTE);
+	NDPISetField(out, TIFFTAG_PHOTOMETRIC, (short)PHOTOMETRIC_PALETTE);
 	CopyField(TIFFTAG_ORIENTATION, shortv);
-	TIFFSetField(out, TIFFTAG_SAMPLESPERPIXEL, (short)1);
+	NDPISetField(out, TIFFTAG_SAMPLESPERPIXEL, (short)1);
 	CopyField(TIFFTAG_PLANARCONFIG, shortv);
-	TIFFSetField(out, TIFFTAG_ROWSPERSTRIP,
-	    TIFFDefaultStripSize(out, rowsperstrip));
+	NDPISetField(out, TIFFTAG_ROWSPERSTRIP,
+	    NDPIDefaultStripSize(out, rowsperstrip));
 	CopyField(TIFFTAG_MINSAMPLEVALUE, shortv);
 	CopyField(TIFFTAG_MAXSAMPLEVALUE, shortv);
 	CopyField(TIFFTAG_RESOLUTIONUNIT, shortv);
@@ -297,8 +297,8 @@ main(int argc, char* argv[])
 		gm[i] = SCALE(gm[i]);
 		bm[i] = SCALE(bm[i]);
 	}
-	TIFFSetField(out, TIFFTAG_COLORMAP, rm, gm, bm);
-	(void) TIFFClose(out);
+	NDPISetField(out, TIFFTAG_COLORMAP, rm, gm, bm);
+	(void) NDPIClose(out);
 	return (EXIT_SUCCESS);
 }
 
@@ -370,7 +370,7 @@ get_histogram(TIFF* in, Colorbox* box)
 	register uint32_t j, i;
 	unsigned char *inputline;
 
-	inputline = (unsigned char *)_TIFFmalloc(TIFFScanlineSize(in));
+	inputline = (unsigned char *)_NDPImalloc(NDPIScanlineSize(in));
 	if (inputline == NULL) {
 		fprintf(stderr, "No space for scanline buffer\n");
 		exit(EXIT_FAILURE);
@@ -384,7 +384,7 @@ get_histogram(TIFF* in, Colorbox* box)
 		*ptr++ = 0;
 	}
 	for (i = 0; i < imagelength; i++) {
-		if (TIFFReadScanline(in, inputline, i, 0) <= 0)
+		if (NDPIReadScanline(in, inputline, i, 0) <= 0)
 			break;
 		inptr = inputline;
 		for (j = imagewidth; j-- > 0;) {
@@ -412,7 +412,7 @@ get_histogram(TIFF* in, Colorbox* box)
 		        histogram[red][green][blue]++;
 		}
 	}
-	_TIFFfree(inputline);
+	_NDPIfree(inputline);
 }
 
 static Colorbox *
@@ -648,7 +648,7 @@ create_colorcell(int red, int green, int blue)
 	ir = red >> (COLOR_DEPTH-C_DEPTH);
 	ig = green >> (COLOR_DEPTH-C_DEPTH);
 	ib = blue >> (COLOR_DEPTH-C_DEPTH);
-	ptr = (C_cell *)_TIFFmalloc(sizeof (C_cell));
+	ptr = (C_cell *)_NDPImalloc(sizeof (C_cell));
 	*(ColorCells + ir*C_LEN*C_LEN + ig*C_LEN + ib) = ptr;
 	ptr->num_ents = 0;
 
@@ -780,10 +780,10 @@ quant(TIFF* in, TIFF* out)
 	register uint32_t i, j;
 	register int red, green, blue;
 
-	inputline = (unsigned char *)_TIFFmalloc(TIFFScanlineSize(in));
-	outline = (unsigned char *)_TIFFmalloc(imagewidth);
+	inputline = (unsigned char *)_NDPImalloc(NDPIScanlineSize(in));
+	outline = (unsigned char *)_NDPImalloc(imagewidth);
 	for (i = 0; i < imagelength; i++) {
-		if (TIFFReadScanline(in, inputline, i, 0) <= 0)
+		if (NDPIReadScanline(in, inputline, i, 0) <= 0)
 			break;
 		inptr = inputline;
 		outptr = outline;
@@ -796,15 +796,15 @@ quant(TIFF* in, TIFF* out)
 		if (TIFFWriteScanline(out, outline, i, 0) < 0)
 			break;
 	}
-	_TIFFfree(inputline);
-	_TIFFfree(outline);
+	_NDPIfree(inputline);
+	_NDPIfree(outline);
 }
 
 #define	SWAP(type,a,b)	{ type p; p = a; a = b; b = p; }
 
 #define	GetInputLine(tif, row, bad)                                     \
         do {                                                            \
-                if (TIFFReadScanline(tif, inputline, row, 0) <= 0)	\
+                if (NDPIReadScanline(tif, inputline, row, 0) <= 0)	\
                         bad;						\
                 inptr = inputline;					\
                 nextptr = nextline;					\
@@ -838,10 +838,10 @@ quant_fsdither(TIFF* in, TIFF* out)
 
 	imax = imagelength - 1;
 	jmax = imagewidth - 1;
-	inputline = (unsigned char *)_TIFFmalloc(TIFFScanlineSize(in));
-	thisline = (short *)_TIFFmalloc(imagewidth * 3 * sizeof (short));
-	nextline = (short *)_TIFFmalloc(imagewidth * 3 * sizeof (short));
-	outline = (unsigned char *) _TIFFmalloc(TIFFScanlineSize(out));
+	inputline = (unsigned char *)_NDPImalloc(NDPIScanlineSize(in));
+	thisline = (short *)_NDPImalloc(imagewidth * 3 * sizeof (short));
+	nextline = (short *)_NDPImalloc(imagewidth * 3 * sizeof (short));
+	outline = (unsigned char *) _NDPImalloc(NDPIScanlineSize(out));
 
 	GetInputLine(in, 0, goto bad);		/* get first line */
 	for (i = 1; i <= imagelength; ++i) {
@@ -919,10 +919,10 @@ quant_fsdither(TIFF* in, TIFF* out)
 			break;
 	}
 bad:
-	_TIFFfree(inputline);
-	_TIFFfree(thisline);
-	_TIFFfree(nextline);
-	_TIFFfree(outline);
+	_NDPIfree(inputline);
+	_NDPIfree(thisline);
+	_NDPIfree(nextline);
+	_NDPIfree(outline);
 }
 /*
  * Local Variables:

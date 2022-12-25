@@ -22,17 +22,17 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFPrintDirectory 3TIFF "December 12, 1991" "libtiff"
+.TH NDPIPrintDirectory 3TIFF "December 12, 1991" "libtiff"
 .SH NAME
-TIFFPrintDirectory \- print a description of a
+NDPIPrintDirectory \- print a description of a
 .SM TIFF
 directory
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "void TIFFPrintDirectory(TIFF *" tif ", FILE *" fd ", long " flags ")"
+.BI "void NDPIPrintDirectory(TIFF *" tif ", FILE *" fd ", long " flags ")"
 .SH DESCRIPTION
-.I TIFFPrintDirectory
+.I NDPIPrintDirectory
 prints a description of the current directory in the specified
 .SM TIFF
 file to the standard I/O output stream
@@ -64,6 +64,6 @@ None.
 None.
 .SH "SEE ALSO"
 .IR libtiff (3TIFF),
-.IR TIFFOpen (3TIFF),
-.IR TIFFReadDirectory (3TIFF),
-.IR TIFFSetDirectory (3TIFF)
+.IR NDPIOpen (3TIFF),
+.IR NDPIReadDirectory (3TIFF),
+.IR NDPISetDirectory (3TIFF)

@@ -178,13 +178,13 @@ main(int argc, char **argv)
 	strcat(srcfile,"/");
 	strcat(srcfile,srcfilerel);
 
-	tif = TIFFOpen(srcfile,"r");
+	tif = NDPIOpen(srcfile,"r");
 	if ( tif == NULL ) {
 		fprintf( stderr, "Could not open %s\n", srcfile);
 		exit( 1 );
 	}
 
-	status = TIFFGetField(tif,TIFFTAG_YCBCRSUBSAMPLING, &h, &v);
+	status = NDPIGetField(tif,TIFFTAG_YCBCRSUBSAMPLING, &h, &v);
 	if ( status == 0 || h != 2 || v != 2) {
 		fprintf( stderr, "Could not retrieve subsampling tag.\n" );
 		exit(1);
@@ -193,7 +193,7 @@ main(int argc, char **argv)
 	/*
 	 * What is the appropriate size of a YCbCr encoded tile?
 	 */
-	sz = TIFFTileSize(tif);
+	sz = NDPITileSize(tif);
 	if( sz != 24576) {
 		fprintf(stderr, "tiles are %d bytes\n", (int)sz);
 		exit(1);
@@ -204,10 +204,10 @@ main(int argc, char **argv)
 	/*
 	 * Read a tile in decompressed form, but still YCbCr subsampled.
 	 */
-	szout = TIFFReadEncodedTile(tif,9,buffer,sz);
+	szout = NDPIReadEncodedTile(tif,9,buffer,sz);
 	if (szout != sz) {
 		fprintf( stderr, 
-			 "Did not get expected result code from TIFFReadEncodedTile()(%d instead of %d)\n", 
+			 "Did not get expected result code from NDPIReadEncodedTile()(%d instead of %d)\n", 
 			 (int) szout, (int) sz );
 		return 1;
 	}
@@ -222,9 +222,9 @@ main(int argc, char **argv)
 	/*
 	 * Read a tile using the built-in conversion to RGB format provided by the JPEG library.
 	 */
-	TIFFSetField(tif, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
+	NDPISetField(tif, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
 
-	sz = TIFFTileSize(tif);
+	sz = NDPITileSize(tif);
 	if( sz != 128*128*3) {
 		fprintf(stderr, "tiles are %d bytes\n", (int)sz);
 		exit(1);
@@ -232,10 +232,10 @@ main(int argc, char **argv)
 
 	buffer = (unsigned char *) malloc(sz);
 
-	szout = TIFFReadEncodedTile(tif,9,buffer,sz);
+	szout = NDPIReadEncodedTile(tif,9,buffer,sz);
 	if (szout != sz) {
 		fprintf( stderr, 
-			 "Did not get expected result code from TIFFReadEncodedTile()(%d instead of %d)\n", 
+			 "Did not get expected result code from NDPIReadEncodedTile()(%d instead of %d)\n", 
 			 (int) szout, (int) sz );
 		return 1;
 	}
@@ -254,23 +254,23 @@ main(int argc, char **argv)
 
 	free( buffer );
 
-	TIFFClose(tif);
+	NDPIClose(tif);
 
 	/*
 	 * Reopen and test reading using the RGBA interface.
 	 */
-	tif = TIFFOpen(srcfile,"r");
+	tif = NDPIOpen(srcfile,"r");
 	
 	sz = 128 * 128 * sizeof(uint32_t);
 	rgba_buffer = (uint32_t *) malloc(sz);
 	
-	if (!TIFFReadRGBATile( tif, 1*128, 2*128, rgba_buffer )) {
-		fprintf( stderr, "TIFFReadRGBATile() returned failure code.\n" );
+	if (!NDPIReadRGBATile( tif, 1*128, 2*128, rgba_buffer )) {
+		fprintf( stderr, "NDPIReadRGBATile() returned failure code.\n" );
 		return 1;
 	}
 
 	/*
-	 * Currently TIFFReadRGBATile() just uses JPEGCOLORMODE_RGB so this
+	 * Currently NDPIReadRGBATile() just uses JPEGCOLORMODE_RGB so this
 	 * trivially matches the last results.  Eventually we should actually
 	 * accomplish it from the YCbCr subsampled buffer ourselves in which
 	 * case the results may be subtly different but similar.
@@ -283,7 +283,7 @@ main(int argc, char **argv)
 					  rgba_buffer );
 
 	free( rgba_buffer );
-	TIFFClose(tif);
+	NDPIClose(tif);
 
 	if (pixel_status) {
 		exit(1);

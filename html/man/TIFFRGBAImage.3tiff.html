@@ -29,8 +29,8 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>TIFFRGBAImageOK, TIFFRGBAImageBegin, TIFFRGBAImageGet,
-TIFFRGBAImageEnd &minus; read and decode an image into a
+<p>NDPIRGBAImageOK, NDPIRGBAImageBegin, NDPIRGBAImageGet,
+NDPIRGBAImageEnd &minus; read and decode an image into a
 raster</p>
 </td>
 </table>
@@ -47,15 +47,15 @@ raster</p>
 <p><b>typedef unsigned char TIFFRGBValue; typedef struct
 _TIFFRGBAImage TIFFRGBAImage;</b></p>
 <!-- INDENTATION -->
-<p><b>int TIFFRGBAImageOK(TIFF *</b><i>tif</i><b>, char</b>
+<p><b>int NDPIRGBAImageOK(TIFF *</b><i>tif</i><b>, char</b>
 <i>emsg[1024]</i><b>)<br>
-int TIFFRGBAImageBegin(TIFFRGBAImage *</b><i>img</i><b>,
+int NDPIRGBAImageBegin(TIFFRGBAImage *</b><i>img</i><b>,
 TIFF*</b> <i>tif</i><b>, int</b> <i>stopOnError</i><b>,
 char</b> <i>emsg[1024]</i><b>)<br>
-int TIFFRGBAImageGet(TIFFRGBAImage *</b><i>img</i><b>,
+int NDPIRGBAImageGet(TIFFRGBAImage *</b><i>img</i><b>,
 uint32_t*</b> <i>raster</i><b>, uint32_t</b> <i>width</i> <b>,
 uint32_t</b> <i>height</i><b>)<br>
-void TIFFRGBAImageEnd(TIFFRGBAImage
+void NDPIRGBAImageEnd(TIFFRGBAImage
 *</b><i>img</i><b>)</b></p>
 </td>
 </table>
@@ -80,17 +80,17 @@ installing custom routines that manipulate image data
 according to application requirements.</p>
 <!-- INDENTATION -->
 <p>The default usage for these routines is: check if an
-image can be processed using <i>TIFFRGBAImageOK</i>,
+image can be processed using <i>NDPIRGBAImageOK</i>,
 construct a decoder state block using
-<i>TIFFRGBAImageBegin</i>, read and decode an image into a
-target raster using <i>TIFFRGBAImageGet</i>, and then
-release resources using <i>TIFFRGBAImageEnd</i>.
-<i>TIFFRGBAImageGet</i> can be called multiple times to
+<i>NDPIRGBAImageBegin</i>, read and decode an image into a
+target raster using <i>NDPIRGBAImageGet</i>, and then
+release resources using <i>NDPIRGBAImageEnd</i>.
+<i>NDPIRGBAImageGet</i> can be called multiple times to
 decode an image using different state parameters. If
 multiple images are to be displayed and there is not enough
 space for each of the decoded rasters, multiple state blocks
 can be managed and then calls can be made to
-<i>TIFFRGBAImageGet</i> as needed to display an image.</p>
+<i>NDPIRGBAImageGet</i> as needed to display an image.</p>
 <!-- INDENTATION -->
 <p>The generated raster is assumed to be an array of
 <i>width</i> times <i>height</i> 32-bit entries, where
@@ -111,7 +111,7 @@ samples. The macros <i>TIFFGetR</i>, <i>TIFFGetG</i>,
 access individual samples. Images without Associated Alpha
 matting information have a constant Alpha of 1.0 (255).</p>
 <!-- INDENTATION -->
-<p><i>TIFFRGBAImageGet</i> converts non-8-bit images by
+<p><i>NDPIRGBAImageGet</i> converts non-8-bit images by
 scaling sample values. Palette, grayscale, bilevel,
 <small>CMYK</small> , and YCbCr images are converted to
 <small>RGB</small> transparently. Raster pixels are returned
@@ -121,7 +121,7 @@ directory.</p>
 <p>The parameter <i>stopOnError</i> specifies how to act if
 an error is encountered while reading the image. If
 <i>stopOnError</i> is non-zero, then an error will terminate
-the operation; otherwise <i>TIFFRGBAImageGet</i> will
+the operation; otherwise <i>NDPIRGBAImageGet</i> will
 continue processing data until all the possible data in the
 image have been requested.</p>
 </td>
@@ -140,7 +140,7 @@ data in a different format one need only override the
 &lsquo;&lsquo;<i>put methods</i>&rsquo;&rsquo; used to store
 raster data. These methods are are defined in the
 <i>TIFFRGBAImage</i> structure and initially setup by
-<i>TIFFRGBAImageBegin</i> to point to routines that pack
+<i>NDPIRGBAImageBegin</i> to point to routines that pack
 raster data in the default <small>ABGR</small> pixel format.
 Two different routines are used according to the physical
 organization of the image data in the file:
@@ -163,7 +163,7 @@ to colormap indices for display on a colormap display.</p>
 memory by overriding the put methods as described above for
 supporting alternate raster formats. Simply keep a reference
 to the default put methods setup by
-<i>TIFFRGBAImageBegin</i> and then invoke them before or
+<i>NDPIRGBAImageBegin</i> and then invoke them before or
 after each display operation. For example, the
 <i>tiffgt</i>(1) utility uses the following put method to
 update the display as the raster is being filled:</p>
@@ -201,7 +201,7 @@ the variable <i>putContig</i>.)</p>
 commonly encountered flavors of <small>TIFF.</small> It is
 possible to extend this support by overriding the
 &lsquo;&lsquo;<i>get method</i>&rsquo;&rsquo; invoked by
-<i>TIFFRGBAImageGet</i> to read <small>TIFF</small> image
+<i>NDPIRGBAImageGet</i> to read <small>TIFF</small> image
 data. Details of doing this are a bit involved, it is best
 to make a copy of an existing get method and modify it to
 suit the needs of an application.</p>
@@ -246,7 +246,7 @@ Otherwise, 0 is returned if an error was encountered and
 <td width="8%"></td>
 <td width="91%">
 <p>All error messages are directed to the
-<i>TIFFError</i>(3TIFF) routine.</p>
+<i>NDPIError</i>(3TIFF) routine.</p>
 <!-- INDENTATION -->
 <p><b>Sorry, can not handle %d-bit pictures</b>. The image
 had <i>BitsPerSample</i> other than 1, 2, 4, 8, or 16.</p>
@@ -305,10 +305,10 @@ insufficient memory to allocate a table used to map data to
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><b>TIFFOpen</b>(3TIFF), <b>TIFFReadRGBAImage</b>(3TIFF),
-<b>TIFFReadRGBAImageOriented</b>(3TIFF),
-<b>TIFFReadRGBAStrip</b>(3TIFF),
-<b>TIFFReadRGBATile</b>(3TIFF), <b>libtiff</b>(3TIFF)</p>
+<p><b>NDPIOpen</b>(3TIFF), <b>NDPIReadRGBAImage</b>(3TIFF),
+<b>NDPIReadRGBAImageOriented</b>(3TIFF),
+<b>NDPIReadRGBAStrip</b>(3TIFF),
+<b>NDPIReadRGBATile</b>(3TIFF), <b>libtiff</b>(3TIFF)</p>
 <!-- INDENTATION -->
 <p>Libtiff library home page:
 <b>http://www.simplesystems.org/libtiff/</b></p>

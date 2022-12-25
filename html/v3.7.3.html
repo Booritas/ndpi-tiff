@@ -149,13 +149,13 @@ The following information is located here:
 	See http://chriscox.org/TIFF_TN3_Draft2.pdf for details.
 
 	<li> tiffio.h, tiffiop.h, tif_dir.c, tif_read.c, tif_swab.c:
-	Added _TIFFSwab24BitData() and TIFFSwabArrayOfLong() functions used to
+	Added _NDPISwab24BitData() and NDPISwabArrayOfLong() functions used to
 	swap 24-bit floating point values.
 
 	<li> tiff.h: Added predictor constants.
 
 	<li> tiffiop.h, tif_dir.c: Use uint32 type for appropriate values
-	in _TIFFVSetField() function. Inspired by the bug
+	in _NDPIVSetField() function. Inspired by the bug
 	<a href="http://bugzilla.remotesensing.org/show_bug.cgi?id=816">
 		http://bugzilla.remotesensing.org/show_bug.cgi?id=816</a>
 

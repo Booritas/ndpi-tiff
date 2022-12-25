@@ -114,10 +114,10 @@ static	int TIFFWriteRational(TIFF*,
    calling this function, because some of the fields may have caused various
    data items to be written out BEFORE writing the directory structure.
 
-   This code was basically written by ripping of the TIFFWriteDirectory() 
+   This code was basically written by ripping of the NDPIWriteDirectory() 
    code and generalizing it, using RPS's TIFFWritePliIfd() code for
    inspiration.  My original goal was to make this code general enough that
-   the original TIFFWriteDirectory() could be rewritten to just call this
+   the original NDPIWriteDirectory() could be rewritten to just call this
    function with the appropriate field and field-accessing arguments.
 
    However, now I realize that there's a lot of code that gets executed for
@@ -159,7 +159,7 @@ TIFFWritePrivateDataSubDirectory(TIFF* tif,
 	 */
 
 	/* Finish writing out any image data. */
-	TIFFFlushData(tif);
+	NDPIFlushData(tif);
 
 	/*
 	 * Size the directory so that we can calculate
@@ -173,9 +173,9 @@ TIFFWritePrivateDataSubDirectory(TIFF* tif,
 			   instead of 1. */
 			nfields += 1;
 	dirsize = nfields * sizeof (TIFFDirEntry);
-	data = (char*) _TIFFmalloc(dirsize);
+	data = (char*) _NDPImalloc(dirsize);
 	if (data == NULL) {
-		TIFFErrorExt(tif->tif_clientdata, tif->tif_name,
+		NDPIErrorExt(tif->tif_clientdata, tif->tif_name,
 		    "Cannot write private subdirectory, out of space");
 		return (0);
 	}
@@ -185,13 +185,13 @@ TIFFWritePrivateDataSubDirectory(TIFF* tif,
 	 * data, so we don't link it into the directory structure at all.
 	 */
 	if (tif->tif_dataoff == 0)
-	    tif->tif_dataoff =(TIFFSeekFile(tif, (toff_t) 0, SEEK_END)+1) &~ 1;
+	    tif->tif_dataoff =(NDPISeekFile(tif, (toff_t) 0, SEEK_END)+1) &~ 1;
 	diroff = tif->tif_dataoff;
 	tif->tif_dataoff = (toff_t)(
 	    diroff + sizeof (uint16_t) + dirsize + sizeof (toff_t));
 	if (tif->tif_dataoff & 1)
 		tif->tif_dataoff++;
-	(void) TIFFSeekFile(tif, tif->tif_dataoff, SEEK_SET);
+	(void) NDPISeekFile(tif, tif->tif_dataoff, SEEK_SET);
 	/*tif->tif_curdir++;*/
 	dir = (TIFFDirEntry*) data;
 	/*
@@ -215,8 +215,8 @@ TIFFWritePrivateDataSubDirectory(TIFF* tif,
 	 * of 95 tags in a directory.
 	 */
 	fields_size = pdir_fields_last / (8*sizeof(uint32_t)) + 1;
-	fields = _TIFFmalloc(fields_size*sizeof(uint32_t));
-	_TIFFmemcpy(fields, pdir_fieldsset, fields_size * sizeof(uint32_t));
+	fields = _NDPImalloc(fields_size*sizeof(uint32_t));
+	_NDPImemcpy(fields, pdir_fieldsset, fields_size * sizeof(uint32_t));
 
 	/* Deleted "write out extra samples tag" code here. */
 
@@ -258,31 +258,31 @@ TIFFWritePrivateDataSubDirectory(TIFF* tif,
 		 * byte-swap indirect data.
 		 */
 		for (dir = (TIFFDirEntry*) data; dircount; dir++, dircount--) {
-			TIFFSwabArrayOfShort(&dir->tdir_tag, 2);
-			TIFFSwabArrayOfLong(&dir->tdir_count, 2);
+			NDPISwabArrayOfShort(&dir->tdir_tag, 2);
+			NDPISwabArrayOfLong(&dir->tdir_count, 2);
 		}
 		dircount = (uint16_t) nfields;
-		TIFFSwabShort(&dircount);
-		TIFFSwabLong(&nextdiroff);
+		NDPISwabShort(&dircount);
+		NDPISwabLong(&nextdiroff);
 	}
 
-	(void) TIFFSeekFile(tif, tif->tif_dataoff, SEEK_SET);
+	(void) NDPISeekFile(tif, tif->tif_dataoff, SEEK_SET);
 	if (!WriteOK(tif, &dircount, sizeof (dircount))) {
-		TIFFErrorExt(tif->tif_clientdata, tif->tif_name, "Error writing private subdirectory count");
+		NDPIErrorExt(tif->tif_clientdata, tif->tif_name, "Error writing private subdirectory count");
 		goto bad;
 	}
 	if (!WriteOK(tif, data, dirsize)) {
-		TIFFErrorExt(tif->tif_clientdata, tif->tif_name, "Error writing private subdirectory contents");
+		NDPIErrorExt(tif->tif_clientdata, tif->tif_name, "Error writing private subdirectory contents");
 		goto bad;
 	}
 	if (!WriteOK(tif, &nextdiroff, sizeof (nextdiroff))) {
-		TIFFErrorExt(tif->tif_clientdata, tif->tif_name, "Error writing private subdirectory link");
+		NDPIErrorExt(tif->tif_clientdata, tif->tif_name, "Error writing private subdirectory link");
 		goto bad;
 	}
 	tif->tif_dataoff += sizeof(dircount) + dirsize + sizeof(nextdiroff);
 
-	_TIFFfree(data);
-	_TIFFfree(fields);
+	_NDPIfree(data);
+	_NDPIfree(fields);
 	tif->tif_flags &= ~TIFF_DIRTYDIRECT;
 
 #if (0)
@@ -294,7 +294,7 @@ TIFFWritePrivateDataSubDirectory(TIFF* tif,
 	 * Reset directory-related state for subsequent
 	 * directories.
 	 */
-	TIFFDefaultDirectory(tif);
+	NDPIDefaultDirectory(tif);
 	tif->tif_curoff = 0;
 	tif->tif_row = (uint32_t) -1;
 	tif->tif_curstrip = (tstrip_t) -1;
@@ -302,8 +302,8 @@ TIFFWritePrivateDataSubDirectory(TIFF* tif,
 
 	return (directory_offset);
 bad:
-	_TIFFfree(data);
-	_TIFFfree(fields);
+	_NDPIfree(data);
+	_NDPIfree(fields);
 	return (0);
 }
 #undef WriteRationalPair
@@ -312,7 +312,7 @@ bad:
  * Process tags that are not special cased.
  */
 /* The standard function TIFFWriteNormalTag() could definitely be replaced
-   with a simple call to this function, just adding TIFFGetField() as the
+   with a simple call to this function, just adding NDPIGetField() as the
    last argument. */
 static int
 TIFFWriteNormalSubTag(TIFF* tif, TIFFDirEntry* dir, const TIFFFieldInfo* fip,
@@ -399,11 +399,11 @@ TIFFWriteNormalSubTag(TIFF* tif, TIFFDirEntry* dir, const TIFFFieldInfo* fip,
 		   inconsistency", in the TIFF library. Look at the original
 		   TIFF library code below within the "#if (0) ... #else".
 		   Just from the type of *dp, you can see that this code
-		   expects TIFFGetField() to be handed a double ** for
+		   expects NDPIGetField() to be handed a double ** for
 		   any TIFF_DOUBLE tag, even for the constant wc==1 case.
 		   This is totally inconsistent with other fields (like
 		   TIFF_FLOAT, above) and is also inconsistent with the
-		   TIFFSetField() function for TIFF_DOUBLEs, which expects
+		   NDPISetField() function for TIFF_DOUBLEs, which expects
 		   to be passed a single double by value for the wc==1 case.
 		   (See the handling of TIFFFetchNormalTag() in tif_dirread.c
 		   for an example.) Maybe this function was written before
@@ -517,20 +517,20 @@ TIFFWritePerSampleShorts(TIFF* tif, ttag_t tag, TIFFDirEntry* dir)
 	int i, status, samples = tif->tif_dir.td_samplesperpixel;
 
 	if (samples > NITEMS(buf))
-		w = (uint16_t*) _TIFFmalloc(samples * sizeof (uint16_t));
-	TIFFGetField(tif, tag, &v);
+		w = (uint16_t*) _NDPImalloc(samples * sizeof (uint16_t));
+	NDPIGetField(tif, tag, &v);
 	for (i = 0; i < samples; i++)
 		w[i] = v;
 	status = TIFFWriteShortArray(tif, TIFF_SHORT, tag, dir, samples, w);
 	if (w != buf)
-		_TIFFfree((char*) w);
+		_NDPIfree((char*) w);
 	return (status);
 }
 
 /*
  * Setup a directory entry that references a samples/pixel array of ``type''
  * values and (potentially) write the associated indirect values.  The source
- * data from TIFFGetField() for the specified tag must be returned as double.
+ * data from NDPIGetField() for the specified tag must be returned as double.
  */
 static int
 TIFFWritePerSampleAnys(TIFF* tif,
@@ -542,13 +542,13 @@ TIFFWritePerSampleAnys(TIFF* tif,
 	int samples = (int) tif->tif_dir.td_samplesperpixel;
 
 	if (samples > NITEMS(buf))
-		w = (double*) _TIFFmalloc(samples * sizeof (double));
-	TIFFGetField(tif, tag, &v);
+		w = (double*) _NDPImalloc(samples * sizeof (double));
+	NDPIGetField(tif, tag, &v);
 	for (i = 0; i < samples; i++)
 		w[i] = v;
 	status = TIFFWriteAnyArray(tif, type, tag, dir, samples, w);
 	if (w != buf)
-		_TIFFfree(w);
+		_NDPIfree(w);
 	return (status);
 }
 #undef NITEMS
@@ -562,7 +562,7 @@ TIFFSetupShortPair(TIFF* tif, ttag_t tag, TIFFDirEntry* dir)
 {
 	uint16_t v[2];
 
-	TIFFGetField(tif, tag, &v[0], &v[1]);
+	NDPIGetField(tif, tag, &v[0], &v[1]);
 	return (TIFFWriteShortArray(tif, TIFF_SHORT, tag, dir, 2, v));
 }
 
@@ -600,7 +600,7 @@ TIFFWriteByteArray(TIFF* tif, TIFFDirEntry* dir, char* cp)
 		if (!TIFFWriteData(tif, dir, cp))
 			return (0);
 	} else
-		_TIFFmemcpy(&dir->tdir_offset, cp, dir->tdir_count);
+		_NDPImemcpy(&dir->tdir_offset, cp, dir->tdir_count);
 	return (1);
 }
 
@@ -663,7 +663,7 @@ TIFFWriteRationalArray(TIFF* tif,
 	dir->tdir_tag = tag;
 	dir->tdir_type = (short) type;
 	dir->tdir_count = n;
-	t = (uint32_t*) _TIFFmalloc(2*n * sizeof (uint32_t));
+	t = (uint32_t*) _NDPImalloc(2*n * sizeof (uint32_t));
 	for (i = 0; i < n; i++) {
 		float fv = v[i];
 		int sign = 1;
@@ -687,7 +687,7 @@ TIFFWriteRationalArray(TIFF* tif,
 		t[2*i+1] = den;
 	}
 	status = TIFFWriteData(tif, dir, (char *)t);
-	_TIFFfree((char*) t);
+	_NDPIfree((char*) t);
 	return (status);
 }
 
@@ -735,7 +735,7 @@ TIFFWriteAnyArray(TIFF* tif,
 	int i, status = 0;
 
 	if (n * TIFFDataWidth(type) > sizeof buf)
-		w = (char*) _TIFFmalloc(n * TIFFDataWidth(type));
+		w = (char*) _NDPImalloc(n * TIFFDataWidth(type));
 	switch (type) {
 	case TIFF_BYTE:
 		{ unsigned char* bp = (unsigned char*) w;
@@ -812,7 +812,7 @@ TIFFWriteAnyArray(TIFF* tif,
 	status = 1;
  out:
 	if (w != buf)
-		_TIFFfree(w);
+		_NDPIfree(w);
 	return (status);
 }
 
@@ -853,19 +853,19 @@ TIFFWriteData(TIFF* tif, TIFFDirEntry* dir, char* cp)
 		switch (dir->tdir_type) {
 		case TIFF_SHORT:
 		case TIFF_SSHORT:
-			TIFFSwabArrayOfShort((uint16_t*) cp, dir->tdir_count);
+			NDPISwabArrayOfShort((uint16_t*) cp, dir->tdir_count);
 			break;
 		case TIFF_LONG:
 		case TIFF_SLONG:
 		case TIFF_FLOAT:
-			TIFFSwabArrayOfLong((uint32_t*) cp, dir->tdir_count);
+			NDPISwabArrayOfLong((uint32_t*) cp, dir->tdir_count);
 			break;
 		case TIFF_RATIONAL:
 		case TIFF_SRATIONAL:
-			TIFFSwabArrayOfLong((uint32_t*) cp, 2*dir->tdir_count);
+			NDPISwabArrayOfLong((uint32_t*) cp, 2*dir->tdir_count);
 			break;
 		case TIFF_DOUBLE:
-			TIFFSwabArrayOfDouble((double*) cp, dir->tdir_count);
+			NDPISwabArrayOfDouble((double*) cp, dir->tdir_count);
 			break;
 		}
 	}
@@ -876,7 +876,7 @@ TIFFWriteData(TIFF* tif, TIFFDirEntry* dir, char* cp)
 		tif->tif_dataoff += (cc + 1) & ~1;
 		return (1);
 	}
-	TIFFErrorExt(tif->tif_clientdata, tif->tif_name, "Error writing data for field \"%s\"",
+	NDPIErrorExt(tif->tif_clientdata, tif->tif_name, "Error writing data for field \"%s\"",
 	    _TIFFFieldWithTag(tif, dir->tdir_tag)->field_name);
 	return (0);
 }
@@ -892,15 +892,15 @@ TIFFLinkDirectory(TIFF* tif)
 	uint32_t nextdir;
 	uint32_t diroff;
 
-	tif->tif_diroff = (TIFFSeekFile(tif, (toff_t) 0, SEEK_END)+1) &~ 1;
+	tif->tif_diroff = (NDPISeekFile(tif, (toff_t) 0, SEEK_END)+1) &~ 1;
 	diroff = (uint32_t) tif->tif_diroff;
 	if (tif->tif_flags & TIFF_SWAB)
-		TIFFSwabLong(&diroff);
+		NDPISwabLong(&diroff);
 #if SUBIFD_SUPPORT
 	if (tif->tif_flags & TIFF_INSUBIFD) {
-		(void) TIFFSeekFile(tif, tif->tif_subifdoff, SEEK_SET);
+		(void) NDPISeekFile(tif, tif->tif_subifdoff, SEEK_SET);
 		if (!WriteOK(tif, &diroff, sizeof (diroff))) {
-			TIFFErrorExt(tif->tif_clientdata, module,
+			NDPIErrorExt(tif->tif_clientdata, module,
 			    "%s: Error writing SubIFD directory link",
 			    tif->tif_name);
 			return (0);
@@ -923,9 +923,9 @@ TIFFLinkDirectory(TIFF* tif)
 		 */
 		tif->tif_header.tiff_diroff = (uint32_t) tif->tif_diroff;
 #define	HDROFF(f)	((toff_t) &(((TIFFHeader*) 0)->f))
-		(void) TIFFSeekFile(tif, HDROFF(tiff_diroff), SEEK_SET);
+		(void) NDPISeekFile(tif, HDROFF(tiff_diroff), SEEK_SET);
 		if (!WriteOK(tif, &diroff, sizeof (diroff))) {
-			TIFFErrorExt(tif->tif_clientdata, tif->tif_name, "Error writing TIFF header");
+			NDPIErrorExt(tif->tif_clientdata, tif->tif_name, "Error writing TIFF header");
 			return (0);
 		}
 		return (1);
@@ -939,23 +939,23 @@ TIFFLinkDirectory(TIFF* tif)
 
 		if (!SeekOK(tif, nextdir) ||
 		    !ReadOK(tif, &dircount, sizeof (dircount))) {
-			TIFFErrorExt(tif->tif_clientdata, module, "Error fetching directory count");
+			NDPIErrorExt(tif->tif_clientdata, module, "Error fetching directory count");
 			return (0);
 		}
 		if (tif->tif_flags & TIFF_SWAB)
-			TIFFSwabShort(&dircount);
-		(void) TIFFSeekFile(tif,
+			NDPISwabShort(&dircount);
+		(void) NDPISeekFile(tif,
 		    dircount * sizeof (TIFFDirEntry), SEEK_CUR);
 		if (!ReadOK(tif, &nextdir, sizeof (nextdir))) {
-			TIFFErrorExt(tif->tif_clientdata, module, "Error fetching directory link");
+			NDPIErrorExt(tif->tif_clientdata, module, "Error fetching directory link");
 			return (0);
 		}
 		if (tif->tif_flags & TIFF_SWAB)
-			TIFFSwabLong(&nextdir);
+			NDPISwabLong(&nextdir);
 	} while (nextdir != 0);
-	(void) TIFFSeekFile(tif, -(toff_t) sizeof (nextdir), SEEK_CUR);
+	(void) NDPISeekFile(tif, -(toff_t) sizeof (nextdir), SEEK_CUR);
 	if (!WriteOK(tif, &diroff, sizeof (diroff))) {
-		TIFFErrorExt(tif->tif_clientdata, module, "Error writing directory link");
+		NDPIErrorExt(tif->tif_clientdata, module, "Error writing directory link");
 		return (0);
 	}
 	return (1);

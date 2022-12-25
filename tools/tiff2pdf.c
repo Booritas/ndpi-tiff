@@ -345,27 +345,27 @@ tsize_t t2p_write_pdf_trailer(T2P*, TIFF*);
 static void
 t2p_disable(TIFF *tif)
 {
-	T2P *t2p = (T2P*) TIFFClientdata(tif);
+	T2P *t2p = (T2P*) NDPIClientdata(tif);
 	t2p->outputdisable = 1;
 }
 
 static void
 t2p_enable(TIFF *tif)
 {
-	T2P *t2p = (T2P*) TIFFClientdata(tif);
+	T2P *t2p = (T2P*) NDPIClientdata(tif);
 	t2p->outputdisable = 0;
 }
 
 /*
- * Procs for TIFFClientOpen
+ * Procs for NDPIClientOpen
  */
 
 #ifdef OJPEG_SUPPORT
 static tmsize_t 
 t2pReadFile(TIFF *tif, tdata_t data, tmsize_t size)
 {
-	thandle_t client = TIFFClientdata(tif);
-	TIFFReadWriteProc proc = TIFFGetReadProc(tif);
+	thandle_t client = NDPIClientdata(tif);
+	TIFFReadWriteProc proc = NDPIGetReadProc(tif);
 	if (proc)
 		return proc(client, data, size);
 	return -1;
@@ -375,8 +375,8 @@ t2pReadFile(TIFF *tif, tdata_t data, tmsize_t size)
 static tmsize_t 
 t2pWriteFile(TIFF *tif, tdata_t data, tmsize_t size)
 {
-	thandle_t client = TIFFClientdata(tif);
-	TIFFReadWriteProc proc = TIFFGetWriteProc(tif);
+	thandle_t client = NDPIClientdata(tif);
+	TIFFReadWriteProc proc = NDPIGetWriteProc(tif);
 	if (proc)
 		return proc(client, data, size);
 	return -1;
@@ -385,8 +385,8 @@ t2pWriteFile(TIFF *tif, tdata_t data, tmsize_t size)
 static uint64_t
 t2pSeekFile(TIFF *tif, toff_t offset, int whence)
 {
-	thandle_t client = TIFFClientdata(tif);
-	TIFFSeekProc proc = TIFFGetSeekProc(tif);
+	thandle_t client = NDPIClientdata(tif);
+	TIFFSeekProc proc = NDPIGetSeekProc(tif);
 	if (proc)
 		return proc(client, offset, whence);
 	return -1;
@@ -454,7 +454,7 @@ checkAdd64(uint64_t summand1, uint64_t summand2, T2P* t2p)
 	uint64_t bytes = summand1 + summand2;
 
 	if (bytes < summand1) {
-		TIFFError(TIFF2PDF_MODULE, "Integer overflow");
+		NDPIError(TIFF2PDF_MODULE, "Integer overflow");
 		t2p->t2p_error = T2P_ERR_ERROR;
 		bytes = 0;
 	}
@@ -469,7 +469,7 @@ checkMultiply64(uint64_t first, uint64_t second, T2P* t2p)
 	uint64_t bytes = first * second;
 
 	if (second && bytes / second != first) {
-		TIFFError(TIFF2PDF_MODULE, "Integer overflow");
+		NDPIError(TIFF2PDF_MODULE, "Integer overflow");
 		t2p->t2p_error = T2P_ERR_ERROR;
 		bytes = 0;
 	}
@@ -615,7 +615,7 @@ int main(int argc, char** argv){
 	t2p = t2p_init();
 
 	if (t2p == NULL){
-		TIFFError(TIFF2PDF_MODULE, "Can't initialize context");
+		NDPIError(TIFF2PDF_MODULE, "Can't initialize context");
 		goto fail;
 	}
 
@@ -763,21 +763,21 @@ int main(int argc, char** argv){
 	 * Input
 	 */
 	if(argc > optind) {
-		input = TIFFOpen(argv[optind++], "r");
+		input = NDPIOpen(argv[optind++], "r");
 		if (input==NULL) {
-			TIFFError(TIFF2PDF_MODULE, 
+			NDPIError(TIFF2PDF_MODULE, 
 				  "Can't open input file %s for reading", 
 				  argv[optind-1]);
 			goto fail;
 		}
 	} else {
-		TIFFError(TIFF2PDF_MODULE, "No input file specified"); 
+		NDPIError(TIFF2PDF_MODULE, "No input file specified"); 
 		usage_info(EXIT_FAILURE);
 		goto fail;
 	}
 
 	if(argc > optind) {
-		TIFFError(TIFF2PDF_MODULE, 
+		NDPIError(TIFF2PDF_MODULE, 
 			  "No support for multiple input files"); 
 		usage_info(EXIT_FAILURE);
 		goto fail;
@@ -790,7 +790,7 @@ int main(int argc, char** argv){
 	if (outfilename) {
 		t2p->outputfile = fopen(outfilename, "wb");
 		if (t2p->outputfile == NULL) {
-			TIFFError(TIFF2PDF_MODULE,
+			NDPIError(TIFF2PDF_MODULE,
 				  "Can't open output file %s for writing",
 				  outfilename);
 			goto fail;
@@ -800,13 +800,13 @@ int main(int argc, char** argv){
 		t2p->outputfile = stdout;
 	}
 
-	output = TIFFClientOpen(outfilename, "w", (thandle_t) t2p,
+	output = NDPIClientOpen(outfilename, "w", (thandle_t) t2p,
 				t2p_readproc, t2p_writeproc, t2p_seekproc, 
 				t2p_closeproc, t2p_sizeproc, 
 				t2p_mapproc, t2p_unmapproc);
 	t2p->outputdisable = 0;
 	if (output == NULL) {
-		TIFFError(TIFF2PDF_MODULE,
+		NDPIError(TIFF2PDF_MODULE,
 			  "Can't initialize output descriptor");
 		goto fail;
 	}
@@ -822,7 +822,7 @@ int main(int argc, char** argv){
 	 */
 	t2p_write_pdf(t2p, input, output);
 	if (t2p->t2p_error != 0) {
-		TIFFError(TIFF2PDF_MODULE,
+		NDPIError(TIFF2PDF_MODULE,
 			  "An error occurred creating output PDF file");
 		goto fail;
 	}
@@ -832,9 +832,9 @@ fail:
 	ret = EXIT_FAILURE;
 success:
 	if(input != NULL)
-		TIFFClose(input);
+		NDPIClose(input);
 	if (output != NULL)
-		TIFFClose(output);
+		NDPIClose(output);
 	if (t2p != NULL)
 		t2p_free(t2p);
 	return ret;
@@ -952,15 +952,15 @@ int tiff2pdf_match_paper_size(float* width, float* length, char* papersize){
 
 T2P* t2p_init()
 {
-	T2P* t2p = (T2P*) _TIFFmalloc(sizeof(T2P));
+	T2P* t2p = (T2P*) _NDPImalloc(sizeof(T2P));
 	if(t2p==NULL){
-		TIFFError(
+		NDPIError(
 			TIFF2PDF_MODULE, 
 			"Can't allocate %"TIFF_SIZE_FORMAT" bytes of memory for t2p_init",
 			sizeof(T2P));
 		return( (T2P*) NULL );
 	}
-	_TIFFmemset(t2p, 0x00, sizeof(T2P));
+	_NDPImemset(t2p, 0x00, sizeof(T2P));
 	t2p->pdf_majorversion=1;
 	t2p->pdf_minorversion=1;
 	t2p->pdf_defaultxres=300.0;
@@ -983,28 +983,28 @@ void t2p_free(T2P* t2p)
 
 	if (t2p != NULL) {
 		if(t2p->pdf_xrefoffsets != NULL){
-			_TIFFfree( (tdata_t) t2p->pdf_xrefoffsets);
+			_NDPIfree( (tdata_t) t2p->pdf_xrefoffsets);
 		}
 		if(t2p->tiff_pages != NULL){
-			_TIFFfree( (tdata_t) t2p->tiff_pages);
+			_NDPIfree( (tdata_t) t2p->tiff_pages);
 		}
 		for(i=0;i<t2p->tiff_pagecount;i++){
 			if(t2p->tiff_tiles[i].tiles_tiles != NULL){
-				_TIFFfree( (tdata_t) t2p->tiff_tiles[i].tiles_tiles);
+				_NDPIfree( (tdata_t) t2p->tiff_tiles[i].tiles_tiles);
 			}
 		}
 		if(t2p->tiff_tiles != NULL){
-			_TIFFfree( (tdata_t) t2p->tiff_tiles);
+			_NDPIfree( (tdata_t) t2p->tiff_tiles);
 		}
 		if(t2p->pdf_palette != NULL){
-			_TIFFfree( (tdata_t) t2p->pdf_palette);
+			_NDPIfree( (tdata_t) t2p->pdf_palette);
 		}
 #ifdef OJPEG_SUPPORT
 		if(t2p->pdf_ojpegdata != NULL){
-			_TIFFfree( (tdata_t) t2p->pdf_ojpegdata);
+			_NDPIfree( (tdata_t) t2p->pdf_ojpegdata);
 		}
 #endif
-		_TIFFfree( (tdata_t) t2p );
+		_NDPIfree( (tdata_t) t2p );
 	}
 
 	return;
@@ -1036,7 +1036,7 @@ void t2p_validate(T2P* t2p){
 		if(t2p->pdf_defaultcompressionquality%100 !=0){
 			t2p->pdf_defaultcompressionquality/=100;
 			t2p->pdf_defaultcompressionquality*=100;
-			TIFFError(
+			NDPIError(
 				TIFF2PDF_MODULE, 
 				"PNG Group predictor differencing not implemented, assuming compression quality %"PRIu16,
 				t2p->pdf_defaultcompressionquality);
@@ -1067,50 +1067,50 @@ void t2p_read_tiff_init(T2P* t2p, TIFF* input){
 	uint16_t tiff_transferfunctioncount=0;
 	uint16_t* tiff_transferfunction[3];
 
-	directorycount=TIFFNumberOfDirectories(input);
+	directorycount=NDPINumberOfDirectories(input);
 	if(directorycount > TIFF_DIR_MAX) {
-		TIFFError(
+		NDPIError(
 			TIFF2PDF_MODULE,
 			"TIFF contains too many directories, %s",
-			TIFFFileName(input));
+			NDPIFileName(input));
 		t2p->t2p_error = T2P_ERR_ERROR;
 		return;
 	}
-	t2p->tiff_pages = (T2P_PAGE*) _TIFFmalloc(TIFFSafeMultiply(tmsize_t,directorycount,sizeof(T2P_PAGE)));
+	t2p->tiff_pages = (T2P_PAGE*) _NDPImalloc(TIFFSafeMultiply(tmsize_t,directorycount,sizeof(T2P_PAGE)));
 	if(t2p->tiff_pages==NULL){
-		TIFFError(
+		NDPIError(
 			TIFF2PDF_MODULE, 
 			"Can't allocate %"TIFF_SIZE_FORMAT" bytes of memory for tiff_pages array, %s", 
 			sizeof(T2P_PAGE) * directorycount,
-			TIFFFileName(input));
+			NDPIFileName(input));
 		t2p->t2p_error = T2P_ERR_ERROR;
 		return;
 	}
-	_TIFFmemset( t2p->tiff_pages, 0x00, directorycount * sizeof(T2P_PAGE));
-	t2p->tiff_tiles = (T2P_TILES*) _TIFFmalloc(TIFFSafeMultiply(tmsize_t,directorycount,sizeof(T2P_TILES)));
+	_NDPImemset( t2p->tiff_pages, 0x00, directorycount * sizeof(T2P_PAGE));
+	t2p->tiff_tiles = (T2P_TILES*) _NDPImalloc(TIFFSafeMultiply(tmsize_t,directorycount,sizeof(T2P_TILES)));
 	if(t2p->tiff_tiles==NULL){
-		TIFFError(
+		NDPIError(
 			TIFF2PDF_MODULE, 
 			"Can't allocate %"TIFF_SIZE_FORMAT" bytes of memory for tiff_tiles array, %s",
             sizeof(T2P_TILES) * directorycount,
-			TIFFFileName(input));
+			NDPIFileName(input));
 		t2p->t2p_error = T2P_ERR_ERROR;
 		return;
 	}
-	_TIFFmemset( t2p->tiff_tiles, 0x00, directorycount * sizeof(T2P_TILES));
+	_NDPImemset( t2p->tiff_tiles, 0x00, directorycount * sizeof(T2P_TILES));
 	for(i=0;i<directorycount;i++){
 		uint32_t subfiletype = 0;
 		
-		if(!TIFFSetDirectory(input, i)){
-			TIFFError(
+		if(!NDPISetDirectory(input, i)){
+			NDPIError(
 				TIFF2PDF_MODULE, 
 				"Can't set directory %"PRIu16" of input file %s",
 				i,
-				TIFFFileName(input));
+				NDPIFileName(input));
 			t2p->t2p_error = T2P_ERR_ERROR;
 			return;
 		}
-		if(TIFFGetField(input, TIFFTAG_PAGENUMBER, &pagen, &paged)){
+		if(NDPIGetField(input, TIFFTAG_PAGENUMBER, &pagen, &paged)){
 			if((pagen>paged) && (paged != 0)){
 				t2p->tiff_pages[t2p->tiff_pagecount].page_number = 
 					paged;
@@ -1120,7 +1120,7 @@ void t2p_read_tiff_init(T2P* t2p, TIFF* input){
 			}
 			goto ispage2;
 		}
-		if(TIFFGetField(input, TIFFTAG_SUBFILETYPE, &subfiletype)){
+		if(NDPIGetField(input, TIFFTAG_SUBFILETYPE, &subfiletype)){
 			if ( ((subfiletype & FILETYPE_PAGE) != 0)
                              || (subfiletype == 0)){
 				goto ispage;
@@ -1128,7 +1128,7 @@ void t2p_read_tiff_init(T2P* t2p, TIFF* input){
 				goto isnotpage;
 			}
 		}
-		if(TIFFGetField(input, TIFFTAG_OSUBFILETYPE, &subfiletype)){
+		if(NDPIGetField(input, TIFFTAG_OSUBFILETYPE, &subfiletype)){
 			if ((subfiletype == OFILETYPE_IMAGE) 
 				|| (subfiletype == OFILETYPE_PAGE)
 				|| (subfiletype == 0) ){
@@ -1141,9 +1141,9 @@ void t2p_read_tiff_init(T2P* t2p, TIFF* input){
 		t2p->tiff_pages[t2p->tiff_pagecount].page_number=t2p->tiff_pagecount;
 		ispage2:
 		t2p->tiff_pages[t2p->tiff_pagecount].page_directory=i;
-		if(TIFFIsTiled(input)){
+		if(NDPIIsTiled(input)){
 			t2p->tiff_pages[t2p->tiff_pagecount].page_tilecount = 
-				TIFFNumberOfTiles(input);
+				NDPINumberOfTiles(input);
 		}
 		t2p->tiff_pagecount++;
 		isnotpage:
@@ -1155,25 +1155,25 @@ void t2p_read_tiff_init(T2P* t2p, TIFF* input){
 
 	for(i=0;i<t2p->tiff_pagecount;i++){
 		t2p->pdf_xrefcount += 5;
-		TIFFSetDirectory(input, t2p->tiff_pages[i].page_directory );
-		if((TIFFGetField(input, TIFFTAG_PHOTOMETRIC, &xuint16)
+		NDPISetDirectory(input, t2p->tiff_pages[i].page_directory );
+		if((NDPIGetField(input, TIFFTAG_PHOTOMETRIC, &xuint16)
                     && (xuint16==PHOTOMETRIC_PALETTE))
-		   || TIFFGetField(input, TIFFTAG_INDEXED, &xuint16)) {
+		   || NDPIGetField(input, TIFFTAG_INDEXED, &xuint16)) {
 			t2p->tiff_pages[i].page_extra++;
 			t2p->pdf_xrefcount++;
 		}
 #ifdef ZIP_SUPPORT
-		if (TIFFGetField(input, TIFFTAG_COMPRESSION, &xuint16)) {
+		if (NDPIGetField(input, TIFFTAG_COMPRESSION, &xuint16)) {
                         if( (xuint16== COMPRESSION_DEFLATE ||
                              xuint16== COMPRESSION_ADOBE_DEFLATE) && 
                             ((t2p->tiff_pages[i].page_tilecount != 0) 
-                             || TIFFNumberOfStrips(input)==1) &&
+                             || NDPINumberOfStrips(input)==1) &&
                             (t2p->pdf_nopassthrough==0)	){
                                 if(t2p->pdf_minorversion<2){t2p->pdf_minorversion=2;}
                         }
                 }
 #endif
-		if (TIFFGetField(input, TIFFTAG_TRANSFERFUNCTION,
+		if (NDPIGetField(input, TIFFTAG_TRANSFERFUNCTION,
                                  &(tiff_transferfunction[0]),
                                  &(tiff_transferfunction[1]),
                                  &(tiff_transferfunction[2]))) {
@@ -1191,7 +1191,7 @@ void t2p_read_tiff_init(T2P* t2p, TIFF* input){
 
                 if (i > 0){
                     if (tiff_transferfunctioncount != t2p->tiff_transferfunctioncount){
-                        TIFFError(
+                        NDPIError(
                             TIFF2PDF_MODULE,
                             "Different transfer function on page %"PRIu16,
                             i);
@@ -1216,7 +1216,7 @@ void t2p_read_tiff_init(T2P* t2p, TIFF* input){
                                 t2p->pdf_minorversion = 2;
                 }
 
-		if( TIFFGetField(
+		if( NDPIGetField(
 			input, 
 			TIFFTAG_ICCPROFILE, 
 			&(t2p->tiff_iccprofilelength), 
@@ -1227,23 +1227,23 @@ void t2p_read_tiff_init(T2P* t2p, TIFF* input){
 		}
 		t2p->tiff_tiles[i].tiles_tilecount=
 			t2p->tiff_pages[i].page_tilecount;
-		if( (TIFFGetField(input, TIFFTAG_PLANARCONFIG, &xuint16) != 0)
+		if( (NDPIGetField(input, TIFFTAG_PLANARCONFIG, &xuint16) != 0)
 			&& (xuint16 == PLANARCONFIG_SEPARATE ) ){
-				if( !TIFFGetField(input, TIFFTAG_SAMPLESPERPIXEL, &xuint16) )
+				if( !NDPIGetField(input, TIFFTAG_SAMPLESPERPIXEL, &xuint16) )
 				{
-					TIFFError(
+					NDPIError(
                         TIFF2PDF_MODULE, 
                         "Missing SamplesPerPixel, %s", 
-                        TIFFFileName(input));
+                        NDPIFileName(input));
                     t2p->t2p_error = T2P_ERR_ERROR;
                     return;
 				}
                 if( (t2p->tiff_tiles[i].tiles_tilecount % xuint16) != 0 )
                 {
-                    TIFFError(
+                    NDPIError(
                         TIFF2PDF_MODULE, 
                         "Invalid tile count, %s", 
-                        TIFFFileName(input));
+                        NDPIFileName(input));
                     t2p->t2p_error = T2P_ERR_ERROR;
                     return;
                 }
@@ -1252,21 +1252,21 @@ void t2p_read_tiff_init(T2P* t2p, TIFF* input){
 		if( t2p->tiff_tiles[i].tiles_tilecount > 0){
 			t2p->pdf_xrefcount += 
 				(t2p->tiff_tiles[i].tiles_tilecount -1)*2;
-			TIFFGetField(input, 
+			NDPIGetField(input, 
 				TIFFTAG_TILEWIDTH, 
 				&( t2p->tiff_tiles[i].tiles_tilewidth) );
-			TIFFGetField(input, 
+			NDPIGetField(input, 
 				TIFFTAG_TILELENGTH, 
 				&( t2p->tiff_tiles[i].tiles_tilelength) );
 			t2p->tiff_tiles[i].tiles_tiles = 
-			(T2P_TILE*) _TIFFmalloc(TIFFSafeMultiply(tmsize_t,t2p->tiff_tiles[i].tiles_tilecount,
+			(T2P_TILE*) _NDPImalloc(TIFFSafeMultiply(tmsize_t,t2p->tiff_tiles[i].tiles_tilecount,
                                                                  sizeof(T2P_TILE)) );
 			if( t2p->tiff_tiles[i].tiles_tiles == NULL){
-				TIFFError(
+				NDPIError(
 					TIFF2PDF_MODULE, 
 					"Can't allocate %"TIFF_SIZE_FORMAT" bytes of memory for t2p_read_tiff_init, %s",
                     sizeof(T2P_TILE) * t2p->tiff_tiles[i].tiles_tilecount,
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return;
 			}
@@ -1320,42 +1320,42 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
         t2p->pdf_switchdecode = t2p->pdf_colorspace_invert;
         
 	
-	TIFFSetDirectory(input, t2p->tiff_pages[t2p->pdf_page].page_directory);
+	NDPISetDirectory(input, t2p->tiff_pages[t2p->pdf_page].page_directory);
 
-	TIFFGetField(input, TIFFTAG_IMAGEWIDTH, &(t2p->tiff_width));
+	NDPIGetField(input, TIFFTAG_IMAGEWIDTH, &(t2p->tiff_width));
 	if(t2p->tiff_width == 0){
-		TIFFError(
+		NDPIError(
 			TIFF2PDF_MODULE, 
 			"No support for %s with zero width", 
-			TIFFFileName(input)	);
+			NDPIFileName(input)	);
 		t2p->t2p_error = T2P_ERR_ERROR;
 		return;
 	}
 
-	TIFFGetField(input, TIFFTAG_IMAGELENGTH, &(t2p->tiff_length));
+	NDPIGetField(input, TIFFTAG_IMAGELENGTH, &(t2p->tiff_length));
 	if(t2p->tiff_length == 0){
-		TIFFError(
+		NDPIError(
 			TIFF2PDF_MODULE, 
 			"No support for %s with zero length", 
-			TIFFFileName(input)	);
+			NDPIFileName(input)	);
 		t2p->t2p_error = T2P_ERR_ERROR;
 		return;
 	}
 
-        if(TIFFGetField(input, TIFFTAG_COMPRESSION, &(t2p->tiff_compression)) == 0){
-                TIFFError(
+        if(NDPIGetField(input, TIFFTAG_COMPRESSION, &(t2p->tiff_compression)) == 0){
+                NDPIError(
                         TIFF2PDF_MODULE, 
                         "No support for %s with no compression tag", 
-                        TIFFFileName(input)     );
+                        NDPIFileName(input)     );
                 t2p->t2p_error = T2P_ERR_ERROR;
                 return;
 
         }
-        if( TIFFIsCODECConfigured(t2p->tiff_compression) == 0){
-		TIFFError(
+        if( NDPIIsCODECConfigured(t2p->tiff_compression) == 0){
+		NDPIError(
 			TIFF2PDF_MODULE, 
 			"No support for %s with compression type %"PRIu16":  not configured",
-			TIFFFileName(input), 
+			NDPIFileName(input), 
 			t2p->tiff_compression	
 			);
 		t2p->t2p_error = T2P_ERR_ERROR;
@@ -1363,7 +1363,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 	
 	}
 
-	TIFFGetFieldDefaulted(input, TIFFTAG_BITSPERSAMPLE, &(t2p->tiff_bitspersample));
+	NDPIGetFieldDefaulted(input, TIFFTAG_BITSPERSAMPLE, &(t2p->tiff_bitspersample));
 	switch(t2p->tiff_bitspersample){
 		case 1:
 		case 2:
@@ -1374,25 +1374,25 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 			TIFFWarning(
 				TIFF2PDF_MODULE, 
 				"Image %s has 0 bits per sample, assuming 1",
-				TIFFFileName(input));
+				NDPIFileName(input));
 			t2p->tiff_bitspersample=1;
 			break;
 		default:
-			TIFFError(
+			NDPIError(
 				TIFF2PDF_MODULE, 
 				"No support for %s with %"PRIu16" bits per sample",
-				TIFFFileName(input),
+				NDPIFileName(input),
 				t2p->tiff_bitspersample);
 			t2p->t2p_error = T2P_ERR_ERROR;
 			return;
 	}
 
-	TIFFGetFieldDefaulted(input, TIFFTAG_SAMPLESPERPIXEL, &(t2p->tiff_samplesperpixel));
+	NDPIGetFieldDefaulted(input, TIFFTAG_SAMPLESPERPIXEL, &(t2p->tiff_samplesperpixel));
 	if(t2p->tiff_samplesperpixel>4){
-		TIFFError(
+		NDPIError(
 			TIFF2PDF_MODULE, 
 			"No support for %s with %"PRIu16" samples per pixel",
-			TIFFFileName(input),
+			NDPIFileName(input),
 			t2p->tiff_samplesperpixel);
 		t2p->t2p_error = T2P_ERR_ERROR;
 		return;
@@ -1401,21 +1401,21 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 		TIFFWarning(
 			TIFF2PDF_MODULE, 
 			"Image %s has 0 samples per pixel, assuming 1",
-			TIFFFileName(input));
+			NDPIFileName(input));
 		t2p->tiff_samplesperpixel=1;
 	}
 	
-	if(TIFFGetField(input, TIFFTAG_SAMPLEFORMAT, &xuint16) != 0 ){
+	if(NDPIGetField(input, TIFFTAG_SAMPLEFORMAT, &xuint16) != 0 ){
 		switch(xuint16){
 			case 0:
 			case 1:
 			case 4:
 				break;
 			default:
-				TIFFError(
+				NDPIError(
 					TIFF2PDF_MODULE, 
 					"No support for %s with sample format %"PRIu16,
-					TIFFFileName(input),
+					NDPIFileName(input),
 					xuint16);
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return;
@@ -1423,13 +1423,13 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 		}
 	}
 	
-	TIFFGetFieldDefaulted(input, TIFFTAG_FILLORDER, &(t2p->tiff_fillorder));
+	NDPIGetFieldDefaulted(input, TIFFTAG_FILLORDER, &(t2p->tiff_fillorder));
 	
-        if(TIFFGetField(input, TIFFTAG_PHOTOMETRIC, &(t2p->tiff_photometric)) == 0){
-                TIFFError(
+        if(NDPIGetField(input, TIFFTAG_PHOTOMETRIC, &(t2p->tiff_photometric)) == 0){
+                NDPIError(
                         TIFF2PDF_MODULE, 
                         "No support for %s with no photometric interpretation tag", 
-                        TIFFFileName(input)     );
+                        NDPIFileName(input)     );
                 t2p->t2p_error = T2P_ERR_ERROR;
                 return;
 
@@ -1455,21 +1455,21 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 			if(t2p->tiff_samplesperpixel == 3){
 				break;
 			}
-			if(TIFFGetField(input, TIFFTAG_INDEXED, &xuint16)){
+			if(NDPIGetField(input, TIFFTAG_INDEXED, &xuint16)){
 				if(xuint16==1)
 					goto photometric_palette;
 			}
 			if(t2p->tiff_samplesperpixel > 3) {
 				if(t2p->tiff_samplesperpixel == 4) {
 					t2p->pdf_colorspace = T2P_CS_RGB;
-					if(TIFFGetField(input,
+					if(NDPIGetField(input,
 							TIFFTAG_EXTRASAMPLES,
 							&xuint16, &xuint16p)
 					   && xuint16 == 1) {
 						if(xuint16p[0] == EXTRASAMPLE_ASSOCALPHA){
 							if( t2p->tiff_bitspersample != 8 )
 							{
-							    TIFFError(
+							    NDPIError(
 								    TIFF2PDF_MODULE, 
 								    "No support for BitsPerSample=%"PRIu16" for RGBA",
 								    t2p->tiff_bitspersample);
@@ -1482,7 +1482,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 						if(xuint16p[0] == EXTRASAMPLE_UNASSALPHA){
 							if( t2p->tiff_bitspersample != 8 )
 							{
-							    TIFFError(
+							    NDPIError(
 								    TIFF2PDF_MODULE, 
 								    "No support for BitsPerSample=%"PRIu16" for RGBA",
 								    t2p->tiff_bitspersample);
@@ -1495,7 +1495,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 						TIFFWarning(
 							TIFF2PDF_MODULE, 
 							"RGB image %s has 4 samples per pixel, assuming RGBA",
-							TIFFFileName(input));
+							NDPIFileName(input));
 							break;
 					}
 					t2p->pdf_colorspace=T2P_CS_CMYK;
@@ -1503,22 +1503,22 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 					TIFFWarning(
 						TIFF2PDF_MODULE, 
 						"RGB image %s has 4 samples per pixel, assuming inverse CMYK",
-					TIFFFileName(input));
+					NDPIFileName(input));
 					break;
 				} else {
-					TIFFError(
+					NDPIError(
 						TIFF2PDF_MODULE, 
 						"No support for RGB image %s with %"PRIu16" samples per pixel",
-						TIFFFileName(input), 
+						NDPIFileName(input), 
 						t2p->tiff_samplesperpixel);
 					t2p->t2p_error = T2P_ERR_ERROR;
 					break;
 				}
 			} else {
-				TIFFError(
+				NDPIError(
 					TIFF2PDF_MODULE, 
 					"No support for RGB image %s with %"PRIu16" samples per pixel",
-					TIFFFileName(input), 
+					NDPIFileName(input), 
 					t2p->tiff_samplesperpixel);
 				t2p->t2p_error = T2P_ERR_ERROR;
 				break;
@@ -1526,42 +1526,42 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 		case PHOTOMETRIC_PALETTE: 
 			photometric_palette:
 			if(t2p->tiff_samplesperpixel!=1){
-				TIFFError(
+				NDPIError(
 					TIFF2PDF_MODULE, 
 					"No support for palettized image %s with not one sample per pixel", 
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return;
 			}
 			t2p->pdf_colorspace=T2P_CS_RGB | T2P_CS_PALETTE;
 			t2p->pdf_palettesize=0x0001<<t2p->tiff_bitspersample;
-			if(!TIFFGetField(input, TIFFTAG_COLORMAP, &r, &g, &b)){
-				TIFFError(
+			if(!NDPIGetField(input, TIFFTAG_COLORMAP, &r, &g, &b)){
+				NDPIError(
 					TIFF2PDF_MODULE,
 					"Palettized image %s has no color map",
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return;
 			}
 			if(r == NULL || g == NULL || b == NULL){
-				TIFFError(
+				NDPIError(
 					TIFF2PDF_MODULE,
 					"Error getting 3 components from color map");
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return;
 			}
 			if(t2p->pdf_palette != NULL){
-				_TIFFfree(t2p->pdf_palette);
+				_NDPIfree(t2p->pdf_palette);
 				t2p->pdf_palette=NULL;
 			}
 			t2p->pdf_palette = (unsigned char*)
-				_TIFFmalloc(TIFFSafeMultiply(tmsize_t,t2p->pdf_palettesize,3));
+				_NDPImalloc(TIFFSafeMultiply(tmsize_t,t2p->pdf_palettesize,3));
 			if(t2p->pdf_palette==NULL){
-				TIFFError(
+				NDPIError(
 					TIFF2PDF_MODULE, 
 					"Can't allocate %"PRIu16" bytes of memory for t2p_read_tiff_image, %s",
 					t2p->pdf_palettesize, 
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return;
 			}
@@ -1573,17 +1573,17 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 			t2p->pdf_palettesize *= 3;
 			break;
 		case PHOTOMETRIC_SEPARATED:
-			if(TIFFGetField(input, TIFFTAG_INDEXED, &xuint16)){
+			if(NDPIGetField(input, TIFFTAG_INDEXED, &xuint16)){
 				if(xuint16==1){
 						goto photometric_palette_cmyk;
 				}
 			}
-			if( TIFFGetField(input, TIFFTAG_INKSET, &xuint16) ){
+			if( NDPIGetField(input, TIFFTAG_INKSET, &xuint16) ){
 				if(xuint16 != INKSET_CMYK){
-					TIFFError(
+					NDPIError(
 						TIFF2PDF_MODULE, 
 						"No support for %s because its inkset is not CMYK",
-						TIFFFileName(input) );
+						NDPIFileName(input) );
 					t2p->t2p_error = T2P_ERR_ERROR;
 					return;
 				}
@@ -1591,10 +1591,10 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 			if(t2p->tiff_samplesperpixel==4){
 				t2p->pdf_colorspace=T2P_CS_CMYK;
 			} else {
-				TIFFError(
+				NDPIError(
 					TIFF2PDF_MODULE, 
 					"No support for %s because it has %"PRIu16" samples per pixel",
-					TIFFFileName(input), 
+					NDPIFileName(input), 
 					t2p->tiff_samplesperpixel);
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return;
@@ -1602,42 +1602,42 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 			break;
 			photometric_palette_cmyk:
 			if(t2p->tiff_samplesperpixel!=1){
-				TIFFError(
+				NDPIError(
 					TIFF2PDF_MODULE, 
 					"No support for palettized CMYK image %s with not one sample per pixel", 
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return;
 			}
 			t2p->pdf_colorspace=T2P_CS_CMYK | T2P_CS_PALETTE;
 			t2p->pdf_palettesize=0x0001<<t2p->tiff_bitspersample;
-			if(!TIFFGetField(input, TIFFTAG_COLORMAP, &r, &g, &b, &a)){
-				TIFFError(
+			if(!NDPIGetField(input, TIFFTAG_COLORMAP, &r, &g, &b, &a)){
+				NDPIError(
 					TIFF2PDF_MODULE,
 					"Palettized image %s has no color map",
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return;
 			}
 			if(r == NULL || g == NULL || b == NULL || a == NULL){
-				TIFFError(
+				NDPIError(
 					TIFF2PDF_MODULE,
 					"Error getting 4 components from color map");
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return;
 			}
 			if(t2p->pdf_palette != NULL){
-				_TIFFfree(t2p->pdf_palette);
+				_NDPIfree(t2p->pdf_palette);
 				t2p->pdf_palette=NULL;
 			}
 			t2p->pdf_palette = (unsigned char*) 
-				_TIFFmalloc(TIFFSafeMultiply(tmsize_t,t2p->pdf_palettesize,4));
+				_NDPImalloc(TIFFSafeMultiply(tmsize_t,t2p->pdf_palettesize,4));
 			if(t2p->pdf_palette==NULL){
-				TIFFError(
+				NDPIError(
 					TIFF2PDF_MODULE, 
 					"Can't allocate %"PRIu16" bytes of memory for t2p_read_tiff_image, %s",
 					t2p->pdf_palettesize, 
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return;
 			}
@@ -1665,7 +1665,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 			break;
 		case PHOTOMETRIC_CIELAB:
             if( t2p->tiff_samplesperpixel != 3){
-                TIFFError(
+                NDPIError(
                     TIFF2PDF_MODULE, 
                     "Unsupported samplesperpixel = %"PRIu16" for CIELAB",
                     t2p->tiff_samplesperpixel);
@@ -1673,7 +1673,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
                 return;
             }
             if( t2p->tiff_bitspersample != 8){
-                TIFFError(
+                NDPIError(
                     TIFF2PDF_MODULE, 
                     "Invalid bitspersample = %"PRIu16" for CIELAB",
                     t2p->tiff_bitspersample);
@@ -1696,7 +1696,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 			break;
 		case PHOTOMETRIC_ITULAB:
             if( t2p->tiff_samplesperpixel != 3){
-                TIFFError(
+                NDPIError(
                     TIFF2PDF_MODULE, 
                     "Unsupported samplesperpixel = %"PRIu16" for ITULAB",
                     t2p->tiff_samplesperpixel);
@@ -1704,7 +1704,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
                 return;
             }
             if( t2p->tiff_bitspersample != 8){
-                TIFFError(
+                NDPIError(
                     TIFF2PDF_MODULE, 
                     "Invalid bitspersample = %"PRIu16" for ITULAB",
                     t2p->tiff_bitspersample);
@@ -1720,71 +1720,71 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 			break;
 		case PHOTOMETRIC_LOGL:
 		case PHOTOMETRIC_LOGLUV:
-			TIFFError(
+			NDPIError(
 				TIFF2PDF_MODULE, 
 				"No support for %s with photometric interpretation LogL/LogLuv", 
-				TIFFFileName(input));
+				NDPIFileName(input));
 			t2p->t2p_error = T2P_ERR_ERROR;
 			return;
 		default:
-			TIFFError(
+			NDPIError(
 				TIFF2PDF_MODULE, 
 				"No support for %s with photometric interpretation %"PRIu16,
-				TIFFFileName(input),
+				NDPIFileName(input),
 				t2p->tiff_photometric);
 			t2p->t2p_error = T2P_ERR_ERROR;
 			return;
 	}
 
-	if(TIFFGetField(input, TIFFTAG_PLANARCONFIG, &(t2p->tiff_planar))){
+	if(NDPIGetField(input, TIFFTAG_PLANARCONFIG, &(t2p->tiff_planar))){
 		switch(t2p->tiff_planar){
 			case 0:
 				TIFFWarning(
 					TIFF2PDF_MODULE, 
 					"Image %s has planar configuration 0, assuming 1", 
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->tiff_planar=PLANARCONFIG_CONTIG;
 			case PLANARCONFIG_CONTIG:
 				break;
 			case PLANARCONFIG_SEPARATE:
 				t2p->pdf_sample=T2P_SAMPLE_PLANAR_SEPARATE_TO_CONTIG;
 				if(t2p->tiff_bitspersample!=8){
-					TIFFError(
+					NDPIError(
 						TIFF2PDF_MODULE, 
 						"No support for %s with separated planar configuration and %"PRIu16" bits per sample",
-						TIFFFileName(input),
+						NDPIFileName(input),
 						t2p->tiff_bitspersample);
 					t2p->t2p_error = T2P_ERR_ERROR;
 					return;
 				}
 				break;
 			default:
-				TIFFError(
+				NDPIError(
 					TIFF2PDF_MODULE, 
 					"No support for %s with planar configuration %"PRIu16,
-					TIFFFileName(input),
+					NDPIFileName(input),
 					t2p->tiff_planar);
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return;
 		}
 	}
 
-        TIFFGetFieldDefaulted(input, TIFFTAG_ORIENTATION,
+        NDPIGetFieldDefaulted(input, TIFFTAG_ORIENTATION,
                               &(t2p->tiff_orientation));
         if(t2p->tiff_orientation>8){
                 TIFFWarning(TIFF2PDF_MODULE,
                             "Image %s has orientation %"PRIu16", assuming 0",
-                            TIFFFileName(input), t2p->tiff_orientation);
+                            NDPIFileName(input), t2p->tiff_orientation);
                 t2p->tiff_orientation=0;
         }
 
-        if(TIFFGetField(input, TIFFTAG_XRESOLUTION, &(t2p->tiff_xres) ) == 0){
+        if(NDPIGetField(input, TIFFTAG_XRESOLUTION, &(t2p->tiff_xres) ) == 0){
                 t2p->tiff_xres=0.0;
         }
-        if(TIFFGetField(input, TIFFTAG_YRESOLUTION, &(t2p->tiff_yres) ) == 0){
+        if(NDPIGetField(input, TIFFTAG_YRESOLUTION, &(t2p->tiff_yres) ) == 0){
                 t2p->tiff_yres=0.0;
         }
-	TIFFGetFieldDefaulted(input, TIFFTAG_RESOLUTIONUNIT,
+	NDPIGetFieldDefaulted(input, TIFFTAG_RESOLUTIONUNIT,
 			      &(t2p->tiff_resunit));
 	if(t2p->tiff_resunit == RESUNIT_CENTIMETER) {
 		t2p->tiff_xres *= 2.54F;
@@ -1809,7 +1809,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 #ifdef CCITT_SUPPORT
 		if(t2p->tiff_compression==COMPRESSION_CCITTFAX4  
 			){
-			if(TIFFIsTiled(input) || (TIFFNumberOfStrips(input)==1) ){
+			if(NDPIIsTiled(input) || (NDPINumberOfStrips(input)==1) ){
 				t2p->pdf_transcode = T2P_TRANSCODE_RAW;
 				t2p->pdf_compression=T2P_COMPRESS_G4;
 			}
@@ -1818,11 +1818,11 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 #ifdef ZIP_SUPPORT
 		if(t2p->tiff_compression== COMPRESSION_ADOBE_DEFLATE 
 			|| t2p->tiff_compression==COMPRESSION_DEFLATE){
-			if(TIFFIsTiled(input) || (TIFFNumberOfStrips(input)==1) ){
+			if(NDPIIsTiled(input) || (NDPINumberOfStrips(input)==1) ){
 				uint16_t predictor;
 				t2p->pdf_transcode = T2P_TRANSCODE_RAW;
 				t2p->pdf_compression=T2P_COMPRESS_ZIP;
-				TIFFGetField(input, TIFFTAG_PREDICTOR, &predictor);
+				NDPIGetField(input, TIFFTAG_PREDICTOR, &predictor);
 				t2p->pdf_compressionquality = predictor;
 				/* TIFFTAG_ZIPQUALITY is always Z_DEFAULT_COMPRESSION on reading */
 			}
@@ -1858,10 +1858,10 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 	}
 	if(t2p->tiff_compression==COMPRESSION_JPEG){
 		if(t2p->tiff_planar==PLANARCONFIG_SEPARATE){
-			TIFFError(
+			NDPIError(
 				TIFF2PDF_MODULE, 
 				"No support for %s with JPEG compression and separated planar configuration", 
-				TIFFFileName(input));
+				NDPIFileName(input));
 				t2p->t2p_error=T2P_ERR_ERROR;
 			return;
 		}
@@ -1870,10 +1870,10 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 #ifdef OJPEG_SUPPORT
 	if(t2p->tiff_compression==COMPRESSION_OJPEG){
 		if(t2p->tiff_planar==PLANARCONFIG_SEPARATE){
-			TIFFError(
+			NDPIError(
 				TIFF2PDF_MODULE, 
 				"No support for %s with OJPEG compression and separated planar configuration", 
-				TIFFFileName(input));
+				NDPIFileName(input));
 				t2p->t2p_error=T2P_ERR_ERROR;
 			return;
 		}
@@ -1890,7 +1890,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 		}
 	}
 
-	if (TIFFGetField(input, TIFFTAG_TRANSFERFUNCTION,
+	if (NDPIGetField(input, TIFFTAG_TRANSFERFUNCTION,
 			 &(t2p->tiff_transferfunction[0]),
 			 &(t2p->tiff_transferfunction[1]),
 			 &(t2p->tiff_transferfunction[2]))) {
@@ -1904,7 +1904,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 	} else {
 		t2p->tiff_transferfunctioncount=0;
 	}
-	if(TIFFGetField(input, TIFFTAG_WHITEPOINT, &xfloatp)!=0){
+	if(NDPIGetField(input, TIFFTAG_WHITEPOINT, &xfloatp)!=0){
 		t2p->tiff_whitechromaticities[0]=xfloatp[0];
 		t2p->tiff_whitechromaticities[1]=xfloatp[1];
 		if(t2p->pdf_colorspace & T2P_CS_GRAY){
@@ -1914,7 +1914,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 			t2p->pdf_colorspace |= T2P_CS_CALRGB;
 		}
 	}
-	if(TIFFGetField(input, TIFFTAG_PRIMARYCHROMATICITIES, &xfloatp)!=0){
+	if(NDPIGetField(input, TIFFTAG_PRIMARYCHROMATICITIES, &xfloatp)!=0){
 		t2p->tiff_primarychromaticities[0]=xfloatp[0];
 		t2p->tiff_primarychromaticities[1]=xfloatp[1];
 		t2p->tiff_primarychromaticities[2]=xfloatp[2];
@@ -1926,7 +1926,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 		}
 	}
 	if(t2p->pdf_colorspace & T2P_CS_LAB){
-		if(TIFFGetField(input, TIFFTAG_WHITEPOINT, &xfloatp) != 0){
+		if(NDPIGetField(input, TIFFTAG_WHITEPOINT, &xfloatp) != 0){
 			t2p->tiff_whitechromaticities[0]=xfloatp[0];
 			t2p->tiff_whitechromaticities[1]=xfloatp[1];
 		} else {
@@ -1934,7 +1934,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 			t2p->tiff_whitechromaticities[1]=0.3585F; /* 0.3290F; */
 		}
 	}
-	if(TIFFGetField(input, 
+	if(NDPIGetField(input, 
 		TIFFTAG_ICCPROFILE, 
 		&(t2p->tiff_iccprofilelength), 
 		&(t2p->tiff_iccprofile))!=0){
@@ -1960,7 +1960,7 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
  */
 static void t2p_set_tiff_datasize(T2P* t2p, uint64_t k) {
 	if (k != (uint64_t)(tmsize_t)k || (tmsize_t)k < 0) {
-		TIFFError(TIFF2PDF_MODULE, "Integer overflow");
+		NDPIError(TIFF2PDF_MODULE, "Integer overflow");
 		t2p->t2p_error = T2P_ERR_ERROR;
 		return;
 	}
@@ -1991,31 +1991,31 @@ void t2p_read_tiff_size(T2P* t2p, TIFF* input){
 		if(t2p->pdf_compression == T2P_COMPRESS_ZIP)
 #endif
 		{
-			TIFFGetField(input, TIFFTAG_STRIPBYTECOUNTS, &sbc);
+			NDPIGetField(input, TIFFTAG_STRIPBYTECOUNTS, &sbc);
 			t2p_set_tiff_datasize(t2p, sbc[0]);
 			return;
 		}
 #endif
 #ifdef OJPEG_SUPPORT
 		if(t2p->tiff_compression == COMPRESSION_OJPEG){
-			if(!TIFFGetField(input, TIFFTAG_STRIPBYTECOUNTS, &sbc)){
-				TIFFError(TIFF2PDF_MODULE, 
+			if(!NDPIGetField(input, TIFFTAG_STRIPBYTECOUNTS, &sbc)){
+				NDPIError(TIFF2PDF_MODULE, 
 					"Input file %s missing field: TIFFTAG_STRIPBYTECOUNTS",
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return;
 			}
-			stripcount=TIFFNumberOfStrips(input);
+			stripcount=NDPINumberOfStrips(input);
 			for(i=0;i<stripcount;i++){
 				k = checkAdd64(k, sbc[i], t2p);
 			}
-			if(TIFFGetField(input, TIFFTAG_JPEGIFOFFSET, &(t2p->tiff_dataoffset))){
+			if(NDPIGetField(input, TIFFTAG_JPEGIFOFFSET, &(t2p->tiff_dataoffset))){
 				if(t2p->tiff_dataoffset != 0){
-					if(TIFFGetField(input, TIFFTAG_JPEGIFBYTECOUNT, &(t2p->tiff_datasize))!=0){
+					if(NDPIGetField(input, TIFFTAG_JPEGIFBYTECOUNT, &(t2p->tiff_datasize))!=0){
 						if((uint64_t)t2p->tiff_datasize < k) {
 							TIFFWarning(TIFF2PDF_MODULE, 
 								"Input file %s has short JPEG interchange file byte count", 
-								TIFFFileName(input));
+								NDPIFileName(input));
 							t2p->pdf_ojpegiflength=t2p->tiff_datasize;
 							k = checkAdd64(k, t2p->tiff_datasize, t2p);
 							k = checkAdd64(k, 6, t2p);
@@ -2026,9 +2026,9 @@ void t2p_read_tiff_size(T2P* t2p, TIFF* input){
 						}
 						return;
 					}else {
-						TIFFError(TIFF2PDF_MODULE, 
+						NDPIError(TIFF2PDF_MODULE, 
 							"Input file %s missing field: TIFFTAG_JPEGIFBYTECOUNT",
-							TIFFFileName(input));
+							NDPIFileName(input));
 							t2p->t2p_error = T2P_ERR_ERROR;
 							return;
 					}
@@ -2044,7 +2044,7 @@ void t2p_read_tiff_size(T2P* t2p, TIFF* input){
 #ifdef JPEG_SUPPORT
 		if(t2p->tiff_compression == COMPRESSION_JPEG) {
 			uint32_t count = 0;
-			if(TIFFGetField(input, TIFFTAG_JPEGTABLES, &count, &jpt) != 0 ){
+			if(NDPIGetField(input, TIFFTAG_JPEGTABLES, &count, &jpt) != 0 ){
 				if(count > 4){
 					k += count;
 					k -= 2; /* don't use EOI of header */
@@ -2052,11 +2052,11 @@ void t2p_read_tiff_size(T2P* t2p, TIFF* input){
 			} else {
 				k = 2; /* SOI for first strip */
 			}
-			stripcount=TIFFNumberOfStrips(input);
-			if(!TIFFGetField(input, TIFFTAG_STRIPBYTECOUNTS, &sbc)){
-				TIFFError(TIFF2PDF_MODULE, 
+			stripcount=NDPINumberOfStrips(input);
+			if(!NDPIGetField(input, TIFFTAG_STRIPBYTECOUNTS, &sbc)){
+				NDPIError(TIFF2PDF_MODULE, 
 					"Input file %s missing field: TIFFTAG_STRIPBYTECOUNTS",
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return;
 			}
@@ -2076,17 +2076,17 @@ void t2p_read_tiff_size(T2P* t2p, TIFF* input){
 #ifdef JPEG_SUPPORT
 	if(t2p->pdf_compression == T2P_COMPRESS_JPEG
 	   && t2p->tiff_photometric == PHOTOMETRIC_YCBCR) {
-		k = checkMultiply64(TIFFNumberOfStrips(input), TIFFStripSize(input), t2p);
+		k = checkMultiply64(NDPINumberOfStrips(input), NDPIStripSize(input), t2p);
 	} else
 #endif
 	{
-		k = checkMultiply64(TIFFScanlineSize(input), t2p->tiff_length, t2p);
+		k = checkMultiply64(NDPIScanlineSize(input), t2p->tiff_length, t2p);
 		if(t2p->tiff_planar==PLANARCONFIG_SEPARATE){
 			k = checkMultiply64(k, t2p->tiff_samplesperpixel, t2p);
 		}
 	}
 	if (k == 0) {
-		/* Assume we had overflow inside TIFFScanlineSize */
+		/* Assume we had overflow inside NDPIScanlineSize */
 		t2p->t2p_error = T2P_ERR_ERROR;
 	}
 
@@ -2118,14 +2118,14 @@ void t2p_read_tiff_size_tile(T2P* t2p, TIFF* input, ttile_t tile){
 		&& !(t2p->pdf_compression==T2P_COMPRESS_JPEG)
 #endif
 		){
-			t2p->tiff_datasize=TIFFTileSize(input);
+			t2p->tiff_datasize=NDPITileSize(input);
 			if (t2p->tiff_datasize == 0) {
-				/* Assume we had overflow inside TIFFTileSize */
+				/* Assume we had overflow inside NDPITileSize */
 				t2p->t2p_error = T2P_ERR_ERROR;
 			}
 			return;
 		} else {
-			TIFFGetField(input, TIFFTAG_TILEBYTECOUNTS, &tbc);
+			NDPIGetField(input, TIFFTAG_TILEBYTECOUNTS, &tbc);
 			k=tbc[tile];
 #ifdef OJPEG_SUPPORT
 			if(t2p->tiff_compression==COMPRESSION_OJPEG){
@@ -2135,7 +2135,7 @@ void t2p_read_tiff_size_tile(T2P* t2p, TIFF* input, ttile_t tile){
 #ifdef JPEG_SUPPORT
 			if(t2p->tiff_compression==COMPRESSION_JPEG) {
 				uint32_t count = 0;
-				if(TIFFGetField(input, TIFFTAG_JPEGTABLES, &count, &jpt)!=0){
+				if(NDPIGetField(input, TIFFTAG_JPEGTABLES, &count, &jpt)!=0){
 					if(count > 4){
 						k = checkAdd64(k, count, t2p);
 						k -= 2; /* don't use EOI of header or SOI of tile */
@@ -2147,12 +2147,12 @@ void t2p_read_tiff_size_tile(T2P* t2p, TIFF* input, ttile_t tile){
 			return;
 		}
 	}
-	k = TIFFTileSize(input);
+	k = NDPITileSize(input);
 	if(t2p->tiff_planar==PLANARCONFIG_SEPARATE){
 		k = checkMultiply64(k, t2p->tiff_samplesperpixel, t2p);
 	}
 	if (k == 0) {
-		/* Assume we had overflow inside TIFFTileSize */
+		/* Assume we had overflow inside NDPITileSize */
 		t2p->t2p_error = T2P_ERR_ERROR;
 	}
 
@@ -2259,22 +2259,22 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
 #ifdef CCITT_SUPPORT
 		if(t2p->pdf_compression == T2P_COMPRESS_G4){
 			buffer = (unsigned char*)
-				_TIFFmalloc(t2p->tiff_datasize);
+				_NDPImalloc(t2p->tiff_datasize);
 			if (buffer == NULL) {
-				TIFFError(TIFF2PDF_MODULE,
+				NDPIError(TIFF2PDF_MODULE,
 					"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory for "
 					"t2p_readwrite_pdf_image, %s",
 					t2p->tiff_datasize,
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
 			memset(buffer, 0, t2p->tiff_datasize);
-			if (TIFFReadRawStrip(input, 0, (tdata_t) buffer,
+			if (NDPIReadRawStrip(input, 0, (tdata_t) buffer,
 					 t2p->tiff_datasize) < 0) {
-				TIFFError(TIFF2PDF_MODULE,
-					"TIFFReadRawStrip() failed");
-				_TIFFfree(buffer);
+				NDPIError(TIFF2PDF_MODULE,
+					"NDPIReadRawStrip() failed");
+				_NDPIfree(buffer);
 				return(0);
 			}
 			if (t2p->tiff_fillorder==FILLORDER_LSB2MSB){
@@ -2282,42 +2282,42 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
 					 * make sure is lsb-to-msb
 					 * bit-endianness fill order
 					 */
-					TIFFReverseBits(buffer,
+					NDPIReverseBits(buffer,
 							t2p->tiff_datasize);
 			}
 			t2pWriteFile(output, (tdata_t) buffer,
 				      t2p->tiff_datasize);
-			_TIFFfree(buffer);
+			_NDPIfree(buffer);
 			return(t2p->tiff_datasize);
 		}
 #endif /* ifdef CCITT_SUPPORT */
 #ifdef ZIP_SUPPORT
 		if (t2p->pdf_compression == T2P_COMPRESS_ZIP) {
 			buffer = (unsigned char*)
-				_TIFFmalloc(t2p->tiff_datasize);
+				_NDPImalloc(t2p->tiff_datasize);
 			if(buffer == NULL){
-				TIFFError(TIFF2PDF_MODULE,
+				NDPIError(TIFF2PDF_MODULE,
 					"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory for t2p_readwrite_pdf_image, %s",
 					t2p->tiff_datasize,
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
 			memset(buffer, 0, t2p->tiff_datasize);
-			if (TIFFReadRawStrip(input, 0, (tdata_t) buffer,
+			if (NDPIReadRawStrip(input, 0, (tdata_t) buffer,
 					 t2p->tiff_datasize) < 0) {
-				TIFFError(TIFF2PDF_MODULE,
-					"TIFFReadRawStrip() failed");
-				_TIFFfree(buffer);
+				NDPIError(TIFF2PDF_MODULE,
+					"NDPIReadRawStrip() failed");
+				_NDPIfree(buffer);
 				return(0);
 			}
 			if (t2p->tiff_fillorder==FILLORDER_LSB2MSB) {
-					TIFFReverseBits(buffer,
+					NDPIReverseBits(buffer,
 							t2p->tiff_datasize);
 			}
 			t2pWriteFile(output, (tdata_t) buffer,
 				      t2p->tiff_datasize);
-			_TIFFfree(buffer);
+			_NDPIfree(buffer);
 			return(t2p->tiff_datasize);
 		}
 #endif /* ifdef ZIP_SUPPORT */
@@ -2326,12 +2326,12 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
 
 			if(t2p->tiff_dataoffset != 0) {
 				buffer = (unsigned char*)
-					_TIFFmalloc(t2p->tiff_datasize);
+					_NDPImalloc(t2p->tiff_datasize);
 				if(buffer == NULL) {
-					TIFFError(TIFF2PDF_MODULE,
+					NDPIError(TIFF2PDF_MODULE,
 						"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory for t2p_readwrite_pdf_image, %s",
 						t2p->tiff_datasize,
-						TIFFFileName(input));
+						NDPIFileName(input));
 					t2p->t2p_error = T2P_ERR_ERROR;
 					return(0);
 				}
@@ -2348,7 +2348,7 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
 						     SEEK_SET);
 					t2pWriteFile(output, (tdata_t) buffer,
 						      t2p->tiff_datasize);
-					_TIFFfree(buffer);
+					_NDPIfree(buffer);
 					return(t2p->tiff_datasize);
 				} else {
 					inputoffset=t2pSeekFile(input, 0,
@@ -2362,7 +2362,7 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
 					t2p->pdf_ojpegiflength = 0;
 					t2pSeekFile(input, inputoffset,
 						     SEEK_SET);
-					TIFFGetField(input,
+					NDPIGetField(input,
 						     TIFFTAG_YCBCRSUBSAMPLING,
 						     &h_samp, &v_samp);
 					buffer[bufferoffset++]= 0xff;
@@ -2372,62 +2372,62 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
 					h_samp*=8;
 					v_samp*=8;
 					ri=(t2p->tiff_width+h_samp-1) / h_samp;
-					TIFFGetField(input,
+					NDPIGetField(input,
 						     TIFFTAG_ROWSPERSTRIP,
 						     &rows);
 					ri*=(rows+v_samp-1)/v_samp;
 					buffer[bufferoffset++]= (ri>>8) & 0xff;
 					buffer[bufferoffset++]= ri & 0xff;
-					stripcount=TIFFNumberOfStrips(input);
+					stripcount=NDPINumberOfStrips(input);
 					for(i=0;i<stripcount;i++){
 						if(i != 0 ){ 
 							buffer[bufferoffset++]=0xff;
 							buffer[bufferoffset++]=(0xd0 | ((i-1)%8));
 						}
-						bufferoffset+=TIFFReadRawStrip(input, 
+						bufferoffset+=NDPIReadRawStrip(input, 
 							i, 
 							(tdata_t) &(((unsigned char*)buffer)[bufferoffset]), 
 							-1);
 					}
 					t2pWriteFile(output, (tdata_t) buffer, bufferoffset);
-					_TIFFfree(buffer);
+					_NDPIfree(buffer);
 					return(bufferoffset);
 				}
 			} else {
 				if(! t2p->pdf_ojpegdata){
-					TIFFError(TIFF2PDF_MODULE,
+					NDPIError(TIFF2PDF_MODULE,
 						"No support for OJPEG image %s with bad tables",
-						TIFFFileName(input));
+						NDPIFileName(input));
 					t2p->t2p_error = T2P_ERR_ERROR;
 					return(0);
 				}
 				buffer = (unsigned char*)
-					_TIFFmalloc(t2p->tiff_datasize);
+					_NDPImalloc(t2p->tiff_datasize);
 				if(buffer==NULL){
-					TIFFError(TIFF2PDF_MODULE,
+					NDPIError(TIFF2PDF_MODULE,
 						"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory for t2p_readwrite_pdf_image, %s",
 						t2p->tiff_datasize,
-						TIFFFileName(input));
+						NDPIFileName(input));
 					t2p->t2p_error = T2P_ERR_ERROR;
 					return(0);
 				}
 				memset(buffer, 0, t2p->tiff_datasize);
-				_TIFFmemcpy(buffer, t2p->pdf_ojpegdata, t2p->pdf_ojpegdatalength);
+				_NDPImemcpy(buffer, t2p->pdf_ojpegdata, t2p->pdf_ojpegdatalength);
 				bufferoffset=t2p->pdf_ojpegdatalength;
-				stripcount=TIFFNumberOfStrips(input);
+				stripcount=NDPINumberOfStrips(input);
 				for(i=0;i<stripcount;i++){
 					tsize_t retTIFFReadRawStrip;
 					if(i != 0){
 						buffer[bufferoffset++]=0xff;
 						buffer[bufferoffset++]=(0xd0 | ((i-1)%8));
 					}
-					retTIFFReadRawStrip = TIFFReadRawStrip(input,
+					retTIFFReadRawStrip = NDPIReadRawStrip(input,
 						i, 
 						(tdata_t) &(((unsigned char*)buffer)[bufferoffset]), 
 						-1);
 					if (retTIFFReadRawStrip < 0) {
-						TIFFError(TIFF2PDF_MODULE, "TIFFReadRawStrip()");
-						_TIFFfree(buffer);
+						NDPIError(TIFF2PDF_MODULE, "NDPIReadRawStrip()");
+						_NDPIfree(buffer);
 						t2p->t2p_error = T2P_ERR_ERROR;
 						return(0);
 					}
@@ -2437,7 +2437,7 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
 				if( ! ( (buffer[bufferoffset-1]==0xd9) && (buffer[bufferoffset-2]==0xff) ) ){
 					t2pWriteFile(output, (tdata_t) jpeg_eof_marker, sizeof(jpeg_eof_marker));
 				}
-				_TIFFfree(buffer);
+				_NDPIfree(buffer);
 				return(bufferoffset);
 #if 0
                                 /*
@@ -2445,9 +2445,9 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
                                   mis-placed and we are not sure where it
                                   should be (if anywhere)
                                 */
-				TIFFError(TIFF2PDF_MODULE, 
+				NDPIError(TIFF2PDF_MODULE, 
 	"No support for OJPEG image %s with no JPEG File Interchange offset", 
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 #endif
@@ -2458,45 +2458,45 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
 		if(t2p->tiff_compression == COMPRESSION_JPEG) {
 			uint32_t count = 0;
 			buffer = (unsigned char*)
-				_TIFFmalloc(t2p->tiff_datasize);
+				_NDPImalloc(t2p->tiff_datasize);
 			if(buffer==NULL){
-				TIFFError(TIFF2PDF_MODULE,
+				NDPIError(TIFF2PDF_MODULE,
 					"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory for t2p_readwrite_pdf_image, %s",
 					t2p->tiff_datasize,
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
 			memset(buffer, 0, t2p->tiff_datasize);
-			if (TIFFGetField(input, TIFFTAG_JPEGTABLES, &count, &jpt) != 0) {
+			if (NDPIGetField(input, TIFFTAG_JPEGTABLES, &count, &jpt) != 0) {
 				if(count > 4) {
-					_TIFFmemcpy(buffer, jpt, count);
+					_NDPImemcpy(buffer, jpt, count);
 					bufferoffset += count - 2;
 				}
 			}
-			stripcount=TIFFNumberOfStrips(input);
-			TIFFGetField(input, TIFFTAG_STRIPBYTECOUNTS, &sbc);
+			stripcount=NDPINumberOfStrips(input);
+			NDPIGetField(input, TIFFTAG_STRIPBYTECOUNTS, &sbc);
 			for(i=0;i<stripcount;i++){
 				if(sbc[i]>max_striplength) max_striplength=sbc[i];
 			}
 			stripbuffer = (unsigned char*)
-				_TIFFmalloc(max_striplength);
+				_NDPImalloc(max_striplength);
 			if(stripbuffer==NULL){
-				TIFFError(TIFF2PDF_MODULE,
+				NDPIError(TIFF2PDF_MODULE,
 					"Can't allocate %"PRId32" bytes of memory for t2p_readwrite_pdf_image, %s",
 					max_striplength,
-					TIFFFileName(input));
-				_TIFFfree(buffer);
+					NDPIFileName(input));
+				_NDPIfree(buffer);
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
 			memset(stripbuffer, 0, max_striplength);
 			for(i=0;i<stripcount;i++){
-				striplength=TIFFReadRawStrip(input, i, (tdata_t) stripbuffer, -1);
+				striplength=NDPIReadRawStrip(input, i, (tdata_t) stripbuffer, -1);
 				if (striplength < 0) {
-					TIFFError(TIFF2PDF_MODULE, "TIFFReadRawStrip() failed");
-					_TIFFfree(samplebuffer);
-					_TIFFfree(buffer);
+					NDPIError(TIFF2PDF_MODULE, "NDPIReadRawStrip() failed");
+					_NDPIfree(samplebuffer);
+					_NDPIfree(buffer);
 					t2p->t2p_error = T2P_ERR_ERROR;
 					return(0);
 				}
@@ -2508,19 +2508,19 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
 					&bufferoffset, 
 					i, 
 					t2p->tiff_length)){
-						TIFFError(TIFF2PDF_MODULE, 
+						NDPIError(TIFF2PDF_MODULE, 
 				"Can't process JPEG data in input file %s", 
-							TIFFFileName(input));
-						_TIFFfree(samplebuffer);
-						_TIFFfree(buffer);
+							NDPIFileName(input));
+						_NDPIfree(samplebuffer);
+						_NDPIfree(buffer);
 						t2p->t2p_error = T2P_ERR_ERROR;
 						return(0);
 				}
 			}
 			t2pWriteFile(output, (tdata_t) buffer, bufferoffset);
 			t2pWriteFile(output, (tdata_t) jpeg_eof_marker, sizeof(jpeg_eof_marker));
-			_TIFFfree(stripbuffer);
-			_TIFFfree(buffer);
+			_NDPIfree(stripbuffer);
+			_NDPIfree(buffer);
 			return(bufferoffset);
 		}
 #endif /* ifdef JPEG_SUPPORT */
@@ -2528,30 +2528,30 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
 	}
 
 	if(t2p->pdf_sample==T2P_SAMPLE_NOTHING){
-		buffer = (unsigned char*) _TIFFmalloc(t2p->tiff_datasize);
+		buffer = (unsigned char*) _NDPImalloc(t2p->tiff_datasize);
 		if(buffer==NULL){
-			TIFFError(TIFF2PDF_MODULE,
+			NDPIError(TIFF2PDF_MODULE,
 				"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory for t2p_readwrite_pdf_image, %s",
 				t2p->tiff_datasize,
-				TIFFFileName(input));
+				NDPIFileName(input));
 			t2p->t2p_error = T2P_ERR_ERROR;
 			return(0);
 		}
 		memset(buffer, 0, t2p->tiff_datasize);
-		stripsize=TIFFStripSize(input);
-		stripcount=TIFFNumberOfStrips(input);
+		stripsize=NDPIStripSize(input);
+		stripcount=NDPINumberOfStrips(input);
 		for(i=0;i<stripcount;i++){
 			read = 
-				TIFFReadEncodedStrip(input, 
+				NDPIReadEncodedStrip(input, 
 				i, 
 				(tdata_t) &buffer[bufferoffset], 
 				TIFFmin(stripsize, t2p->tiff_datasize - bufferoffset));
 			if(read==-1){
-				TIFFError(TIFF2PDF_MODULE, 
+				NDPIError(TIFF2PDF_MODULE, 
 					"Error on decoding strip %"PRIu32" of %s",
 					i, 
-					TIFFFileName(input));
-				_TIFFfree(buffer);
+					NDPIFileName(input));
+				_NDPIfree(buffer);
 				t2p->t2p_error=T2P_ERR_ERROR;
 				return(0);
 			}
@@ -2560,46 +2560,46 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
 	} else {
 		if(t2p->pdf_sample & T2P_SAMPLE_PLANAR_SEPARATE_TO_CONTIG){
 		
-			sepstripsize=TIFFStripSize(input);
-			sepstripcount=TIFFNumberOfStrips(input);
+			sepstripsize=NDPIStripSize(input);
+			sepstripcount=NDPINumberOfStrips(input);
 		
 			stripsize=sepstripsize*t2p->tiff_samplesperpixel;
 			stripcount=sepstripcount/t2p->tiff_samplesperpixel;
 			
-			buffer = (unsigned char*) _TIFFmalloc(t2p->tiff_datasize);
+			buffer = (unsigned char*) _NDPImalloc(t2p->tiff_datasize);
 			if(buffer==NULL){
-				TIFFError(TIFF2PDF_MODULE,
+				NDPIError(TIFF2PDF_MODULE,
 					"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory for t2p_readwrite_pdf_image, %s",
 					t2p->tiff_datasize,
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
 			memset(buffer, 0, t2p->tiff_datasize);
-			samplebuffer = (unsigned char*) _TIFFmalloc(stripsize);
+			samplebuffer = (unsigned char*) _NDPImalloc(stripsize);
 			if(samplebuffer==NULL){
-				TIFFError(TIFF2PDF_MODULE,
+				NDPIError(TIFF2PDF_MODULE,
 					"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory for t2p_readwrite_pdf_image, %s",
 					t2p->tiff_datasize,
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
-                                _TIFFfree(buffer);
+                                _NDPIfree(buffer);
 				return(0);
 			}
 			for(i=0;i<stripcount;i++){
 				samplebufferoffset=0;
 				for(j=0;j<t2p->tiff_samplesperpixel;j++){
 					read = 
-						TIFFReadEncodedStrip(input, 
+						NDPIReadEncodedStrip(input, 
 							i + j*stripcount, 
 							(tdata_t) &(samplebuffer[samplebufferoffset]), 
 							TIFFmin(sepstripsize, stripsize - samplebufferoffset));
 					if(read==-1){
-						TIFFError(TIFF2PDF_MODULE,
+						NDPIError(TIFF2PDF_MODULE,
 							"Error on decoding strip %"PRIu32" of %s",
 							i + j*stripcount,
-							TIFFFileName(input));
-							_TIFFfree(buffer);
+							NDPIFileName(input));
+							_NDPIfree(buffer);
 						t2p->t2p_error=T2P_ERR_ERROR;
 						return(0);
 					}
@@ -2612,35 +2612,35 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
 					samplebufferoffset); 
 				bufferoffset+=samplebufferoffset;
 			}
-			_TIFFfree(samplebuffer);
+			_NDPIfree(samplebuffer);
 			goto dataready;
 		}
 
-		buffer = (unsigned char*) _TIFFmalloc(t2p->tiff_datasize);
+		buffer = (unsigned char*) _NDPImalloc(t2p->tiff_datasize);
 		if(buffer==NULL){
-			TIFFError(TIFF2PDF_MODULE,
+			NDPIError(TIFF2PDF_MODULE,
 				"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory for t2p_readwrite_pdf_image, %s",
 				t2p->tiff_datasize,
-				TIFFFileName(input));
+				NDPIFileName(input));
 			t2p->t2p_error = T2P_ERR_ERROR;
 			return(0);
 		}
 		memset(buffer, 0, t2p->tiff_datasize);
-		stripsize=TIFFStripSize(input);
-		stripcount=TIFFNumberOfStrips(input);
+		stripsize=NDPIStripSize(input);
+		stripcount=NDPINumberOfStrips(input);
 		for(i=0;i<stripcount;i++){
 			read = 
-				TIFFReadEncodedStrip(input, 
+				NDPIReadEncodedStrip(input, 
 				i, 
 				(tdata_t) &buffer[bufferoffset], 
 				TIFFmin(stripsize, t2p->tiff_datasize - bufferoffset));
 			if(read==-1){
-				TIFFError(TIFF2PDF_MODULE, 
+				NDPIError(TIFF2PDF_MODULE, 
 					"Error on decoding strip %"PRIu32" of %s",
 					i, 
-					TIFFFileName(input));
-				_TIFFfree(samplebuffer);
-				_TIFFfree(buffer);
+					NDPIFileName(input));
+				_NDPIfree(samplebuffer);
+				_NDPIfree(buffer);
 				t2p->t2p_error=T2P_ERR_ERROR;
 				return(0);
 			}
@@ -2649,16 +2649,16 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
 
 		if(t2p->pdf_sample & T2P_SAMPLE_REALIZE_PALETTE){
 			// FIXME: overflow?
-			samplebuffer=(unsigned char*)_TIFFrealloc( 
+			samplebuffer=(unsigned char*)_NDPIrealloc( 
 				(tdata_t) buffer, 
 				t2p->tiff_datasize * t2p->tiff_samplesperpixel);
 			if(samplebuffer==NULL){
-				TIFFError(TIFF2PDF_MODULE, 
+				NDPIError(TIFF2PDF_MODULE, 
 	"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory for t2p_readwrite_pdf_image, %s",
 					t2p->tiff_datasize,
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
-				_TIFFfree(buffer);
+				_NDPIfree(buffer);
 				return(0);
 			} else {
 				buffer=samplebuffer;
@@ -2680,30 +2680,30 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
 		}
 
 		if(t2p->pdf_sample & T2P_SAMPLE_YCBCR_TO_RGB){
-			samplebuffer=(unsigned char*)_TIFFrealloc(
+			samplebuffer=(unsigned char*)_NDPIrealloc(
 				(tdata_t)buffer, 
 				t2p->tiff_width*t2p->tiff_length*4);
 			if(samplebuffer==NULL){
-				TIFFError(TIFF2PDF_MODULE, 
+				NDPIError(TIFF2PDF_MODULE, 
 	"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory for t2p_readwrite_pdf_image, %s",
 					t2p->tiff_datasize,
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
-				_TIFFfree(buffer);
+				_NDPIfree(buffer);
 				return(0);
 			} else {
 				buffer=samplebuffer;
 			}
-			if(!TIFFReadRGBAImageOriented(
+			if(!NDPIReadRGBAImageOriented(
 				input, 
 				t2p->tiff_width, 
 				t2p->tiff_length, 
 				(uint32_t*)buffer,
 				ORIENTATION_TOPLEFT,
 				0)){
-				TIFFError(TIFF2PDF_MODULE, 
-	"Can't use TIFFReadRGBAImageOriented to extract RGB image from %s", 
-					TIFFFileName(input));
+				NDPIError(TIFF2PDF_MODULE, 
+	"Can't use NDPIReadRGBAImageOriented to extract RGB image from %s", 
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
@@ -2723,54 +2723,54 @@ tsize_t t2p_readwrite_pdf_image(T2P* t2p, TIFF* input, TIFF* output){
 dataready:
 
 	t2p_disable(output);
-	TIFFSetField(output, TIFFTAG_PHOTOMETRIC, t2p->tiff_photometric);
-	TIFFSetField(output, TIFFTAG_BITSPERSAMPLE, t2p->tiff_bitspersample);
-	TIFFSetField(output, TIFFTAG_SAMPLESPERPIXEL, t2p->tiff_samplesperpixel);
-	TIFFSetField(output, TIFFTAG_IMAGEWIDTH, t2p->tiff_width);
-	TIFFSetField(output, TIFFTAG_IMAGELENGTH, t2p->tiff_length);
-	TIFFSetField(output, TIFFTAG_ROWSPERSTRIP, t2p->tiff_length);
-	TIFFSetField(output, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-	TIFFSetField(output, TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);
+	NDPISetField(output, TIFFTAG_PHOTOMETRIC, t2p->tiff_photometric);
+	NDPISetField(output, TIFFTAG_BITSPERSAMPLE, t2p->tiff_bitspersample);
+	NDPISetField(output, TIFFTAG_SAMPLESPERPIXEL, t2p->tiff_samplesperpixel);
+	NDPISetField(output, TIFFTAG_IMAGEWIDTH, t2p->tiff_width);
+	NDPISetField(output, TIFFTAG_IMAGELENGTH, t2p->tiff_length);
+	NDPISetField(output, TIFFTAG_ROWSPERSTRIP, t2p->tiff_length);
+	NDPISetField(output, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+	NDPISetField(output, TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);
 
 	switch(t2p->pdf_compression){
 	case T2P_COMPRESS_NONE:
-		TIFFSetField(output, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
+		NDPISetField(output, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
 		break;
 #ifdef CCITT_SUPPORT
 	case T2P_COMPRESS_G4:
-		TIFFSetField(output, TIFFTAG_COMPRESSION, COMPRESSION_CCITTFAX4);
+		NDPISetField(output, TIFFTAG_COMPRESSION, COMPRESSION_CCITTFAX4);
 		break;
 #endif /* ifdef CCITT_SUPPORT */
 #ifdef JPEG_SUPPORT
 	case T2P_COMPRESS_JPEG:
 		if(t2p->tiff_photometric==PHOTOMETRIC_YCBCR) {
 			uint16_t hor = 0, ver = 0;
-			if (TIFFGetField(input, TIFFTAG_YCBCRSUBSAMPLING, &hor, &ver) !=0 ) {
+			if (NDPIGetField(input, TIFFTAG_YCBCRSUBSAMPLING, &hor, &ver) !=0 ) {
 				if(hor != 0 && ver != 0){
-					TIFFSetField(output, TIFFTAG_YCBCRSUBSAMPLING, hor, ver);
+					NDPISetField(output, TIFFTAG_YCBCRSUBSAMPLING, hor, ver);
 				}
 			}
-			if(TIFFGetField(input, TIFFTAG_REFERENCEBLACKWHITE, &xfloatp)!=0){
-				TIFFSetField(output, TIFFTAG_REFERENCEBLACKWHITE, xfloatp);
+			if(NDPIGetField(input, TIFFTAG_REFERENCEBLACKWHITE, &xfloatp)!=0){
+				NDPISetField(output, TIFFTAG_REFERENCEBLACKWHITE, xfloatp);
 			}
 		}
-		if(TIFFSetField(output, TIFFTAG_COMPRESSION, COMPRESSION_JPEG)==0){
-			TIFFError(TIFF2PDF_MODULE, 
+		if(NDPISetField(output, TIFFTAG_COMPRESSION, COMPRESSION_JPEG)==0){
+			NDPIError(TIFF2PDF_MODULE, 
 		"Unable to use JPEG compression for input %s and output %s", 
-				TIFFFileName(input),
-				TIFFFileName(output));
-			_TIFFfree(buffer);
+				NDPIFileName(input),
+				NDPIFileName(output));
+			_NDPIfree(buffer);
 			t2p->t2p_error = T2P_ERR_ERROR;
 			return(0);
 		}
-		TIFFSetField(output, TIFFTAG_JPEGTABLESMODE, 0);
+		NDPISetField(output, TIFFTAG_JPEGTABLESMODE, 0);
 
 		if(t2p->pdf_colorspace & (T2P_CS_RGB | T2P_CS_LAB)){
-			TIFFSetField(output, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_YCBCR);
+			NDPISetField(output, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_YCBCR);
 			if(t2p->tiff_photometric != PHOTOMETRIC_YCBCR){
-				TIFFSetField(output, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
+				NDPISetField(output, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
 			} else {
-				TIFFSetField(output, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RAW);
+				NDPISetField(output, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RAW);
 			}
 		}
 		if(t2p->pdf_colorspace & T2P_CS_GRAY){
@@ -2780,7 +2780,7 @@ dataready:
 			(void)0;
 		}
 		if(t2p->pdf_defaultcompressionquality != 0){
-			TIFFSetField(output, 
+			NDPISetField(output, 
 				TIFFTAG_JPEGQUALITY, 
 				t2p->pdf_defaultcompressionquality);
 		}
@@ -2789,14 +2789,14 @@ dataready:
 #endif /* ifdef JPEG_SUPPORT */
 #ifdef ZIP_SUPPORT
 	case T2P_COMPRESS_ZIP:
-		TIFFSetField(output, TIFFTAG_COMPRESSION, COMPRESSION_DEFLATE);
+		NDPISetField(output, TIFFTAG_COMPRESSION, COMPRESSION_DEFLATE);
 		if(t2p->pdf_defaultcompressionquality%100 != 0){
-			TIFFSetField(output, 
+			NDPISetField(output, 
 				TIFFTAG_PREDICTOR, 
 				t2p->pdf_defaultcompressionquality % 100);
 		}
 		if(t2p->pdf_defaultcompressionquality/100 != 0){
-			TIFFSetField(output, 
+			NDPISetField(output, 
 				TIFFTAG_ZIPQUALITY, 
 				(t2p->pdf_defaultcompressionquality / 100));
 		}
@@ -2822,14 +2822,14 @@ dataready:
 						     t2p->tiff_datasize); 
 	}
 	if (buffer != NULL) {
-		_TIFFfree(buffer);
+		_NDPIfree(buffer);
 		buffer=NULL;
 	}
 
 	if (bufferoffset == (tsize_t)-1) {
-		TIFFError(TIFF2PDF_MODULE, 
+		NDPIError(TIFF2PDF_MODULE, 
 			  "Error writing encoded strip to output PDF %s", 
-			  TIFFFileName(output));
+			  NDPIFileName(output));
 		t2p->t2p_error = T2P_ERR_ERROR;
 		return(0);
 	}
@@ -2879,57 +2879,57 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 	){
 #ifdef CCITT_SUPPORT
 		if(t2p->pdf_compression == T2P_COMPRESS_G4){
-			buffer= (unsigned char*) _TIFFmalloc(t2p->tiff_datasize);
+			buffer= (unsigned char*) _NDPImalloc(t2p->tiff_datasize);
 			if(buffer==NULL){
-				TIFFError(TIFF2PDF_MODULE, 
+				NDPIError(TIFF2PDF_MODULE, 
 					"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory "
                                         "for t2p_readwrite_pdf_image_tile, %s", 
 					t2p->tiff_datasize,
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
 			memset(buffer, 0, t2p->tiff_datasize);
-			if (TIFFReadRawTile(input, tile, (tdata_t) buffer, t2p->tiff_datasize) < 0) {
-				TIFFError(TIFF2PDF_MODULE,
-					"TIFFReadRawTile() failed");
-				_TIFFfree(buffer);
+			if (NDPIReadRawTile(input, tile, (tdata_t) buffer, t2p->tiff_datasize) < 0) {
+				NDPIError(TIFF2PDF_MODULE,
+					"NDPIReadRawTile() failed");
+				_NDPIfree(buffer);
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
 			if (t2p->tiff_fillorder==FILLORDER_LSB2MSB){
-					TIFFReverseBits(buffer, t2p->tiff_datasize);
+					NDPIReverseBits(buffer, t2p->tiff_datasize);
 			}
 			t2pWriteFile(output, (tdata_t) buffer, t2p->tiff_datasize);
-			_TIFFfree(buffer);
+			_NDPIfree(buffer);
 			return(t2p->tiff_datasize);
 		}
 #endif
 #ifdef ZIP_SUPPORT
 		if(t2p->pdf_compression == T2P_COMPRESS_ZIP){
-			buffer= (unsigned char*) _TIFFmalloc(t2p->tiff_datasize);
+			buffer= (unsigned char*) _NDPImalloc(t2p->tiff_datasize);
 			if(buffer==NULL){
-				TIFFError(TIFF2PDF_MODULE, 
+				NDPIError(TIFF2PDF_MODULE, 
 					"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory "
                                         "for t2p_readwrite_pdf_image_tile, %s", 
 					t2p->tiff_datasize,
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
 			memset(buffer, 0, t2p->tiff_datasize);
-			if (TIFFReadRawTile(input, tile, (tdata_t) buffer, t2p->tiff_datasize) < 0) {
-				TIFFError(TIFF2PDF_MODULE,
-					"TIFFReadRawTile() failed");
-				_TIFFfree(buffer);
+			if (NDPIReadRawTile(input, tile, (tdata_t) buffer, t2p->tiff_datasize) < 0) {
+				NDPIError(TIFF2PDF_MODULE,
+					"NDPIReadRawTile() failed");
+				_NDPIfree(buffer);
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
 			if (t2p->tiff_fillorder==FILLORDER_LSB2MSB){
-					TIFFReverseBits(buffer, t2p->tiff_datasize);
+					NDPIReverseBits(buffer, t2p->tiff_datasize);
 			}
 			t2pWriteFile(output, (tdata_t) buffer, t2p->tiff_datasize);
-			_TIFFfree(buffer);
+			_NDPIfree(buffer);
 			return(t2p->tiff_datasize);
 		}
 #endif
@@ -2937,25 +2937,25 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 		if(t2p->tiff_compression == COMPRESSION_OJPEG){
 			tsize_t retTIFFReadRawTile;
 			if(! t2p->pdf_ojpegdata){
-				TIFFError(TIFF2PDF_MODULE, 
+				NDPIError(TIFF2PDF_MODULE, 
 					"No support for OJPEG image %s with "
                                         "bad tables", 
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
-			buffer=(unsigned char*) _TIFFmalloc(t2p->tiff_datasize);
+			buffer=(unsigned char*) _NDPImalloc(t2p->tiff_datasize);
 			if(buffer==NULL){
-				TIFFError(TIFF2PDF_MODULE, 
+				NDPIError(TIFF2PDF_MODULE, 
 					"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory "
                                         "for t2p_readwrite_pdf_image, %s", 
 					t2p->tiff_datasize,
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
 			memset(buffer, 0, t2p->tiff_datasize);
-			_TIFFmemcpy(buffer, t2p->pdf_ojpegdata, t2p->pdf_ojpegdatalength);
+			_NDPImemcpy(buffer, t2p->pdf_ojpegdata, t2p->pdf_ojpegdatalength);
 			if(edge!=0){
 				if(t2p_tile_is_bottom_edge(t2p->tiff_tiles[t2p->pdf_page], tile)){
 					buffer[7]=
@@ -2971,20 +2971,20 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 				}
 			}
 			bufferoffset = t2p->pdf_ojpegdatalength;
-			retTIFFReadRawTile = TIFFReadRawTile(input,
+			retTIFFReadRawTile = NDPIReadRawTile(input,
 					tile, 
 					(tdata_t) &(((unsigned char*)buffer)[bufferoffset]), 
 					-1);
 			if (retTIFFReadRawTile < 0) {
-				TIFFError(TIFF2PDF_MODULE, "TIFFReadRawTile() failed");
-				_TIFFfree(buffer);
+				NDPIError(TIFF2PDF_MODULE, "NDPIReadRawTile() failed");
+				_NDPIfree(buffer);
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
 			bufferoffset += retTIFFReadRawTile;
 			t2pWriteFile(output, (tdata_t) buffer, bufferoffset);
 			t2pWriteFile(output, (tdata_t) jpeg_eof_marker, sizeof(jpeg_eof_marker));
-			_TIFFfree(buffer);
+			_NDPIfree(buffer);
 			return(bufferoffset);
 		}
 #endif
@@ -2992,36 +2992,36 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 		if(t2p->tiff_compression == COMPRESSION_JPEG){
 			unsigned char table_end[2];
 			uint32_t count = 0;
-			buffer= (unsigned char*) _TIFFmalloc(t2p->tiff_datasize);
+			buffer= (unsigned char*) _NDPImalloc(t2p->tiff_datasize);
 			if(buffer==NULL){
-				TIFFError(TIFF2PDF_MODULE, 
+				NDPIError(TIFF2PDF_MODULE, 
 					"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory "
                                         "for t2p_readwrite_pdf_image_tile, %s", 
                                         t2p->tiff_datasize,
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
 			memset(buffer, 0, t2p->tiff_datasize);
-			if(TIFFGetField(input, TIFFTAG_JPEGTABLES, &count, &jpt) != 0) {
+			if(NDPIGetField(input, TIFFTAG_JPEGTABLES, &count, &jpt) != 0) {
 				if (count > 4) {
                                         tsize_t retTIFFReadRawTile;
                     /* Ignore EOI marker of JpegTables */
-					_TIFFmemcpy(buffer, jpt, count - 2);
+					_NDPImemcpy(buffer, jpt, count - 2);
 					bufferoffset += count - 2;
                     /* Store last 2 bytes of the JpegTables */
 					table_end[0] = buffer[bufferoffset-2];
 					table_end[1] = buffer[bufferoffset-1];
 					xuint32 = bufferoffset;
                                         bufferoffset -= 2;
-                                        retTIFFReadRawTile = TIFFReadRawTile(
+                                        retTIFFReadRawTile = NDPIReadRawTile(
 						input, 
 						tile, 
 						(tdata_t) &(((unsigned char*)buffer)[bufferoffset]), 
 						-1);
                                         if( retTIFFReadRawTile < 0 )
                                         {
-                                            _TIFFfree(buffer);
+                                            _NDPIfree(buffer);
                                             t2p->t2p_error = T2P_ERR_ERROR;
                                             return(0);
                                         }
@@ -3033,7 +3033,7 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 				}
 			}
 			t2pWriteFile(output, (tdata_t) buffer, bufferoffset);
-			_TIFFfree(buffer);
+			_NDPIfree(buffer);
 			return(bufferoffset);
 		}
 #endif
@@ -3041,29 +3041,29 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 	}
 
 	if(t2p->pdf_sample==T2P_SAMPLE_NOTHING){
-		buffer = (unsigned char*) _TIFFmalloc(t2p->tiff_datasize);
+		buffer = (unsigned char*) _NDPImalloc(t2p->tiff_datasize);
 		if(buffer==NULL){
-			TIFFError(TIFF2PDF_MODULE, 
+			NDPIError(TIFF2PDF_MODULE, 
 				"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory for "
                                 "t2p_readwrite_pdf_image_tile, %s", 
 				t2p->tiff_datasize,
-				TIFFFileName(input));
+				NDPIFileName(input));
 			t2p->t2p_error = T2P_ERR_ERROR;
 			return(0);
 		}
 		memset(buffer, 0, t2p->tiff_datasize);
 
-		read = TIFFReadEncodedTile(
+		read = NDPIReadEncodedTile(
 			input, 
 			tile, 
 			(tdata_t) &buffer[bufferoffset], 
 			t2p->tiff_datasize);
 		if(read==-1){
-			TIFFError(TIFF2PDF_MODULE, 
+			NDPIError(TIFF2PDF_MODULE, 
 				"Error on decoding tile %"PRIu32" of %s",
 				tile, 
-				TIFFFileName(input));
-			_TIFFfree(buffer);
+				NDPIFileName(input));
+			_NDPIfree(buffer);
 			t2p->t2p_error=T2P_ERR_ERROR;
 			return(0);
 		}
@@ -3071,29 +3071,29 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 	} else {
 
 		if(t2p->pdf_sample == T2P_SAMPLE_PLANAR_SEPARATE_TO_CONTIG){
-			septilesize=TIFFTileSize(input);
-			septilecount=TIFFNumberOfTiles(input);
+			septilesize=NDPITileSize(input);
+			septilecount=NDPINumberOfTiles(input);
 			/* tilesize=septilesize*t2p->tiff_samplesperpixel; */
 			tilecount=septilecount/t2p->tiff_samplesperpixel;
-			buffer = (unsigned char*) _TIFFmalloc(t2p->tiff_datasize);
+			buffer = (unsigned char*) _NDPImalloc(t2p->tiff_datasize);
 			if(buffer==NULL){
-				TIFFError(TIFF2PDF_MODULE,
+				NDPIError(TIFF2PDF_MODULE,
 					"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory "
 					"for t2p_readwrite_pdf_image_tile, %s",
 					t2p->tiff_datasize,
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
 			memset(buffer, 0, t2p->tiff_datasize);
-			samplebuffer = (unsigned char*) _TIFFmalloc(t2p->tiff_datasize);
+			samplebuffer = (unsigned char*) _NDPImalloc(t2p->tiff_datasize);
 			if(samplebuffer==NULL){
-				TIFFError(TIFF2PDF_MODULE,
+				NDPIError(TIFF2PDF_MODULE,
 					"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory "
 					"for t2p_readwrite_pdf_image_tile, %s",
 					t2p->tiff_datasize,
-					TIFFFileName(input));
-				_TIFFfree(buffer);
+					NDPIFileName(input));
+				_NDPIfree(buffer);
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
@@ -3101,17 +3101,17 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 			samplebufferoffset=0;
 			for(i=0;i<t2p->tiff_samplesperpixel;i++){
 				read = 
-					TIFFReadEncodedTile(input, 
+					NDPIReadEncodedTile(input, 
 						tile + i*tilecount, 
 						(tdata_t) &(samplebuffer[samplebufferoffset]), 
 						septilesize);
 				if(read==-1){
-					TIFFError(TIFF2PDF_MODULE, 
+					NDPIError(TIFF2PDF_MODULE, 
 						"Error on decoding tile %"PRIu32" of %s",
 						tile + i*tilecount, 
-						TIFFFileName(input));
-						_TIFFfree(samplebuffer);
-						_TIFFfree(buffer);
+						NDPIFileName(input));
+						_NDPIfree(samplebuffer);
+						_NDPIfree(buffer);
 					t2p->t2p_error=T2P_ERR_ERROR;
 					return(0);
 				}
@@ -3123,32 +3123,32 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 				samplebuffer, 
 				samplebufferoffset); 
 			bufferoffset+=samplebufferoffset;
-			_TIFFfree(samplebuffer);
+			_NDPIfree(samplebuffer);
 		}
 
 		if(buffer==NULL){
-			buffer = (unsigned char*) _TIFFmalloc(t2p->tiff_datasize);
+			buffer = (unsigned char*) _NDPImalloc(t2p->tiff_datasize);
 			if(buffer==NULL){
-				TIFFError(TIFF2PDF_MODULE,
+				NDPIError(TIFF2PDF_MODULE,
 					"Can't allocate %"TIFF_SSIZE_FORMAT" bytes of memory "
 					"for t2p_readwrite_pdf_image_tile, %s",
 					t2p->tiff_datasize,
-					TIFFFileName(input));
+					NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 			}
 			memset(buffer, 0, t2p->tiff_datasize);
-			read = TIFFReadEncodedTile(
+			read = NDPIReadEncodedTile(
 				input, 
 				tile, 
 				(tdata_t) &buffer[bufferoffset], 
 				t2p->tiff_datasize);
 			if(read==-1){
-				TIFFError(TIFF2PDF_MODULE,
+				NDPIError(TIFF2PDF_MODULE,
 					"Error on decoding tile %"PRIu32" of %s",
 					tile,
-					TIFFFileName(input));
-				_TIFFfree(buffer);
+					NDPIFileName(input));
+				_NDPIfree(buffer);
 				t2p->t2p_error=T2P_ERR_ERROR;
 				return(0);
 			}
@@ -3169,10 +3169,10 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 		}
 
 		if(t2p->pdf_sample & T2P_SAMPLE_YCBCR_TO_RGB){
-			TIFFError(TIFF2PDF_MODULE,
+			NDPIError(TIFF2PDF_MODULE,
 				"No support for YCbCr to RGB in tile for %s",
-				TIFFFileName(input));
-			_TIFFfree(buffer);
+				NDPIFileName(input));
+			_NDPIfree(buffer);
 			t2p->t2p_error = T2P_ERR_ERROR;
 			return(0);
 		}
@@ -3186,7 +3186,7 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 	}
 
 	if(t2p_tile_is_right_edge(t2p->tiff_tiles[t2p->pdf_page], tile) != 0){
-		if ((uint64_t)t2p->tiff_datasize < (uint64_t)TIFFTileRowSize(input) * (uint64_t)t2p->tiff_tiles[t2p->pdf_page].tiles_tilelength) {
+		if ((uint64_t)t2p->tiff_datasize < (uint64_t)NDPITileRowSize(input) * (uint64_t)t2p->tiff_tiles[t2p->pdf_page].tiles_tilelength) {
 			/* we don't know how to handle PLANARCONFIG_CONTIG, PHOTOMETRIC_YCBCR with 3 samples per pixel */
 			TIFFWarning(
 				TIFF2PDF_MODULE,
@@ -3194,7 +3194,7 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 		} else {
 			t2p_tile_collapse_left(
 				buffer,
-				TIFFTileRowSize(input),
+				NDPITileRowSize(input),
 				t2p->tiff_tiles[t2p->pdf_page].tiles_tilewidth,
 				t2p->tiff_tiles[t2p->pdf_page].tiles_edgetilewidth,
 				t2p->tiff_tiles[t2p->pdf_page].tiles_tilelength);
@@ -3203,72 +3203,72 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 
 
 	t2p_disable(output);
-	TIFFSetField(output, TIFFTAG_PHOTOMETRIC, t2p->tiff_photometric);
-	TIFFSetField(output, TIFFTAG_BITSPERSAMPLE, t2p->tiff_bitspersample);
-	TIFFSetField(output, TIFFTAG_SAMPLESPERPIXEL, t2p->tiff_samplesperpixel);
+	NDPISetField(output, TIFFTAG_PHOTOMETRIC, t2p->tiff_photometric);
+	NDPISetField(output, TIFFTAG_BITSPERSAMPLE, t2p->tiff_bitspersample);
+	NDPISetField(output, TIFFTAG_SAMPLESPERPIXEL, t2p->tiff_samplesperpixel);
 	if(t2p_tile_is_right_edge(t2p->tiff_tiles[t2p->pdf_page], tile) == 0){
-		TIFFSetField(
+		NDPISetField(
 			output, 
 			TIFFTAG_IMAGEWIDTH, 
 			t2p->tiff_tiles[t2p->pdf_page].tiles_tilewidth);
 	} else {
-		TIFFSetField(
+		NDPISetField(
 			output, 
 			TIFFTAG_IMAGEWIDTH, 
 			t2p->tiff_tiles[t2p->pdf_page].tiles_edgetilewidth);
 	}
 	if(t2p_tile_is_bottom_edge(t2p->tiff_tiles[t2p->pdf_page], tile) == 0){
-		TIFFSetField(
+		NDPISetField(
 			output, 
 			TIFFTAG_IMAGELENGTH, 
 			t2p->tiff_tiles[t2p->pdf_page].tiles_tilelength);
-		TIFFSetField(
+		NDPISetField(
 			output, 
 			TIFFTAG_ROWSPERSTRIP, 
 			t2p->tiff_tiles[t2p->pdf_page].tiles_tilelength);
 	} else {
-		TIFFSetField(
+		NDPISetField(
 			output, 
 			TIFFTAG_IMAGELENGTH, 
 			t2p->tiff_tiles[t2p->pdf_page].tiles_edgetilelength);
-		TIFFSetField(
+		NDPISetField(
 			output, 
 			TIFFTAG_ROWSPERSTRIP, 
 			t2p->tiff_tiles[t2p->pdf_page].tiles_edgetilelength);
 	}
-	TIFFSetField(output, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-	TIFFSetField(output, TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);
+	NDPISetField(output, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+	NDPISetField(output, TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);
 
 	switch(t2p->pdf_compression){
 	case T2P_COMPRESS_NONE:
-		TIFFSetField(output, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
+		NDPISetField(output, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
 		break;
 #ifdef CCITT_SUPPORT
 	case T2P_COMPRESS_G4:
-		TIFFSetField(output, TIFFTAG_COMPRESSION, COMPRESSION_CCITTFAX4);
+		NDPISetField(output, TIFFTAG_COMPRESSION, COMPRESSION_CCITTFAX4);
 		break;
 #endif
 #ifdef JPEG_SUPPORT
 	case T2P_COMPRESS_JPEG:
 		if (t2p->tiff_photometric==PHOTOMETRIC_YCBCR) {
 			uint16_t hor = 0, ver = 0;
-			if (TIFFGetField(input, TIFFTAG_YCBCRSUBSAMPLING, &hor, &ver)!=0) {
+			if (NDPIGetField(input, TIFFTAG_YCBCRSUBSAMPLING, &hor, &ver)!=0) {
 				if (hor != 0 && ver != 0) {
-					TIFFSetField(output, TIFFTAG_YCBCRSUBSAMPLING, hor, ver);
+					NDPISetField(output, TIFFTAG_YCBCRSUBSAMPLING, hor, ver);
 				}
 			}
-			if(TIFFGetField(input, TIFFTAG_REFERENCEBLACKWHITE, &xfloatp)!=0){
-				TIFFSetField(output, TIFFTAG_REFERENCEBLACKWHITE, xfloatp);
+			if(NDPIGetField(input, TIFFTAG_REFERENCEBLACKWHITE, &xfloatp)!=0){
+				NDPISetField(output, TIFFTAG_REFERENCEBLACKWHITE, xfloatp);
 			}
 		}
-		TIFFSetField(output, TIFFTAG_COMPRESSION, COMPRESSION_JPEG);
-		TIFFSetField(output, TIFFTAG_JPEGTABLESMODE, 0); /* JPEGTABLESMODE_NONE */
+		NDPISetField(output, TIFFTAG_COMPRESSION, COMPRESSION_JPEG);
+		NDPISetField(output, TIFFTAG_JPEGTABLESMODE, 0); /* JPEGTABLESMODE_NONE */
 		if(t2p->pdf_colorspace & (T2P_CS_RGB | T2P_CS_LAB)){
-			TIFFSetField(output, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_YCBCR);
+			NDPISetField(output, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_YCBCR);
 			if(t2p->tiff_photometric != PHOTOMETRIC_YCBCR){
-				TIFFSetField(output, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
+				NDPISetField(output, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
 			} else {
-				TIFFSetField(output, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RAW);
+				NDPISetField(output, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RAW);
 			}
 		}
 		if(t2p->pdf_colorspace & T2P_CS_GRAY){
@@ -3278,7 +3278,7 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 			(void)0;
 		}
 		if(t2p->pdf_defaultcompressionquality != 0){
-			TIFFSetField(output, 
+			NDPISetField(output, 
 				TIFFTAG_JPEGQUALITY, 
 				t2p->pdf_defaultcompressionquality);
 		}
@@ -3286,14 +3286,14 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 #endif
 #ifdef ZIP_SUPPORT
 	case T2P_COMPRESS_ZIP:
-		TIFFSetField(output, TIFFTAG_COMPRESSION, COMPRESSION_DEFLATE);
+		NDPISetField(output, TIFFTAG_COMPRESSION, COMPRESSION_DEFLATE);
 		if(t2p->pdf_defaultcompressionquality%100 != 0){
-			TIFFSetField(output, 
+			NDPISetField(output, 
 				TIFFTAG_PREDICTOR, 
 				t2p->pdf_defaultcompressionquality % 100);
 		}
 		if(t2p->pdf_defaultcompressionquality/100 != 0){
-			TIFFSetField(output, 
+			NDPISetField(output, 
 				TIFFTAG_ZIPQUALITY, 
 				(t2p->pdf_defaultcompressionquality / 100));
 		}
@@ -3303,26 +3303,26 @@ tsize_t t2p_readwrite_pdf_image_tile(T2P* t2p, TIFF* input, TIFF* output, ttile_
 		break;
 	}
 
-	if (TIFFStripSize(output) > t2p->tiff_datasize) {
-		TIFFError(TIFF2PDF_MODULE,
+	if (NDPIStripSize(output) > t2p->tiff_datasize) {
+		NDPIError(TIFF2PDF_MODULE,
 		          "Size mismatch input %" PRId64 ", output %" PRId64,
-		          (int64_t) t2p->tiff_datasize, (int64_t) TIFFStripSize(output));
-		_TIFFfree(buffer);
+		          (int64_t) t2p->tiff_datasize, (int64_t) NDPIStripSize(output));
+		_NDPIfree(buffer);
 		t2p->t2p_error = T2P_ERR_ERROR;
 		return(0);
 	}
 	t2p_enable(output);
 	t2p->outputwritten = 0;
 	bufferoffset = TIFFWriteEncodedStrip(output, (tstrip_t) 0, buffer,
-	                                     TIFFStripSize(output));
+	                                     NDPIStripSize(output));
 	if (buffer != NULL) {
-		_TIFFfree(buffer);
+		_NDPIfree(buffer);
 		buffer = NULL;
 	}
 	if (bufferoffset == -1) {
-		TIFFError(TIFF2PDF_MODULE,
+		NDPIError(TIFF2PDF_MODULE,
 		         "Error writing encoded tile to output PDF %s",
-		          TIFFFileName(output));
+		          NDPIFileName(output));
 		t2p->t2p_error = T2P_ERR_ERROR;
 		return(0);
 	}
@@ -3355,83 +3355,83 @@ int t2p_process_ojpeg_tables(T2P* t2p, TIFF* input){
 	uint16_t ri=0;
 	uint32_t rows=0;
 	
-	if(!TIFFGetField(input, TIFFTAG_JPEGPROC, &proc)){
-		TIFFError(TIFF2PDF_MODULE, 
+	if(!NDPIGetField(input, TIFFTAG_JPEGPROC, &proc)){
+		NDPIError(TIFF2PDF_MODULE, 
 			"Missing JPEGProc field in OJPEG image %s", 
-			TIFFFileName(input));
+			NDPIFileName(input));
 			t2p->t2p_error = T2P_ERR_ERROR;
 		return(0);
 	}
 	if(proc!=JPEGPROC_BASELINE && proc!=JPEGPROC_LOSSLESS){
-		TIFFError(TIFF2PDF_MODULE, 
+		NDPIError(TIFF2PDF_MODULE, 
 			"Bad JPEGProc field in OJPEG image %s", 
-			TIFFFileName(input));
+			NDPIFileName(input));
 			t2p->t2p_error = T2P_ERR_ERROR;
 		return(0);
 	}
-	if(!TIFFGetField(input, TIFFTAG_JPEGQTABLES, &q_length, &q)){
-		TIFFError(TIFF2PDF_MODULE, 
+	if(!NDPIGetField(input, TIFFTAG_JPEGQTABLES, &q_length, &q)){
+		NDPIError(TIFF2PDF_MODULE, 
 			"Missing JPEGQTables field in OJPEG image %s", 
-			TIFFFileName(input));
+			NDPIFileName(input));
 			t2p->t2p_error = T2P_ERR_ERROR;
 		return(0);
 	}
 	if(q_length < (64U * t2p->tiff_samplesperpixel)){
-		TIFFError(TIFF2PDF_MODULE, 
+		NDPIError(TIFF2PDF_MODULE, 
 			"Bad JPEGQTables field in OJPEG image %s", 
-			TIFFFileName(input));
+			NDPIFileName(input));
 			t2p->t2p_error = T2P_ERR_ERROR;
 		return(0);
 	} 
-	if(!TIFFGetField(input, TIFFTAG_JPEGDCTABLES, &dc_length, &dc)){
-		TIFFError(TIFF2PDF_MODULE, 
+	if(!NDPIGetField(input, TIFFTAG_JPEGDCTABLES, &dc_length, &dc)){
+		NDPIError(TIFF2PDF_MODULE, 
 			"Missing JPEGDCTables field in OJPEG image %s", 
-			TIFFFileName(input));
+			NDPIFileName(input));
 			t2p->t2p_error = T2P_ERR_ERROR;
 		return(0);
 	}
 	if(proc==JPEGPROC_BASELINE){
-		if(!TIFFGetField(input, TIFFTAG_JPEGACTABLES, &ac_length, &ac)){
-			TIFFError(TIFF2PDF_MODULE, 
+		if(!NDPIGetField(input, TIFFTAG_JPEGACTABLES, &ac_length, &ac)){
+			NDPIError(TIFF2PDF_MODULE, 
 				"Missing JPEGACTables field in OJPEG image %s", 
-				TIFFFileName(input));
+				NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 			return(0);
 		}
 	} else {
-		if(!TIFFGetField(input, TIFFTAG_JPEGLOSSLESSPREDICTORS, &lp)){
-			TIFFError(TIFF2PDF_MODULE, 
+		if(!NDPIGetField(input, TIFFTAG_JPEGLOSSLESSPREDICTORS, &lp)){
+			NDPIError(TIFF2PDF_MODULE, 
 				"Missing JPEGLosslessPredictors field in OJPEG image %s", 
-				TIFFFileName(input));
+				NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 				return(0);
 		}
-		if(!TIFFGetField(input, TIFFTAG_JPEGPOINTTRANSFORM, &pt)){
-			TIFFError(TIFF2PDF_MODULE, 
+		if(!NDPIGetField(input, TIFFTAG_JPEGPOINTTRANSFORM, &pt)){
+			NDPIError(TIFF2PDF_MODULE, 
 				"Missing JPEGPointTransform field in OJPEG image %s", 
-				TIFFFileName(input));
+				NDPIFileName(input));
 				t2p->t2p_error = T2P_ERR_ERROR;
 			return(0);
 		}
 	}
-	if(!TIFFGetField(input, TIFFTAG_YCBCRSUBSAMPLING, &h_samp, &v_samp)){
+	if(!NDPIGetField(input, TIFFTAG_YCBCRSUBSAMPLING, &h_samp, &v_samp)){
 		h_samp=1;
 		v_samp=1;
 	}
 	if(t2p->pdf_ojpegdata != NULL){
-		_TIFFfree(t2p->pdf_ojpegdata);
+		_NDPIfree(t2p->pdf_ojpegdata);
 		t2p->pdf_ojpegdata=NULL;
 	} 
-	t2p->pdf_ojpegdata = _TIFFmalloc(2048);
+	t2p->pdf_ojpegdata = _NDPImalloc(2048);
 	if(t2p->pdf_ojpegdata == NULL){
-		TIFFError(TIFF2PDF_MODULE, 
+		NDPIError(TIFF2PDF_MODULE, 
 			"Can't allocate %u bytes of memory for t2p_process_ojpeg_tables, %s", 
 			2048u,
-			TIFFFileName(input));
+			NDPIFileName(input));
 		t2p->t2p_error = T2P_ERR_ERROR;
 		return(0);
 	}
-	_TIFFmemset(t2p->pdf_ojpegdata, 0x00, 2048);
+	_NDPImemset(t2p->pdf_ojpegdata, 0x00, 2048);
 	t2p->pdf_ojpegdatalength = 0;
 	table_count=t2p->tiff_samplesperpixel;
 	if(proc==JPEGPROC_BASELINE){
@@ -3449,7 +3449,7 @@ int t2p_process_ojpeg_tables(T2P* t2p, TIFF* input){
 	ojpegdata[t2p->pdf_ojpegdatalength++]=0x00;
 	ojpegdata[t2p->pdf_ojpegdatalength++]=(8 + 3*t2p->tiff_samplesperpixel);
 	ojpegdata[t2p->pdf_ojpegdatalength++]=(t2p->tiff_bitspersample & 0xff);
-	if(TIFFIsTiled(input)){
+	if(NDPIIsTiled(input)){
 		ojpegdata[t2p->pdf_ojpegdatalength++]=
 			(t2p->tiff_tiles[t2p->pdf_page].tiles_tilelength >> 8) & 0xff;
 		ojpegdata[t2p->pdf_ojpegdatalength++]=
@@ -3485,7 +3485,7 @@ int t2p_process_ojpeg_tables(T2P* t2p, TIFF* input){
 		ojpegdata[t2p->pdf_ojpegdatalength++]=0x00;
 		ojpegdata[t2p->pdf_ojpegdatalength++]=0x43;
 		ojpegdata[t2p->pdf_ojpegdatalength++]=dest;
-		_TIFFmemcpy( &(ojpegdata[t2p->pdf_ojpegdatalength++]), 
+		_NDPImemcpy( &(ojpegdata[t2p->pdf_ojpegdatalength++]), 
 			&(((unsigned char*)q)[64*dest]), 64);
 		t2p->pdf_ojpegdatalength+=64;
 	}
@@ -3496,7 +3496,7 @@ int t2p_process_ojpeg_tables(T2P* t2p, TIFF* input){
 		offset_ms_l=t2p->pdf_ojpegdatalength;
 		t2p->pdf_ojpegdatalength+=2;
 		ojpegdata[t2p->pdf_ojpegdatalength++]=dest & 0x0f;
-		_TIFFmemcpy( &(ojpegdata[t2p->pdf_ojpegdatalength]), 
+		_NDPImemcpy( &(ojpegdata[t2p->pdf_ojpegdatalength]), 
 			&(((unsigned char*)dc)[offset_table]), 16);
 		code_count=0;
 		offset_table+=16;
@@ -3505,7 +3505,7 @@ int t2p_process_ojpeg_tables(T2P* t2p, TIFF* input){
 		}
 		ojpegdata[offset_ms_l]=((19+code_count)>>8) & 0xff;
 		ojpegdata[offset_ms_l+1]=(19+code_count) & 0xff;
-		_TIFFmemcpy( &(ojpegdata[t2p->pdf_ojpegdatalength]), 
+		_NDPImemcpy( &(ojpegdata[t2p->pdf_ojpegdatalength]), 
 			&(((unsigned char*)dc)[offset_table]), code_count);
 		offset_table+=code_count;
 		t2p->pdf_ojpegdatalength+=code_count;
@@ -3519,7 +3519,7 @@ int t2p_process_ojpeg_tables(T2P* t2p, TIFF* input){
 			t2p->pdf_ojpegdatalength+=2;
 			ojpegdata[t2p->pdf_ojpegdatalength] |= 0x10;
 			ojpegdata[t2p->pdf_ojpegdatalength++] |=dest & 0x0f;
-			_TIFFmemcpy( &(ojpegdata[t2p->pdf_ojpegdatalength]), 
+			_NDPImemcpy( &(ojpegdata[t2p->pdf_ojpegdatalength]), 
 				&(((unsigned char*)ac)[offset_table]), 16);
 			code_count=0;
 			offset_table+=16;
@@ -3528,13 +3528,13 @@ int t2p_process_ojpeg_tables(T2P* t2p, TIFF* input){
 			}	
 			ojpegdata[offset_ms_l]=((19+code_count)>>8) & 0xff;
 			ojpegdata[offset_ms_l+1]=(19+code_count) & 0xff;
-			_TIFFmemcpy( &(ojpegdata[t2p->pdf_ojpegdatalength]), 
+			_NDPImemcpy( &(ojpegdata[t2p->pdf_ojpegdatalength]), 
 				&(((unsigned char*)ac)[offset_table]), code_count);
 			offset_table+=code_count;
 			t2p->pdf_ojpegdatalength+=code_count;
 		}
 	}
-	if(TIFFNumberOfStrips(input)>1){
+	if(NDPINumberOfStrips(input)>1){
 		ojpegdata[t2p->pdf_ojpegdatalength++]=0xff;
 		ojpegdata[t2p->pdf_ojpegdatalength++]=0xdd;
 		ojpegdata[t2p->pdf_ojpegdatalength++]=0x00;
@@ -3542,7 +3542,7 @@ int t2p_process_ojpeg_tables(T2P* t2p, TIFF* input){
 		h_samp*=8;
 		v_samp*=8;
 		ri=(t2p->tiff_width+h_samp-1) / h_samp;
-		TIFFGetField(input, TIFFTAG_ROWSPERSTRIP, &rows);
+		NDPIGetField(input, TIFFTAG_ROWSPERSTRIP, &rows);
 		ri*=(rows+v_samp-1)/v_samp;
 		ojpegdata[t2p->pdf_ojpegdatalength++]= (ri>>8) & 0xff;
 		ojpegdata[t2p->pdf_ojpegdatalength++]= ri & 0xff;
@@ -3619,7 +3619,7 @@ int t2p_process_jpeg_strip(
 			case 0xd8:	/* SOI - start of image */
                 if( *bufferoffset + 2 > buffersize )
                     return(0);
-				_TIFFmemcpy(&(buffer[*bufferoffset]), &(strip[i-1]), 2);
+				_NDPImemcpy(&(buffer[*bufferoffset]), &(strip[i-1]), 2);
 				*bufferoffset+=2;
 				break;
 			case 0xc0:	/* SOF0 */
@@ -3630,7 +3630,7 @@ int t2p_process_jpeg_strip(
 				if(no==0){
                     if( *bufferoffset + datalen + 2 + 6 > buffersize )
                         return(0);
-					_TIFFmemcpy(&(buffer[*bufferoffset]), &(strip[i-1]), datalen+2);
+					_NDPImemcpy(&(buffer[*bufferoffset]), &(strip[i-1]), datalen+2);
                     if( *bufferoffset + 9 >= buffersize )
                         return(0);
 					ncomp = buffer[*bufferoffset+9];
@@ -3673,14 +3673,14 @@ int t2p_process_jpeg_strip(
 			case 0xdb: /* DQT */
                 if( *bufferoffset + datalen + 2 > buffersize )
                     return(0);
-				_TIFFmemcpy(&(buffer[*bufferoffset]), &(strip[i-1]), datalen+2);
+				_NDPImemcpy(&(buffer[*bufferoffset]), &(strip[i-1]), datalen+2);
 				*bufferoffset+=datalen+2;
 				break;
 			case 0xda: /* SOS */
 				if(no==0){
                     if( *bufferoffset + datalen + 2 > buffersize )
                         return(0);
-					_TIFFmemcpy(&(buffer[*bufferoffset]), &(strip[i-1]), datalen+2);
+					_NDPImemcpy(&(buffer[*bufferoffset]), &(strip[i-1]), datalen+2);
 					*bufferoffset+=datalen+2;
 				} else {
                     if( *bufferoffset + 2 > buffersize )
@@ -3693,7 +3693,7 @@ int t2p_process_jpeg_strip(
 				/* copy remainder of strip */
                 if( *bufferoffset + *striplength - i > buffersize )
                     return(0);
-				_TIFFmemcpy(&(buffer[*bufferoffset]), &(strip[i]), *striplength - i);
+				_NDPImemcpy(&(buffer[*bufferoffset]), &(strip[i]), *striplength - i);
 				*bufferoffset+= *striplength - i;
 				return(1);
 			default:
@@ -3736,7 +3736,7 @@ void t2p_tile_collapse_left(
 
 
 /*
- * This function calls TIFFWriteDirectory on the output after blanking its
+ * This function calls NDPIWriteDirectory on the output after blanking its
  * output by replacing the read, write, and seek procedures with empty
  * implementations, then it replaces the original implementations.
  */
@@ -3745,10 +3745,10 @@ void
 t2p_write_advance_directory(T2P* t2p, TIFF* output)
 {
 	t2p_disable(output);
-	if(!TIFFWriteDirectory(output)){
-		TIFFError(TIFF2PDF_MODULE, 
+	if(!NDPIWriteDirectory(output)){
+		NDPIError(TIFF2PDF_MODULE, 
 			"Error writing virtual directory to output PDF %s", 
-			TIFFFileName(output));
+			NDPIFileName(output));
 		t2p->t2p_error = T2P_ERR_ERROR;
 		return;
 	}
@@ -3791,7 +3791,7 @@ tsize_t t2p_sample_realize_palette(T2P* t2p, unsigned char* buffer){
         if( (data_size == 0U) || (t2p->tiff_datasize < 0) ||
             (data_size > (size_t) t2p->tiff_datasize) )
         {
-            TIFFError(TIFF2PDF_MODULE,
+            NDPIError(TIFF2PDF_MODULE,
                       "Error: sample_count * component_count > t2p->tiff_datasize");
             t2p->t2p_error = T2P_ERR_ERROR;
             return 1;
@@ -3801,7 +3801,7 @@ tsize_t t2p_sample_realize_palette(T2P* t2p, unsigned char* buffer){
 		palette_offset=buffer[i-1] * component_count;
 		sample_offset= (i-1) * component_count;
 		if(palette_offset + component_count > t2p->pdf_palettesize){
-			TIFFError(TIFF2PDF_MODULE,
+			NDPIError(TIFF2PDF_MODULE,
 				"Error: palette_offset + component_count > t2p->pdf_palettesize");
 			return 1;
 		}
@@ -4265,7 +4265,7 @@ tsize_t t2p_write_pdf_info(T2P* t2p, TIFF* input, TIFF* output)
 	written += t2p_write_pdf_string(buffer, output);
 	written += t2pWriteFile(output, (tdata_t) "\n", 1);
 	if (!t2p->pdf_creator_set) {
-		if (TIFFGetField(input, TIFFTAG_SOFTWARE, &info) != 0 && info) {
+		if (NDPIGetField(input, TIFFTAG_SOFTWARE, &info) != 0 && info) {
 			strncpy(t2p->pdf_creator, info, sizeof(t2p->pdf_creator) - 1);
 			t2p->pdf_creator[sizeof(t2p->pdf_creator) - 1] = '\0';
 		}
@@ -4276,8 +4276,8 @@ tsize_t t2p_write_pdf_info(T2P* t2p, TIFF* input, TIFF* output)
 		written += t2pWriteFile(output, (tdata_t) "\n", 1);
 	}
 	if (!t2p->pdf_author_set) {
-		if ((TIFFGetField(input, TIFFTAG_ARTIST, &info) != 0
-		     || TIFFGetField(input, TIFFTAG_COPYRIGHT, &info) != 0)
+		if ((NDPIGetField(input, TIFFTAG_ARTIST, &info) != 0
+		     || NDPIGetField(input, TIFFTAG_COPYRIGHT, &info) != 0)
 		    && info) {
 			strncpy(t2p->pdf_author, info, sizeof(t2p->pdf_author) - 1);
 			t2p->pdf_author[sizeof(t2p->pdf_author) - 1] = '\0';
@@ -4289,7 +4289,7 @@ tsize_t t2p_write_pdf_info(T2P* t2p, TIFF* input, TIFF* output)
 		written += t2pWriteFile(output, (tdata_t) "\n", 1);
 	}
 	if (!t2p->pdf_title_set) {
-		if (TIFFGetField(input, TIFFTAG_DOCUMENTNAME, &info) != 0 && info) {
+		if (NDPIGetField(input, TIFFTAG_DOCUMENTNAME, &info) != 0 && info) {
 			strncpy(t2p->pdf_title, info, sizeof(t2p->pdf_title) - 1);
 			t2p->pdf_title[sizeof(t2p->pdf_title) - 1] = '\0';
 		}
@@ -4300,7 +4300,7 @@ tsize_t t2p_write_pdf_info(T2P* t2p, TIFF* input, TIFF* output)
 		written += t2pWriteFile(output, (tdata_t) "\n", 1);
 	}
 	if (!t2p->pdf_subject_set) {
-		if (TIFFGetField(input, TIFFTAG_IMAGEDESCRIPTION, &info) != 0 && info) {
+		if (NDPIGetField(input, TIFFTAG_IMAGEDESCRIPTION, &info) != 0 && info) {
 			strncpy(t2p->pdf_subject, info, sizeof(t2p->pdf_subject) - 1);
 			t2p->pdf_subject[sizeof(t2p->pdf_subject) - 1] = '\0';
 		}
@@ -4331,7 +4331,7 @@ void t2p_pdf_currenttime(T2P* t2p)
 	time_t timenow;
 
 	if (time(&timenow) == (time_t) -1) {
-		TIFFError(TIFF2PDF_MODULE,
+		NDPIError(TIFF2PDF_MODULE,
 			  "Can't get the current time: %s", strerror(errno));
 		timenow = (time_t) 0;
 	}
@@ -4358,7 +4358,7 @@ void t2p_pdf_tifftime(T2P* t2p, TIFF* input)
 {
 	char* datetime;
 
-	if (TIFFGetField(input, TIFFTAG_DATETIME, &datetime) != 0
+	if (NDPIGetField(input, TIFFTAG_DATETIME, &datetime) != 0
 	    && (strlen(datetime) >= 19) ){
 		t2p->pdf_datetime[0]='D';
 		t2p->pdf_datetime[1]=':';
@@ -4612,7 +4612,7 @@ void t2p_compose_pdf_page(T2P* t2p){
 		    t2p->tiff_width > INT_MAX - tilewidth ||
 		    t2p->tiff_length > INT_MAX - tilelength )
 		{
-		    TIFFError(TIFF2PDF_MODULE, "Integer overflow");
+		    NDPIError(TIFF2PDF_MODULE, "Integer overflow");
 		    t2p->t2p_error = T2P_ERR_ERROR;
 		    return;
 		}
@@ -5511,7 +5511,7 @@ tsize_t t2p_write_pdf_trailer(T2P* t2p, TIFF* output)
   This function writes a PDF to a file given a pointer to a TIFF.
 
   The idea with using a TIFF* as output for a PDF file is that the file 
-  can be created with TIFFClientOpen for memory-mapped use within the TIFF 
+  can be created with NDPIClientOpen for memory-mapped use within the TIFF 
   library, and TIFFWriteEncodedStrip can be used to write compressed data to 
   the output.  The output is not actually a TIFF file, it is a PDF file.  
 
@@ -5532,7 +5532,7 @@ tsize_t t2p_write_pdf_trailer(T2P* t2p, TIFF* output)
   beginning of the file.  The function only writes to the output PDF and does 
   not seek.  See the example usage in the main() function.
 
-	TIFF* output = TIFFOpen("output.pdf", "w");
+	TIFF* output = NDPIOpen("output.pdf", "w");
 	assert(output != NULL);
 
 	if(output->tif_seekproc != NULL){
@@ -5542,8 +5542,8 @@ tsize_t t2p_write_pdf_trailer(T2P* t2p, TIFF* output)
   This function returns the file size of the output PDF file.  On error it 
   returns zero and the t2p->t2p_error variable is set to T2P_ERR_ERROR.
 
-  After this function completes, call t2p_free on t2p, TIFFClose on input, 
-  and TIFFClose on output.
+  After this function completes, call t2p_free on t2p, NDPIClose on input, 
+  and NDPIClose on output.
 */
 
 tsize_t t2p_write_pdf(T2P* t2p, TIFF* input, TIFF* output){
@@ -5555,9 +5555,9 @@ tsize_t t2p_write_pdf(T2P* t2p, TIFF* input, TIFF* output){
 
 	t2p_read_tiff_init(t2p, input);
 	if(t2p->t2p_error!=T2P_ERR_OK){return(0);}
-	t2p->pdf_xrefoffsets= (uint32_t*) _TIFFmalloc(TIFFSafeMultiply(tmsize_t, t2p->pdf_xrefcount, sizeof(uint32_t)) );
+	t2p->pdf_xrefoffsets= (uint32_t*) _NDPImalloc(TIFFSafeMultiply(tmsize_t, t2p->pdf_xrefcount, sizeof(uint32_t)) );
 	if(t2p->pdf_xrefoffsets==NULL){
-		TIFFError(
+		NDPIError(
 			TIFF2PDF_MODULE, 
 			"Can't allocate %"TIFF_SIZE_FORMAT" bytes of memory for t2p_write_pdf",
 			sizeof(uint32_t) * t2p->pdf_xrefcount);
@@ -5667,7 +5667,7 @@ tsize_t t2p_write_pdf(T2P* t2p, TIFF* input, TIFF* output){
 				streamlen=written;
 				t2p_read_tiff_size_tile(t2p, input, i2);
 				if (t2p->tiff_maxdatasize && (t2p->tiff_datasize > t2p->tiff_maxdatasize)) {
-					TIFFError(TIFF2PDF_MODULE,
+					NDPIError(TIFF2PDF_MODULE,
 						"Allocation of %" PRIu64 " bytes is forbidden. Limit is %" PRIu64 ". Use -m option to change limit",
                               (uint64_t)t2p->tiff_datasize, (uint64_t)t2p->tiff_maxdatasize);
 					t2p->t2p_error = T2P_ERR_ERROR;
@@ -5697,7 +5697,7 @@ tsize_t t2p_write_pdf(T2P* t2p, TIFF* input, TIFF* output){
 			streamlen=written;
 			t2p_read_tiff_size(t2p, input);
 			if (t2p->tiff_maxdatasize && (t2p->tiff_datasize > t2p->tiff_maxdatasize)) {
-				TIFFError(TIFF2PDF_MODULE,
+				NDPIError(TIFF2PDF_MODULE,
 					"Allocation of %" PRIu64 " bytes is forbidden. Limit is %" PRIu64 ". Use -m option to change limit",
                           (uint64_t)t2p->tiff_datasize, (uint64_t)t2p->tiff_maxdatasize);
 				t2p->t2p_error = T2P_ERR_ERROR;

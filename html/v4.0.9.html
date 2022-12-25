@@ -101,8 +101,8 @@ information is located here:
 
 <UL>
 
-    <LI> libtiff/tif_color.c: TIFFYCbCrToRGBInit(): stricter clamping to avoid
-	int32 overflow in TIFFYCbCrtoRGB().
+    <LI> libtiff/tif_color.c: NDPIYCbCrToRGBInit(): stricter clamping to avoid
+	int32 overflow in NDPIYCbCrtoRGB().
 	Fixes https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=1844
 	Credit to OSS Fuzz
 
@@ -112,9 +112,9 @@ information is located here:
 	Fixes https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=1907
 	Credit to OSS Fuzz
 
-    <LI> libtiff/tif_dirinfo.c, tif_dirread.c: add _TIFFCheckFieldIsValidForCodec(),
-	and use it in TIFFReadDirectory() so as to ignore fields whose tag is a
-	codec-specified tag but this codec is not enabled. This avoids TIFFGetField()
+    <LI> libtiff/tif_dirinfo.c, tif_dirread.c: add _NDPICheckFieldIsValidForCodec(),
+	and use it in NDPIReadDirectory() so as to ignore fields whose tag is a
+	codec-specified tag but this codec is not enabled. This avoids NDPIGetField()
 	to behave differently depending on whether the codec is enabled or not, and
 	thus can avoid stack based buffer overflows in a number of TIFF utilities
 	such as tiffsplit, tiffcmp, thumbnail, etc.
@@ -176,33 +176,33 @@ information is located here:
     <LI> libtiff/tif_jbig.c: fix memory leak in error code path of JBIGDecode()
 	Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2706
 	Reported by team OWL337
-    <LI> libtiff/tif_dirread.c: in TIFFReadDirEntryFloat(), check that a
+    <LI> libtiff/tif_dirread.c: in NDPIReadDirEntryFloat(), check that a
 	double value can fit in a float before casting. Patch by Nicolas RUFF
     <LI> libtiff/tiffiop.h, libtiff/tif_jpeg.c, libtiff/tif_jpeg_12.c,
-	libtiff/tif_read.c: make TIFFReadScanline() works in
+	libtiff/tif_read.c: make NDPIReadScanline() works in
 	CHUNKY_STRIP_READ_SUPPORT mode with JPEG stream with multiple scans.
 	Also make configurable through a LIBTIFF_JPEG_MAX_ALLOWED_SCAN_NUMBER
 	environment variable the maximum number of scans allowed. Defaults to
 	100.
-    <LI> libtiff/tif_read.c: TIFFFillTile(): add limitation to the number
+    <LI> libtiff/tif_read.c: NDPIFillTile(): add limitation to the number
 	of bytes read in case td_stripbytecount[strip] is bigger than
 	reasonable, so as to avoid excessive memory allocation (similarly to
 	what was done for TIFFFileStrip() on 2017-05-10)
-    <LI> libtiff/tif_getimage.c: use _TIFFReadEncodedStripAndAllocBuffer(). 
+    <LI> libtiff/tif_getimage.c: use _NDPIReadEncodedStripAndAllocBuffer(). 
 	Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2708 and
 	https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=2433 .
 	Credit to OSS Fuzz
-    <LI> libtiff/tif_read.c, tiffiop.h: add a _TIFFReadEncodedStripAndAllocBuffer()
-	function, variant of TIFFReadEncodedStrip() that allocates the
-	decoded buffer only after a first successful TIFFFillStrip(). This avoids
+    <LI> libtiff/tif_read.c, tiffiop.h: add a _NDPIReadEncodedStripAndAllocBuffer()
+	function, variant of NDPIReadEncodedStrip() that allocates the
+	decoded buffer only after a first successful NDPIFillStrip(). This avoids
 	excessive memory allocation on corrupted files.
     <LI> libtiff/tif_dirwrite.c: in TIFFWriteDirectoryTagCheckedXXXX()
 	functions associated with LONG8/SLONG8 data type, replace assertion that
 	the file is BigTIFF, by a non-fatal error.
 	Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2712
 	Reported by team OWL337
-    <LI> libtiff/tif_read.c: TIFFStartTile(): set tif_rawcc to
-	tif_rawdataloaded when it is set. Similarly to TIFFStartStrip().
+    <LI> libtiff/tif_read.c: NDPIStartTile(): set tif_rawcc to
+	tif_rawdataloaded when it is set. Similarly to NDPIStartStrip().
 	This issue was revealed by the change of 2017-06-30 in TIFFFileTile(),
 	limiting the number of bytes read. But it could probably have been hit
 	too in CHUNKY_STRIP_READ_SUPPORT mode previously ?
@@ -211,13 +211,13 @@ information is located here:
     <LI> libtiff/tif_error.c, tif_warning.c: correctly use va_list when both
 	an old-style and new-style warning/error handlers are installed.
 	Patch by Paavo Helde (sent on the mailing list)
-    <LI> libtiff/tif_getimage.c: use _TIFFReadTileAndAllocBuffer().
+    <LI> libtiff/tif_getimage.c: use _NDPIReadTileAndAllocBuffer().
 	Fixes https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=2470
 	Credit to OSS Fuzz.
-    <LI> libtiff/tif_read.c, tiffiop.h: add a _TIFFReadEncodedTileAndAllocBuffer()
-	and _TIFFReadTileAndAllocBuffer() variants of TIFFReadEncodedTile() and
-	TIFFReadTile() that allocates the decoded buffer only after a first
-	successful TIFFFillTile(). This avoids excessive memory allocation
+    <LI> libtiff/tif_read.c, tiffiop.h: add a _NDPIReadEncodedTileAndAllocBuffer()
+	and _NDPIReadTileAndAllocBuffer() variants of NDPIReadEncodedTile() and
+	NDPIReadTile() that allocates the decoded buffer only after a first
+	successful NDPIFillTile(). This avoids excessive memory allocation
 	on corrupted files.
     <LI> libtiff/tif_pixarlog.c: avoid excessive memory allocation on decoding
 	when RowsPerStrip tag is not defined (and thus td_rowsperstrip == UINT_MAX)
@@ -231,17 +231,17 @@ information is located here:
 	of one page size on the CPU architecture (typically 4096). Credit
 	to myself :-)
     <LI> libtiff/tif_dir.c: avoid potential null pointer dereference in
-	_TIFFVGetField() on corrupted TIFFTAG_NUMBEROFINKS tag instance.
+	_NDPIVGetField() on corrupted TIFFTAG_NUMBEROFINKS tag instance.
 	Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2713
     <LI> tools/tiff2pdf.c: prevent heap buffer overflow write in "Raw"
 	mode on PlanarConfig=Contig input images.
 	Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2715
 	Reported by team OWL337
-    <LI> libtiff/tif_read.c: TIFFFillStrip() / TIFFFillTile().
+    <LI> libtiff/tif_read.c: NDPIFillStrip() / NDPIFillTile().
 	Complementary fix for http://bugzilla.maptools.org/show_bug.cgi?id=2708
 	in the isMapped() case, so as to avoid excessive memory allocation
 	when we need a temporary buffer but the file is truncated.
-    <LI> libtiff/tif_read.c: TIFFFillStrip() / TIFFFillTile().
+    <LI> libtiff/tif_read.c: NDPIFillStrip() / NDPIFillTile().
 	Complementary fix for http://bugzilla.maptools.org/show_bug.cgi?id=2708
 	in the isMapped() case, so as to avoid excessive memory allocation
 	when we need a temporary buffer but the file is truncated.
@@ -264,12 +264,12 @@ information is located here:
 	Fixes https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=2350
 	Credit to OSS Fuzz
     <LI> libtiff/tif_read.c: add protection against excessive memory
-	allocation attempts in TIFFReadDirEntryArray() on short files.
+	allocation attempts in NDPIReadDirEntryArray() on short files.
 	Effective for mmap'ed case. And non-mmap'ed case, but restricted
 	to 64bit builds.
 	Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2675
     <LI> libtiff/tif_read.c: add protection against excessive memory
-	allocation attempts in TIFFReadDirEntryArray() on short files.
+	allocation attempts in NDPIReadDirEntryArray() on short files.
 	Effective for mmap'ed case. And non-mmap'ed case, but restricted
 	to 64bit builds.
 	Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2675
@@ -295,12 +295,12 @@ information is located here:
 	Fixes https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=2700
 	Credit to OSS Fuzz
    <LI> libtiff/tif_dirwrite.c: replace assertion related to not finding the
-	SubIFD tag by runtime check (in TIFFWriteDirectorySec())
+	SubIFD tag by runtime check (in NDPIWriteDirectorySec())
 	Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2727
 	Reported by team OWL337
    <LI> libtiff/tif_dirwrite.c: replace assertion to tag value not fitting
 	on uint32 when selecting the value of SubIFD tag by runtime check
-	(in TIFFWriteDirectoryTagSubifd()).
+	(in NDPIWriteDirectoryTagSubifd()).
 	Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2728
 	Reported by team OWL337
    <LI> libtiff/tif_jpeg.c: accept reading the last strip of a JPEG compressed
@@ -308,13 +308,13 @@ information is located here:
 	strip. Emit a warning in this situation since this is non compliant.
    <LI> libtiff/tiffiop.h, tif_aux.c: redirect SeekOK() macro to a _TIFFSeekoK()
 	function that checks if the offset is not bigger than INT64_MAX, so as
-	to avoid a -1 error return code of TIFFSeekFile() to match a required
+	to avoid a -1 error return code of NDPISeekFile() to match a required
 	seek to UINT64_MAX/-1.
 	Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2726
 	Adapted from proposal by Nicolas Ruff.
    <LI> libtiff/tif_dirread.c: add NULL check to avoid likely false positive
 	null-pointer dereference warning by CLang Static Analyzer.
-   <LI> libtiff/libtiff.def: add TIFFReadRGBAStripExt and TIFFReadRGBATileExt
+   <LI> libtiff/libtiff.def: add NDPIReadRGBAStripExt and NDPIReadRGBATileExt
 	Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2735
    <LI> libtiff/tif_jpeg.c: add compatibility with libjpeg-turbo 1.5.2 that
 	honours max_memory_to_use > 0.

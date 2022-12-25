@@ -22,15 +22,15 @@
 .\" OF THIS SOFTWARE.
 .\"
 .if n .po 0
-.TH TIFFOpen 3TIFF "July 1, 2005" "libtiff"
+.TH NDPIOpen 3TIFF "July 1, 2005" "libtiff"
 .SH NAME
-TIFFOpen, TIFFFdOpen, TIFFClientOpen \- open a
+NDPIOpen, TIFFFdOpen, NDPIClientOpen \- open a
 .SM TIFF
 file for reading or writing
 .SH SYNOPSIS
 .B "#include <tiffio.h>"
 .sp
-.BI "TIFF* TIFFOpen(const char *" filename ", const char *" mode ")"
+.BI "TIFF* NDPIOpen(const char *" filename ", const char *" mode ")"
 .br
 .BI "TIFF* TIFFFdOpen(const int " fd ", const char *" filename ", const char *" mode ")"
 .sp
@@ -46,9 +46,9 @@ file for reading or writing
 .br
 .B "typedef void (*TIFFUnmapFileProc)(thandle_t, tdata_t, toff_t);"
 .sp
-.BI "TIFF* TIFFClientOpen(const char *" filename ", const char *" mode ", thandle_t " clientdata ", TIFFReadWriteProc " readproc ", TIFFReadWriteProc " writeproc ", TIFFSeekProc " seekproc ", TIFFCloseProc " closeproc ", TIFFSizeProc " sizeproc ", TIFFMapFileProc " mapproc ", TIFFUnmapFileProc " unmapproc ")"
+.BI "TIFF* NDPIClientOpen(const char *" filename ", const char *" mode ", thandle_t " clientdata ", TIFFReadWriteProc " readproc ", TIFFReadWriteProc " writeproc ", TIFFSeekProc " seekproc ", TIFFCloseProc " closeproc ", TIFFSizeProc " sizeproc ", TIFFMapFileProc " mapproc ", TIFFUnmapFileProc " unmapproc ")"
 .SH DESCRIPTION
-.IR TIFFOpen
+.IR NDPIOpen
 opens a
 .SM TIFF
 file whose name is
@@ -70,7 +70,7 @@ If a file is opened for reading, the first
 .SM TIFF
 directory in the file is automatically read
 (also see
-.IR TIFFSetDirectory (3TIFF)
+.IR NDPISetDirectory (3TIFF)
 for reading directories other than the first).
 If a file is opened for writing or appending, a default directory
 is automatically created for writing subsequent data.
@@ -91,12 +91,12 @@ column represents the visual left hand side),
 .IR Compression =1
 (no compression).
 To alter these values, or to define values for additional fields,
-.IR TIFFSetField (3TIFF)
+.IR NDPISetField (3TIFF)
 must be used.
 .PP
 .IR TIFFFdOpen
 is like
-.IR TIFFOpen
+.IR NDPIOpen
 except that it opens a
 .SM TIFF
 file given an open file descriptor
@@ -105,9 +105,9 @@ The file's name and mode must reflect that of the open descriptor.
 The object associated with the file descriptor
 .BR "must support random access" .
 .PP
-.IR TIFFClientOpen
+.IR NDPIClientOpen
 is like
-.IR TIFFOpen
+.IR NDPIOpen
 except that the caller supplies a collection of functions that the
 library will use to do \s-1UNIX\s+1-like I/O operations. 
 The
@@ -133,7 +133,7 @@ The
 .I clientdata
 parameter is an opaque ``handle'' passed to the client-specified
 routines passed as parameters to
-.IR TIFFClientOpen .
+.IR NDPIClientOpen .
 .SH OPTIONS
 The open mode parameter can include the following flags in
 addition to the ``r'', ``w'', and ``a'' flags.
@@ -245,17 +245,17 @@ a new file the ``b'' and ``l'' option flags may be included in
 the call to open a file; for example, ``wb'' or ``wl''.
 .SH "RETURN VALUES"
 Upon successful completion 
-.IR TIFFOpen ,
+.IR NDPIOpen ,
 .IR TIFFFdOpen ,
 and
-.IR TIFFClientOpen
+.IR NDPIClientOpen
 return a 
 .SM TIFF
 pointer.
 Otherwise, NULL is returned.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.IR TIFFError (3TIFF)
+.IR NDPIError (3TIFF)
 routine.
 Likewise, warning messages are directed to the
 .IR TIFFWarning (3TIFF)
@@ -267,7 +267,7 @@ The specified
 parameter was not one of ``r'' (read), ``w'' (write), or ``a'' (append).
 .PP
 .BR "%s: Cannot open" .
-.IR TIFFOpen ()
+.IR NDPIOpen ()
 was unable to open the specified filename for read/writing.
 .PP
 .BR "Cannot read TIFF header" .
@@ -290,4 +290,4 @@ ordering of the current machine was opened for appending (``a'').
 This is a limitation of the library.
 .SH "SEE ALSO"
 .IR libtiff (3TIFF),
-.IR TIFFClose (3TIFF)
+.IR NDPIClose (3TIFF)

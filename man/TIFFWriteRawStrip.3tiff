@@ -52,7 +52,7 @@ Otherwise, the value of
 is returned.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.BR TIFFError (3TIFF)
+.BR NDPIError (3TIFF)
 routine.
 .PP
 \fB%s: File not open for writing\fP.
@@ -64,18 +64,18 @@ organized in tiles because the
 and
 .I TileLength
 tags have been set with
-.BR TIFFSetField (3TIFF).
+.BR NDPISetField (3TIFF).
 .PP
 \fB%s: Must set "ImageWidth" before writing data\fP.
 The image's width has not be set before the first write.
 See
-.BR TIFFSetField (3TIFF)
+.BR NDPISetField (3TIFF)
 for information on how to do this.
 .PP
 \fB%s: Must set "PlanarConfiguration" before writing data\fP.
 The organization of data has not be defined before the first write.
 See
-.BR TIFFSetField (3TIFF)
+.BR NDPISetField (3TIFF)
 for information on how to do this.
 .PP
 \fB%s: No space for strip arrays"\fP.
@@ -86,7 +86,7 @@ offsets and byte counts.
 The specified strip is not a valid strip according to the
 currently specified image dimensions.
 .SH "SEE ALSO"
-.BR TIFFOpen (3TIFF),
+.BR NDPIOpen (3TIFF),
 .BR TIFFWriteEncodedStrip (3TIFF),
 .BR TIFFWriteScanline (3TIFF),
 .BR libtiff (3TIFF)

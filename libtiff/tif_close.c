@@ -29,7 +29,7 @@
 #include <string.h>
 
 /************************************************************************/
-/*                            TIFFCleanup()                             */
+/*                            NDPICleanup()                             */
 /************************************************************************/
 
 /**
@@ -42,18 +42,18 @@
  */
 
 void
-TIFFCleanup(TIFF* tif)
+NDPICleanup(TIFF* tif)
 {
 	/*
          * Flush buffered data and directory (if dirty).
          */
 	if (tif->tif_mode != O_RDONLY)
-		TIFFFlush(tif);
+		NDPIFlush(tif);
 	(*tif->tif_cleanup)(tif);
-	TIFFFreeDirectory(tif);
+	NDPIFreeDirectory(tif);
 
 	if (tif->tif_dirlist)
-		_TIFFfree(tif->tif_dirlist);
+		_NDPIfree(tif->tif_dirlist);
 
 	/*
          * Clean up client info links.
@@ -63,12 +63,12 @@ TIFFCleanup(TIFF* tif)
 		TIFFClientInfoLink *psLink = tif->tif_clientinfo;
 
 		tif->tif_clientinfo = psLink->next;
-		_TIFFfree( psLink->name );
-		_TIFFfree( psLink );
+		_NDPIfree( psLink->name );
+		_NDPIfree( psLink );
 	}
 
 	if (tif->tif_rawdata && (tif->tif_flags&TIFF_MYBUFFER))
-		_TIFFfree(tif->tif_rawdata);
+		_NDPIfree(tif->tif_rawdata);
 	if (isMapped(tif))
 		TIFFUnmapFileContents(tif, tif->tif_base, (toff_t)tif->tif_size);
 
@@ -82,12 +82,12 @@ TIFFCleanup(TIFF* tif)
 			TIFFField *fld = tif->tif_fields[i];
 			if (fld->field_bit == FIELD_CUSTOM &&
 			    strncmp("Tag ", fld->field_name, 4) == 0) {
-				_TIFFfree(fld->field_name);
-				_TIFFfree(fld);
+				_NDPIfree(fld->field_name);
+				_NDPIfree(fld);
 			}
 		}
 
-		_TIFFfree(tif->tif_fields);
+		_NDPIfree(tif->tif_fields);
 	}
 
         if (tif->tif_nfieldscompat > 0) {
@@ -95,22 +95,22 @@ TIFFCleanup(TIFF* tif)
 
                 for (i = 0; i < tif->tif_nfieldscompat; i++) {
                         if (tif->tif_fieldscompat[i].allocated_size)
-                                _TIFFfree(tif->tif_fieldscompat[i].fields);
+                                _NDPIfree(tif->tif_fieldscompat[i].fields);
                 }
-                _TIFFfree(tif->tif_fieldscompat);
+                _NDPIfree(tif->tif_fieldscompat);
         }
 
-	_TIFFfree(tif);
+	_NDPIfree(tif);
 }
 
 /************************************************************************/
-/*                            TIFFClose()                               */
+/*                            NDPIClose()                               */
 /************************************************************************/
 
 /**
  * Close a previously opened TIFF file.
  *
- * TIFFClose closes a file that was previously opened with TIFFOpen().
+ * NDPIClose closes a file that was previously opened with NDPIOpen().
  * Any buffered data are flushed to the file, including the contents of
  * the current directory (if modified); and all resources are reclaimed.
  * 
@@ -118,12 +118,12 @@ TIFFCleanup(TIFF* tif)
  */
 
 void
-TIFFClose(TIFF* tif)
+NDPIClose(TIFF* tif)
 {
 	TIFFCloseProc closeproc = tif->tif_closeproc;
 	thandle_t fd = tif->tif_clientdata;
 
-	TIFFCleanup(tif);
+	NDPICleanup(tif);
 	(void) (*closeproc)(fd);
 }
 

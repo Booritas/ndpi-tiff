@@ -64,7 +64,7 @@
 #include <string.h>
 #include "tiffio.h"
 
-void TIFFBuildOverviews( TIFF *, int, int *, int, const char *,
+void NDPIBuildOverviews( TIFF *, int, int *, int, const char *,
                          int (*)(double,void*), void * );
 
 /************************************************************************/
@@ -149,17 +149,17 @@ int main( int argc, char ** argv )
 /* -------------------------------------------------------------------- */
 /*      Build the overview.                                             */
 /* -------------------------------------------------------------------- */
-    hTIFF = TIFFOpen( argv[1], "r+" );
+    hTIFF = NDPIOpen( argv[1], "r+" );
     if( hTIFF == NULL )
     {
-        fprintf( stderr, "TIFFOpen(%s) failed.\n", argv[1] );
+        fprintf( stderr, "NDPIOpen(%s) failed.\n", argv[1] );
         return( 1 );
     }
 
-    TIFFBuildOverviews( hTIFF, nOverviewCount, anOverviews, bUseSubIFD,
+    NDPIBuildOverviews( hTIFF, nOverviewCount, anOverviews, bUseSubIFD,
                         pszResampling, NULL, NULL );
 
-    TIFFClose( hTIFF );
+    NDPIClose( hTIFF );
 
 /* -------------------------------------------------------------------- */
 /*      Optionally test for memory leaks.                               */

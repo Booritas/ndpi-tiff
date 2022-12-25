@@ -142,7 +142,7 @@ struct tiff {
 	tmsize_t             tif_tilesize;     /* # of bytes in a tile */
 	/* compression scheme hooks */
 	int                  tif_decodestatus;
-	TIFFBoolMethod       tif_fixuptags;    /* called in TIFFReadDirectory */
+	TIFFBoolMethod       tif_fixuptags;    /* called in NDPIReadDirectory */
 	TIFFBoolMethod       tif_setupdecode;  /* called once before predecode */
 	TIFFPreMethod        tif_predecode;    /* pre- row/strip/tile decoding */
 	TIFFBoolMethod       tif_setupencode;  /* called once before preencode */
@@ -206,7 +206,7 @@ struct tiff {
 	((*(tif)->tif_readproc)((tif)->tif_clientdata,(buf),(size)))
 #define TIFFWriteFile(tif, buf, size) \
 	((*(tif)->tif_writeproc)((tif)->tif_clientdata,(buf),(size)))
-#define TIFFSeekFile(tif, off, whence) \
+#define NDPISeekFile(tif, off, whence) \
 	((*(tif)->tif_seekproc)((tif)->tif_clientdata,(off),(whence)))
 #define TIFFCloseFile(tif) \
 	((*(tif)->tif_closeproc)((tif)->tif_clientdata))
@@ -225,7 +225,7 @@ struct tiff {
 	(TIFFReadFile((tif),(buf),(size))==(size))
 #endif
 #ifndef SeekOK
-#define SeekOK(tif, off) _TIFFSeekOK(tif, off)
+#define SeekOK(tif, off) _NDPISeekOK(tif, off)
 #endif
 #ifndef WriteOK
 #define WriteOK(tif, buf, size) \
@@ -315,75 +315,75 @@ typedef size_t TIFFIOSize_t;
 #if defined(__cplusplus)
 extern "C" {
 #endif
-extern int _TIFFgetMode(const char* mode, const char* module);
-extern int _TIFFNoRowEncode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s);
-extern int _TIFFNoStripEncode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s);
-extern int _TIFFNoTileEncode(TIFF*, uint8_t* pp, tmsize_t cc, uint16_t s);
-extern int _TIFFNoRowDecode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s);
-extern int _TIFFNoStripDecode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s);
-extern int _TIFFNoTileDecode(TIFF*, uint8_t* pp, tmsize_t cc, uint16_t s);
-extern void _TIFFNoPostDecode(TIFF* tif, uint8_t* buf, tmsize_t cc);
-extern int _TIFFNoPreCode(TIFF* tif, uint16_t s);
-extern int _TIFFNoSeek(TIFF* tif, uint32_t off);
-extern void _TIFFSwab16BitData(TIFF* tif, uint8_t* buf, tmsize_t cc);
-extern void _TIFFSwab24BitData(TIFF* tif, uint8_t* buf, tmsize_t cc);
-extern void _TIFFSwab32BitData(TIFF* tif, uint8_t* buf, tmsize_t cc);
-extern void _TIFFSwab64BitData(TIFF* tif, uint8_t* buf, tmsize_t cc);
-extern int TIFFFlushData1(TIFF* tif);
-extern int TIFFDefaultDirectory(TIFF* tif);
-extern void _TIFFSetDefaultCompressionState(TIFF* tif);
-extern int _TIFFRewriteField(TIFF *, uint16_t, TIFFDataType, tmsize_t, void *);
-extern int TIFFSetCompressionScheme(TIFF* tif, int scheme);
+extern int _NDPIgetMode(const char* mode, const char* module);
+extern int _NDPINoRowEncode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s);
+extern int _NDPINoStripEncode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s);
+extern int _NDPINoTileEncode(TIFF*, uint8_t* pp, tmsize_t cc, uint16_t s);
+extern int _NDPINoRowDecode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s);
+extern int _NDPINoStripDecode(TIFF* tif, uint8_t* pp, tmsize_t cc, uint16_t s);
+extern int _NDPINoTileDecode(TIFF*, uint8_t* pp, tmsize_t cc, uint16_t s);
+extern void _NDPINoPostDecode(TIFF* tif, uint8_t* buf, tmsize_t cc);
+extern int _NDPINoPreCode(TIFF* tif, uint16_t s);
+extern int _NDPINoSeek(TIFF* tif, uint32_t off);
+extern void _NDPISwab16BitData(TIFF* tif, uint8_t* buf, tmsize_t cc);
+extern void _NDPISwab24BitData(TIFF* tif, uint8_t* buf, tmsize_t cc);
+extern void _NDPISwab32BitData(TIFF* tif, uint8_t* buf, tmsize_t cc);
+extern void _NDPISwab64BitData(TIFF* tif, uint8_t* buf, tmsize_t cc);
+extern int NDPIFlushData1(TIFF* tif);
+extern int NDPIDefaultDirectory(TIFF* tif);
+extern void _NDPISetDefaultCompressionState(TIFF* tif);
+extern int _NDPIRewriteField(TIFF *, uint16_t, TIFFDataType, tmsize_t, void *);
+extern int NDPISetCompressionScheme(TIFF* tif, int scheme);
 extern int TIFFSetDefaultCompressionState(TIFF* tif);
-extern uint32_t _TIFFDefaultStripSize(TIFF* tif, uint32_t s);
-extern void _TIFFDefaultTileSize(TIFF* tif, uint32_t* tw, uint32_t* th);
-extern int _TIFFDataSize(TIFFDataType type);
+extern uint32_t _NDPIDefaultStripSize(TIFF* tif, uint32_t s);
+extern void _NDPIDefaultTileSize(TIFF* tif, uint32_t* tw, uint32_t* th);
+extern int _NDPIDataSize(TIFFDataType type);
 
 /*--: Rational2Double: Return size of TIFFSetGetFieldType in bytes. */
-extern int _TIFFSetGetFieldSize(TIFFSetGetFieldType setgettype);
+extern int _NDPISetGetFieldSize(TIFFSetGetFieldType setgettype);
 
-extern void _TIFFsetByteArray(void**, void*, uint32_t);
-extern void _TIFFsetString(char**, char*);
-extern void _TIFFsetShortArray(uint16_t**, uint16_t*, uint32_t);
-extern void _TIFFsetLongArray(uint32_t**, uint32_t*, uint32_t);
-extern void _TIFFsetFloatArray(float**, float*, uint32_t);
-extern void _TIFFsetDoubleArray(double**, double*, uint32_t);
+extern void _NDPIsetByteArray(void**, void*, uint32_t);
+extern void _NDPIsetString(char**, char*);
+extern void _NDPIsetShortArray(uint16_t**, uint16_t*, uint32_t);
+extern void _NDPIsetLongArray(uint32_t**, uint32_t*, uint32_t);
+extern void _NDPIsetFloatArray(float**, float*, uint32_t);
+extern void _NDPIsetDoubleArray(double**, double*, uint32_t);
 
-extern void _TIFFprintAscii(FILE*, const char*);
-extern void _TIFFprintAsciiTag(FILE*, const char*, const char*);
+extern void _NDPIprintAscii(FILE*, const char*);
+extern void _NDPIprintAsciiTag(FILE*, const char*, const char*);
 
 extern TIFFErrorHandler _TIFFwarningHandler;
 extern TIFFErrorHandler _TIFFerrorHandler;
 extern TIFFErrorHandlerExt _TIFFwarningHandlerExt;
 extern TIFFErrorHandlerExt _TIFFerrorHandlerExt;
 
-extern uint32_t _TIFFMultiply32(TIFF*, uint32_t, uint32_t, const char*);
-extern uint64_t _TIFFMultiply64(TIFF*, uint64_t, uint64_t, const char*);
-extern tmsize_t _TIFFMultiplySSize(TIFF*, tmsize_t, tmsize_t, const char*);
-extern tmsize_t _TIFFCastUInt64ToSSize(TIFF*, uint64_t, const char*);
-extern void* _TIFFCheckMalloc(TIFF*, tmsize_t, tmsize_t, const char*);
-extern void* _TIFFCheckRealloc(TIFF*, void*, tmsize_t, tmsize_t, const char*);
+extern uint32_t _NDPIMultiply32(TIFF*, uint32_t, uint32_t, const char*);
+extern uint64_t _NDPIMultiply64(TIFF*, uint64_t, uint64_t, const char*);
+extern tmsize_t _NDPIMultiplySSize(TIFF*, tmsize_t, tmsize_t, const char*);
+extern tmsize_t _NDPICastUInt64ToSSize(TIFF*, uint64_t, const char*);
+extern void* _NDPICheckMalloc(TIFF*, tmsize_t, tmsize_t, const char*);
+extern void* _NDPICheckRealloc(TIFF*, void*, tmsize_t, tmsize_t, const char*);
 
-extern double _TIFFUInt64ToDouble(uint64_t);
-extern float _TIFFUInt64ToFloat(uint64_t);
+extern double _NDPIUInt64ToDouble(uint64_t);
+extern float _NDPIUInt64ToFloat(uint64_t);
 
-extern float _TIFFClampDoubleToFloat(double);
+extern float _NDPIClampDoubleToFloat(double);
 
 extern tmsize_t
-_TIFFReadEncodedStripAndAllocBuffer(TIFF* tif, uint32_t strip,
+_NDPIReadEncodedStripAndAllocBuffer(TIFF* tif, uint32_t strip,
                                     void **buf, tmsize_t bufsizetoalloc,
                                     tmsize_t size_to_read);
 extern tmsize_t
-_TIFFReadEncodedTileAndAllocBuffer(TIFF* tif, uint32_t tile,
+_NDPIReadEncodedTileAndAllocBuffer(TIFF* tif, uint32_t tile,
                                    void **buf, tmsize_t bufsizetoalloc,
                                    tmsize_t size_to_read);
 extern tmsize_t
-_TIFFReadTileAndAllocBuffer(TIFF* tif,
+_NDPIReadTileAndAllocBuffer(TIFF* tif,
                             void **buf, tmsize_t bufsizetoalloc,
                             uint32_t x, uint32_t y, uint32_t z, uint16_t s);
-extern int _TIFFSeekOK(TIFF* tif, toff_t off);
+extern int _NDPISeekOK(TIFF* tif, toff_t off);
 
-extern int TIFFInitDumpMode(TIFF*, int);
+extern int NDPIInitDumpMode(TIFF*, int);
 #ifdef PACKBITS_SUPPORT
 extern int TIFFInitPackBits(TIFF*, int);
 #endif
@@ -395,7 +395,7 @@ extern int TIFFInitCCITTFax3(TIFF*, int), TIFFInitCCITTFax4(TIFF*, int);
 extern int TIFFInitThunderScan(TIFF*, int);
 #endif
 #ifdef NEXT_SUPPORT
-extern int TIFFInitNeXT(TIFF*, int);
+extern int NDPIInitNeXT(TIFF*, int);
 #endif
 #ifdef LZW_SUPPORT
 extern int TIFFInitLZW(TIFF*, int);
@@ -405,7 +405,7 @@ extern int TIFFInitOJPEG(TIFF*, int);
 #endif
 #ifdef JPEG_SUPPORT
 extern int TIFFInitJPEG(TIFF*, int);
-extern int TIFFJPEGIsFullStripRequired(TIFF*);
+extern int NDPIJPEGIsFullStripRequired(TIFF*);
 #endif
 #ifdef JBIG_SUPPORT
 extern int TIFFInitJBIG(TIFF*, int);

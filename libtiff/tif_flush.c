@@ -28,12 +28,12 @@
 #include "tiffiop.h"
 
 int
-TIFFFlush(TIFF* tif)
+NDPIFlush(TIFF* tif)
 {
     if( tif->tif_mode == O_RDONLY )
         return 1;
 
-    if (!TIFFFlushData(tif))
+    if (!NDPIFlushData(tif))
         return (0);
                 
     /* In update (r+) mode we try to detect the case where 
@@ -45,12 +45,12 @@ TIFFFlush(TIFF* tif)
         && !(tif->tif_flags & TIFF_DIRTYDIRECT) 
         && tif->tif_mode == O_RDWR )
     {
-        if( TIFFForceStrileArrayWriting(tif) )
+        if( NDPIForceStrileArrayWriting(tif) )
             return 1;
     }
 
     if ((tif->tif_flags & (TIFF_DIRTYDIRECT|TIFF_DIRTYSTRIP)) 
-        && !TIFFRewriteDirectory(tif))
+        && !NDPIRewriteDirectory(tif))
         return (0);
 
     return (1);
@@ -58,45 +58,45 @@ TIFFFlush(TIFF* tif)
 
 /*
  * This is an advanced writing function that must be used in a particular
- * sequence, and together with TIFFDeferStrileArrayWriting(),
+ * sequence, and together with NDPIDeferStrileArrayWriting(),
  * to make its intended effect. Its aim is to force the writing of
  * the [Strip/Tile][Offsets/ByteCounts] arrays at the end of the file, when
  * they have not yet been rewritten.
  *
  * The typical sequence of calls is:
- * TIFFOpen()
- * [ TIFFCreateDirectory(tif) ]
- * Set fields with calls to TIFFSetField(tif, ...)
- * TIFFDeferStrileArrayWriting(tif)
- * TIFFWriteCheck(tif, ...)
- * TIFFWriteDirectory(tif)
+ * NDPIOpen()
+ * [ NDPICreateDirectory(tif) ]
+ * Set fields with calls to NDPISetField(tif, ...)
+ * NDPIDeferStrileArrayWriting(tif)
+ * NDPIWriteCheck(tif, ...)
+ * NDPIWriteDirectory(tif)
  * ... potentially create other directories and come back to the above directory
- * TIFFForceStrileArrayWriting(tif)
+ * NDPIForceStrileArrayWriting(tif)
  *
  * Returns 1 in case of success, 0 otherwise.
  */
-int TIFFForceStrileArrayWriting(TIFF* tif)
+int NDPIForceStrileArrayWriting(TIFF* tif)
 {
-    static const char module[] = "TIFFForceStrileArrayWriting";
-    const int isTiled = TIFFIsTiled(tif);
+    static const char module[] = "NDPIForceStrileArrayWriting";
+    const int isTiled = NDPIIsTiled(tif);
 
     if (tif->tif_mode == O_RDONLY)
     {
-        TIFFErrorExt(tif->tif_clientdata, tif->tif_name,
+        NDPIErrorExt(tif->tif_clientdata, tif->tif_name,
                      "File opened in read-only mode");
         return 0;
     }
     if( tif->tif_diroff == 0 )
     {
-        TIFFErrorExt(tif->tif_clientdata, module,
+        NDPIErrorExt(tif->tif_clientdata, module,
                      "Directory has not yet been written");
         return 0;
     }
     if( (tif->tif_flags & TIFF_DIRTYDIRECT) != 0 )
     {
-        TIFFErrorExt(tif->tif_clientdata, module,
+        NDPIErrorExt(tif->tif_clientdata, module,
                      "Directory has changes other than the strile arrays. "
-                     "TIFFRewriteDirectory() should be called instead");
+                     "NDPIRewriteDirectory() should be called instead");
         return 0;
     }
 
@@ -111,23 +111,23 @@ int TIFFForceStrileArrayWriting(TIFF* tif)
              tif->tif_dir.td_stripbytecount_entry.tdir_type == 0 &&
              tif->tif_dir.td_stripbytecount_entry.tdir_offset.toff_long8 == 0) )
         {
-            TIFFErrorExt(tif->tif_clientdata, module,
+            NDPIErrorExt(tif->tif_clientdata, module,
                         "Function not called together with "
-                        "TIFFDeferStrileArrayWriting()");
+                        "NDPIDeferStrileArrayWriting()");
             return 0;
         }
 
-        if (tif->tif_dir.td_stripoffset_p == NULL && !TIFFSetupStrips(tif))
+        if (tif->tif_dir.td_stripoffset_p == NULL && !NDPISetupStrips(tif))
             return 0;
     }
 
-    if( _TIFFRewriteField( tif,
+    if( _NDPIRewriteField( tif,
                            isTiled ? TIFFTAG_TILEOFFSETS :
                                      TIFFTAG_STRIPOFFSETS,
                            TIFF_LONG8,
                            tif->tif_dir.td_nstrips,
                            tif->tif_dir.td_stripoffset_p )
-        && _TIFFRewriteField( tif,
+        && _NDPIRewriteField( tif,
                               isTiled ? TIFFTAG_TILEBYTECOUNTS :
                                         TIFFTAG_STRIPBYTECOUNTS,
                               TIFF_LONG8,
@@ -146,13 +146,13 @@ int TIFFForceStrileArrayWriting(TIFF* tif)
  * Flush buffered data to the file.
  *
  * Frank Warmerdam'2000: I modified this to return 1 if TIFF_BEENWRITING
- * is not set, so that TIFFFlush() will proceed to write out the directory.
+ * is not set, so that NDPIFlush() will proceed to write out the directory.
  * The documentation says returning 1 is an error indicator, but not having
  * been writing isn't exactly a an error.  Hopefully this doesn't cause
  * problems for other people. 
  */
 int
-TIFFFlushData(TIFF* tif)
+NDPIFlushData(TIFF* tif)
 {
 	if ((tif->tif_flags & TIFF_BEENWRITING) == 0)
 		return (1);
@@ -161,7 +161,7 @@ TIFFFlushData(TIFF* tif)
 		if (!(*tif->tif_postencode)(tif))
 			return (0);
 	}
-	return (TIFFFlushData1(tif));
+	return (NDPIFlushData1(tif));
 }
 
 /* vim: set ts=8 sts=8 sw=8 noet: */

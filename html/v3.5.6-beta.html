@@ -57,7 +57,7 @@ The following information is located here:
 
 <UL> 
 
-	<LI> tif_dir.c: Clear TIFF_ISTILED flag in TIFFDefaultDirectory
+	<LI> tif_dir.c: Clear TIFF_ISTILED flag in NDPIDefaultDirectory
 	as per http://bugzilla.remotesensing.org/show_bug.cgi?id=18
 	from vandrove@vc.cvut.cz.
 
@@ -65,7 +65,7 @@ The following information is located here:
 	output buffer, and to issue a warning if data needs to be
 	discarded.  See http://bugzilla.remotesensing.org/show_bug.cgi?id=18
 
-	<LI> Modified TIFFClientOpen() to emit an error on an attempt to
+	<LI> Modified NDPIClientOpen() to emit an error on an attempt to
 	open a comperessed file for update (O_RDWR/r+) access.  This is
 	because the compressor/decompressor code gets very confused when
 	the mode is O_RDWR, assuming this means writing only.  See
@@ -105,7 +105,7 @@ The following information is located here:
 
 	<LI> tif_read.c: fix subtle bug with determining the number of
 	rows for strips that are the last strip in a separation but
-	not the last strip of all in TIFFReadEncodedStrip().  
+	not the last strip of all in NDPIReadEncodedStrip().  
 
 	<LI> Applied 16/32 bit fix to tif_fax3.c.  Fix supplied by
 	Peter Skarpetis <peters@serendipity-software.com.au>

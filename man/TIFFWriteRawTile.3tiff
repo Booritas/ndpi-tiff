@@ -41,7 +41,7 @@ bytes of raw data to the specified tile.
 is returned.
 .SH DIAGNOSTICS
 All error messages are directed to the
-.BR TIFFError (3TIFF)
+.BR NDPIError (3TIFF)
 routine.
 .PP
 \fB%s: File not open for writing\fP.
@@ -53,17 +53,17 @@ The image is assumed to be organized in strips because neither of the
 or
 .I TileLength
 tags have been set with
-.BR TIFFSetField (3TIFF).
+.BR NDPISetField (3TIFF).
 .PP
 \fB%s: Must set "ImageWidth" before writing data\fP.
 The image's width has not be set before the first write.
 See
-.BR TIFFSetField (3TIFF)
+.BR NDPISetField (3TIFF)
 for information on how to do this.
 .PP
 \fB%s: Must set "PlanarConfiguration" before writing data\fP. The organization
 of data has not be defined before the first write. See
-.BR TIFFSetField (3TIFF)
+.BR NDPISetField (3TIFF)
 for information on how to do this.
 .PP
 \fB%s: No space for tile arrays"\fP.
@@ -74,7 +74,7 @@ counts.
 The specified tile is not valid according to the currently specified image
 dimensions.
 .SH "SEE ALSO"
-.BR TIFFOpen (3TIFF),
+.BR NDPIOpen (3TIFF),
 .BR TIFFWriteEncodedTile (3TIFF),
 .BR TIFFWriteScanline (3TIFF),
 .BR libtiff (3TIFF)

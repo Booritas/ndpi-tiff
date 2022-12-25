@@ -79,26 +79,26 @@ int main(int argc, char **argv)
     refblackwhite[2] = 0.0; refblackwhite[3] = 255.0;
     refblackwhite[4] = 0.0; refblackwhite[5] = 255.0;
 
-    if ((tif = TIFFOpen(input_file, "w")) == NULL) {
+    if ((tif = NDPIOpen(input_file, "w")) == NULL) {
         fprintf(stderr, "can't open %s as a TIFF file\n", input_file);
         exit(0);
     }
 
-    TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, WIDTH);
-    TIFFSetField(tif, TIFFTAG_IMAGELENGTH, HEIGHT);
-    TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8);
-    TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
-    TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
-    TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 3);
-    TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, 1);
-    TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-    TIFFSetField(tif, TIFFTAG_RESOLUTIONUNIT, RESUNIT_NONE);
+    NDPISetField(tif, TIFFTAG_IMAGEWIDTH, WIDTH);
+    NDPISetField(tif, TIFFTAG_IMAGELENGTH, HEIGHT);
+    NDPISetField(tif, TIFFTAG_BITSPERSAMPLE, 8);
+    NDPISetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
+    NDPISetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
+    NDPISetField(tif, TIFFTAG_SAMPLESPERPIXEL, 3);
+    NDPISetField(tif, TIFFTAG_ROWSPERSTRIP, 1);
+    NDPISetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+    NDPISetField(tif, TIFFTAG_RESOLUTIONUNIT, RESUNIT_NONE);
 #ifdef notdef
-    TIFFSetField(tif, TIFFTAG_WHITEPOINT, whitex, whitey);
-    TIFFSetField(tif, TIFFTAG_PRIMARYCHROMATICITIES, primaries);
+    NDPISetField(tif, TIFFTAG_WHITEPOINT, whitex, whitey);
+    NDPISetField(tif, TIFFTAG_PRIMARYCHROMATICITIES, primaries);
 #endif
-    TIFFSetField(tif, TIFFTAG_REFERENCEBLACKWHITE, refblackwhite);
-    TIFFSetField(tif, TIFFTAG_TRANSFERFUNCTION, red, green, blue);
+    NDPISetField(tif, TIFFTAG_REFERENCEBLACKWHITE, refblackwhite);
+    NDPISetField(tif, TIFFTAG_TRANSFERFUNCTION, red, green, blue);
 
     scan_line = (unsigned char *) malloc(WIDTH * 3);
 
@@ -180,7 +180,7 @@ int main(int argc, char **argv)
     }
 
     free(scan_line);
-    TIFFClose(tif);
+    NDPIClose(tif);
     exit(0);
 }
 

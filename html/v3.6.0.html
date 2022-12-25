@@ -84,8 +84,8 @@ anonymous tag definition is created for the tag in the tag definition list.
 The type, and some other metadata is worked out from the instance encountered.
 These fields are known as "custom tags".  <p>
 
-Custom tags can be set and fetched normally using TIFFSetField() and 
-TIFFGetField(), and appear pretty much like normal tags to application code.
+Custom tags can be set and fetched normally using NDPISetField() and 
+NDPIGetField(), and appear pretty much like normal tags to application code.
 However, they have no impact on internal libtiff processing (such as
 compression).  Some utilities, such as tiffcp will now copy these custom
 tags to the new output files. <p>
@@ -153,7 +153,7 @@ as per bug 94.
 <UL>
 
 <li> libtiff/tif_getimage.c: New function <A
-HREF="./man/TIFFReadRGBAImage.3t.html">TIFFReadRGBAImageOriented()</A>
+HREF="./man/NDPIReadRGBAImage.3t.html">NDPIReadRGBAImageOriented()</A>
 implemented to retrieve raster array with user-specified origin position.
 
 <li> libtiff/tif_fax3.c: Fix wrong line numbering.
@@ -175,7 +175,7 @@ for byte swapping complex image data.
 <li> libtiff/tif_open.c: Removed error if opening a compressed file
 in update mode bug (198).
 
-<li> libtiff/tif_write.c: TIFFWriteCheck() now fails if the image is
+<li> libtiff/tif_write.c: NDPIWriteCheck() now fails if the image is
 a pre-existing compressed image.  That is, image writing to pre-existing
 compressed images is not allowed.
 
@@ -203,7 +203,7 @@ LZWDecode() and LZWDecodeCompat() fixing bugs 190 and 100.
 <li> libtiff/tif_lzw.c: Added check for valid code lengths in LZWDecode()
 and LZWDecodeCompat(). Fixes bug 115.
 
-<li> tif_getimage.c: Ensure that TIFFRGBAImageBegin() returns the
+<li> tif_getimage.c: Ensure that NDPIRGBAImageBegin() returns the
 return code from the underlying pick function as per bug 177.
 
 <li> libtiff/{tif_jpeg.c,tif_strip.c,tif_print.c}: Hacked tif_jpeg.c to
@@ -213,25 +213,25 @@ present in the tiff tags as per bug 168.
 <li> libtiff/tif_jpeg.c: Fixed problem with setting of nrows in 
 JPEGDecode() as per bug 129. 
 
-<li> libtiff/tif_read.c, libtiff/tif_write.c: TIFFReadScanline() and
+<li> libtiff/tif_read.c, libtiff/tif_write.c: NDPIReadScanline() and
 TIFFWriteScanline() now set tif_row explicitly in case the codec has
 fooled with the value as per bug 129.
 
 <li> libtiff/tif_ojpeg.c: Major upgrade from Scott.  Details in bug 156.
 
 <li>  libtiff/tif_open.c: Pointers to custom procedures
-in TIFFClientOpen() are checked to be not NULL-pointers.
+in NDPIClientOpen() are checked to be not NULL-pointers.
 
 <li> libtiff/tif_lzw.c: Assertions in LZWDecode and LZWDecodeCompat
 replaced by warnings. Now libtiff should read corrupted LZW-compressed
 files by skipping bad strips as per bug 100.
 	
 <li> libtiff/: tif_dirwrite.c, tif_write.c, tiffio.h:
-<a href=./man/TIFFWriteDirectory.3t.html>TIFFCheckpointDirectory()</a>
+<a href=./man/NDPIWriteDirectory.3t.html>NDPICheckpointDirectory()</a>
 routine added as per bug 124.  The
-<a href=./man/TIFFWriteDirectory.3t.html>TIFFWriteDirectory</a>
+<a href=./man/NDPIWriteDirectory.3t.html>NDPIWriteDirectory</a>
 man page discusses this new function as well as the related 
-<a href=./man/TIFFWriteDirectory.3t.html>TIFFRewriteDirectory()</a>.
+<a href=./man/NDPIWriteDirectory.3t.html>NDPIRewriteDirectory()</a>.
 
 <li> libtiff/: tif_codec.c, tif_compress.c, tiffiop.h, tif_getimage.c: 
 Introduced
@@ -250,8 +250,8 @@ CLIPPATH, XCLIPPATHUNITS, YCLIPPATHUNITS, OPIIMAGEID, OPIPROXY and
 INDEXED. Added PHOTOMETRIC tag value from TIFF technote 4 ICCLAB (=9).
 
 <li> libtiff/tif_getimage.c: Additional check for supported codecs added in 
-TIFFRGBAImageOK, TIFFReadRGBAImage, TIFFReadRGBAStrip and TIFFReadRGBATile now
-use TIFFRGBAImageOK before reading a per bug 110.
+NDPIRGBAImageOK, NDPIReadRGBAImage, NDPIReadRGBAStrip and NDPIReadRGBATile now
+use NDPIRGBAImageOK before reading a per bug 110.
 
 <li> libtiff/: tif_dir.c, tif_dir.h, tif_dirinfo.c, tif_dirread.c,
 tif_dirwrite.c: Added routine
@@ -265,7 +265,7 @@ TIFFTAG_BITSPERSAMPLE, TIFFTAG_PHOTOMETRIC as per bug 99.
 
 <li> libtiff/{tiff.h,tif_fax3.c}: Add support for __arch64__ as per bug 94.
 
-<li> libtiff/tif_read.c: Fixed TIFFReadEncodedStrip() to fail if the
+<li> libtiff/tif_read.c: Fixed NDPIReadEncodedStrip() to fail if the
 decodestrip function returns anything not greater than zero as per bug 97.
 
 <li> libtiff/tif_jpeg.c: fixed computation of segment_width for 
@@ -314,8 +314,8 @@ explicitly select color	space of input image data.
 <li> <a href=./man/ppm2tiff.1.html>ppm2tiff</a>: Fixed possible endless loop.
 
 <li> <a href=./man/tiff2rgba.1.html>tiff2rgba</a>: Switched to use
-<A HREF="./man/TIFFReadRGBAImage.3t.html">TIFFReadRGBAImageOriented()</A>
-instead of <A HREF="./man/TIFFReadRGBAImage.3t.html">TIFFReadRGBAImage()</A>.
+<A HREF="./man/NDPIReadRGBAImage.3t.html">NDPIReadRGBAImageOriented()</A>
+instead of <A HREF="./man/NDPIReadRGBAImage.3t.html">NDPIReadRGBAImage()</A>.
 
 <li> <a href=./man/tiffcmp.1.html>tiffcmp</a>: Fixed problem with unused data
 comparing (bug 349). `-z' option now can be used to set the number of reported

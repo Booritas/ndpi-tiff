@@ -83,43 +83,43 @@ main()
 	unsigned char	buf[SPP] = { 0, 127, 255 };
 
 	/* Test whether we can write tags. */
-	tif = TIFFOpen(filename, "w");
+	tif = NDPIOpen(filename, "w");
 	if (!tif) {
 		fprintf (stderr, "Can't create test TIFF file %s.\n", filename);
 		return 1;
 	}
 
-	if (!TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, width)) {
+	if (!NDPISetField(tif, TIFFTAG_IMAGEWIDTH, width)) {
 		fprintf (stderr, "Can't set ImageWidth tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_IMAGELENGTH, length)) {
+	if (!NDPISetField(tif, TIFFTAG_IMAGELENGTH, length)) {
 		fprintf (stderr, "Can't set ImageLength tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, bps)) {
+	if (!NDPISetField(tif, TIFFTAG_BITSPERSAMPLE, bps)) {
 		fprintf (stderr, "Can't set BitsPerSample tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, SPP)) {
+	if (!NDPISetField(tif, TIFFTAG_SAMPLESPERPIXEL, SPP)) {
 		fprintf (stderr, "Can't set SamplesPerPixel tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, rows_per_strip)) {
+	if (!NDPISetField(tif, TIFFTAG_ROWSPERSTRIP, rows_per_strip)) {
 		fprintf (stderr, "Can't set SamplesPerPixel tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_PLANARCONFIG, planarconfig)) {
+	if (!NDPISetField(tif, TIFFTAG_PLANARCONFIG, planarconfig)) {
 		fprintf (stderr, "Can't set PlanarConfiguration tag.\n");
 		goto failure;
 	}
-	if (!TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, photometric)) {
+	if (!NDPISetField(tif, TIFFTAG_PHOTOMETRIC, photometric)) {
 		fprintf (stderr, "Can't set PhotometricInterpretation tag.\n");
 		goto failure;
 	}
 
 	for (i = 0; i < NSINGLETAGS; i++) {
-		if (!TIFFSetField(tif, short_single_tags[i].tag,
+		if (!NDPISetField(tif, short_single_tags[i].tag,
 				  short_single_tags[i].value)) {
 			fprintf(stderr, "Can't set tag %"PRIu32".\n",
 				short_single_tags[i].tag);
@@ -128,7 +128,7 @@ main()
 	}
 
 	for (i = 0; i < NPAIREDTAGS; i++) {
-		if (!TIFFSetField(tif, short_paired_tags[i].tag,
+		if (!NDPISetField(tif, short_paired_tags[i].tag,
 				  short_paired_tags[i].values[0],
 				  short_paired_tags[i].values[1])) {
 			fprintf(stderr, "Can't set tag %"PRIu32".\n",
@@ -143,10 +143,10 @@ main()
 		goto failure;
 	}
 
-	TIFFClose(tif);
+	NDPIClose(tif);
 	
 	/* Ok, now test whether we can read written values. */
-	tif = TIFFOpen(filename, "r");
+	tif = NDPIOpen(filename, "r");
 	if (!tif) {
 		fprintf (stderr, "Can't open test TIFF file %s.\n", filename);
 		return 1;
@@ -185,7 +185,7 @@ main()
 			goto failure;
 	}
 
-	TIFFClose(tif);
+	NDPIClose(tif);
 	
 	/* All tests passed; delete file and exit with success status. */
 	unlink(filename);
@@ -196,7 +196,7 @@ failure:
 	 * Something goes wrong; close file and return unsuccessful status.
 	 * Do not remove the file for further manual investigation.
 	 */
-	TIFFClose(tif);
+	NDPIClose(tif);
 	return 1;
 }
 

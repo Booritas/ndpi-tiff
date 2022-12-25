@@ -51,7 +51,7 @@ The following information is located here:
 	for converting TIFF images directly into PDF.
 	<li> New <a href="./man/TIFFcolor.3t.html">color conversion module</a>.
 	<li> Full support for Orientation tag in
-	<a href="./man/TIFFReadRGBAImage.3t.html">TIFFRGBAImage</a> interface.
+	<a href="./man/NDPIReadRGBAImage.3t.html">TIFFRGBAImage</a> interface.
 	<li> Many bugs fixed.
 </ul>
 
@@ -102,9 +102,9 @@ appropriate manual pages.
 reported by Antonio Scuri.
 
 <li> libtiff/{tiffio.h, tif_codec.c}: Added new function
-TIFFIsCODECConfigured(), suggested by Ross Finlayson.
+NDPIIsCODECConfigured(), suggested by Ross Finlayson.
 
-<li> libtiff/tif_ojpeg.c: TIFFVGetField() function now can properly extract
+<li> libtiff/tif_ojpeg.c: NDPIVGetField() function now can properly extract
 the fields from the OJPEG files. Patch supplied by Ross	Finlayson.
 
 <li> libtiff/tif_dir.h: _TIFFFindOrRegisterdInfo declaration replaced
@@ -130,11 +130,11 @@ using <a href="./man/tiff2rgba.1.html">tiff2rgba</a> utility abd then process
 it with the <a href="./man/tiff2ps.1.html">tiff2ps</a>.
 
 <li> libtiff/tif_tile.c: Remove spurious use of "s" (sample) in the
-planarconfig_contig case in TIFFComputeTile() as per bug 387
+planarconfig_contig case in NDPIComputeTile() as per bug 387
 
 <li> libtiff/tiffiop.h: New macros: TIFFmax and TIFFmin.
 
-<li> libtiff/{tiffio.h, tif_strip.c}: Added TIFFRawStripSize() function
+<li> libtiff/{tiffio.h, tif_strip.c}: Added NDPIRawStripSize() function
 as suggested by Chris Hanson.
 
 <li> libtiff/{tif_lzw.c, tif_fax3.c}: Proper support for update mode

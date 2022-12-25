@@ -58,7 +58,7 @@ _XTIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
          * will only print them out if the TIFFPRINT_MYMULTIDOUBLES
          * flag is passed into the print method.
          */
-	if (TIFFFieldSet(tif,FIELD_EXAMPLE_MULTI))
+	if (NDPIFieldSet(tif,FIELD_EXAMPLE_MULTI))
 	{
 		fprintf(fd, "  My Multi-Valued Doubles:");
 		if (flags & TIFFPRINT_MYMULTIDOUBLES) 
@@ -73,14 +73,14 @@ _XTIFFPrintDirectory(TIFF* tif, FILE* fd, long flags)
 			fprintf(fd, "(present)\n");
 	}
 
-	if (TIFFFieldSet(tif,FIELD_EXAMPLE_SINGLE))
+	if (NDPIFieldSet(tif,FIELD_EXAMPLE_SINGLE))
 	{
 		fprintf(fd, "  My Single Long Tag:  %lu\n", xd->xd_example_single);
 	}
 
-	if (TIFFFieldSet(tif,FIELD_EXAMPLE_ASCII))
+	if (NDPIFieldSet(tif,FIELD_EXAMPLE_ASCII))
 	{
-		_TIFFprintAsciiTag(fd,"My ASCII Tag",
+		_NDPIprintAsciiTag(fd,"My ASCII Tag",
 			 xd->xd_example_ascii);
 	}
 }
@@ -105,14 +105,14 @@ _XTIFFVSetField(TIFF* tif, ttag_t tag, va_list ap)
 	case TIFFTAG_EXAMPLE_MULTI:
 		/* multi-valued tags need to store the count as well */
 		xd->xd_num_multi = (uint16_t) va_arg(ap, int);
-		_TIFFsetDoubleArray(&xd->xd_example_multi, va_arg(ap, double*),
+		_NDPIsetDoubleArray(&xd->xd_example_multi, va_arg(ap, double*),
 			(long) xd->xd_num_multi);
 		break;
 	case TIFFTAG_EXAMPLE_SINGLE:
 		xd->xd_example_single = va_arg(ap, uint32_t);
 		break;
 	case TIFFTAG_EXAMPLE_ASCII:
-		_TIFFsetString(&xd->xd_example_ascii, va_arg(ap, char*));
+		_NDPIsetString(&xd->xd_example_ascii, va_arg(ap, char*));
 		break;
 	default:
 		/* call the inherited method */
@@ -138,12 +138,12 @@ _XTIFFVSetField(TIFF* tif, ttag_t tag, va_list ap)
 	va_end(ap);
 	return (status);
 badvalue:
-	TIFFErrorExt(tif->tif_clientdata, tif->tif_name, "%d: Bad value for \"%s\"", v,
+	NDPIErrorExt(tif->tif_clientdata, tif->tif_name, "%d: Bad value for \"%s\"", v,
 	    _TIFFFieldWithTag(tif, tag)->field_name);
 	va_end(ap);
 	return (0);
 badvalue32:
-	TIFFErrorExt(tif->tif_clientdata, tif->tif_name, "%ld: Bad value for \"%s\"", v32,
+	NDPIErrorExt(tif->tif_clientdata, tif->tif_name, "%ld: Bad value for \"%s\"", v32,
 	    _TIFFFieldWithTag(tif, tag)->field_name);
 	va_end(ap);
 	return (0);
@@ -181,7 +181,7 @@ _XTIFFVGetField(TIFF* tif, ttag_t tag, va_list ap)
 
 #define	CleanupField(member) {		\
     if (xd->member) {			\
-	_TIFFfree(xd->member);		\
+	_NDPIfree(xd->member);		\
 	xd->member = 0;			\
     }					\
 }
@@ -220,7 +220,7 @@ static void _XTIFFLocalDefaultDirectory(TIFF *tif)
 	 */
 	 
 	_XTIFFFreeDirectory(xt);	
-	_TIFFmemset(xt,0,sizeof(xtiff));
+	_NDPImemset(xt,0,sizeof(xtiff));
 
 	/* Override the tag access methods */
 
@@ -258,13 +258,13 @@ _XTIFFDefaultDirectory(TIFF *tif)
 	/* Allocate Directory Structure if first time, and install it */
 	if (!(tif->tif_flags & XTIFF_INITIALIZED))
 	{
-		xt = _TIFFmalloc(sizeof(xtiff));
+		xt = _NDPImalloc(sizeof(xtiff));
 		if (!xt)
 		{
 			/* handle memory allocation failure here ! */
 			return;
 		}
-		_TIFFmemset(xt,0,sizeof(xtiff));
+		_NDPImemset(xt,0,sizeof(xtiff));
 		/*
 		 * Install into TIFF structure.
 		 */
@@ -299,7 +299,7 @@ void _XTIFFInitialize(void)
 	first_time = 0;
 	
 	/* Grab the inherited method and install */
-	_ParentExtender = TIFFSetTagExtender(_XTIFFDefaultDirectory);
+	_ParentExtender = NDPISetTagExtender(_XTIFFDefaultDirectory);
 }
 
 
@@ -314,7 +314,7 @@ XTIFFOpen(const char* name, const char* mode)
 	
 	/* Open the file; the callback will set everything up
 	 */
-	return TIFFOpen(name, mode);
+	return NDPIOpen(name, mode);
 }
 
 TIFF*
@@ -335,11 +335,11 @@ XTIFFClose(TIFF *tif)
 	xtiff *xt = XTIFFDIR(tif);
 	
 	/* call inherited function first */
-	TIFFClose(tif);
+	NDPIClose(tif);
 	
 	/* Free up extended allocated memory */
 	_XTIFFFreeDirectory(xt);
-	_TIFFfree(xt);
+	_NDPIfree(xt);
 }
 /*
  * Local Variables:

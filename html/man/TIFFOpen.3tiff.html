@@ -4,11 +4,11 @@
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
 <meta name="Content-Style" content="text/css">
-<title>TIFFOpen</title>
+<title>NDPIOpen</title>
 </head>
 <body>
 
-<h1 align=center>TIFFOpen</h1>
+<h1 align=center>NDPIOpen</h1>
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
@@ -27,7 +27,7 @@
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>TIFFOpen, TIFFFdOpen, TIFFClientOpen &minus; open a
+<p>NDPIOpen, TIFFFdOpen, NDPIClientOpen &minus; open a
 <small>TIFF</small> file for reading or writing</p>
 </td>
 </table>
@@ -41,7 +41,7 @@
 <td width="91%">
 <p><b>#include &lt;tiffio.h&gt;</b></p>
 <!-- INDENTATION -->
-<p><b>TIFF* TIFFOpen(const char *</b><i>filename</i><b>,
+<p><b>TIFF* NDPIOpen(const char *</b><i>filename</i><b>,
 const char *</b><i>mode</i><b>)<br>
 TIFF* TIFFFdOpen(const int</b> <i>fd</i><b>, const char
 *</b><i>filename</i><b>, const char
@@ -57,7 +57,7 @@ toff_t*);<br>
 typedef void (*TIFFUnmapFileProc)(thandle_t, tdata_t,
 toff_t);</b></p>
 <!-- INDENTATION -->
-<p><b>TIFF* TIFFClientOpen(const char
+<p><b>TIFF* NDPIClientOpen(const char
 *</b><i>filename</i><b>, const char *</b><i>mode</i><b>,
 thandle_t</b> <i>clientdata</i><b>, TIFFReadWriteProc</b>
 <i>readproc</i><b>, TIFFReadWriteProc</b>
@@ -75,7 +75,7 @@ TIFFUnmapFileProc</b> <i>unmapproc</i><b>)</b></p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><i>TIFFOpen</i> opens a <small>TIFF</small> file whose
+<p><i>NDPIOpen</i> opens a <small>TIFF</small> file whose
 name is <i>filename</i> and returns a handle to be used in
 subsequent calls to routines in <i>libtiff</i>. If the open
 operation fails, then zero is returned. The <i>mode</i>
@@ -91,7 +91,7 @@ writing, all previous data is overwritten.</p>
 <!-- INDENTATION -->
 <p>If a file is opened for reading, the first
 <small>TIFF</small> directory in the file is automatically
-read (also see <i>TIFFSetDirectory</i>(3TIFF) for reading
+read (also see <i>NDPISetDirectory</i>(3TIFF) for reading
 directories other than the first). If a file is opened for
 writing or appending, a default directory is automatically
 created for writing subsequent data. This directory has all
@@ -104,17 +104,17 @@ column represents the visual left hand side),
 <i>SamplesPerPixel</i>=1, <i>RowsPerStrip</i>=infinity,
 <i>ResolutionUnit</i>=2 (inches), and <i>Compression</i>=1
 (no compression). To alter these values, or to define values
-for additional fields, <i>TIFFSetField</i>(3TIFF) must be
+for additional fields, <i>NDPISetField</i>(3TIFF) must be
 used.</p>
 <!-- INDENTATION -->
-<p><i>TIFFFdOpen</i> is like <i>TIFFOpen</i> except that it
+<p><i>TIFFFdOpen</i> is like <i>NDPIOpen</i> except that it
 opens a <small>TIFF</small> file given an open file
 descriptor <i>fd</i>. The file&rsquo;s name and mode must
 reflect that of the open descriptor. The object associated
 with the file descriptor <b>must support random
 access</b>.</p>
 <!-- INDENTATION -->
-<p><i>TIFFClientOpen</i> is like <i>TIFFOpen</i> except that
+<p><i>NDPIClientOpen</i> is like <i>NDPIOpen</i> except that
 the caller supplies a collection of functions that the
 library will use to do <small>UNIX</small> -like I/O
 operations. The <i>readproc</i> and <i>writeproc</i> are
@@ -128,7 +128,7 @@ and unmap a file&rsquo;s contents in memory; c.f.
 <i>mmap</i>(2) and <i>munmap</i>(2). The <i>clientdata</i>
 parameter is an opaque &lsquo;&lsquo;handle&rsquo;&rsquo;
 passed to the client-specified routines passed as parameters
-to <i>TIFFClientOpen</i>.</p>
+to <i>NDPIClientOpen</i>.</p>
 </td>
 </table>
 <a name="OPTIONS"></a>
@@ -358,8 +358,8 @@ in the call to open a file; for example,
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p>Upon successful completion <i>TIFFOpen</i>,
-<i>TIFFFdOpen</i>, and <i>TIFFClientOpen</i> return a
+<p>Upon successful completion <i>NDPIOpen</i>,
+<i>TIFFFdOpen</i>, and <i>NDPIClientOpen</i> return a
 <small>TIFF</small> pointer. Otherwise, NULL is
 returned.</p>
 </td>
@@ -373,7 +373,7 @@ returned.</p>
 <td width="8%"></td>
 <td width="91%">
 <p>All error messages are directed to the
-<i>TIFFError</i>(3TIFF) routine. Likewise, warning messages
+<i>NDPIError</i>(3TIFF) routine. Likewise, warning messages
 are directed to the <i>TIFFWarning</i>(3TIFF) routine.</p>
 <!-- INDENTATION -->
 <p><b>&quot;%s&quot;: Bad mode</b>. The specified
@@ -382,7 +382,7 @@ are directed to the <i>TIFFWarning</i>(3TIFF) routine.</p>
 &lsquo;&lsquo;w&rsquo;&rsquo; (write), or
 &lsquo;&lsquo;a&rsquo;&rsquo; (append).</p>
 <!-- INDENTATION -->
-<p><b>%s: Cannot open</b>. <i>TIFFOpen</i>() was unable to
+<p><b>%s: Cannot open</b>. <i>NDPIOpen</i>() was unable to
 open the specified filename for read/writing.</p>
 <!-- INDENTATION -->
 <p><b>Cannot read TIFF header</b>. An error occurred while
@@ -413,7 +413,7 @@ limitation of the library.</p>
 <tr valign="top" align="left">
 <td width="8%"></td>
 <td width="91%">
-<p><i>libtiff</i>(3TIFF), <i>TIFFClose</i>(3TIFF)</p>
+<p><i>libtiff</i>(3TIFF), <i>NDPIClose</i>(3TIFF)</p>
 </td>
 </table>
 <hr>

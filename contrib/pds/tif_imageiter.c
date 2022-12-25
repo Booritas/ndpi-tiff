@@ -38,7 +38,7 @@
  * "blocks" of pixels rather than for individual pixels. The format of the
  * callback arguments is given below.
  *
- * This code was taken from TIFFReadRGBAImage() in tif_getimage.c of the original
+ * This code was taken from NDPIReadRGBAImage() in tif_getimage.c of the original
  * TIFF distribution, and simplified and generalized to provide this general
  * iteration capability. Those routines could certainly be re-implemented in terms
  * of a TIFFImageIter if desired.
@@ -60,7 +60,7 @@ static int
 isCCITTCompression(TIFF* tif)
 {
     uint16_t compress;
-    TIFFGetField(tif, TIFFTAG_COMPRESSION, &compress);
+    NDPIGetField(tif, TIFFTAG_COMPRESSION, &compress);
     return (compress == COMPRESSION_CCITTFAX3 ||
 	    compress == COMPRESSION_CCITTFAX4 ||
 	    compress == COMPRESSION_CCITTRLE ||
@@ -77,10 +77,10 @@ TIFFImageIterBegin(TIFFImageIter* img, TIFF* tif, int stop, char emsg[1024])
 
     img->tif = tif;
     img->stoponerr = stop;
-    TIFFGetFieldDefaulted(tif, TIFFTAG_BITSPERSAMPLE, &img->bitspersample);
+    NDPIGetFieldDefaulted(tif, TIFFTAG_BITSPERSAMPLE, &img->bitspersample);
     img->alpha = 0;
-    TIFFGetFieldDefaulted(tif, TIFFTAG_SAMPLESPERPIXEL, &img->samplesperpixel);
-    TIFFGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES,
+    NDPIGetFieldDefaulted(tif, TIFFTAG_SAMPLESPERPIXEL, &img->samplesperpixel);
+    NDPIGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES,
 	&extrasamples, &sampleinfo);
     if (extrasamples == 1)
 	switch (sampleinfo[0]) {
@@ -90,8 +90,8 @@ TIFFImageIterBegin(TIFFImageIter* img, TIFF* tif, int stop, char emsg[1024])
 	    break;
 	}
     colorchannels = img->samplesperpixel - extrasamples;
-    TIFFGetFieldDefaulted(tif, TIFFTAG_PLANARCONFIG, &planarconfig);
-    if (!TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &img->photometric)) {
+    NDPIGetFieldDefaulted(tif, TIFFTAG_PLANARCONFIG, &planarconfig);
+    if (!NDPIGetField(tif, TIFFTAG_PHOTOMETRIC, &img->photometric)) {
 	switch (colorchannels) {
 	case 1:
 	    if (isCCITTCompression(tif))
@@ -109,9 +109,9 @@ TIFFImageIterBegin(TIFFImageIter* img, TIFF* tif, int stop, char emsg[1024])
     }
     switch (img->photometric) {
     case PHOTOMETRIC_PALETTE:
-	if (!TIFFGetField(tif, TIFFTAG_COLORMAP,
+	if (!NDPIGetField(tif, TIFFTAG_COLORMAP,
 	    &img->redcmap, &img->greencmap, &img->bluecmap)) {
-		TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "Missing required \"Colormap\" tag");
+		NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "Missing required \"Colormap\" tag");
 	    return (0);
 	}
 	/* fall through... */
@@ -135,11 +135,11 @@ TIFFImageIterBegin(TIFFImageIter* img, TIFF* tif, int stop, char emsg[1024])
 	}
 	/* It would probably be nice to have a reality check here. */
 	{ uint16_t compress;
-	  TIFFGetField(tif, TIFFTAG_COMPRESSION, &compress);
+	  NDPIGetField(tif, TIFFTAG_COMPRESSION, &compress);
 	  if (compress == COMPRESSION_JPEG && planarconfig == PLANARCONFIG_CONTIG) {
 	    /* can rely on libjpeg to convert to RGB */
 	    /* XXX should restore current state on exit */
-	    TIFFSetField(tif, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
+	    NDPISetField(tif, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
 	    img->photometric = PHOTOMETRIC_RGB;
 	  }
 	}
@@ -153,7 +153,7 @@ TIFFImageIterBegin(TIFFImageIter* img, TIFF* tif, int stop, char emsg[1024])
 	break;
     case PHOTOMETRIC_SEPARATED: {
 	uint16_t inkset;
-	TIFFGetFieldDefaulted(tif, TIFFTAG_INKSET, &inkset);
+	NDPIGetFieldDefaulted(tif, TIFFTAG_INKSET, &inkset);
 	if (inkset != INKSET_CMYK) {
 	    sprintf(emsg, "Sorry, can not handle separated image with %s=%d",
 		"InkSet", inkset);
@@ -171,15 +171,15 @@ TIFFImageIterBegin(TIFFImageIter* img, TIFF* tif, int stop, char emsg[1024])
 	    photoTag, img->photometric);
 	return (0);
     }
-    TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &img->width);
-    TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &img->height);
+    NDPIGetField(tif, TIFFTAG_IMAGEWIDTH, &img->width);
+    NDPIGetField(tif, TIFFTAG_IMAGELENGTH, &img->height);
 
-    TIFFGetFieldDefaulted(tif, TIFFTAG_ORIENTATION, &img->orientation);
+    NDPIGetFieldDefaulted(tif, TIFFTAG_ORIENTATION, &img->orientation);
     switch (img->orientation) {
     case ORIENTATION_BOTRIGHT:
     case ORIENTATION_RIGHTBOT:	/* XXX */
     case ORIENTATION_LEFTBOT:	/* XXX */
-	TIFFWarning(TIFFFileName(tif), "using bottom-left orientation");
+	TIFFWarning(NDPIFileName(tif), "using bottom-left orientation");
 	img->orientation = ORIENTATION_BOTLEFT;
 	/* fall through... */
     case ORIENTATION_BOTLEFT:
@@ -188,7 +188,7 @@ TIFFImageIterBegin(TIFFImageIter* img, TIFF* tif, int stop, char emsg[1024])
     case ORIENTATION_RIGHTTOP:	/* XXX */
     case ORIENTATION_LEFTTOP:	/* XXX */
     default:
-	TIFFWarning(TIFFFileName(tif), "using top-left orientation");
+	TIFFWarning(NDPIFileName(tif), "using top-left orientation");
 	img->orientation = ORIENTATION_TOPLEFT;
 	/* fall through... */
     case ORIENTATION_TOPLEFT:
@@ -198,9 +198,9 @@ TIFFImageIterBegin(TIFFImageIter* img, TIFF* tif, int stop, char emsg[1024])
     img->isContig =
 	!(planarconfig == PLANARCONFIG_SEPARATE && colorchannels > 1);
     if (img->isContig) {
-	img->get = TIFFIsTiled(tif) ? gtTileContig : gtStripContig;
+	img->get = NDPIIsTiled(tif) ? gtTileContig : gtStripContig;
     } else {
-	img->get = TIFFIsTiled(tif) ? gtTileSeparate : gtStripSeparate;
+	img->get = NDPIIsTiled(tif) ? gtTileSeparate : gtStripSeparate;
     }
     return (1);
 }
@@ -209,11 +209,11 @@ int
 TIFFImageIterGet(TIFFImageIter* img, void *udata, uint32_t w, uint32_t h)
 {
     if (img->get == NULL) {
-	TIFFErrorExt(img->tif->tif_clientdata, TIFFFileName(img->tif), "No \"get\" routine setup");
+	NDPIErrorExt(img->tif->tif_clientdata, NDPIFileName(img->tif), "No \"get\" routine setup");
 	return (0);
     }
     if (img->callback.any == NULL) {
-	TIFFErrorExt(img->tif->tif_clientdata, TIFFFileName(img->tif),
+	NDPIErrorExt(img->tif->tif_clientdata, NDPIFileName(img->tif),
 		"No \"put\" routine setupl; probably can not handle image format");
 	return (0);
     }
@@ -241,7 +241,7 @@ TIFFReadImageIter(TIFF* tif,
 	ok = TIFFImageIterGet(&img, raster, rwidth, img.height);
 	TIFFImageIterEnd(&img);
     } else {
-	TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), emsg);
+	NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), emsg);
 	ok = 0;
     }
     return (ok);
@@ -266,18 +266,18 @@ gtTileContig(TIFFImageIter* img, void *udata, uint32_t w, uint32_t h)
     int32_t fromskew;
     uint32_t nrow;
 
-    buf = (u_char*) _TIFFmalloc(TIFFTileSize(tif));
+    buf = (u_char*) _NDPImalloc(NDPITileSize(tif));
     if (buf == 0) {
-	TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "No space for tile buffer");
+	NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "No space for tile buffer");
 	return (0);
     }
-    TIFFGetField(tif, TIFFTAG_TILEWIDTH, &tw);
-    TIFFGetField(tif, TIFFTAG_TILELENGTH, &th);
+    NDPIGetField(tif, TIFFTAG_TILEWIDTH, &tw);
+    NDPIGetField(tif, TIFFTAG_TILELENGTH, &th);
     orientation = img->orientation;
     for (row = 0; row < h; row += th) {
 	nrow = (row + th > h ? h - row : th);
 	for (col = 0; col < w; col += tw) {
-	    if (TIFFReadTile(tif, buf, col, row, 0, 0) < 0 && img->stoponerr)
+	    if (NDPIReadTile(tif, buf, col, row, 0, 0) < 0 && img->stoponerr)
 		break;
 	    if (col + tw > w) {
 		/*
@@ -292,7 +292,7 @@ gtTileContig(TIFFImageIter* img, void *udata, uint32_t w, uint32_t h)
 	    }
 	}
     }
-    _TIFFfree(buf);
+    _NDPIfree(buf);
     return (1);
 }
 
@@ -320,10 +320,10 @@ gtTileSeparate(TIFFImageIter* img, void *udata, uint32_t w, uint32_t h)
     int alpha = img->alpha;
     uint32_t nrow;
 
-    tilesize = TIFFTileSize(tif);
-    buf = (u_char*) _TIFFmalloc(4*tilesize);
+    tilesize = NDPITileSize(tif);
+    buf = (u_char*) _NDPImalloc(4*tilesize);
     if (buf == 0) {
-	TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "No space for tile buffer");
+	NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "No space for tile buffer");
 	return (0);
     }
     r = buf;
@@ -332,19 +332,19 @@ gtTileSeparate(TIFFImageIter* img, void *udata, uint32_t w, uint32_t h)
     a = b + tilesize;
     if (!alpha)
 	memset(a, 0xff, tilesize);
-    TIFFGetField(tif, TIFFTAG_TILEWIDTH, &tw);
-    TIFFGetField(tif, TIFFTAG_TILELENGTH, &th);
+    NDPIGetField(tif, TIFFTAG_TILEWIDTH, &tw);
+    NDPIGetField(tif, TIFFTAG_TILELENGTH, &th);
     orientation = img->orientation;
     for (row = 0; row < h; row += th) {
 	nrow = (row + th > h ? h - row : th);
 	for (col = 0; col < w; col += tw) {
-	    if (TIFFReadTile(tif, r, col, row,0,0) < 0 && img->stoponerr)
+	    if (NDPIReadTile(tif, r, col, row,0,0) < 0 && img->stoponerr)
 		break;
-	    if (TIFFReadTile(tif, g, col, row,0,1) < 0 && img->stoponerr)
+	    if (NDPIReadTile(tif, g, col, row,0,1) < 0 && img->stoponerr)
 		break;
-	    if (TIFFReadTile(tif, b, col, row,0,2) < 0 && img->stoponerr)
+	    if (NDPIReadTile(tif, b, col, row,0,2) < 0 && img->stoponerr)
 		break;
-	    if (alpha && TIFFReadTile(tif,a,col,row,0,3) < 0 && img->stoponerr)
+	    if (alpha && NDPIReadTile(tif,a,col,row,0,3) < 0 && img->stoponerr)
 		break;
 	    if (col + tw > w) {
 		/*
@@ -359,7 +359,7 @@ gtTileSeparate(TIFFImageIter* img, void *udata, uint32_t w, uint32_t h)
 	    }
 	}
     }
-    _TIFFfree(buf);
+    _NDPIfree(buf);
     return (1);
 }
 
@@ -382,23 +382,23 @@ gtStripContig(TIFFImageIter* img, void *udata, uint32_t w, uint32_t h)
     tsize_t scanline;
     int32_t fromskew;
 
-    buf = (u_char*) _TIFFmalloc(TIFFStripSize(tif));
+    buf = (u_char*) _NDPImalloc(NDPIStripSize(tif));
     if (buf == 0) {
-	TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "No space for strip buffer");
+	NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "No space for strip buffer");
 	return (0);
     }
     orientation = img->orientation;
-    TIFFGetFieldDefaulted(tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
-    scanline = TIFFScanlineSize(tif);
+    NDPIGetFieldDefaulted(tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
+    scanline = NDPIScanlineSize(tif);
     fromskew = (w < imagewidth ? imagewidth - w : 0);
     for (row = 0; row < h; row += rowsperstrip) {
 	nrow = (row + rowsperstrip > h ? h - row : rowsperstrip);
-	if (TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, row, 0),
+	if (NDPIReadEncodedStrip(tif, NDPIComputeStrip(tif, row, 0),
 	    buf, nrow*scanline) < 0 && img->stoponerr)
 		break;
 	(*callback)(img, udata, 0, row, w, nrow, fromskew, buf);
     }
-    _TIFFfree(buf);
+    _NDPIfree(buf);
     return (1);
 }
 
@@ -424,10 +424,10 @@ gtStripSeparate(TIFFImageIter* img, void *udata, uint32_t w, uint32_t h)
     int32_t fromskew;
     int alpha = img->alpha;
 
-    stripsize = TIFFStripSize(tif);
-    r = buf = (u_char *)_TIFFmalloc(4*stripsize);
+    stripsize = NDPIStripSize(tif);
+    r = buf = (u_char *)_NDPImalloc(4*stripsize);
     if (buf == 0) {
-	TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), "No space for tile buffer");
+	NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), "No space for tile buffer");
 	return (0);
     }
     g = r + stripsize;
@@ -436,27 +436,27 @@ gtStripSeparate(TIFFImageIter* img, void *udata, uint32_t w, uint32_t h)
     if (!alpha)
 	memset(a, 0xff, stripsize);
     orientation = img->orientation;
-    TIFFGetFieldDefaulted(tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
-    scanline = TIFFScanlineSize(tif);
+    NDPIGetFieldDefaulted(tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
+    scanline = NDPIScanlineSize(tif);
     fromskew = (w < imagewidth ? imagewidth - w : 0);
     for (row = 0; row < h; row += rowsperstrip) {
 	nrow = (row + rowsperstrip > h ? h - row : rowsperstrip);
-	if (TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, row, 0),
+	if (NDPIReadEncodedStrip(tif, NDPIComputeStrip(tif, row, 0),
 	    r, nrow*scanline) < 0 && img->stoponerr)
 	    break;
-	if (TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, row, 1),
+	if (NDPIReadEncodedStrip(tif, NDPIComputeStrip(tif, row, 1),
 	    g, nrow*scanline) < 0 && img->stoponerr)
 	    break;
-	if (TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, row, 2),
+	if (NDPIReadEncodedStrip(tif, NDPIComputeStrip(tif, row, 2),
 	    b, nrow*scanline) < 0 && img->stoponerr)
 	    break;
 	if (alpha &&
-	    (TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, row, 3),
+	    (NDPIReadEncodedStrip(tif, NDPIComputeStrip(tif, row, 3),
 	    a, nrow*scanline) < 0 && img->stoponerr))
 	    break;
 	(*callback)(img, udata, 0, row, w, nrow, fromskew, r, g, b, a);
     }
-    _TIFFfree(buf);
+    _NDPIfree(buf);
     return (1);
 }
 
@@ -508,7 +508,7 @@ main(int argc, char **argv)
 	    ok = TIFFImageIterGet(&img, NULL, img.width, img.height);
 	    TIFFImageIterEnd(&img);
 	} else {
-	    TIFFErrorExt(tif->tif_clientdata, TIFFFileName(tif), emsg);
+	    NDPIErrorExt(tif->tif_clientdata, NDPIFileName(tif), emsg);
 	}
     }
     

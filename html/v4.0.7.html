@@ -88,7 +88,7 @@ information is located here:
         CVE-2016-9297).  Reported by Henri Salo. Assigned as
         CVE-2016-9448
 
-    <LI> libtiff/tif_aux.c: fix crash in TIFFVGetFieldDefaulted() when
+    <LI> libtiff/tif_aux.c: fix crash in NDPIVGetFieldDefaulted() when
         requesting Predictor tag and that the zip/lzw codec is not
         configured.  Fixes
         http://bugzilla.maptools.org/show_bug.cgi?id=2591
@@ -96,21 +96,21 @@ information is located here:
     <LI> libtiff/tif_dirread.c: in TIFFFetchNormalTag(), make sure
         that values of tags with TIFF_SETGET_C16_ASCII /
         TIFF_SETGET_C32_ASCII access are null terminated, to avoid
-        potential read outside buffer in _TIFFPrintField().  Fixes
+        potential read outside buffer in _NDPIPrintField().  Fixes
         http://bugzilla.maptools.org/show_bug.cgi?id=2590
 
     <LI> libtiff/tif_dirread.c: reject images with OJPEG compression
         that have no TileOffsets/StripOffsets tag, when OJPEG
         compression is disabled. Prevent null pointer dereference in
-        TIFFReadRawStrip1() and other functions that expect
+        NDPIReadRawStrip1() and other functions that expect
         td_stripbytecount to be non NULL.  Fixes
         http://bugzilla.maptools.org/show_bug.cgi?id=2585
 
-    <LI> libtiff/tif_strip.c: make TIFFNumberOfStrips() return the
+    <LI> libtiff/tif_strip.c: make NDPINumberOfStrips() return the
         td->td_nstrips value when it is non-zero, instead of
         recomputing it. This is needed in TIFF_STRIPCHOP mode where
         td_nstrips is modified. Fixes a read outsize of array in
-        tiffsplit (or other utilities using TIFFNumberOfStrips()).
+        tiffsplit (or other utilities using NDPINumberOfStrips()).
         Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2587
         (CVE-2016-9273)
 
@@ -139,7 +139,7 @@ information is located here:
         http://bugzilla.maptools.org/show_bug.cgi?id=2500
         (CVE-2014-8127, duplicate: CVE-2016-3658)
 
-    <LI> libtiff/tif_getimage.c (TIFFRGBAImageOK): Reject attempts to
+    <LI> libtiff/tif_getimage.c (NDPIRGBAImageOK): Reject attempts to
         read floating point images.
 
     <LI> libtiff/tif_predict.c (PredictorSetup): Enforce
@@ -152,11 +152,11 @@ information is located here:
         Mitigations team.
 
     <LI> libtiff/tif_write.c: fix issue in error code path of
-        TIFFFlushData1() that didn't reset the tif_rawcc and tif_rawcp
+        NDPIFlushData1() that didn't reset the tif_rawcc and tif_rawcp
         members. I'm not completely sure if that could happen in
         practice outside of the odd behaviour of t2p_seekproc() of
         tiff2pdf). The report points that a better fix could be to
-        check the return value of TIFFFlushData1() in places where it
+        check the return value of NDPIFlushData1() in places where it
         isn't done currently, but it seems this patch is enough.
         Reported as MSVR 35095. Discovered by Axel Souchet & Vishal
         Chauhan & Suha Can from the MSRC Vulnerabilities & Mitigations
@@ -170,12 +170,12 @@ information is located here:
         different and simpler check. (bugzilla #2544)
 
     <LI> libtiff/tif_read.c: Fix out-of-bounds read on memory-mapped
-        files in TIFFReadRawStrip1() and TIFFReadRawTile1() when
+        files in NDPIReadRawStrip1() and NDPIReadRawTile1() when
         stripoffset is beyond tmsize_t max value (reported by Mathias
         Svensson)
 
-    <LI> libtiff/tif_read.c: make TIFFReadEncodedStrip() and
-        TIFFReadEncodedTile() directly use user provided buffer when
+    <LI> libtiff/tif_read.c: make NDPIReadEncodedStrip() and
+        NDPIReadEncodedTile() directly use user provided buffer when
         no compression (and other conditions) to save a memcpy()
 
     <LI> libtiff/tif_write.c: make TIFFWriteEncodedStrip() and
@@ -185,15 +185,15 @@ information is located here:
     <LI> libtiff/tif_luv.c: validate that for COMPRESSION_SGILOG and
         PHOTOMETRIC_LOGL, there is only one sample per pixel. Avoid
         potential invalid memory write on corrupted/unexpected images
-        when using the TIFFRGBAImageBegin() interface (reported by
+        when using the NDPIRGBAImageBegin() interface (reported by
         Clay Wood)
 
     <LI> libtiff/tif_pixarlog.c: fix potential buffer write overrun in
         PixarLogDecode() on corrupted/unexpected images (reported by
         Mathias Svensson) (CVE-2016-5875)
 
-    <LI> libtiff/libtiff.def: Added _TIFFMultiply32 and
-        _TIFFMultiply64 to libtiff.def
+    <LI> libtiff/libtiff.def: Added _NDPIMultiply32 and
+        _NDPIMultiply64 to libtiff.def
 
      <LI> libtiff/tif_config.vc.h (HAVE_SNPRINTF): Add a '1' to the
         HAVE_SNPRINTF definition.
@@ -230,7 +230,7 @@ information is located here:
     <LI> libtiff/tif_getimage.c: fix out-of-bound reads in
         TIFFRGBAImage interface in case of unsupported values of
         SamplesPerPixel/ExtraSamples for LogLUV / CIELab. Add explicit
-        call to TIFFRGBAImageOK() in TIFFRGBAImageBegin(). Fix
+        call to NDPIRGBAImageOK() in NDPIRGBAImageBegin(). Fix
         CVE-2015-8665 reported by limingxing and CVE-2015-8683
         reported by zzf of Alibaba.
 
@@ -242,7 +242,7 @@ information is located here:
         Fax3PutEOLgdal(). Found by Clang Static Analyzer
 
     <LI> libtiff/tif_dirwrite.c: fix truncation to 32 bit of file
-        offsets in TIFFLinkDirectory() and TIFFWriteDirectorySec()
+        offsets in TIFFLinkDirectory() and NDPIWriteDirectorySec()
         when aligning directory offsets on a even offset (affects
         BigTIFF). This was a regression of the changeset of
         2015-10-19.
@@ -389,7 +389,7 @@ information is located here:
         -fsanitize
 
     <LI> tools/tiffdump.c (ReadDirectory): Remove uint32 cast to
-        _TIFFmalloc() argument which resulted in Coverity report.
+        _NDPImalloc() argument which resulted in Coverity report.
         Added more mutiplication overflow checks.
 
 </UL>

@@ -524,7 +524,7 @@ user-supplied scanline buffer is encoded into the raw data buffer (from
 where it is written).  Decoding routines should never have to explicitly
 read data -- a full strip/tile's worth of raw data is read and scanlines
 never cross strip boundaries.  Encoding routines must be cognizant of
-the raw data buffer size and call <TT>TIFFFlushData1()</TT> when necessary.
+the raw data buffer size and call <TT>NDPIFlushData1()</TT> when necessary.
 Note that any pending data is automatically flushed when a new strip/tile is
 started, so there's no need do that in the tif_postencode routine (if
 one exists).  Bit order is automatically handled by the library when

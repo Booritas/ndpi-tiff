@@ -34,42 +34,42 @@ indexfile = index.html
 docfiles = \
 	libtiff.3tiff.html \
 	TIFFbuffer.3tiff.html \
-	TIFFClose.3tiff.html \
+	NDPIClose.3tiff.html \
 	TIFFcodec.3tiff.html \
 	TIFFcolor.3tiff.html \
 	TIFFDataWidth.3tiff.html \
-	TIFFError.3tiff.html \
+	NDPIError.3tiff.html \
 	TIFFFieldDataType.3tiff.html \
 	TIFFFieldName.3tiff.html \
 	TIFFFieldPassCount.3tiff.html \
 	TIFFFieldReadCount.3tiff.html \
 	TIFFFieldTag.3tiff.html \
 	TIFFFieldWriteCount.3tiff.html \
-	TIFFFlush.3tiff.html \
-	TIFFGetField.3tiff.html \
+	NDPIFlush.3tiff.html \
+	NDPIGetField.3tiff.html \
 	TIFFmemory.3tiff.html \
-	TIFFOpen.3tiff.html \
-	TIFFPrintDirectory.3tiff.html \
+	NDPIOpen.3tiff.html \
+	NDPIPrintDirectory.3tiff.html \
 	TIFFquery.3tiff.html \
-	TIFFReadDirectory.3tiff.html \
-	TIFFReadEncodedStrip.3tiff.html \
-	TIFFReadEncodedTile.3tiff.html \
-	TIFFReadRawStrip.3tiff.html \
-	TIFFReadRawTile.3tiff.html \
-	TIFFReadRGBAImage.3tiff.html \
-	TIFFReadRGBAStrip.3tiff.html \
-	TIFFReadRGBATile.3tiff.html \
-	TIFFReadScanline.3tiff.html \
-	TIFFReadTile.3tiff.html \
+	NDPIReadDirectory.3tiff.html \
+	NDPIReadEncodedStrip.3tiff.html \
+	NDPIReadEncodedTile.3tiff.html \
+	NDPIReadRawStrip.3tiff.html \
+	NDPIReadRawTile.3tiff.html \
+	NDPIReadRGBAImage.3tiff.html \
+	NDPIReadRGBAStrip.3tiff.html \
+	NDPIReadRGBATile.3tiff.html \
+	NDPIReadScanline.3tiff.html \
+	NDPIReadTile.3tiff.html \
 	TIFFRGBAImage.3tiff.html \
-	TIFFSetDirectory.3tiff.html \
-	TIFFSetField.3tiff.html \
+	NDPISetDirectory.3tiff.html \
+	NDPISetField.3tiff.html \
 	TIFFsize.3tiff.html \
 	TIFFstrip.3tiff.html \
 	TIFFswab.3tiff.html \
 	TIFFtile.3tiff.html \
 	TIFFWarning.3tiff.html \
-	TIFFWriteDirectory.3tiff.html \
+	NDPIWriteDirectory.3tiff.html \
 	TIFFWriteEncodedStrip.3tiff.html \
 	TIFFWriteEncodedTile.3tiff.html \
 	TIFFWriteRawStrip.3tiff.html \

@@ -206,23 +206,23 @@ printTIF(TIFF* tif, uint16_t pageNumber)
     tstrip_t s, ns;
     time_t creation_time;
 
-    TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &h);
-    TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &w);
-    if (!TIFFGetField(tif, TIFFTAG_COMPRESSION, &compression)
+    NDPIGetField(tif, TIFFTAG_IMAGELENGTH, &h);
+    NDPIGetField(tif, TIFFTAG_IMAGEWIDTH, &w);
+    if (!NDPIGetField(tif, TIFFTAG_COMPRESSION, &compression)
 	|| compression < COMPRESSION_CCITTRLE
 	|| compression > COMPRESSION_CCITT_T6)
 	return;
-    if (!TIFFGetField(tif, TIFFTAG_XRESOLUTION, &xres) || !xres) {
-	TIFFWarning(TIFFFileName(tif),
+    if (!NDPIGetField(tif, TIFFTAG_XRESOLUTION, &xres) || !xres) {
+	TIFFWarning(NDPIFileName(tif),
 	    "No x-resolution, assuming %g dpi", defxres);
 	xres = defxres;
     }
-    if (!TIFFGetField(tif, TIFFTAG_YRESOLUTION, &yres) || !yres) {
-	TIFFWarning(TIFFFileName(tif),
+    if (!NDPIGetField(tif, TIFFTAG_YRESOLUTION, &yres) || !yres) {
+	TIFFWarning(NDPIFileName(tif),
 	    "No y-resolution, assuming %g lpi", defyres);
 	yres = defyres;					/* XXX */
     }
-    if (TIFFGetField(tif, TIFFTAG_RESOLUTIONUNIT, &unit) &&
+    if (NDPIGetField(tif, TIFFTAG_RESOLUTIONUNIT, &unit) &&
       unit == RESUNIT_CENTIMETER) {
 	xres *= 2.54F;
 	yres *= 2.54F;
@@ -261,18 +261,18 @@ printTIF(TIFF* tif, uint16_t pageNumber)
            points * (scale*h/yres + (pageHeight - scale*h/yres) * half));
     printf("%g %g scale\n", points/xres*scale, -points/yres*scale);
     printf("0 setgray\n");
-    TIFFSetField(tif, TIFFTAG_FAXFILLFUNC, printruns);
-    ns = TIFFNumberOfStrips(tif);
+    NDPISetField(tif, TIFFTAG_FAXFILLFUNC, printruns);
+    ns = NDPINumberOfStrips(tif);
     row = 0;
     for (s = 0; s < ns; s++)
-	(void) TIFFReadEncodedStrip(tif, s, (tdata_t) NULL, (tsize_t) -1);
+	(void) NDPIReadEncodedStrip(tif, s, (tdata_t) NULL, (tsize_t) -1);
     printf("p\n");
     printf("grestore $pageTop restore\n");
     totalPages++;
 }
 
 #define	GetPageNumber(tif) \
-TIFFGetField(tif, TIFFTAG_PAGENUMBER, &pn, &ptotal)
+NDPIGetField(tif, TIFFTAG_PAGENUMBER, &pn, &ptotal)
 
 int
 findPage(TIFF* tif, uint16_t pageNumber)
@@ -280,11 +280,11 @@ findPage(TIFF* tif, uint16_t pageNumber)
     uint16_t pn = (uint16_t) -1;
     uint16_t ptotal = (uint16_t) -1;
     if (GetPageNumber(tif)) {
-	while (pn != (pageNumber-1) && TIFFReadDirectory(tif) && GetPageNumber(tif))
+	while (pn != (pageNumber-1) && NDPIReadDirectory(tif) && GetPageNumber(tif))
 	    ;
 	return (pn == (pageNumber-1));
     } else
-	return (TIFFSetDirectory(tif, (tdir_t)(pageNumber-1)));
+	return (NDPISetDirectory(tif, (tdir_t)(pageNumber-1)));
 }
 
 void
@@ -307,7 +307,7 @@ fax2ps(TIFF* tif, uint16_t npages, uint16_t* pages, char* filename)
 	uint16_t pageNumber = 0;
 	do
 	    printTIF(tif, pageNumber++);
-	while (TIFFReadDirectory(tif));
+	while (NDPIReadDirectory(tif));
     }
 }
 
@@ -379,13 +379,13 @@ main(int argc, char** argv)
     if (npages > 0)
 	qsort(pages, npages, sizeof(uint16_t), pcompar);
     if (!dowarnings)
-	TIFFSetWarningHandler(0);
+	NDPISetWarningHandler(0);
     if (optind < argc) {
 	do {
-	    tif = TIFFOpen(argv[optind], "r");
+	    tif = NDPIOpen(argv[optind], "r");
 	    if (tif) {
 		fax2ps(tif, npages, pages, argv[optind]);
-		TIFFClose(tif);
+		NDPIClose(tif);
 	    } else
 		fprintf(stderr, "%s: Can not open, or not a TIFF file.\n",
 		    argv[optind]);
@@ -419,7 +419,7 @@ main(int argc, char** argv)
 #endif
 	if (tif) {
 	    fax2ps(tif, npages, pages, "<stdin>");
-	    TIFFClose(tif);
+	    NDPIClose(tif);
 	} else
 	    fprintf(stderr, "Can not open, or not a TIFF file.\n");
 	fclose(fd);
