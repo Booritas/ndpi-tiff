@@ -385,53 +385,53 @@ extern int _NDPISeekOK(TIFF* tif, toff_t off);
 
 extern int NDPIInitDumpMode(TIFF*, int);
 #ifdef PACKBITS_SUPPORT
-extern int TIFFInitPackBits(TIFF*, int);
+extern int NDPIInitPackBits(TIFF*, int);
 #endif
 #ifdef CCITT_SUPPORT
-extern int TIFFInitCCITTRLE(TIFF*, int), TIFFInitCCITTRLEW(TIFF*, int);
-extern int TIFFInitCCITTFax3(TIFF*, int), TIFFInitCCITTFax4(TIFF*, int);
+extern int NDPIInitCCITTRLE(TIFF*, int), NDPIInitCCITTRLEW(TIFF*, int);
+extern int NDPIInitCCITTFax3(TIFF*, int), NDPIInitCCITTFax4(TIFF*, int);
 #endif
 #ifdef THUNDER_SUPPORT
-extern int TIFFInitThunderScan(TIFF*, int);
+extern int NDPIInitThunderScan(TIFF*, int);
 #endif
 #ifdef NEXT_SUPPORT
 extern int NDPIInitNeXT(TIFF*, int);
 #endif
 #ifdef LZW_SUPPORT
-extern int TIFFInitLZW(TIFF*, int);
+extern int NDPIInitLZW(TIFF*, int);
 #endif
 #ifdef OJPEG_SUPPORT
-extern int TIFFInitOJPEG(TIFF*, int);
+extern int NDPIInitOJPEG(TIFF*, int);
 #endif
 #ifdef JPEG_SUPPORT
 extern int NDPIInitJPEG(TIFF*, int);
 extern int NDPIJPEGIsFullStripRequired(TIFF*);
 #endif
 #ifdef JBIG_SUPPORT
-extern int TIFFInitJBIG(TIFF*, int);
+extern int NDPIInitJBIG(TIFF*, int);
 #endif
 #ifdef ZIP_SUPPORT
-extern int TIFFInitZIP(TIFF*, int);
+extern int NDPIInitZIP(TIFF*, int);
 #endif
 #ifdef PIXARLOG_SUPPORT
-extern int TIFFInitPixarLog(TIFF*, int);
+extern int NDPIInitPixarLog(TIFF*, int);
 #endif
 #ifdef LOGLUV_SUPPORT
-extern int TIFFInitSGILog(TIFF*, int);
+extern int NDPIInitSGILog(TIFF*, int);
 #endif
 #ifdef LERC_SUPPORT
-extern int TIFFInitLERC(TIFF* tif, int);
+extern int NDPIInitLERC(TIFF* tif, int);
 #endif
 #ifdef LZMA_SUPPORT
-extern int TIFFInitLZMA(TIFF*, int);
+extern int NDPIInitLZMA(TIFF*, int);
 #endif
 #ifdef ZSTD_SUPPORT
-extern int TIFFInitZSTD(TIFF*, int);
+extern int NDPIInitZSTD(TIFF*, int);
 #endif
 #ifdef WEBP_SUPPORT
-extern int TIFFInitWebP(TIFF*, int);
+extern int NDPIInitWebP(TIFF*, int);
 #endif
-extern const TIFFCodec _TIFFBuiltinCODECS[];
+extern const TIFFCodec _NDPIBuiltinCODECS[];
 
 #if defined(__cplusplus)
 }

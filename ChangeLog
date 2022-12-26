@@ -825,7 +825,7 @@
 
 2020-12-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
-	_TIFFBuiltinCODECS should be const.
+	_NDPIBuiltinCODECS should be const.
 
 2020-12-28  Even Rouault  <even.rouault@spatialys.com>
 
@@ -10001,7 +10001,7 @@ btiff/tif_win32.c: Replace custom Win32 memory api with generic
 
 2004-02-17  Frank Warmerdam  <warmerdam@pobox.com>
 
-	* libtiff/tif_codec.c: Fixed typo in TIFFInitPackBits name as per:
+	* libtiff/tif_codec.c: Fixed typo in NDPIInitPackBits name as per:
 	http://bugzilla.remotesensing.org/show_bug.cgi?id=494
 
 2004-02-05  Andrey Kiselev  <dron@ak4719.spb.edu>
@@ -10409,7 +10409,7 @@ btiff/tif_win32.c: Replace custom Win32 memory api with generic
 2003-08-05  Andrey Kiselev  <dron@ak4719.spb.edu>
 
 	* libtiff/tif_lzw.c: Move LZW codec state block allocation back to
-	TIFFInitLZW(), because its initialization in LZWSetupDecode() cause
+	NDPIInitLZW(), because its initialization in LZWSetupDecode() cause
 	problems with predictor initialization. Remove O_RDONLY check during
 	state block allocation to be able open LZW compressed files in update
 	mode.

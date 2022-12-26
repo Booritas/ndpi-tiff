@@ -370,9 +370,9 @@ static const TIFFField ZSTDFields[] = {
 };
 
 int
-TIFFInitZSTD(TIFF* tif, int scheme)
+NDPIInitZSTD(TIFF* tif, int scheme)
 {
-        static const char module[] = "TIFFInitZSTD";
+        static const char module[] = "NDPIInitZSTD";
         ZSTDState* sp;
 
         (void) scheme;

@@ -132,7 +132,7 @@ _XTIFFVSetField(TIFF* tif, ttag_t tag, va_list ap)
       		  	TIFFMEMBER(tif,printdir) = _XTIFFPrintDirectory;
 			xt->xtif_flags |= XTIFFP_PRINT;
 		}
-		TIFFSetFieldBit(tif, _NDPIFieldWithTag(tif, tag)->field_bit);
+		NDPISetFieldBit(tif, _NDPIFieldWithTag(tif, tag)->field_bit);
 		tif->tif_flags |= TIFF_DIRTYDIRECT;
 	}
 	va_end(ap);

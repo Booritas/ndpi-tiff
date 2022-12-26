@@ -613,9 +613,9 @@ static const TIFFField zipFields[] = {
 };
 
 int
-TIFFInitZIP(TIFF* tif, int scheme)
+NDPIInitZIP(TIFF* tif, int scheme)
 {
-	static const char module[] = "TIFFInitZIP";
+	static const char module[] = "NDPIInitZIP";
 	ZIPState* sp;
 
 	assert( (scheme == COMPRESSION_DEFLATE)

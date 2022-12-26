@@ -685,7 +685,7 @@ PixarLogSetupDecode(TIFF* tif)
 	 * after decompression. */
 	tif->tif_postdecode = _NDPINoPostDecode;  
 
-	/* for some reason, we can't do this in TIFFInitPixarLog */
+	/* for some reason, we can't do this in NDPIInitPixarLog */
 
 	sp->stride = (td->td_planarconfig == PLANARCONFIG_CONTIG ?
 	    td->td_samplesperpixel : 1);
@@ -903,7 +903,7 @@ PixarLogSetupEncode(TIFF* tif)
 
 	assert(sp != NULL);
 
-	/* for some reason, we can't do this in TIFFInitPixarLog */
+	/* for some reason, we can't do this in NDPIInitPixarLog */
 
 	sp->stride = (td->td_planarconfig == PLANARCONFIG_CONTIG ?
 	    td->td_samplesperpixel : 1);
@@ -1394,9 +1394,9 @@ static const TIFFField pixarlogFields[] = {
 };
 
 int
-TIFFInitPixarLog(TIFF* tif, int scheme)
+NDPIInitPixarLog(TIFF* tif, int scheme)
 {
-	static const char module[] = "TIFFInitPixarLog";
+	static const char module[] = "NDPIInitPixarLog";
 
 	PixarLogState* sp;
 

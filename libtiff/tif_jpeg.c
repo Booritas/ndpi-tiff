@@ -1898,7 +1898,7 @@ JPEGSetupEncode(TIFF* tif)
                         /* Mark the field present */
                         /* Can't use NDPISetField since BEENWRITING is already set! */
                         tif->tif_flags |= TIFF_DIRTYDIRECT;
-                        TIFFSetFieldBit(tif, FIELD_JPEGTABLES);
+                        NDPISetFieldBit(tif, FIELD_JPEGTABLES);
                 }
 	} else {
 		/* We do not support application-supplied JPEGTables, */
@@ -2322,7 +2322,7 @@ JPEGVSetField(TIFF* tif, uint32_t tag, va_list ap)
 		}
 		_NDPIsetByteArray(&sp->jpegtables, va_arg(ap, void*), v32);
 		sp->jpegtables_length = v32;
-		TIFFSetFieldBit(tif, FIELD_JPEGTABLES);
+		NDPISetFieldBit(tif, FIELD_JPEGTABLES);
 		break;
 	case TIFFTAG_JPEGQUALITY:
 		sp->jpegquality = (int) va_arg(ap, int);
@@ -2350,7 +2350,7 @@ JPEGVSetField(TIFF* tif, uint32_t tag, va_list ap)
 	}
 
 	if ((fip = NDPIFieldWithTag(tif, tag)) != NULL) {
-		TIFFSetFieldBit(tif, fip->field_bit);
+		NDPISetFieldBit(tif, fip->field_bit);
 	} else {
 		return (0);
 	}
@@ -2589,7 +2589,7 @@ a JPEGTABLES tag generated and causes null-filled JPEGTABLES tags to be written
 when the JPEG data is placed with NDPIWriteRawStrip.  The field bit should be 
 set, anyway, later when actual JPEGTABLES header is generated, so removing it 
 here hopefully is harmless.
-            TIFFSetFieldBit(tif, FIELD_JPEGTABLES);
+            NDPISetFieldBit(tif, FIELD_JPEGTABLES);
 */
             sp->jpegtables_length = SIZE_OF_JPEGTABLES;
             sp->jpegtables = (void *) _NDPImalloc(sp->jpegtables_length);

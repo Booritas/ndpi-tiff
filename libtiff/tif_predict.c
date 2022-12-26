@@ -766,7 +766,7 @@ PredictorVSetField(TIFF* tif, uint32_t tag, va_list ap)
 	switch (tag) {
 	case TIFFTAG_PREDICTOR:
 		sp->predictor = (uint16_t) va_arg(ap, uint16_vap);
-		TIFFSetFieldBit(tif, FIELD_PREDICTOR);
+		NDPISetFieldBit(tif, FIELD_PREDICTOR);
 		break;
 	default:
 		return (*sp->vsetparent)(tif, tag, ap);

@@ -176,7 +176,7 @@ ThunderDecodeRow(TIFF* tif, uint8_t* buf, tmsize_t occ, uint16_t s)
 }
 
 int
-TIFFInitThunderScan(TIFF* tif, int scheme)
+NDPIInitThunderScan(TIFF* tif, int scheme)
 {
 	(void) scheme;
 

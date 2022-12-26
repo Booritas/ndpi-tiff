@@ -190,7 +190,7 @@ NDPIFindCODEC(uint16_t scheme)
 	for (cd = registeredCODECS; cd; cd = cd->next)
 		if (cd->info->scheme == scheme)
 			return ((const TIFFCodec*) cd->info);
-	for (c = _TIFFBuiltinCODECS; c->name; c++)
+	for (c = _NDPIBuiltinCODECS; c->name; c++)
 		if (c->scheme == scheme)
 			return (c);
 	return ((const TIFFCodec*) 0);
@@ -267,7 +267,7 @@ NDPIGetConfiguredCODECs()
 		_NDPImemcpy(codecs + i - 1, cd->info, sizeof(TIFFCodec));
 		i++;
 	}
-	for (c = _TIFFBuiltinCODECS; c->name; c++) {
+	for (c = _NDPIBuiltinCODECS; c->name; c++) {
 		if (NDPIIsCODECConfigured(c->scheme)) {
 			new_codecs = (TIFFCodec *)
 				_NDPIrealloc(codecs, i * sizeof(TIFFCodec));

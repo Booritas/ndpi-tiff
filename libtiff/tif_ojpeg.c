@@ -416,9 +416,9 @@ static boolean OJPEGLibjpegJpegSourceMgrResyncToRestart(jpeg_decompress_struct* 
 static void OJPEGLibjpegJpegSourceMgrTermSource(jpeg_decompress_struct* cinfo);
 
 int
-TIFFInitOJPEG(TIFF* tif, int scheme)
+NDPIInitOJPEG(TIFF* tif, int scheme)
 {
-	static const char module[]="TIFFInitOJPEG";
+	static const char module[]="NDPIInitOJPEG";
 	OJPEGState* sp;
 
         (void)scheme;
@@ -603,7 +603,7 @@ OJPEGVSetField(TIFF* tif, uint32_t tag, va_list ap)
 	fip = NDPIFieldWithTag(tif,tag);
 	if( fip == NULL ) /* shouldn't happen */
 	    return(0);
-	TIFFSetFieldBit(tif,fip->field_bit);
+	NDPISetFieldBit(tif,fip->field_bit);
 	tif->tif_flags|=TIFF_DIRTYDIRECT;
 	return(1);
 }

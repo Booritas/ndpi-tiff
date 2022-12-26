@@ -284,7 +284,7 @@ PackBitsDecode(TIFF* tif, uint8_t* op, tmsize_t occ, uint16_t s)
 }
 
 int
-TIFFInitPackBits(TIFF* tif, int scheme)
+NDPIInitPackBits(TIFF* tif, int scheme)
 {
 	(void) scheme;
 	tif->tif_decoderow = PackBitsDecode;

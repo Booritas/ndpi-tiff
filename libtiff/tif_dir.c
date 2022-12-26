@@ -766,7 +766,7 @@ _NDPIVSetField(TIFF* tif, uint32_t tag, va_list ap)
 	if (status) {
 		const TIFFField* fip2=NDPIFieldWithTag(tif,tag);
 		if (fip2)                
-			TIFFSetFieldBit(tif, fip2->field_bit);
+			NDPISetFieldBit(tif, fip2->field_bit);
 		tif->tif_flags |= TIFF_DIRTYDIRECT;
 	}
 

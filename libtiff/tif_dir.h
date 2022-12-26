@@ -208,7 +208,7 @@ typedef struct {
 #define BITn(n)				(((unsigned long)1L)<<((n)&0x1f))
 #define BITFIELDn(tif, n)		((tif)->tif_dir.td_fieldsset[(n)/32])
 #define NDPIFieldSet(tif, field)	(BITFIELDn(tif, field) & BITn(field))
-#define TIFFSetFieldBit(tif, field)	(BITFIELDn(tif, field) |= BITn(field))
+#define NDPISetFieldBit(tif, field)	(BITFIELDn(tif, field) |= BITn(field))
 #define NDPIClrFieldBit(tif, field)	(BITFIELDn(tif, field) &= ~BITn(field))
 
 #define FieldSet(fields, f)		(fields[(f)/32] & BITn(f))

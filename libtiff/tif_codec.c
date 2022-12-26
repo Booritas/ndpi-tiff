@@ -32,13 +32,13 @@
 static int NotConfigured(TIFF*, int);
 
 #ifndef LZW_SUPPORT
-#define TIFFInitLZW NotConfigured
+#define NDPIInitLZW NotConfigured
 #endif
 #ifndef PACKBITS_SUPPORT
-#define TIFFInitPackBits NotConfigured
+#define NDPIInitPackBits NotConfigured
 #endif
 #ifndef THUNDER_SUPPORT
-#define TIFFInitThunderScan NotConfigured
+#define NDPIInitThunderScan NotConfigured
 #endif
 #ifndef NEXT_SUPPORT
 #define NDPIInitNeXT NotConfigured
@@ -47,64 +47,64 @@ static int NotConfigured(TIFF*, int);
 #define NDPIInitJPEG NotConfigured
 #endif
 #ifndef OJPEG_SUPPORT
-#define TIFFInitOJPEG NotConfigured
+#define NDPIInitOJPEG NotConfigured
 #endif
 #ifndef CCITT_SUPPORT
-#define TIFFInitCCITTRLE NotConfigured
-#define TIFFInitCCITTRLEW NotConfigured
-#define TIFFInitCCITTFax3 NotConfigured
-#define TIFFInitCCITTFax4 NotConfigured
+#define NDPIInitCCITTRLE NotConfigured
+#define NDPIInitCCITTRLEW NotConfigured
+#define NDPIInitCCITTFax3 NotConfigured
+#define NDPIInitCCITTFax4 NotConfigured
 #endif
 #ifndef JBIG_SUPPORT
-#define TIFFInitJBIG NotConfigured
+#define NDPIInitJBIG NotConfigured
 #endif
 #ifndef ZIP_SUPPORT
-#define TIFFInitZIP NotConfigured
+#define NDPIInitZIP NotConfigured
 #endif
 #ifndef PIXARLOG_SUPPORT
-#define TIFFInitPixarLog NotConfigured
+#define NDPIInitPixarLog NotConfigured
 #endif
 #ifndef LOGLUV_SUPPORT
-#define TIFFInitSGILog NotConfigured
+#define NDPIInitSGILog NotConfigured
 #endif
 #ifndef LERC_SUPPORT
-#define TIFFInitLERC NotConfigured
+#define NDPIInitLERC NotConfigured
 #endif
 #ifndef LZMA_SUPPORT
-#define TIFFInitLZMA NotConfigured
+#define NDPIInitLZMA NotConfigured
 #endif
 #ifndef ZSTD_SUPPORT
-#define TIFFInitZSTD NotConfigured
+#define NDPIInitZSTD NotConfigured
 #endif
 #ifndef WEBP_SUPPORT
-#define TIFFInitWebP NotConfigured
+#define NDPIInitWebP NotConfigured
 #endif
 
 /*
  * Compression schemes statically built into the library.
  */
-const TIFFCodec _TIFFBuiltinCODECS[] = {
+const TIFFCodec _NDPIBuiltinCODECS[] = {
     { "None",		COMPRESSION_NONE,	NDPIInitDumpMode },
-    { "LZW",		COMPRESSION_LZW,	TIFFInitLZW },
-    { "PackBits",	COMPRESSION_PACKBITS,	TIFFInitPackBits },
-    { "ThunderScan",	COMPRESSION_THUNDERSCAN,TIFFInitThunderScan },
+    { "LZW",		COMPRESSION_LZW,	NDPIInitLZW },
+    { "PackBits",	COMPRESSION_PACKBITS,	NDPIInitPackBits },
+    { "ThunderScan",	COMPRESSION_THUNDERSCAN,NDPIInitThunderScan },
     { "NeXT",		COMPRESSION_NEXT,	NDPIInitNeXT },
     { "JPEG",		COMPRESSION_JPEG,	NDPIInitJPEG },
-    { "Old-style JPEG",	COMPRESSION_OJPEG,	TIFFInitOJPEG },
-    { "CCITT RLE",	COMPRESSION_CCITTRLE,	TIFFInitCCITTRLE },
-    { "CCITT RLE/W",	COMPRESSION_CCITTRLEW,	TIFFInitCCITTRLEW },
-    { "CCITT Group 3",	COMPRESSION_CCITTFAX3,	TIFFInitCCITTFax3 },
-    { "CCITT Group 4",	COMPRESSION_CCITTFAX4,	TIFFInitCCITTFax4 },
-    { "ISO JBIG",	COMPRESSION_JBIG,	TIFFInitJBIG },
-    { "Deflate",	COMPRESSION_DEFLATE,	TIFFInitZIP },
-    { "AdobeDeflate",   COMPRESSION_ADOBE_DEFLATE , TIFFInitZIP }, 
-    { "PixarLog",	COMPRESSION_PIXARLOG,	TIFFInitPixarLog },
-    { "SGILog",		COMPRESSION_SGILOG,	TIFFInitSGILog },
-    { "SGILog24",	COMPRESSION_SGILOG24,	TIFFInitSGILog },
-    { "LZMA",		COMPRESSION_LZMA,	TIFFInitLZMA },
-    { "ZSTD",		COMPRESSION_ZSTD,	TIFFInitZSTD },
-    { "WEBP",		COMPRESSION_WEBP,	TIFFInitWebP },
-    { "LERC",		COMPRESSION_LERC,	TIFFInitLERC },
+    { "Old-style JPEG",	COMPRESSION_OJPEG,	NDPIInitOJPEG },
+    { "CCITT RLE",	COMPRESSION_CCITTRLE,	NDPIInitCCITTRLE },
+    { "CCITT RLE/W",	COMPRESSION_CCITTRLEW,	NDPIInitCCITTRLEW },
+    { "CCITT Group 3",	COMPRESSION_CCITTFAX3,	NDPIInitCCITTFax3 },
+    { "CCITT Group 4",	COMPRESSION_CCITTFAX4,	NDPIInitCCITTFax4 },
+    { "ISO JBIG",	COMPRESSION_JBIG,	NDPIInitJBIG },
+    { "Deflate",	COMPRESSION_DEFLATE,	NDPIInitZIP },
+    { "AdobeDeflate",   COMPRESSION_ADOBE_DEFLATE , NDPIInitZIP }, 
+    { "PixarLog",	COMPRESSION_PIXARLOG,	NDPIInitPixarLog },
+    { "SGILog",		COMPRESSION_SGILOG,	NDPIInitSGILog },
+    { "SGILog24",	COMPRESSION_SGILOG24,	NDPIInitSGILog },
+    { "LZMA",		COMPRESSION_LZMA,	NDPIInitLZMA },
+    { "ZSTD",		COMPRESSION_ZSTD,	NDPIInitZSTD },
+    { "WEBP",		COMPRESSION_WEBP,	NDPIInitWebP },
+    { "LERC",		COMPRESSION_LERC,	NDPIInitLERC },
     { NULL,             0,                      NULL }
 };
 

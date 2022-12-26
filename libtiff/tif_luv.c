@@ -1678,9 +1678,9 @@ static const TIFFField LogLuvFields[] = {
 };
 
 int
-TIFFInitSGILog(TIFF* tif, int scheme)
+NDPIInitSGILog(TIFF* tif, int scheme)
 {
-	static const char module[] = "TIFFInitSGILog";
+	static const char module[] = "NDPIInitSGILog";
 	LogLuvState* sp;
 
 	assert(scheme == COMPRESSION_SGILOG24 || scheme == COMPRESSION_SGILOG);

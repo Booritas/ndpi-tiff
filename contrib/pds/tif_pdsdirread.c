@@ -328,7 +328,7 @@ EstimateStripByteCounts(TIFF* tif, TIFFDirEntry* dir, uint16_t dircount)
 		for (i = 0; i < td->td_nstrips; i++)
 			td->td_stripbytecount[i] = rowbytes*rowsperstrip;
 	}
-	TIFFSetFieldBit(tif, FIELD_STRIPBYTECOUNTS);
+	NDPISetFieldBit(tif, FIELD_STRIPBYTECOUNTS);
 	if (!NDPIFieldSet(tif, FIELD_ROWSPERSTRIP))
 		td->td_rowsperstrip = td->td_imagelength;
 }

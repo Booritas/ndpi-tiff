@@ -629,9 +629,9 @@ static const TIFFField TWebPFields[] = {
 };
 
 int
-TIFFInitWebP(TIFF* tif, int scheme)
+NDPIInitWebP(TIFF* tif, int scheme)
 {
-  static const char module[] = "TIFFInitWebP";
+  static const char module[] = "NDPIInitWebP";
   WebPState* sp;
 
   (void)scheme;

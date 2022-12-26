@@ -556,8 +556,8 @@ NDPISetupStrips(TIFF* tif)
 	 */
 	_NDPImemset(td->td_stripoffset_p, 0, td->td_nstrips*sizeof (uint64_t));
 	_NDPImemset(td->td_stripbytecount_p, 0, td->td_nstrips*sizeof (uint64_t));
-	TIFFSetFieldBit(tif, FIELD_STRIPOFFSETS);
-	TIFFSetFieldBit(tif, FIELD_STRIPBYTECOUNTS);
+	NDPISetFieldBit(tif, FIELD_STRIPOFFSETS);
+	NDPISetFieldBit(tif, FIELD_STRIPBYTECOUNTS);
 	return (1);
 }
 #undef isUnspecified

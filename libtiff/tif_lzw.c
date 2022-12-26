@@ -1143,9 +1143,9 @@ LZWCleanup(TIFF* tif)
 }
 
 int
-TIFFInitLZW(TIFF* tif, int scheme)
+NDPIInitLZW(TIFF* tif, int scheme)
 {
-	static const char module[] = "TIFFInitLZW";
+	static const char module[] = "NDPIInitLZW";
         (void)scheme;
 	assert(scheme == COMPRESSION_LZW);
 	/*

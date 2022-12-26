@@ -1210,9 +1210,9 @@ LERCVGetField(TIFF* tif, uint32_t tag, va_list ap)
         return 1;
 }
 
-int TIFFInitLERC(TIFF* tif, int scheme)
+int NDPIInitLERC(TIFF* tif, int scheme)
 {
-        static const char module[] = "TIFFInitLERC";
+        static const char module[] = "NDPIInitLERC";
         LERCState* sp;
 
         (void) scheme;

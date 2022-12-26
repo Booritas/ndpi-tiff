@@ -1206,7 +1206,7 @@ Fax3VSetField(TIFF* tif, uint32_t tag, va_list ap)
 	}
 	
 	if ((fip = NDPIFieldWithTag(tif, tag)) != NULL)
-		TIFFSetFieldBit(tif, fip->field_bit);
+		NDPISetFieldBit(tif, fip->field_bit);
 	else
 		return 0;
 
@@ -1375,7 +1375,7 @@ InitCCITTFax3(TIFF* tif)
 }
 
 int
-TIFFInitCCITTFax3(TIFF* tif, int scheme)
+NDPIInitCCITTFax3(TIFF* tif, int scheme)
 {
 	(void) scheme;
 	if (InitCCITTFax3(tif)) {
@@ -1384,7 +1384,7 @@ TIFFInitCCITTFax3(TIFF* tif, int scheme)
 		 */
 		if (!_NDPIMergeFields(tif, fax3Fields,
 				      TIFFArrayCount(fax3Fields))) {
-			NDPIErrorExt(tif->tif_clientdata, "TIFFInitCCITTFax3",
+			NDPIErrorExt(tif->tif_clientdata, "NDPIInitCCITTFax3",
 			"Merging CCITT Fax 3 codec-specific tags failed");
 			return 0;
 		}
@@ -1507,7 +1507,7 @@ Fax4PostEncode(TIFF* tif)
 }
 
 int
-TIFFInitCCITTFax4(TIFF* tif, int scheme)
+NDPIInitCCITTFax4(TIFF* tif, int scheme)
 {
 	(void) scheme;
 	if (InitCCITTFax3(tif)) {		/* reuse G3 support */
@@ -1516,7 +1516,7 @@ TIFFInitCCITTFax4(TIFF* tif, int scheme)
 		 */
 		if (!_NDPIMergeFields(tif, fax4Fields,
 				      TIFFArrayCount(fax4Fields))) {
-			NDPIErrorExt(tif->tif_clientdata, "TIFFInitCCITTFax4",
+			NDPIErrorExt(tif->tif_clientdata, "NDPIInitCCITTFax4",
 			"Merging CCITT Fax 4 codec-specific tags failed");
 			return 0;
 		}
@@ -1594,7 +1594,7 @@ Fax3DecodeRLE(TIFF* tif, uint8_t* buf, tmsize_t occ, uint16_t s)
 }
 
 int
-TIFFInitCCITTRLE(TIFF* tif, int scheme)
+NDPIInitCCITTRLE(TIFF* tif, int scheme)
 {
 	(void) scheme;
 	if (InitCCITTFax3(tif)) {		/* reuse G3 support */
@@ -1611,7 +1611,7 @@ TIFFInitCCITTRLE(TIFF* tif, int scheme)
 }
 
 int
-TIFFInitCCITTRLEW(TIFF* tif, int scheme)
+NDPIInitCCITTRLEW(TIFF* tif, int scheme)
 {
 	(void) scheme;
 	if (InitCCITTFax3(tif)) {		/* reuse G3 support */

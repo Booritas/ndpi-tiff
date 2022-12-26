@@ -414,9 +414,9 @@ static const TIFFField lzmaFields[] = {
 };
 
 int
-TIFFInitLZMA(TIFF* tif, int scheme)
+NDPIInitLZMA(TIFF* tif, int scheme)
 {
-	static const char module[] = "TIFFInitLZMA";
+	static const char module[] = "NDPIInitLZMA";
 	LZMAState* sp;
 	lzma_stream tmp_stream = LZMA_STREAM_INIT;
 

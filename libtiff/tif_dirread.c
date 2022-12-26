@@ -149,7 +149,7 @@ static enum NDPIReadDirEntryErr NDPIReadDirEntryData(TIFF* tif, uint64_t offset,
 static void NDPIReadDirEntryOutputErr(TIFF* tif, enum NDPIReadDirEntryErr err, const char* module, const char* tagname, int recover);
 
 static void TIFFReadDirectoryCheckOrder(TIFF* tif, TIFFDirEntry* dir, uint16_t dircount);
-static TIFFDirEntry* TIFFReadDirectoryFindEntry(TIFF* tif, TIFFDirEntry* dir, uint16_t dircount, uint16_t tagid);
+static TIFFDirEntry* NDPIReadDirectoryFindEntry(TIFF* tif, TIFFDirEntry* dir, uint16_t dircount, uint16_t tagid);
 static void TIFFReadDirectoryFindFieldInfo(TIFF* tif, uint16_t tagid, uint32_t* fii);
 
 static int EstimateStripByteCounts(TIFF* tif, TIFFDirEntry* dir, uint16_t dircount);
@@ -3664,14 +3664,14 @@ NDPIReadDirectory(TIFF* tif)
 	 * value because it has an incorrect count value (if the
 	 * true value of SamplesPerPixel is not 1).
 	 */
-	dp=TIFFReadDirectoryFindEntry(tif,dir,dircount,TIFFTAG_SAMPLESPERPIXEL);
+	dp=NDPIReadDirectoryFindEntry(tif,dir,dircount,TIFFTAG_SAMPLESPERPIXEL);
 	if (dp)
 	{
 		if (!TIFFFetchNormalTag(tif,dp,0))
 			goto bad;
 		dp->tdir_ignore = TRUE;
 	}
-	dp=TIFFReadDirectoryFindEntry(tif,dir,dircount,TIFFTAG_COMPRESSION);
+	dp=NDPIReadDirectoryFindEntry(tif,dir,dircount,TIFFTAG_COMPRESSION);
 	if (dp)
 	{
 		/*
@@ -3744,7 +3744,7 @@ NDPIReadDirectory(TIFF* tif)
 					case TIFFTAG_STRIPBYTECOUNTS:
 					case TIFFTAG_TILEOFFSETS:
 					case TIFFTAG_TILEBYTECOUNTS:
-						TIFFSetFieldBit(tif,fip->field_bit);
+						NDPISetFieldBit(tif,fip->field_bit);
 						break;
 					case TIFFTAG_IMAGEWIDTH:
 					case TIFFTAG_IMAGELENGTH:
@@ -3780,10 +3780,10 @@ NDPIReadDirectory(TIFF* tif)
 	{
 		if (!_NDPIFillStriles(tif))
 		    goto bad;
-		dp=TIFFReadDirectoryFindEntry(tif,dir,dircount,TIFFTAG_STRIPOFFSETS);
+		dp=NDPIReadDirectoryFindEntry(tif,dir,dircount,TIFFTAG_STRIPOFFSETS);
 		if ((dp!=0)&&(dp->tdir_count==1))
 		{
-			dp=TIFFReadDirectoryFindEntry(tif,dir,dircount,
+			dp=NDPIReadDirectoryFindEntry(tif,dir,dircount,
 			    TIFFTAG_STRIPBYTECOUNTS);
 			if ((dp!=0)&&(dp->tdir_count==1))
 			{
@@ -3837,7 +3837,7 @@ NDPIReadDirectory(TIFF* tif)
 			 * because, presumably, all required data is in the
 			 * JpegInterchangeFormat stream.
 			 */
-			TIFFSetFieldBit(tif, FIELD_STRIPOFFSETS);
+			NDPISetFieldBit(tif, FIELD_STRIPOFFSETS);
 		} else
 #endif
         {
@@ -4398,7 +4398,7 @@ TIFFReadDirectoryCheckOrder(TIFF* tif, TIFFDirEntry* dir, uint16_t dircount)
 }
 
 static TIFFDirEntry*
-TIFFReadDirectoryFindEntry(TIFF* tif, TIFFDirEntry* dir, uint16_t dircount, uint16_t tagid)
+NDPIReadDirectoryFindEntry(TIFF* tif, TIFFDirEntry* dir, uint16_t dircount, uint16_t tagid)
 {
 	TIFFDirEntry* m;
 	uint16_t n;
@@ -4675,7 +4675,7 @@ EstimateStripByteCounts(TIFF* tif, TIFFDirEntry* dir, uint16_t dircount)
                     td->td_stripbytecount_p[strip] = rowbytes * rowsperstrip;
                 }
 	}
-	TIFFSetFieldBit(tif, FIELD_STRIPBYTECOUNTS);
+	NDPISetFieldBit(tif, FIELD_STRIPBYTECOUNTS);
 	if (!NDPIFieldSet(tif, FIELD_ROWSPERSTRIP))
 		td->td_rowsperstrip = td->td_imagelength;
 	return 1;
