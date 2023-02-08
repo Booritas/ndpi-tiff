@@ -32,6 +32,9 @@
 #include <math.h>
 #include <float.h>
 
+int TIFFNDPIDummy(void) {
+	return 1;
+}
 uint32_t
 _TIFFMultiply32(TIFF* tif, uint32_t first, uint32_t second, const char* where)
 {

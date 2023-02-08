@@ -282,6 +282,8 @@ typedef int (*TIFFMapFileProc)(thandle_t, void** base, toff_t* size);
 typedef void (*TIFFUnmapFileProc)(thandle_t, void* base, toff_t size);
 typedef void (*TIFFExtendProc)(TIFF*);
 
+extern int TIFFNDPIDummy(void);
+
 extern const char* TIFFGetVersion(void);
 
 extern const TIFFCodec* TIFFFindCODEC(uint16_t);
